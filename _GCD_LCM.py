@@ -1,4 +1,6 @@
 def gcd(x, y):
+    if not y:
+        return x
     if not x % y:
         return y
     z = x % y
