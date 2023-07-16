@@ -14,8 +14,8 @@ for i in range(1, t + 1):
 
     for j in range(n):
         for k in range(n):
-            cnt_t = fly[j][k]
-            cnt_x = fly[j][k]
+            cnt_t = fly[j][k]  # 첫 칸 값 할당
+            cnt_x = fly[j][k]  # 첫 칸 값 할당
             for p in range(4):
                 for q in range(1, m):
                     a = q * ti[p] + j

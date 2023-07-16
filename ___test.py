@@ -1,1 +1,3 @@
-print(21 ** 2 * 2)
+from math import gcd
+
+print(gcd(0, 5))
