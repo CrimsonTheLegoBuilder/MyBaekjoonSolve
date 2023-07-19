@@ -1,5 +1,3 @@
-import sys
-from math import inf
 
 
 def meet(y, slp, dot):
@@ -9,5 +7,10 @@ def meet(y, slp, dot):
     return x
 
 
-a = '......as...'
-print(a[:-2])
+s = []
+for i in range(10):
+    n = int(input())
+    s.append(n % 42)
+
+s = set(s)
+print(len(s))
