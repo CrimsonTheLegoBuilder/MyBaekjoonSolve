@@ -15,10 +15,10 @@ def cal_projection(a, b, c):  # calculate length of projection
 
 
 def cal_height(a, x):  # calculate height
-    return (a**2 - abs(x)**2)**0.5
+    return (a**2 - x**2)**0.5
 
 
-def judge_tetrahedron(ha1, ha2, xa1, xa2, d):  # tetrahedral condition for th last side d
+def judge_tetrahedron(ha1, ha2, xa1, xa2, d):  # tetrahedral condition for the last side d
     if ((ha1 - ha2)**2 + (xa1 - xa2)**2 > d**2) | ((ha1 + ha2)**2 + (xa1 - xa2)**2 < d**2):
         print('NO')
     else:
