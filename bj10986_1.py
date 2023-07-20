@@ -8,7 +8,7 @@ def combi_2(x):
 n, m = map(int, sys.stdin.readline().strip().split())
 arr = list(map(int, sys.stdin.readline().strip().split()))
 dp = [0] * (n + 1)
-cs_mod = [0] * (n + 1)
+cs_mod = [0] * 1001
 ans = 0
 
 for i in range(1, n + 1):
