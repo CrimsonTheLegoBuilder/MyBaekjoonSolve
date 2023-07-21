@@ -55,8 +55,13 @@ def cross(d1, d2, d3):  # CCW
     return (d2[-2] - d1[-2]) * (d3[-1] - d2[-1]) - (d2[-1] - d1[-1]) * (d3[-2] - d2[-2])
 
 
+def cal_r(d1, d2):
+    r = (d1[-1] - d2[-1])**2 + (d1[-2] - d2[-2])**2
+    return r
+
+
 def graham_scan(arr1, d):
-    sorted_arr = [i[:] for i in arr1]
+    sorted_arr = [i[:] for i in arr1[::-1]]
     print(arr1)
     print(sorted_arr)
     d1 = d
@@ -64,15 +69,15 @@ def graham_scan(arr1, d):
     hull = [d1, d2]
     while len(sorted_arr) > 0:
         d3 = sorted_arr.pop()
-        hull.append(d3)
-        if cross(d1, d2, d3) > 0:
+        print(d3)
+        if cross(d1, d2, d3) >= 0:  # cal_r(d3, d1) > cal_r(d2, d1)
+            hull.append(d3)
             d1, d2 = hull[-2], hull[-1]
         else:
             hull.pop()
+            hull.append(d3)
             if len(sorted_arr) == 0:
                 break
-            d3 = sorted_arr.pop()
-            hull.append(d3)
             d1, d2 = hull[-2], hull[-1]
     return hull
 
@@ -107,8 +112,9 @@ else:
     shadow_car_coord = list(set([tuple(i) for i in shadow_coord]))
     shadow_car_coord.sort(key=lambda x: x[1])
     shadow_cyl_coord = sort_by_angle(shadow_car_coord[1:], shadow_car_coord[0])
+    print(shadow_cyl_coord)
     hull_shadow = graham_scan(shadow_cyl_coord, shadow_car_coord[0])
-    ans = cal_area(hull_shadow) - con_sur([xa, ya, za, xb, yb, zb])
     print(hull_shadow)
+    ans = cal_area(hull_shadow) - con_sur([xa, ya, za, xb, yb, zb])
     print(con_sur([xa, ya, za, xb, yb, zb]))
     print(abs(ans/2))
