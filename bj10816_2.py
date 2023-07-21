@@ -30,7 +30,7 @@ def bi_search(target, data):
 arr_s_M = sorted(arr_M)
 
 for i in arr_N:
-    if bi_search(i, arr_s_M) != None:
+    if bi_search(i, arr_s_M):
         dict_M[i] = int(dict_M[i]) + 1
 
 # print(dict_M)
