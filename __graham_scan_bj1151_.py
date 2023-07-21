@@ -2,19 +2,19 @@ import sys
 import math
 
 
-def make_tree(x1, y1, z1, x2, y2, z2):
+def make_tree(x1, y1, z1, x2, y2, z2):  # get the coordinates of all vertices of a tree
     arr = [[x1, y1, z1], [x2, y1, z1], [x1, y2, z1], [x1, y1, z2], [x1, y2, z2], [x2, y1, z2], [x2, y2, z1], [x2, y2, z2]]
     return arr
 
 
-def make_vector(arr, d_l):
+def make_vector(arr, d_l):  # make vector from light(d_l) to each dots of a tree(arr)
     vector = []
     for i in range(len(arr)):
         vector.append([arr[i][0] - d_l[0], arr[i][1] - d_l[1], arr[i][2] - d_l[2]])
     return vector
 
 
-def l_to_p(v1, d_l):
+def l_to_p(v1, d_l):  # intersection`s coordinates of a line from light and a plane
     if v1[2] >= 0:
         return None
     if v1[0] == 0 and v1[1] == 0:
@@ -32,34 +32,30 @@ def l_to_p(v1, d_l):
         x = -(d_l[2] * v1[0] / v1[2]) + d_l[0]
         y = -(d_l[2] * v1[1] / v1[2]) + d_l[1]
         return [x, y]
-# intersection`s coord` of a line from light and a plane
 
 
-def con_sur(d):
-    if d[2] == 0 or d[5] == 0:
-        area = abs((d[0] - d[3]) * (d[1] - d[4]))
+def con_sur(x1, y1, z1, x2, y2, z2):  # if tree's lower surface contacts to a plane:
+    if z1 == 0 or z2 == 0:
+        area = abs((x1 - x2) * (y1 - y2))
         return area
     else:
         return 0
-# if tree's bottom side contact plane:
 
 
-def sort_by_angle(arr, d):
+def sort_by_angle(arr, d):  # compose dots' array sorted by angle [(Θ1, x1, y1), (Θ2, x2, y2)...]
     sorted_by_angle = []
     for [x, y] in arr:
         th = math.atan2(y - d[1], x - d[0])
         sorted_by_angle.append([th, x, y])
     sorted_by_angle.sort(reverse=True)
     return sorted_by_angle
-# compose sorted dots' array by angle [(Θ1, x1, y1), (Θ2, x2, y2)...]
 
 
-def cross(d1, d2, d3):  # CCW
+def cross(d1, d2, d3):  # cross product / CCW
     return (d2[-2] - d1[-2]) * (d3[-1] - d2[-1]) - (d2[-1] - d1[-1]) * (d3[-2] - d2[-2])
-# cross product
 
 
-def graham_scan(arr1, d):
+def graham_scan(arr1, d):  # get a convex hull of shadow
     sorted_arr = [i[:] for i in arr1]
     d1 = [0, *d]  # start point
     d2 = sorted_arr.pop()
@@ -84,8 +80,8 @@ def cal_area(arr):
     pivot = [0, 0]
     area = 0
     for i in range(len(arr)):
-        area += cross(pivot, arr[i - 1], arr[i])
-    return area
+        area += cross(pivot, arr[i - 1], arr[i])/2
+    return abs(area)
 
 
 xa, ya, za, xb, yb, zb = map(int, sys.stdin.readline().strip().split())
@@ -101,9 +97,8 @@ elif len(shadow_coord) <= 4:  # when shadow extends infinitely
     print(-1)
 else:
     shadow_car_coord = list(set([tuple(i) for i in shadow_coord]))  # deduplication
-    shadow_car_coord.sort(key=lambda x: x[1])
+    shadow_car_coord.sort(key=lambda x: x[1])  # sort on y
     shadow_cyl_coord = sort_by_angle(shadow_car_coord[1:], shadow_car_coord[0])
     hull_shadow = graham_scan(shadow_cyl_coord, shadow_car_coord[0])
-    ans = cal_area(hull_shadow) - con_sur([xa, ya, za, xb, yb, zb])
-    print(abs(ans/2))
-# final calculation
+    ans = cal_area(hull_shadow) - con_sur(xa, ya, za, xb, yb, zb)  # final calculation
+    print(ans)
