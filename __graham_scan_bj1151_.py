@@ -17,17 +17,17 @@ def make_vector(arr, d_l):  # make vector from light(d_l) to each dots of a tree
 def l_to_p(v1, d_l):  # intersection`s coordinates of a line from light and a plane
     if v1[2] >= 0:
         return None
-    if v1[0] == 0 and v1[1] == 0:
-        x, y = d_l[0], d_l[1]
-        return [x, y]
-    elif v1[0] == 0:
-        y = (d_l[2] * v1[1] / v1[2]) + d_l[1]
-        x = d_l[0]
-        return [x, y]
-    elif v1[1] == 0:
-        x = (d_l[2] * v1[0] / v1[2]) + d_l[0]
-        y = d_l[1]
-        return [x, y]
+    # if v1[0] == 0 and v1[1] == 0:
+    #     x, y = d_l[0], d_l[1]
+    #     return [x, y]
+    # elif v1[0] == 0:
+    #     y = -(d_l[2] * v1[1] / v1[2]) + d_l[1]
+    #     x = d_l[0]
+    #     return [x, y]
+    # elif v1[1] == 0:
+    #     x = -(d_l[2] * v1[0] / v1[2]) + d_l[0]
+    #     y = d_l[1]
+    #     return [x, y]
     else:
         x = -(d_l[2] * v1[0] / v1[2]) + d_l[0]
         y = -(d_l[2] * v1[1] / v1[2]) + d_l[1]
@@ -51,7 +51,7 @@ def sort_by_angle(arr, d):  # compose dots' array sorted by angle [(Θ1, x1, y1)
     return sorted_by_angle
 
 
-def cross(d1, d2, d3):  # cross product / CCW
+def cross(d1, d2, d3):  # cross product / CCW / get area
     return (d2[-2] - d1[-2]) * (d3[-1] - d2[-1]) - (d2[-1] - d1[-1]) * (d3[-2] - d2[-2])
 
 
