@@ -29,8 +29,8 @@ def l_to_p(v1, d_l):  # line from light end plane
         y = d_l[1]
         return [x, y]
     else:
-        x = (d_l[2] * v1[0] / v1[2]) + d_l[0]
-        y = (d_l[2] * v1[1] / v1[2]) + d_l[1]
+        x = -(d_l[2] * v1[0] / v1[2]) + d_l[0]
+        y = -(d_l[2] * v1[1] / v1[2]) + d_l[1]
         return [x, y]
 
 
@@ -47,7 +47,7 @@ def sort_by_angle(arr, d):  # compose sorted dots' array by angle [[Θ, x, y]...
     for [x, y] in arr:
         th = math.atan2(y - d[1], x - d[0])
         sorted_by_angle.append([th, x, y])
-    sorted_by_angle.sort()
+    sorted_by_angle.sort(reverse=True)
     return sorted_by_angle
 
 
@@ -55,22 +55,28 @@ def cross(d1, d2, d3):  # CCW
     return (d2[-2] - d1[-2]) * (d3[-1] - d2[-1]) - (d2[-1] - d1[-1]) * (d3[-2] - d2[-2])
 
 
+def cal_r(d1, d2):
+    r = (d1[-1] - d2[-1])**2 + (d1[-2] - d2[-2])**2
+    return r
+
+
 def graham_scan(arr1, d):
     sorted_arr = [i[:] for i in arr1]
-    d1 = d
+    d1 = [0, *d]
     d2 = sorted_arr.pop()
     hull = [d1, d2]
     while len(sorted_arr) > 0:
         d3 = sorted_arr.pop()
-        hull.append(d3)
-        if cross(d1, d2, d3) > 0:
+        if cross(d1, d2, d3) >= 0:
+            hull.append(d3)
             d1, d2 = hull[-2], hull[-1]
         else:
-            hull.pop()
+            while cross(d1, d2, d3) < 0:
+                hull.pop()
+                d1, d2 = hull[-2], hull[-1]
+            hull.append(d3)
             if len(sorted_arr) == 0:
                 break
-            d3 = sorted_arr.pop()
-            hull.append(d3)
             d1, d2 = hull[-2], hull[-1]
     return hull
 
@@ -94,8 +100,12 @@ for k in l_to_t:
         continue
     else:
         shadow_coord.append(dot)
-
-if len(shadow_coord) <= 4:
+# shadow_coord = [l_to_p(k, light) for k in l_to_t if l_to_p(k, light)]
+# list of intersection coord` of a line and a plane
+if ((xa == xb) & (ya == yb)) | ((za == zb) & (ya == yb)) | ((xa == xb) & (za == zb)) |\
+        (xa == xb == light[0]) | (ya == yb == light[1]):
+    print(0)
+elif len(shadow_coord) <= 4:  # when shadow extends infinitely
     print(-1)
 else:
     shadow_car_coord = list(set([tuple(i) for i in shadow_coord]))
@@ -103,4 +113,4 @@ else:
     shadow_cyl_coord = sort_by_angle(shadow_car_coord[1:], shadow_car_coord[0])
     hull_shadow = graham_scan(shadow_cyl_coord, shadow_car_coord[0])
     ans = cal_area(hull_shadow) - con_sur([xa, ya, za, xb, yb, zb])
-    print(ans)
+    print(abs(ans/2))
