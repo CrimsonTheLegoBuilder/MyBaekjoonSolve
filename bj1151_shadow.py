@@ -1,6 +1,5 @@
 import sys
 import math
-import collections as cl
 
 
 def cross(d1, d2, d3):  # CCW
@@ -45,5 +44,19 @@ def sort_by_angle(arr, d):  # compose sorted dots' array by angle [[Θ, x, y]...
 
 
 def graham_scan(sorted_arr):
-    while True:
-        sorted_arr
+    hull = [sorted_arr[-1], sorted_arr[-2]]
+    d1 = sorted_arr.pop()
+    d2 = sorted_arr.pop()
+    while len(sorted_arr) > 0:
+        d3 = sorted_arr.pop()
+        hull.append(d3)
+        if cross(d1, d2, d3) > 0:
+            d1, d2 = hull[-2], hull[-1]
+        else:
+            hull.pop()
+            d3 = sorted_arr.pop()
+            hull.append(d3)
+            d1, d2 = hull[-2], hull[-1]
+
+
+
