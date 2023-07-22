@@ -1,13 +1,26 @@
 import sys
 import math
-from collections import deque as dq
-# 외적 그레이엄 선분으로부터 거리 구하기 - 배열 뱉어내기
 
 
-def cross(d1, d2, d3):  # cross product / CCW / get area
-    # if d2 is None:
-    #    return
+def cross(d1, d2, d3):  # cross product / CCW / get area / for 3 dots
+    if len(d2) == 0:
+        return
     return (d2[1] - d1[1]) * (d3[2] - d2[2]) - (d2[2] - d1[2]) * (d3[1] - d2[1])
+
+
+def cross_ccw(a1, a2, a3, a4):  # CCW / for 4 dots
+    v1 = [a2[1] - a1[1], a2[2] - a1[2]]
+    v2 = [a4[1] - a3[1], a4[2] - a3[2]]
+    ccw = v1[0] * v2[1] - v1[1] * v2[0]
+    if ccw < 0:
+        return 0
+    else:
+        return 1
+
+
+def cal_length(a1, a2):
+    l = (a1[1] - a2[1])**2 + (a1[2] - a2[2])**2
+    return l
 
 
 def in_triangle(arr):
@@ -35,23 +48,23 @@ def in_triangle(arr):
             distance_min = length
     if flag == len(arr) - 2:
         return [miny, maxy]  # if all stars are standing in a straight line OR only two stars exists
-    elif len(max_l) == 0:
-        for j in arr[1:-1]:
-            if j == max_r[0]:
-                hull_candidate.append(j)
-            if cross(miny, max_r[0], j) < 0 or cross(maxy, max_r[0], j) > 0:
-                hull_candidate.append(j)
-    elif len(max_r) == 0:
-        for j in arr[1:-1]:
-            if j == max_l[0]:
-                hull_candidate.append(j)
-            if cross(miny, max_l[0], j) > 0 or cross(maxy, max_l[0], j) < 0:
-                hull_candidate.append(j)
+    # elif len(max_l) == 0:
+    #     for j in arr[1:-1]:
+    #         if j == max_r[0]:
+    #             hull_candidate.append(j)
+    #         if cross(miny, max_r[0], j) < 0 or cross(maxy, max_r[0], j) > 0:
+    #             hull_candidate.append(j)
+    # elif len(max_r) == 0:
+    #     for j in arr[1:-1]:
+    #         if j == max_l[0]:
+    #             hull_candidate.append(j)
+    #         if cross(miny, max_l[0], j) > 0 or cross(maxy, max_l[0], j) < 0:
+    #             hull_candidate.append(j)
     else:
         for j in arr[1:-1]:
             if j == max_l[0] or j == max_r[0]:
-                continue
-            if cross(miny, max_l[0], j) > 0 or cross(maxy, max_l[0], j) < 0 or cross(miny, max_r[0], j) < 0 or cross(maxy, max_r[0], j) > 0:
+                hull_candidate.append(j)
+            elif cross(miny, max_l[0], j) > 0 or cross(maxy, max_l[0], j) < 0 or cross(miny, max_r[0], j) < 0 or cross(maxy, max_r[0], j) > 0:
                 hull_candidate.append(j)
     return hull_candidate
 
@@ -89,10 +102,38 @@ def fast_graham_scan(arr):  # get a convex hull of shadow
     return hull
 
 
+def rotating_calipers(arr):
+    a, b, c, d = 0, 1, 1, 2
+    i, ei, fl2, efl2 = arr[a], arr[b], arr[c], arr[d]
+    ans = []
+    max_length = 0
+    while True:
+        if ei == arr[0]:
+            break
+        ccw = cross_ccw(i, ei, fl2, efl2)
+        if ccw:
+            if cal_length(i, fl2) > max_length:
+                ans.clear()
+                ans.append([i, fl2])
+            elif cal_length(i, fl2) == max_length:
+                ans.append([i, fl2])
+            a += 1
+            b += 1
+        else:
+            if cal_length(i, fl2) > max_length:
+                ans.clear()
+                ans.append([i, fl2])
+            elif cal_length(i, fl2) == max_length:
+                ans.append([i, fl2])
+            c += 1
+            d += 1
+    return ans
+
+
 n, t = map(int, sys.stdin.readline().strip().split())
 stars = []
 for _ in range(n):
     dx, dy, vx, vy = map(int, sys.stdin.readline().strip().split())
     stars.append([0.0, dx, dy, vx, vy])
 hull_stars = fast_graham_scan(stars)
-
+# print(hull_stars)
