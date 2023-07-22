@@ -42,7 +42,7 @@ def con_sur(x1, y1, z1, x2, y2, z2):  # if tree's lower surface contacts to a pl
         return 0
 
 
-def sort_by_angle(arr, d):  # compose dots' array sorted by angle [(Θ1, x1, y1), (Θ2, x2, y2)...]
+def sort_by_angle(arr, d):  # compose dots' array sorted by angle [[Θ1, x1, y1], [Θ2, x2, y2]...]
     sorted_by_angle = []
     for [x, y] in arr:
         th = math.atan2(y - d[1], x - d[0])
@@ -97,7 +97,7 @@ elif len(shadow_coord) <= 4:  # when shadow extends infinitely
     print(-1)
 else:
     shadow_car_coord = list(set([tuple(i) for i in shadow_coord]))  # deduplication
-    shadow_car_coord.sort(key=lambda x: x[1])  # sort on y
+    shadow_car_coord.sort(key=lambda y: y[1])  # sort on y
     shadow_cyl_coord = sort_by_angle(shadow_car_coord[1:], shadow_car_coord[0])
     hull_shadow = graham_scan(shadow_cyl_coord, shadow_car_coord[0])
     ans = cal_area(hull_shadow) - con_sur(xa, ya, za, xb, yb, zb)  # final calculation
