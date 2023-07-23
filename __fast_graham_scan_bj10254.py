@@ -113,3 +113,14 @@ def rotating_calipers(hull):
     return max_pair
 
 
+t = int(sys.stdin.readline().strip())
+for _ in range(t):
+    n = int(sys.stdin.readline().strip())
+    cities = []
+    for _ in range(n):
+        dx, dy = map(int, sys.stdin.readline().strip().split())
+        cities.append([0.0, dx, dy])
+    hull_cities = fast_graham_scan(cities)
+    # print(hull_cities)
+    highway = rotating_calipers(hull_cities)
+    print(*highway[0][1:], *highway[1][1:])

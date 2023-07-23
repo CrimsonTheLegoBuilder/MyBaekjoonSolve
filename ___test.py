@@ -1,8 +1,16 @@
-def cross(d1, d2, d3):  # cross product / CCW / get area
-    if len(d2) == 0:
-        return
-    return (d2[1] - d1[1]) * (d3[2] - d2[2]) - (d2[2] - d1[2]) * (d3[1] - d2[1])
+import sys
+import math
+from functools import cmp_to_key
 
 
-print(cross([0, 1, 2], [], [12, 12, 31]))
-print(None or 1)
+def compare(x, y):
+    return (x[1] * y[0] < y[1] * x[0]) - (x[1] * y[0] > y[1] * x[0])
+
+
+def sort_by_angle(arr):  # compose dots' array sorted by angle [[Θ1, x1, y1, vx1, vy1], [Θ2, x2, y2...]]
+    arr.sort(key=cmp_to_key(compare))
+    return arr
+
+
+a = [[1, 2], [1, 1], [-1, 1], [-1, 2], [-2, 1]]
+print(sort_by_angle(a))
