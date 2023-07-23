@@ -43,7 +43,7 @@ def get_candidate(arr):
             max_l.append(i)
             distance_min = length
     if flag == len(arr) - 2:
-        return [miny, maxy]  # if all stars are standing in a straight line OR only two stars exists
+        return [miny, maxy]  # if all dots are standing in a straight line OR only two dots exists
     for j in arr[1:-1]:
         out_l, out_r = False, False
         if len(max_r) != 0:
@@ -63,11 +63,10 @@ def sort_by_angle(arr):  # compose dots' array sorted by angle [[Θ1, x1, y1, vx
         th = math.atan2(arr[i][2] - d0[2], arr[i][1] - d0[1])
         arr[i][0] = th
     arr.sort(reverse=True)
-    # print(arr)
     return arr
 
 
-def fast_graham_scan(arr):  # get a convex hull of shadow
+def fast_graham_scan(arr):  # get a convex hull
     hull_candidate = get_candidate(arr)
     if len(hull_candidate) == 2:
         return hull_candidate

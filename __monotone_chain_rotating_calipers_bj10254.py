@@ -71,23 +71,21 @@ for _ in range(int(sys.stdin.readline().strip())):
                 upper.pop()
             upper.append(du)
         hull_cities = lower[:-1] + upper[:-1]
-    a, b = 0, 1
+    b = 1
     l = len(hull_cities)
-    city_1 = hull_cities[a]
-    city_2 = hull_cities[b]
+    city_1 = hull_cities[0]
+    city_2 = hull_cities[1]
     max_dist = 0
-    while True:
-        if a == l:
-            break
-        i, ei, fl2, efl2 = hull_cities[a], hull_cities[(a + 1) % l], hull_cities[b % l], hull_cities[(b + 1) % l]
-        ccw = cross_ccw(i, ei, fl2, efl2)
-        diagonal = cal_dist_square(i, fl2)
-        if max_dist < diagonal:
-            max_dist = diagonal
-            city_1 = hull_cities[a]
-            city_2 = hull_cities[b % l]
-        if ccw < 0:
-            a += 1
-        else:
+    for a in range(l + 1):
+        while b + 1 != a and cross_ccw(hull_cities[a % l], hull_cities[(a + 1) % l], hull_cities[b % l],
+                                       hull_cities[(b + 1) % l]) > 0:
+            if max_dist < cal_dist_square(hull_cities[a % l], hull_cities[b % l]):
+                max_dist = cal_dist_square(hull_cities[a % l], hull_cities[b % l])
+                city_1 = hull_cities[a % l]
+                city_2 = hull_cities[b % l]
             b += 1
+        if max_dist < cal_dist_square(hull_cities[a % l], hull_cities[b % l]):
+            max_dist = cal_dist_square(hull_cities[a % l], hull_cities[b % l])
+            city_1 = hull_cities[a % l]
+            city_2 = hull_cities[b % l]
     print(*city_1, *city_2)

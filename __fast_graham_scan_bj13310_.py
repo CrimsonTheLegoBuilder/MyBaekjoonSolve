@@ -111,5 +111,3 @@ def rotating_calipers(hull):
             max_2 = hull[b % l]
     max_pair = [max_1, max_2]
     return max_pair
-
-
