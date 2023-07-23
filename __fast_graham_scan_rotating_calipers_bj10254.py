@@ -1,5 +1,8 @@
 import sys
 import math
+# WARNING!! WRONG CODE ####
+# WARNING!! WRONG CODE ####
+# WARNING!! WRONG CODE ####
 
 
 def cross(d1, d2, d3):  # cross product / CCW / get area / for 3 dots
@@ -20,7 +23,7 @@ def cal_dist_square(a1, a2):
 
 
 def get_candidate(arr):
-    arr.sort(key=lambda d: d[2])  # sort on y
+    arr.sort(key=lambda d: (d[2], d[1]))  # sort on y
     miny, maxy = arr[0], arr[-1]
     hull_candidate = [miny, maxy]
     flag = 0
@@ -43,7 +46,7 @@ def get_candidate(arr):
             max_l.append(i)
             distance_min = length
     if flag == len(arr) - 2:
-        return [miny, maxy]  # if all stars are standing in a straight line OR only two stars exists
+        return [miny, maxy]  # if all dots are standing in a straight line OR only two dots exists
     for j in arr[1:-1]:
         out_l, out_r = False, False
         if len(max_r) != 0:
@@ -62,12 +65,12 @@ def sort_by_angle(arr):  # compose dots' array sorted by angle [[Θ1, x1, y1, vx
     for i in range(1, len(arr)):
         th = math.atan2(arr[i][2] - d0[2], arr[i][1] - d0[1])
         arr[i][0] = th
+    # arr.sort(key=lambda d: (-d[0], d[2]))
     arr.sort(reverse=True)
-    # print(arr)
     return arr
 
 
-def fast_graham_scan(arr):  # get a convex hull of shadow
+def fast_graham_scan(arr):  # get a convex hull
     hull_candidate = get_candidate(arr)
     if len(hull_candidate) == 2:
         return hull_candidate
@@ -110,4 +113,19 @@ def rotating_calipers(hull):
             max_1 = hull[a % l]
             max_2 = hull[b % l]
     max_pair = [max_1, max_2]
-    return max_pair
+    return max_dist
+    # return max_pair
+
+
+n = int(sys.stdin.readline().strip())
+dots = []
+for _ in range(n):
+    dx, dy = map(int, sys.stdin.readline().strip().split())
+    dots.append([0.0, dx, dy])
+hull_dots = fast_graham_scan(dots)
+# print(hull_cities)
+if len(hull_dots) <= 2:
+    highway = cal_dist_square(hull_dots[0], hull_dots[1])
+else:
+    highway = rotating_calipers(hull_dots)
+print(highway)

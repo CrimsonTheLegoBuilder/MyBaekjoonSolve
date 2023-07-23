@@ -1,7 +1,4 @@
-a = 1, 2, 3, 4, 5
-b = '진영진홍, 지수, 단비'
+x, y = (10, 20)
 
-print(a)
-print(type(a))
-print(b)
-print(type(b))
+print(type(x))
+print(type((x, y)))
