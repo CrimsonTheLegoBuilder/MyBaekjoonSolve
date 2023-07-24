@@ -11,7 +11,7 @@ def cross_ccw(a1, a2, a3, a4):  # cross product / CCW / for 4 dots
     return v1[0] * v2[1] - v1[1] * v2[0]
 
 
-def monotone_chain(arr):
+def monotone_chain(arr):  # get hull
     arr.sort(key=lambda x: (x[0], x[1]))
     if len(arr) <= 2:
         return arr
@@ -28,11 +28,11 @@ def monotone_chain(arr):
     return lower[:-1] + upper[:-1]
 
 
-def cal_dist_square(a1, a2):
+def cal_dist_square(a1, a2):  # get c^2 = a^2 + b^2
     return (a1[0] - a2[0])**2 + (a1[1] - a2[1])**2
 
 
-def rotating_calipers(hull):
+def rotating_calipers(hull):  # get max length
     b = 1
     l = len(hull)
     max_dist = 0
@@ -48,30 +48,47 @@ def rotating_calipers(hull):
 
 
 def pos_at_day_x(tup, x):
-    pos_at_x = [(tup[0] + tup[2] * x, tup[1] + tup[3] * x) for _ in tup]
-    return pos_at_x
+    pos_at_x_th = [(i[0] + i[2]*x, i[1] + i[3]*x) for i in tup]
+    return pos_at_x_th
 
 
-def get_max(hull, x):
-    start, end = 1, x
+def get_days_ternary_search(dots, x):
+    start, end = 0, x-1
     while end - start >= 3:
-        mid_1 = (start * 2 + end) // 3  # 1/3
-        mid_2 = (start + end * 2) // 3  # 2/3
-        day_l = pos_at_day_x(hull, mid_1)
+        mid_1 = (start*2 + end) // 3  # 1/3
+        mid_2 = (start + end*2) // 3  # 2/3
+        day_l = pos_at_day_x(dots, mid_1)
         hull_l = monotone_chain(day_l)
         max_l = rotating_calipers(hull_l)
-        day_r = pos_at_day_x(hull, mid_2)
+        day_r = pos_at_day_x(dots, mid_2)
         hull_r = monotone_chain(day_r)
         max_r = rotating_calipers(hull_r)
         if max_l <= max_r:
             end = mid_2
         else:
             start = mid_1
+        return [i for i in range(start, end + 1, 1)]
+
+
+def get_min(dots, x):
+    min_length = int(32e15)
+    min_day = 0
+    for i in x:
+        pos_at_i = pos_at_day_x(dots, i)
+        hull_i = monotone_chain(pos_at_i)
+        max_i = rotating_calipers(hull_i)
+        if min_length > max_i:
+            min_length = max_i
+            min_day = i
+    return min_day, min_length
 
 
 n, t = map(int, sys.stdin.readline().strip().split())
 stars = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
-
-
-
-
+if t > 6:
+    range_of_days = get_days_ternary_search(stars, t)
+else:
+    range_of_days = [i for i in range(t + 1)]
+ans = get_min(stars, range_of_days)
+print(ans[0])
+print(ans[1])
