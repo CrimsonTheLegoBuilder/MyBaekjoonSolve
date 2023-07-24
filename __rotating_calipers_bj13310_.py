@@ -47,12 +47,12 @@ def rotating_calipers(hull):  # get max length
     return max_dist
 
 
-def pos_at_day_x(tup, x):
+def pos_at_day_x(tup, x):  # positions at day-x
     pos_at_x_th = [(i[0] + i[2]*x, i[1] + i[3]*x) for i in tup]
     return pos_at_x_th
 
 
-def get_days_ternary_search(dots, x):
+def get_days_ternary_search(dots, x):  # get range of days during which the maximum length of the hull becomes smaller
     start, end = 0, x
     while end - start >= 3:
         mid_1 = (start*2 + end) // 3  # 1/3
@@ -72,7 +72,7 @@ def get_days_ternary_search(dots, x):
     return [i for i in range(start, end + 1, 1)]
 
 
-def get_min(dots, x):
+def get_min(dots, x):  # find min length of hulls and day after ternary search
     min_length = int(32e15)
     min_day = 0
     for i in x:
@@ -89,7 +89,7 @@ n, t = map(int, sys.stdin.readline().strip().split())
 stars = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
 if t > 6:
     range_of_days = get_days_ternary_search(stars, t)
-else:
+else:  # ternary search is inefficiency if it does not exceed 7 days
     range_of_days = [i for i in range(t + 1)]
 # print(range_of_days)
 ans = get_min(stars, range_of_days)
@@ -97,6 +97,8 @@ print(ans[0])
 print(ans[1])
 
 '''
+example
+
 10 100
 1 1 5 5
 5 5 -1 1
