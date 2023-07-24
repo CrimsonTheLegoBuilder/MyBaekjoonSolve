@@ -32,7 +32,7 @@ def cal_dist_square(a1, a2):  # get c^2 = a^2 + b^2
     return (a1[0] - a2[0])**2 + (a1[1] - a2[1])**2
 
 
-def rotating_calipers(hull):  # get max length
+def rotating_calipers(hull):  # get max distance of hull
     b = 1
     l = len(hull)
     max_dist = 0
@@ -47,7 +47,7 @@ def rotating_calipers(hull):  # get max length
     return max_dist
 
 
-def pos_at_day_x(tup, x):  # positions at day-x
+def pos_at_day_x(tup, x):  # compose list of positions at day x
     pos_at_x_th = [(i[0] + i[2]*x, i[1] + i[3]*x) for i in tup]
     return pos_at_x_th
 
@@ -55,24 +55,27 @@ def pos_at_day_x(tup, x):  # positions at day-x
 def get_days_ternary_search(dots, x):  # get range of days during which the maximum length of the hull becomes smaller
     start, end = 0, x
     while end - start >= 3:
-        mid_1 = (start*2 + end) // 3  # 1/3
-        mid_2 = (start + end*2) // 3  # 2/3
-        day_l = pos_at_day_x(dots, mid_1)
-        hull_l = monotone_chain(day_l)
+        mid_l = (start*2 + end) // 3  # 1/3
+        mid_r = (start + end*2) // 3  # 2/3
+
+        pos_x_l = pos_at_day_x(dots, mid_l)
+        hull_l = monotone_chain(pos_x_l)
         max_l = rotating_calipers(hull_l)
-        day_r = pos_at_day_x(dots, mid_2)
-        hull_r = monotone_chain(day_r)
+
+        pos_x_r = pos_at_day_x(dots, mid_r)
+        hull_r = monotone_chain(pos_x_r)
         max_r = rotating_calipers(hull_r)
+
         if max_l <= max_r:
-            end = mid_2
+            end = mid_r
         else:
-            start = mid_1
+            start = mid_l
         # print(start, end)
         # print(max_l, max_r)
-    return [i for i in range(start, end + 1, 1)]
+    return (i for i in range(start, end + 1, 1))
 
 
-def get_min(dots, x):  # find min length of hulls and day after ternary search
+def get_min(dots, x):  # find min length of hulls and min day after ternary search
     min_length = int(32e15)
     min_day = 0
     for i in x:
@@ -89,7 +92,7 @@ n, t = map(int, sys.stdin.readline().strip().split())
 stars = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
 if t > 6:
     range_of_days = get_days_ternary_search(stars, t)
-else:  # ternary search is inefficiency if it does not exceed 7 days
+else:  # the ternary search is inefficient if it does not exceed 7 days
     range_of_days = [i for i in range(t + 1)]
 # print(range_of_days)
 ans = get_min(stars, range_of_days)
