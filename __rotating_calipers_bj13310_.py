@@ -53,7 +53,7 @@ def pos_at_day_x(tup, x):
 
 
 def get_days_ternary_search(dots, x):
-    start, end = 0, x-1
+    start, end = 0, x
     while end - start >= 3:
         mid_1 = (start*2 + end) // 3  # 1/3
         mid_2 = (start + end*2) // 3  # 2/3
@@ -67,7 +67,9 @@ def get_days_ternary_search(dots, x):
             end = mid_2
         else:
             start = mid_1
-        return [i for i in range(start, end + 1, 1)]
+        # print(start, end)
+        # print(max_l, max_r)
+    return [i for i in range(start, end + 1, 1)]
 
 
 def get_min(dots, x):
@@ -89,6 +91,43 @@ if t > 6:
     range_of_days = get_days_ternary_search(stars, t)
 else:
     range_of_days = [i for i in range(t + 1)]
+# print(range_of_days)
 ans = get_min(stars, range_of_days)
 print(ans[0])
 print(ans[1])
+
+'''
+10 100
+1 1 5 5
+5 5 -1 1
+2 3 2 3
+4 3 5 6
+6 5 4 3
+3 3 -1 -1
+6 9 -1 -2
+7 8 -2 -4
+0 0 10 0
+-2 -3 -4 5
+
+8 100
+1 1 0 0
+2 2 -1 0
+3 4 1 0
+5 4 -3 4
+6 7 9 -1
+0 3 3 3
+2 0 -3 -3
+1 0 2 1
+
+10 100
+50 60 -5 -5
+50 50 -1 -1
+20 30 -2 -3
+40 30 -5 -6
+-60 -50 4 3
+-15 -30 1 1
+60 90 -5 -6
+70 80 -2 -4
+0 0 7 0
+-20 -30 4 5
+'''
