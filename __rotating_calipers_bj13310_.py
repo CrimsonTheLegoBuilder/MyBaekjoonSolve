@@ -47,16 +47,31 @@ def rotating_calipers(hull):
     return max_dist
 
 
-def find_pair(pairs):
-    pass
+def pos_at_day_x(tup, x):
+    pos_at_x = [(tup[0] + tup[2] * x, tup[1] + tup[3] * x) for _ in tup]
+    return pos_at_x
+
+
+def get_max(hull, x):
+    start, end = 1, x
+    while end - start >= 3:
+        mid_1 = (start * 2 + end) // 3  # 1/3
+        mid_2 = (start + end * 2) // 3  # 2/3
+        day_l = pos_at_day_x(hull, mid_1)
+        hull_l = monotone_chain(day_l)
+        max_l = rotating_calipers(hull_l)
+        day_r = pos_at_day_x(hull, mid_2)
+        hull_r = monotone_chain(day_r)
+        max_r = rotating_calipers(hull_r)
+        if max_l <= max_r:
+            end = mid_2
+        else:
+            start = mid_1
 
 
 n, t = map(int, sys.stdin.readline().strip().split())
-cities = [list(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
-cities.sort(key=lambda x: (x[0], x[1]))
-if len(cities) <= 2:
-    two_stars = [(cities[0], cities[1])]
-else:
-    hull_cities = monotone_chain(cities)
-    two_stars = rotating_calipers(hull_cities)
+stars = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
+
+
+
 
