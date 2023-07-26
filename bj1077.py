@@ -110,7 +110,7 @@ def get_polygon_area(hull):
     area = 0
     for i in range(a):
         area += cross_3(pivot, hull[a - 1], hull[a])
-    return area
+    return abs(area/2)
 
 
 n, m = map(int, sys.stdin.readline().strip().split())
