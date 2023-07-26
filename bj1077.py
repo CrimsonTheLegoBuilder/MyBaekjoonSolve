@@ -6,9 +6,15 @@ def cross_3(d1, d2, d3):  # cross product / CCW / get area / for 3 dots
 
 
 def cross_4(a1, a2, a3, a4):  # cross product / CCW / line-segment intersection / for 4 dots
-    v1 = [a2[0] - a1[0], a2[1] - a1[1]]
-    v2 = [a4[0] - a3[0], a4[1] - a3[1]]
+    v1 = (a2[0] - a1[0], a2[1] - a1[1])
+    v2 = (a4[0] - a3[0], a4[1] - a3[1])
     return v1[0] * v2[1] - v1[1] * v2[0]
+
+
+def dot_product(a1, a2, a3, a4):
+    v1 = (a2[0] - a1[0], a2[1] - a1[1])
+    v2 = (a4[0] - a3[0], a4[1] - a3[1])
+    return v1[0] * v2[0] + v1[1] * v2[1]
 
 
 def cal_dist_square(a1, a2):  # get c^2 = a^2 + b^2
@@ -19,12 +25,26 @@ def across_dots(hull1, hull2):
     cross_dots = []
     for i in range(len(hull1)):
         for j in range(len(hull2)):
-            if cross_3(hull1[i - 1], hull1[i], hull2[j]) * cross_3(hull1[i], hull1[i - 1], hull2[j - 1]) > 0 and \
+            if dot_product(hull1[i], hull1[i - 1], hull2[i], hull2[i - 1]) == 0:  # parallel
+                continue
+            elif cross_3(hull1[i - 1], hull1[i], hull2[j]) * cross_3(hull1[i], hull1[i - 1], hull2[j - 1]) > 0 and \
                     cross_3(hull2[j - 1], hull2[j], hull1[i]) * cross_3(hull2[j], hull2[j - 1], hull1[i - 1]) > 0:
+                if hull1[i][0] - hull1[i - 1][0] == 0:  # prevent ZeroDivisionError
+                    x = hull1[i][0]
+                    y =
+                elif hull2[i][0] - hull2[i - 1][0] == 0:
+                    pass
+                elif hull1[i][1] - hull1[i - 1][1] == 0:
+                    pass
+                elif hull2[i][1] - hull2[i - 1][1] == 0:
+                    pass
                 a = (hull1[i][1] - hull1[i - 1][1]) / (hull1[i][0] - hull1[i - 1][0])
                 b = (hull2[i][1] - hull2[i - 1][1]) / (hull2[i][0] - hull2[i - 1][0])
                 c = (hull1[i][0] - hull1[i - 1][0]) / (hull1[i][1] - hull1[i - 1][1])
                 d = (hull2[i][0] - hull2[i - 1][0]) / (hull2[i][1] - hull2[i - 1][1])
+                if (hull1[i][1] - hull1[i - 1][1]) * (hull2[i][0] - hull2[i - 1][0]) - (hull2[i][1] - hull2[i - 1][1]) * (hull1[i][0] - hull1[i - 1][0]) == 0 or \
+                        (hull1[i][0] - hull1[i - 1][0]) * (hull2[i][1] - hull2[i - 1][1]) - (hull2[i][0] - hull2[i - 1][0]) * (hull1[i][1] - hull1[i - 1][1]) == 0:
+                    continue  # parallel
                 x = (a*hull1[i][0] - b*hull2[i][0] - hull1[i][1] + hull2[i][1]) / (a - b)
                 y = (hull2[i][1] - hull1[i][1] - c*hull2[i][1] + d*hull1[i][1]) / (c - d)
                 cross_dots.append((x, y))
