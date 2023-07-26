@@ -11,42 +11,48 @@ def cross_4(a1, a2, a3, a4):  # cross product / CCW / line-segment intersection 
     return v1[0] * v2[1] - v1[1] * v2[0]
 
 
-def dot_product(a1, a2, a3, a4):
-    v1 = (a2[0] - a1[0], a2[1] - a1[1])
-    v2 = (a4[0] - a3[0], a4[1] - a3[1])
-    return v1[0] * v2[0] + v1[1] * v2[1]
-
-
-def cal_dist_square(a1, a2):  # get c^2 = a^2 + b^2
-    return (a1[0] - a2[0])**2 + (a1[1] - a2[1])**2
-
-
 def across_dots(hull1, hull2):
     cross_dots = []
     for i in range(len(hull1)):
         for j in range(len(hull2)):
-            if dot_product(hull1[i], hull1[i - 1], hull2[i], hull2[i - 1]) == 0:  # parallel
-                continue
-            elif cross_3(hull1[i - 1], hull1[i], hull2[j]) * cross_3(hull1[i], hull1[i - 1], hull2[j - 1]) > 0 and \
-                    cross_3(hull2[j - 1], hull2[j], hull1[i]) * cross_3(hull2[j], hull2[j - 1], hull1[i - 1]) > 0:
-                if hull1[i][0] - hull1[i - 1][0] == 0:  # prevent ZeroDivisionError
-                    x = hull1[i][0]
-                    y =
-                elif hull2[i][0] - hull2[i - 1][0] == 0:
-                    pass
-                elif hull1[i][1] - hull1[i - 1][1] == 0:
-                    pass
-                elif hull2[i][1] - hull2[i - 1][1] == 0:
-                    pass
-                a = (hull1[i][1] - hull1[i - 1][1]) / (hull1[i][0] - hull1[i - 1][0])
-                b = (hull2[i][1] - hull2[i - 1][1]) / (hull2[i][0] - hull2[i - 1][0])
-                c = (hull1[i][0] - hull1[i - 1][0]) / (hull1[i][1] - hull1[i - 1][1])
-                d = (hull2[i][0] - hull2[i - 1][0]) / (hull2[i][1] - hull2[i - 1][1])
-                if (hull1[i][1] - hull1[i - 1][1]) * (hull2[i][0] - hull2[i - 1][0]) - (hull2[i][1] - hull2[i - 1][1]) * (hull1[i][0] - hull1[i - 1][0]) == 0 or \
-                        (hull1[i][0] - hull1[i - 1][0]) * (hull2[i][1] - hull2[i - 1][1]) - (hull2[i][0] - hull2[i - 1][0]) * (hull1[i][1] - hull1[i - 1][1]) == 0:
-                    continue  # parallel
-                x = (a*hull1[i][0] - b*hull2[i][0] - hull1[i][1] + hull2[i][1]) / (a - b)
-                y = (hull2[i][1] - hull1[i][1] - c*hull2[i][1] + d*hull1[i][1]) / (c - d)
+            if hull1[i] == hull2[j] or hull1[i] == hull2[j - 1]:
+                d1 = hull1[i]
+                cross_dots.append(d1)
+                if hull1[i - 1] == hull2[j] or hull1[i - 1] == hull2[j - 1]:
+                    d2 = hull1[i - 1]
+                    cross_dots.append(d2)
+            if cross_3(hull1[i - 1], hull1[i], hull2[j - 1]) * cross_3(hull1[i], hull1[i - 1], hull2[j]) > 0 and \
+                    cross_3(hull2[j - 1], hull2[j], hull1[i - 1]) * cross_3(hull2[j], hull2[j - 1], hull1[i]) > 0:
+                if hull1[i - 1][0] - hull1[i][0] == 0 and hull2[j - 1][1] - hull2[j][1] == 0:  # prevent ZeroDivisionError
+                    x = hull1[i - 1][0]
+                    y = hull2[j - 1][1]
+                elif hull2[j - 1][0] - hull2[j][0] == 0 and hull1[i - 1][1] - hull1[i][1] == 0:
+                    x = hull2[j - 1][0]
+                    y = hull1[i - 1][1]
+                elif hull1[i - 1][0] - hull1[i][0] == 0:
+                    x = hull1[i - 1][0]
+                    y = hull2[j - 1][1] + (hull2[j - 1][1] - hull2[j][1]) * (hull1[i - 1][0] - hull2[j - 1][0]) / (
+                                hull2[j - 1][0] - hull2[j][0])
+                elif hull1[i - 1][1] - hull1[i][1] == 0:
+                    x = hull2[j - 1][0] + (hull2[j - 1][0] - hull2[j][0]) * (hull1[i - 1][1] - hull2[j - 1][1]) / (
+                                hull2[j - 1][1] - hull2[j][1])
+                    y = hull1[i - 1][1]
+                elif hull2[j - 1][0] - hull2[j][0] == 0:
+                    x = hull2[j - 1][0]
+                    y = hull1[i - 1][1] + (hull1[i - 1][1] - hull1[i][1]) * (hull2[j - 1][0] - hull1[i - 1][0]) / (
+                                hull1[i - 1][0] - hull1[i][0])
+                elif hull2[j - 1][1] - hull2[j][1] == 0:
+                    x = hull1[i - 1][0] + (hull1[i - 1][0] - hull1[i][0]) * (hull2[j - 1][1] - hull1[i - 1][1]) / (
+                                hull1[i - 1][1] - hull1[i][1])
+                    y = hull2[j - 1][1]
+                else:
+                    a = (hull1[i - 1][1] - hull1[i][1]) / (hull1[i - 1][0] - hull1[i][0])
+                    b = (hull2[j - 1][1] - hull2[j][1]) / (hull2[j - 1][0] - hull2[j][0])
+                    c = (hull1[i - 1][0] - hull1[i][0]) / (hull1[i - 1][1] - hull1[i][1])
+                    d = (hull2[j - 1][0] - hull2[j][0]) / (hull2[j - 1][1] - hull2[j][1])
+
+                    x = (hull2[j - 1][1] - hull1[i - 1][1] + a * hull1[i - 1][0] - b * hull2[j - 1][0]) / (a - b)
+                    y = (hull2[j - 1][0] - hull1[i - 1][0] + c * hull1[i - 1][1] - d * hull2[j - 1][1]) / (c - d)
                 cross_dots.append((x, y))
     return cross_dots
 
@@ -90,26 +96,12 @@ def monotone_chain(arr):  # get hull
     return lower[:-1] + upper[:-1]
 
 
-def rotating_calipers(hull):  # get max distance of hull
-    b = 1
-    l = len(hull)
-    max_dist = 0
-    for a in range(l + 1):
-        while b + 1 != a and cross_4(hull[a % l], hull[(a + 1) % l], hull[b % l], hull[(b + 1) % l]) > 0:
-            if max_dist < cal_dist_square(hull[a % l], hull[b % l]):
-                max_dist = cal_dist_square(hull[a % l], hull[b % l])
-            b += 1
-        if max_dist < cal_dist_square(hull[a % l], hull[b % l]):
-            max_dist = cal_dist_square(hull[a % l], hull[b % l])
-    return max_dist
-
-
 def get_polygon_area(hull):
     pivot = (0, 0)
     a = len(hull)
     area = 0
     for i in range(a):
-        area += cross_3(pivot, hull[a - 1], hull[a])
+        area += cross_3(pivot, hull[i - 1], hull[i])
     return abs(area/2)
 
 
@@ -117,6 +109,8 @@ n, m = map(int, sys.stdin.readline().strip().split())
 arr_a = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
 arr_b = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(m)]
 hull_can = get_hull(arr_a, arr_b) + across_dots(arr_a, arr_b)
+# print(hull_can)
 hull_intersection = monotone_chain(hull_can)
+# print(hull_intersection)
 ans = get_polygon_area(hull_intersection)
 print(ans)
