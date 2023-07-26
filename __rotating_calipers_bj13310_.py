@@ -37,8 +37,7 @@ def rotating_calipers(hull):  # get max distance of hull
     l = len(hull)
     max_dist = 0
     for a in range(l + 1):
-        while b + 1 != a and cross_ccw(hull[a % l], hull[(a + 1) % l], hull[b % l],
-                                       hull[(b + 1) % l]) > 0:
+        while (b + 1) % l != a % l and cross_ccw(hull[a % l], hull[(a + 1) % l], hull[b % l], hull[(b + 1) % l]) > 0:
             if max_dist < cal_dist_square(hull[a % l], hull[b % l]):
                 max_dist = cal_dist_square(hull[a % l], hull[b % l])
             b += 1

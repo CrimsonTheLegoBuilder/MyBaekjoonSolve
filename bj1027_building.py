@@ -1,20 +1,24 @@
 import sys
 
-n = int(sys.stdin.readline().strip())
+n = int(sys.stdin.readline().strip())  # 고속 입출력. 건물의 수.
 
-arr = list(map(int, sys.stdin.readline().strip().split()))
-dp = [0] * n
+arr = list(map(int, sys.stdin.readline().strip().split()))  # 건물들의 높이와 위치가 기록된 리스트
+dp = [0] * n  # 해당 건물에서 보이는 다른 건물들의 수를 기록할 dp
 
-for i in range(n):
+for i in range(n):  # 모든 건물들의 꼭대기에 일일이 올라가본다.
+    inc = -1e10  # 임의의 작은 수를 설정한다. 설마 이 말도 안 되는 숫자보다 높이 차이가 심하게 나는 건물 조합은 존재하지 않을 것이다.
+    for j in range(i - 1, -1, -1):  # 왼쪽부터, 가까운 건물 순으로 살핀다.
+        if (arr[j] - arr[i]) / (i - j) > inc:  # 만약, 지금 보고 있는 건물과의 높이 차가 아까 봤던 건물과의 높이 차보다 크다면?
+            dp[i] += 1  # 보인다. 건물 하나 추가.
+            inc = (arr[j] - arr[i]) / (i - j)  # 지금 보고 있는 건물과의 높이 차를 기록.
     inc = -1e10
-    for j in range(i - 1, -1, -1):
-        if (arr[j] - arr[i]) / (i - j) > inc:
-            dp[i] += 1
-            inc = (arr[j] - arr[i]) / (i - j)
-    inc = -1e10
-    for k in range(i + 1, n):
-        if (arr[k] - arr[i]) / (k - i) > inc:
-            dp[i] += 1
-            inc = (arr[k] - arr[i]) / (k - i)
+    for k in range(i + 1, n):  # 이번에는 오른쪽 가까운 건물부터 끝까지 살펴본다.
+        if (arr[k] - arr[i]) / (k - i) > inc:  # 만약, 지금 보고 있는 건물과의 높이 차가 아까 봤던 건물과의 높이 차보다 크다면?
+            dp[i] += 1  # 보인다. 건물 하나 추가.
+            inc = (arr[k] - arr[i]) / (k - i)  # 지금 보고 있는 건물과의 높이 차를 기록.
+print(max(dp))  # 가장 건물이 많이 보이는 건물의 번호와 그 건물에서 보이는 건물의 수가 기록되어 있다.
 
-print(max(dp))
+'''
+기하학과 브루트포스 알고리즘을 적절히 응용하는 문제이다. 모든 건물 꼭대기에 올라가서 일일이 볼 수 있는 건물들을 살펴본다.
+기울기가 더 높은 건물은 앞에 낮은 건물이 있어도 보이므로 기울기가 더 높은 건물들을 dp에 기록하여 가장 많이 볼 수 있는 건물의 수를 출력한다.
+'''

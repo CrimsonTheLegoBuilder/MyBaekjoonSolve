@@ -4,7 +4,7 @@ n, m = map(int, sys.stdin.readline().strip().split())
 arr = [sys.stdin.readline().strip() for _ in range(n)]  # 0. 일단 입력 받는 줄부터 적고 시작
 # print(arr)  0. 잘 받아지는지 확인하는 용도
 ans = -1  # 0. 제곱수를 찾지 못하면 답은 -1이며 더 크면 갱신
-square_set = set(i**2 for i in range(31623))  # 5. 최대 제곱수도 999,999,999를 넘지 못하므로 10e9의 제곱근인 31622.77...까지 전처리
+square_set = set(i**2 for i in range(31624))  # 5. 최대 제곱수도 999,999,999를 넘지 못하므로 10e9의 제곱근인 31622.77...까지 전처리
 
 for i in range(n):
     for j in range(m):
