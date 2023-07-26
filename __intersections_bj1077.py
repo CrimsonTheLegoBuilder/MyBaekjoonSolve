@@ -5,13 +5,13 @@ def cross_3(d1, d2, d3):  # cross product / CCW / get area / for 3 dots
     return (d2[0] - d1[0]) * (d3[1] - d2[1]) - (d2[1] - d1[1]) * (d3[0] - d2[0])
 
 
-def cross_4(a1, a2, a3, a4):  # cross product / CCW / line-segment intersection / for 4 dots
+def cross_4(a1, a2, a3, a4):  # cross product / CCW / for 4 dots
     v1 = (a2[0] - a1[0], a2[1] - a1[1])
     v2 = (a4[0] - a3[0], a4[1] - a3[1])
     return v1[0] * v2[1] - v1[1] * v2[0]
 
 
-def across_dots(hull1, hull2):
+def intersection_dots(hull1, hull2):
     cross_dots = []
     for i in range(len(hull1)):
         for j in range(len(hull2)):
@@ -57,7 +57,7 @@ def across_dots(hull1, hull2):
     return cross_dots
 
 
-def get_hull(arr1, arr2):
+def get_inner(arr1, arr2):
     hull_candidate = []
     len_1, len_2 = len(arr1), len(arr2)
     for i in arr1:
@@ -108,9 +108,9 @@ def get_polygon_area(hull):
 n, m = map(int, sys.stdin.readline().strip().split())
 arr_a = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
 arr_b = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(m)]
-hull_can = get_hull(arr_a, arr_b) + across_dots(arr_a, arr_b)
-# print(hull_can)
-hull_intersection = monotone_chain(hull_can)
-# print(hull_intersection)
-ans = get_polygon_area(hull_intersection)
+hull_intersection = get_inner(arr_a, arr_b) + intersection_dots(arr_a, arr_b)
+sorted_hull = monotone_chain(hull_intersection)
+ans = get_polygon_area(sorted_hull)
 print(ans)
+# print(hull_can)
+# print(hull_intersection)
