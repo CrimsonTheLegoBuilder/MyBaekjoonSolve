@@ -84,6 +84,19 @@ def rotating_calipers(hull):  # get max distance of hull
     return max_dist
 
 
+def get_polygon_area(hull):
+    pivot = (0, 0)
+    a = len(hull)
+    area = 0
+    for i in range(a):
+        area += cross_3(pivot, hull[a - 1], hull[a])
+    return area
+
+
 n, m = map(int, sys.stdin.readline().strip().split())
 arr_a = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
 arr_b = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(m)]
+hull_can = get_hull(arr_a, arr_b) + across_dots(arr_a, arr_b)
+hull_intersection = monotone_chain(hull_can)
+ans = get_polygon_area(hull_intersection)
+print(ans)
