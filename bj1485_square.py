@@ -28,6 +28,6 @@ for _ in range(n):
     if ((abs(C1) == l1 * l2) & (l1 == l2) & (-1 * dot2 == l3 * l4)) | ((abs(C2) == l3 * l4) & (l3 == l4) & (-1 * dot1 == l1 * l2)):
         sys.stdout.write('1\n')
     elif (dot1 == l1 * l2) & (dot2 == l3 * l4) & (abs(cross(v1, v3)) == l1 * l3):
-        sys.stdout.write('1\n')
+        sys.stdout.write('0\n')
     else:
         sys.stdout.write('0\n')
