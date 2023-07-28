@@ -6,5 +6,7 @@ while True:
         exit(0)
     if a > b:
         print('YES')
+        print('YES')
     else:
+        print('NO')
         print('NO')
