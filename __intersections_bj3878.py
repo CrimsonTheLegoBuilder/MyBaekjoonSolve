@@ -15,15 +15,21 @@ def intersection_dots(hull1, hull2):
     cross_dots = []
     for i in range(len(hull1)):
         for j in range(len(hull2)):
-            if hull1[i] == hull2[j] or hull1[i] == hull2[j - 1]:
-                d1 = hull1[i]
+            if (hull2[j - 1] == hull1[i] or hull2[j - 1] == hull1[i - 1]) | \
+                (cross_3(hull1[i - 1], hull1[i], hull2[j - 1]) == 0 and
+                    sorted([hull1[i - 1], hull1[i], hull2[j - 1]], key=lambda o: (o[0], o[1]))[1] == hull2[j - 1]):
+                d1 = hull2[j - 1]
                 cross_dots.append(d1)
-                if hull1[i - 1] == hull2[j] or hull1[i - 1] == hull2[j - 1]:
-                    d2 = hull1[i - 1]
-                    cross_dots.append(d2)
+            if (hull1[i - 1] == hull2[j] or hull1[i - 1] == hull2[j - 1]) | \
+                    (cross_3(hull2[j - 1], hull2[j], hull1[i - 1]) == 0 and
+                     sorted([hull2[j - 1], hull2[j], hull1[i - 1]], key=lambda o: (o[0], o[1]))[1] == hull1[
+                         i - 1]):
+                d1 = hull1[i - 1]
+                cross_dots.append(d1)
             if cross_3(hull1[i - 1], hull1[i], hull2[j - 1]) * cross_3(hull1[i], hull1[i - 1], hull2[j]) > 0 and \
                     cross_3(hull2[j - 1], hull2[j], hull1[i - 1]) * cross_3(hull2[j], hull2[j - 1], hull1[i]) > 0:
-                if hull1[i - 1][0] - hull1[i][0] == 0 and hull2[j - 1][1] - hull2[j][1] == 0:  # prevent ZeroDivisionError
+                # prevent ZeroDivisionError
+                if hull1[i - 1][0] - hull1[i][0] == 0 and hull2[j - 1][1] - hull2[j][1] == 0:
                     x = hull1[i - 1][0]
                     y = hull2[j - 1][1]
                 elif hull2[j - 1][0] - hull2[j][0] == 0 and hull1[i - 1][1] - hull1[i][1] == 0:
@@ -54,6 +60,7 @@ def intersection_dots(hull1, hull2):
                     x = (hull2[j - 1][1] - hull1[i - 1][1] + a * hull1[i - 1][0] - b * hull2[j - 1][0]) / (a - b)
                     y = (hull2[j - 1][0] - hull1[i - 1][0] + c * hull1[i - 1][1] - d * hull2[j - 1][1]) / (c - d)
                 cross_dots.append((x, y))
+    cross_dots = list(set(cross_dots))
     return cross_dots
 
 
@@ -63,7 +70,7 @@ def get_inner(arr1, arr2):
     for i in arr1:
         flag = True
         for j in range(len_2):
-            if cross_3(i, arr2[j], arr2[(j + 1) % len_2]) * cross_3(i, arr2[(j + 1) % len_2], arr2[(j + 2) % len_2]) < 0:
+            if cross_3(i, arr2[j], arr2[(j + 1) % len_2]) * cross_3(i, arr2[(j + 1) % len_2], arr2[(j + 2) % len_2]) <= 0:
                 flag = False
                 break
         if flag:
@@ -71,7 +78,7 @@ def get_inner(arr1, arr2):
     for j in arr2:
         flag = True
         for i in range(len_1):
-            if cross_3(j, arr1[i], arr1[(i + 1) % len_1]) * cross_3(j, arr1[(i + 1) % len_1], arr1[(i + 2) % len_1]) < 0:
+            if cross_3(j, arr1[i], arr1[(i + 1) % len_1]) * cross_3(j, arr1[(i + 1) % len_1], arr1[(i + 2) % len_1]) <= 0:
                 flag = False
                 break
         if flag:
@@ -104,18 +111,45 @@ for _ in range(t):
     if n == 1 and m == 1:
         print('YES')
     elif n == 2 and m == 1:
-        print(0)
-        continue
+        if cross_3(arr_a[0], arr_a[1], arr_b[0]) == 0 and \
+                sorted([arr_a[0], arr_a[1], arr_b[0]], key=lambda x: (x[0], x[1]))[1] == arr_b[0]:
+            print('NO')
+        else:
+            print('YES')
     elif n == 1 and m == 2:
-        print(0)
-        continue
+        if cross_3(arr_b[0], arr_b[1], arr_a[0]) == 0 and \
+                sorted([arr_b[0], arr_b[1], arr_a[0]], key=lambda x: (x[0], x[1]))[1] == arr_a[0]:
+            print('NO')
+        else:
+            print('YES')
     elif n == m == 2:
-        print(0)
-        continue
+        if (cross_3(arr_a[0], arr_a[1], arr_b[0]) * cross_3(arr_a[1], arr_a[0], arr_b[1]) > 0 and
+                cross_3(arr_b[0], arr_b[1], arr_a[0]) * cross_3(arr_b[1], arr_b[0], arr_a[1]) > 0) | \
+            (cross_3(arr_a[0], arr_a[1], arr_b[0]) == 0 and
+             sorted([arr_a[0], arr_a[1], arr_b[0]], key=lambda x: (x[0], x[1]))[1] == arr_b[0]) | \
+            (cross_3(arr_a[0], arr_a[1], arr_b[1]) == 0 and
+             sorted([arr_a[0], arr_a[1], arr_b[1]], key=lambda x: (x[0], x[1]))[1] == arr_b[1]) | \
+            (cross_3(arr_b[0], arr_b[1], arr_a[0]) == 0 and
+             sorted([arr_b[0], arr_b[1], arr_a[0]], key=lambda x: (x[0], x[1]))[1] == arr_a[0]) | \
+            (cross_3(arr_b[0], arr_b[1], arr_a[1]) == 0 and
+             sorted([arr_b[0], arr_b[1], arr_a[1]], key=lambda x: (x[0], x[1]))[1] == arr_a[1]):
+            print('NO')
+        else:
+            print('YES')
+    # elif m == 1:
+    #     a = monotone_chain(arr_a)
+    #     across = intersection_dots(arr_b, a)
+    #     if len(across) < 1:
+    #         print('YES')
+    #     else:
+    #         print('NO')
     else:
-        hull_intersection = get_inner(arr_a, arr_b) + intersection_dots(arr_a, arr_b)
-        sorted_hull = monotone_chain(hull_intersection)
-        if len(sorted_hull) < 1:
+        a = monotone_chain(arr_a)
+        b = monotone_chain(arr_b)
+        across = get_inner(a, b) + intersection_dots(a, b)
+        # print(get_inner(a, b))
+        # print(intersection_dots(a, b))
+        if len(across) < 1:
             print('YES')
         else:
             print('NO')
