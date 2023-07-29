@@ -26,8 +26,10 @@ def cal_angle_1(d1, d2, d3):  # calculate the angle between
     torque = abs(cross_3(d1, d2, d3))
     # arm = dist_square(d1, d2)**.5
     # f = dist_square(d2, d3)**.5
-    arm = -dot_4(d1, d2, d2, d3)
-    angle = atan2(torque, arm)
+    arm = dot_4(d1, d2, d2, d3)
+    angle = atan2(torque, -arm)
+    if torque == 0 and arm < 0:
+        return pi
     return angle
 
 
@@ -41,8 +43,11 @@ def cal_angle_2(d1, d2):  # calculate the angle between
         return -angle
 
 
-print(cal_angle_1((0, 0), (1, 0), (2, 1)))
-print(cal_angle_2((0, 0, 3), (3, 0, 4)))
+def fence(d1, d2):
+    print(dist_square(d1, d2))
+    print((d1[2] - d2[2])**2)
+    print((dist_square(d1, d2) - (d1[2] - d2[2])**2)**.5)
+    return (dist_square(d1, d2) - (d1[2] - d2[2])**2)**.5
 
 
 def monotone_chain(arr):  # get hull
@@ -61,3 +66,20 @@ def monotone_chain(arr):  # get hull
         upper.append(du)
     return lower[:-1] + upper[:-1]
 
+
+t = int(sys.stdin.readline().strip())
+for _ in range(t):
+    n = int(sys.stdin.readline().strip())
+    centre_and_r = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
+    ans = 0
+    hull_c = monotone_chain(centre_and_r)
+    for i in range(n):
+        ans += fence(hull_c[i % n], hull_c[i - 1])
+        theta = (cal_angle_1(hull_c[i - 1], hull_c[i % n], hull_c[(i + 1) % n]) +
+                 cal_angle_2(hull_c[i % n], hull_c[i - 1]) + cal_angle_2(hull_c[i % n], hull_c[(i + 1) % n]))
+        print(cal_angle_1(hull_c[i - 1], hull_c[i % n], hull_c[(i + 1) % n]))
+        print(cal_angle_2(hull_c[i % n], hull_c[i - 1]))
+        print(cal_angle_2(hull_c[i % n], hull_c[(i + 1) % n]))
+        print(theta)
+        ans += hull_c[i][2] * theta
+    print(ans)

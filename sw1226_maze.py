@@ -32,7 +32,7 @@ def find_path(board, p):
     return 0
 
 
-for j in range(1, 11):
+for j in range(1):
     _ = input()
     maze = [list(map(int, list(input()))) for _ in range(16)]
     # print(maze)

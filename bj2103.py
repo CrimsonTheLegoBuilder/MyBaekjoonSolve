@@ -13,3 +13,4 @@ for i in range(0, len(dots) - 1, 2):
     ans += abs(dots[i][0] - dots[i+1][0])
 
 print(ans)
+
