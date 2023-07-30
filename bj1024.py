@@ -38,20 +38,20 @@ while m <= 100:  # 종료 조건 1. 문제에서 제시된 값.
 print(-1)  # 종료 조건 3. 모두 돌아봤는데도 만족하는 조건이 없더라.
 
 # 맞추고 난 이후 볼 수 있게 된 다른 사람의 풀이 중 재밌어보이는 풀이
-# n, l = map(int, input().split())
-# 
-# sm = sum([i for i in range(l)])
-# 
-# while True:
-#     if l>100 or n-sm<0:
-#         print(-1)
-#         break
-# 
-#     if (n-sm)%l==0:
-#         lst = [((n-sm)//l)+i for i in range(l)]
-#         print(*lst)
-#         break
-# 
-#     sm+=l
-#     l+=1
+n, l = map(int, input().split())
+
+sm = sum([i for i in range(l)])
+
+while True:
+    if l>100 or n-sm<0:
+        print(-1)
+        break
+
+    if (n-sm)%l==0:
+        lst = [((n-sm)//l)+i for i in range(l)]
+        print(*lst)
+        break
+
+    sm+=l
+    l+=1
 #     
