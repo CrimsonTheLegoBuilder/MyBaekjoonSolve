@@ -41,9 +41,9 @@ for _ in range(t):
     lines = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(3)]
     dots = [intersection(lines[i], lines[(i + 1) % 3]) for i in range(3) if intersection(lines[i], lines[(i + 1) % 3])]
     if len(dots) <= 2:
-        print(0.0000)
+        print('0.0000')
         continue
     # print(dots)
     ans = cal_area(dots)
     print(f'{ans:.4f}')
-    print(f'{round(ans, 4):.4f}')
+    # print(f'{round(ans, 4):.4f}')
