@@ -4,25 +4,21 @@ sys.setrecursionlimit(10000)
 
 def dfs():
     if len(ans) == m:
-        temp = tuple(arr[i] for i in ans)
-        if temp not in total:
-            total.append(temp)
+        print(*ans)
         return
+    pre_num = -1
     for i in range(n):
-        if i in ans:
-            continue
-        ans.append(i)
-        dfs()
-        ans.pop()
-    return
+        if visited[i] == 0 and pre_num != arr[i]:
+            pre_num = arr[i]
+            visited[i] = 1
+            ans.append(arr[i])
+            dfs()
+            visited[i] = 0
+            ans.pop()
 
 
 n, m = map(int, sys.stdin.readline().strip().split())
-arr = list(map(int, sys.stdin.readline().strip().split()))
-arr.sort()
+arr = sorted(list(map(int, sys.stdin.readline().strip().split())))
+visited = [0] * n
 ans = []
-total = []
 dfs()
-# print(total)
-for x in total:
-    print(*x)
