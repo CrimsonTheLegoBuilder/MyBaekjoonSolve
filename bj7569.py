@@ -18,10 +18,8 @@ def bfs():
 
 
 M, N, H = map(int, sys.stdin.readline().strip().split())
-box = []
+box = [[list(map(int, sys.stdin.readline().strip().split())) for _ in range(N)] for _ in range(H)]
 queue = deque()
-for _ in range(H):
-    box.append([list(map(int, sys.stdin.readline().strip().split())) for _ in range(N)])
 
 for z in range(H):
     for y in range(N):
@@ -30,7 +28,7 @@ for z in range(H):
                 queue.append((z, y, x))
 
 bfs()
-print(box)
+
 latest = 1
 for z in range(H):
     for y in range(N):

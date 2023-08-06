@@ -1,5 +1,6 @@
 import sys
 import math
+from functools import cmp_to_key
 
 
 def cross(d1, d2, d3, d4):  # cross product / get CCW / get Torque / get area
@@ -12,6 +13,15 @@ def dot(d1, d2, d3, d4):  # dot product / get projection / get Force
 
 def cal_dist_square(d1, d2):  # get c^2 = a^2 + b^2
     return (d1[0] - d2[0])**2 + (d1[1] - d2[1])**2
+
+
+def comp(d1, d2):  # compare by slope
+    return (d1[1] * d2[0] > d1[0] * d2[1]) - (d1[1] * d2[0] < d1[0] * d2[1])
+
+
+def sort_by_angle(arr):  # compose dots' array sorted by slope [[x1, y1, vx1, vy1], [x2, y2...]]
+    arr.sort(key=cmp_to_key(comp))
+    return arr
 
 
 def get_polygon_area(hull):  # get area
@@ -132,3 +142,21 @@ def intersection_dots(hull1, hull2):
                 cross_dots.append((x, y))
     cross_dots = list(set(cross_dots))
     return cross_dots
+
+
+# initialize:
+# for i in arr:
+#     dic = {}
+#     value_i = i[2]
+#     for j in arr:
+#         if i == j:
+#             continue
+#         else:
+#             x, y = j[0] - i[0], j[1] - i[1]
+#             gcd_ = gcd(abs(x), abs(y))
+#             temp = (x // gcd_, y // gcd_)
+#
+#             if temp in dic:
+#                 dic[temp] += j[2]
+#             else:
+#                 dic[temp] = j[2]
