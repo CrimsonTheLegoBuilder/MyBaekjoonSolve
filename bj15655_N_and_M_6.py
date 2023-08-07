@@ -2,20 +2,17 @@ import sys
 sys.setrecursionlimit(10000)
 
 
-def dfs():
+def dfs(x):
     if len(ans) == m:
         print(*ans)
         return
-    for i in range(n):
-        if arr[i] in ans:
-            continue
+    for i in range(x, n):
         ans.append(arr[i])
-        dfs()
+        dfs(i+1)
         ans.pop()
 
 
 n, m = map(int, sys.stdin.readline().strip().split())
-arr = list(map(int, sys.stdin.readline().strip().split()))
-arr.sort()
+arr = sorted(list(map(int, sys.stdin.readline().strip().split())))
 ans = []
-dfs()
+dfs(0)
