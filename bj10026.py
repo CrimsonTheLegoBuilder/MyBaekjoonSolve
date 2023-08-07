@@ -45,5 +45,4 @@ for j in range(N):
             dfs_rg(j, k)
             cnt_rg += 1
 
-print(cnt_b)
-print(cnt_rg)
+print(cnt_b, cnt_rg)
