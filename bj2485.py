@@ -1,28 +1,16 @@
 import sys
+from math import gcd
 
 n = int(input())
-arr = []
+arr = [int(sys.stdin.readline().strip()) for _ in range(n)]
 
-for _ in range(n):
-    arr.append(int(sys.stdin.readline().strip()))
-
-arr_n = []
-
+arr_n = [0]*(n-1)
 for i in range(len(arr) - 1):
-    arr_n.append(arr[i + 1] - arr[i])
+    arr_n[i] = arr[i + 1] - arr[i]
 
-cnt = 10 ** 10
+for i in range(len(arr_n) - 1):
+    a, b = arr_n[i], arr_n[i + 1]
+    arr_n[i + 1] = gcd(a, b)
 
-for m in range(len(arr_n) - 1):
-    a, b = arr_n[m], arr_n[m + 1]
-    while b:
-        a, b = b, a % b
-        if b == 0:
-            if a < cnt:
-                cnt = a
-
-m = (max(arr) - min(arr)) // cnt
-# print(cnt)
-# print(max(arr))
-# print(m)
-print(m - n + 1)
+m = (arr[-1] - arr[0]) // arr_n[-1]
+print(m-n+1)
