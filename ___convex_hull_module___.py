@@ -1,6 +1,7 @@
 import sys
-import math
+from math import gcd
 from functools import cmp_to_key
+sys.setrecursionlimit(10000)
 
 
 def cross(d1, d2, d3, d4):  # cross product / get CCW / get Torque / get area
@@ -148,19 +149,20 @@ def intersection_dots(hull1, hull2):
     return cross_dots
 
 
+arr = []
 # initialize:
-# for i in arr:
-#     dic = {}
-#     value_i = i[2]
-#     for j in arr:
-#         if i == j:
-#             continue
-#         else:
-#             x, y = j[0] - i[0], j[1] - i[1]
-#             gcd_ = gcd(abs(x), abs(y))
-#             temp = (x // gcd_, y // gcd_)
-#
-#             if temp in dic:
-#                 dic[temp] += j[2]
-#             else:
-#                 dic[temp] = j[2]
+for i in arr:
+    dic = {}
+    value_i = i[2]
+    for j in arr:
+        if i == j:
+            continue
+        else:
+            x, y = j[0] - i[0], j[1] - i[1]
+            gcd_ = gcd(abs(x), abs(y))
+            temp = (x // gcd_, y // gcd_)
+
+            if temp in dic:
+                dic[temp] += j[2]
+            else:
+                dic[temp] = j[2]
