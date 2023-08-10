@@ -15,6 +15,10 @@ def cal_dist_square(d1, d2):  # get c^2 = a^2 + b^2
     return (d1[0] - d2[0])**2 + (d1[1] - d2[1])**2
 
 
+def cal_dist(d1, d2):  # get c = (a^2 + b^2)^.5
+    return ((d1[0] - d2[0])**2 + (d1[1] - d2[1])**2)**.5
+
+
 def comp(d1, d2):  # compare by slope
     return (d1[1] * d2[0] > d1[0] * d2[1]) - (d1[1] * d2[0] < d1[0] * d2[1])
 

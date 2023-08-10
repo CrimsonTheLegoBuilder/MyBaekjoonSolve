@@ -29,7 +29,7 @@ for tc in range(1, int(input())+1):
             cnt += 1
             i += len(B)
         else:
-            i += boyer_moore(A, B, i)
+            i += 1
 
     ans = len(A) - len(B)*cnt + cnt
     print(f'#{tc} {ans}')
