@@ -149,12 +149,35 @@ def intersection_dots(hull1, hull2):
     return cross_dots
 
 
-arr = []
+def cross_s(s1, s2):  # s_ = (No, x1, y1, x2, y2)
+    result1 = (s1[3] - s1[1]) * (s2[2] - s1[4]) - (s1[4] - s1[2]) * (s2[1] - s1[3])
+    result2 = (s1[1] - s1[3]) * (s2[4] - s1[2]) - (s1[2] - s1[4]) * (s2[3] - s1[1])
+    result3 = (s2[3] - s2[1]) * (s1[2] - s2[4]) - (s2[4] - s2[2]) * (s1[1] - s2[3])
+    result4 = (s2[1] - s2[3]) * (s1[4] - s2[2]) - (s2[2] - s2[4]) * (s1[3] - s2[1])
+    flag1 = (result1 * result2 > 0) * (result3 * result4 > 0)
+    if result1 == 0 and (s2[1] - s1[1]) * (s1[3] - s2[1]) + (s2[2] - s1[2]) * (s1[4] - s2[2]) >= 0:
+        flag1 = 1
+    if result2 == 0 and (s2[3] - s1[1]) * (s1[3] - s2[3]) + (s2[4] - s1[2]) * (s1[4] - s2[4]) >= 0:
+        flag1 = 1
+    if result3 == 0 and (s1[1] - s2[1]) * (s2[3] - s1[1]) + (s1[2] - s2[2]) * (s2[4] - s1[2]) >= 0:
+        flag1 = 1
+    if result4 == 0 and (s1[3] - s2[1]) * (s2[3] - s1[3]) + (s1[4] - s2[2]) * (s2[4] - s1[4]) >= 0:
+        flag1 = 1
+    return flag1
+
+
+def cross_d(d, s):  # d = (x, y), s = (No, x1, y1, x2, y2)
+    result1 = (s[3] - s[1]) * (d[1] - s[4]) - (s[4] - s[2]) * (d[0] - s[3])
+    result2 = (d[0] - s[1]) * (s[3] - d[0]) + (d[1] - s[2]) * (s[4] - d[1])
+    return (result1 == 0) * (result2 >= 0)
+
+
+arr1 = []
 # initialize:
-for i in arr:
+for i in arr1:
     dic = {}
     value_i = i[2]
-    for j in arr:
+    for j in arr1:
         if i == j:
             continue
         else:
