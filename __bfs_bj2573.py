@@ -13,7 +13,8 @@ def bfs(x, y, p):
             if 0 <= nr < N and 0 <= nc < M and not grid[nr][nc] and visited[nr][nc] != p:
                 queue.append((nr, nc))
                 visited[nr][nc] = p
-            if 0 <= nr < N and 0 <= nc < M and not grid[nr][nc] and visited[nr][nc] != p:
+            if 0 <= nr < N and 0 <= nc < M and grid[nr][nc]:
+                grid[nr][nc] -= 1
 
 
 def dfs(r, c):
@@ -45,9 +46,8 @@ dc4 = (0, 1, 0, -1)
 for day in range(1, 11):
     for i in range(N):
         for j in range(M):
-            if not visited[i][j]:
+            if not grid[i][j] and visited[i][j] != day:
                 bfs(i, j, day)
-
 
 
 
