@@ -50,7 +50,6 @@ for day in range(1, 11):
                 bfs(i, j, day)
 
 
-
 '''
 8 10
 4 3 2 2 1 2 5 5 6 6
