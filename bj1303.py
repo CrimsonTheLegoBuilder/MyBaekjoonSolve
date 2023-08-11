@@ -13,7 +13,7 @@ def dfs(r, c):
             dfs(nr, nc)
 
 
-N, M = map(int, sys.stdin.readline().strip().split())
+M, N = map(int, sys.stdin.readline().strip().split())
 grid = [str(sys.stdin.readline().strip()) for _ in range(N)]
 visited = [[0] * M for _ in range(N)]
 power_w = 0
@@ -25,9 +25,18 @@ for i in range(N):
         cnt = 0
         if not visited[i][j]:
             dfs(i, j)
-            print(visited)
+            # print(visited)
             if grid[i][j] == 'W':
                 power_w += cnt**2
             else:
                 power_b += cnt**2
 print(power_w, power_b)
+
+'''
+5 6
+WBWWWW
+WWWWWW
+BBBBBB
+BBBWWB
+WWWWWB
+'''
