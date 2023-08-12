@@ -5,7 +5,7 @@ solutions = [0] * 101
 ans = 0.0
 for _ in range(N):
     c, sl = map(int, sys.stdin.readline().strip().split())  # concentration, solution (L)
-    solutions[c] += sl
+    solutions[c] += float(sl)
     if c == target:
         ans += sl
 print(solutions)
@@ -13,11 +13,13 @@ print(f'solution: {target}% {ans}L')
 print()
 low, high = target - 1, target + 1
 while low >= 0 and high <= 100:
-    while solutions[low] <= 0.000001:
+    # while solutions[low] <= 0.000001:
+    while solutions[low] == 0:
         low -= 1
         if low < 0:
             break
-    while solutions[high] <= 0.000001:
+    # while solutions[high] <= 0.000001:
+    while solutions[high] == 0:
         high += 1
         if high > 100:
             break
@@ -109,3 +111,41 @@ print(f'total: {ans}L')
 41 41
 40 40
 '''
+# import sys
+#
+# N, target = map(int, sys.stdin.readline().strip().split())
+# solutions = [0] * 101
+# ans = 0.0
+# for _ in range(N):
+#     c, sl = map(int, sys.stdin.readline().strip().split())
+#     solutions[c] += sl
+#     if c == target:
+#         ans += sl
+# low, high = target - 1, target + 1
+# while low >= 0 and high <= 100:
+#     while solutions[low] <= 0.000001:
+#         low -= 1
+#         if low < 0:
+#             break
+#     while solutions[high] <= 0.000001:
+#         high += 1
+#         if high > 100:
+#             break
+#     if low < 0 or high > 100:
+#         break
+#     high_sv = solutions[high]
+#     low_sv = solutions[low]
+#     high_sl = high * high_sv / 100
+#     low_sl = low * low_sv / 100
+#     x = (100 * high_sl - target * high_sv) / (target * low_sv - 100 * low_sl)
+#     if x > 1:
+#         ans += high_sv / x + low_sv
+#         solutions[high] -= high_sv / x
+#         solutions[low] = 0
+#         low -= 1
+#     else:
+#         ans += high_sv + low_sv * x
+#         solutions[high] = 0
+#         solutions[low] -= low_sv * x
+#         high += 1
+# print(ans)

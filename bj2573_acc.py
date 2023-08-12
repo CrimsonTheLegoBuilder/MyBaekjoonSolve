@@ -1,6 +1,6 @@
 import sys
 from collections import deque
-sys.stdin = open('___2573_input.txt', 'r')
+# sys.stdin = open('___2573_input.txt', 'r')
 
 
 def bfs(x, y, p):
