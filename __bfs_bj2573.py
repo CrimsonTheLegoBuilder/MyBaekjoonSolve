@@ -1,5 +1,6 @@
 import sys
 from collections import deque
+sys.setrecursionlimit(15000)
 
 
 def bfs(x, y, p):
@@ -38,27 +39,27 @@ dc8 = (1, -1, -1, 1, 1, 0, -1, 0)
 dr = (1, 0, -1, 0)
 dc = (0, 1, 0, -1)
 
-for day in range(1, 11):
+for day in range(1, 12):
     cnt = 0
-    for i in range(N):
-        for j in range(M):
-            if not grid[i][j] and visited_b[i][j] != day:
-                bfs(i, j, day)
-    while stack:
-        i, j = stack.pop()
-        if grid[i][j] > 0:
-            grid[i][j] -= 1
     for i in range(N):
         for j in range(M):
             if grid[i][j] and visited_d[i][j] != day:
                 dfs(i, j, day)
                 cnt += 1
-    for row in grid:
-        print(*row)
-    print()
+    # for row in grid:
+    #     print(*row)
+    # print()
     if cnt > 1:
-        ans = day
+        ans = day-1
         break
+    for i in range(N):
+        for j in range(M):
+            if not grid[i][j] and visited_b[i][j] != day:
+                bfs(i, j, day)
+    for i, j in stack:
+        if grid[i][j] > 0:
+            grid[i][j] -= 1
+    stack.clear()
 print(ans)
 
 '''
