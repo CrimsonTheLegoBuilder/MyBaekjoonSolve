@@ -9,8 +9,8 @@ for _ in range(N):
     if c == target:
         ans += sl
 print(solutions)
-print(f'solution: {target}% {ans}L')
-print()
+print(f'solution: {target}% {ans}L\n')
+
 low, high = target - 1, target + 1
 while low >= 0 and high <= 100:
     # while solutions[low] <= 0.000001:
@@ -36,8 +36,7 @@ while low >= 0 and high <= 100:
         ans += high_sv / x + low_sv
         solutions[high] -= high_sv / x
         solutions[low] = 0
-        print(f'remain / low: {low}% 0.0L / high: {high}% {solutions[high]}L / solution: {ans}L')
-        print()
+        print(f'remain / low: {low}% 0.0L / high: {high}% {solutions[high]}L / solution: {ans}L\n')
         low -= 1
     else:
         print(f'low: {low}% sol {solutions[low]}L use {x * 100}% / high: {high}% sol {solutions[high]}L use 100.0%')
@@ -45,8 +44,7 @@ while low >= 0 and high <= 100:
         ans += high_sv + low_sv * x
         solutions[high] = 0
         solutions[low] -= low_sv * x
-        print(f'remain / low: {low}% {solutions[low]}L / high: {high}% 0.0L / solution: {ans}L')
-        print()
+        print(f'remain / low: {low}% {solutions[low]}L / high: {high}% 0.0L / solution: {ans}L\n')
         high += 1
 
 # print(ans)
@@ -149,3 +147,4 @@ print(f'total: {ans}L')
 #         solutions[low] -= low_sv * x
 #         high += 1
 # print(ans)
+
