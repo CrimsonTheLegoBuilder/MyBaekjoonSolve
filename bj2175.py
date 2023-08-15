@@ -21,15 +21,15 @@ x6, y6 = (x5+x7)/2, (y5+y7)/2
 x8, y8 = (x7+x1)/2, (y7+y1)/2
 dots = ((x1, y1), (x2, y2), (x3, y3), (x4, y4), (x5, y5), (x6, y6), (x7, y7), (x8, y8))
 quadra = get_polygon_area(dots)
-print(quadra)
-print(dots)
+# print(quadra)
+# print(dots)
 ans = 12e12
 for j in range(3, 8):
     for k in range(9-j):
         temp = get_polygon_area(dots[k:k+j])
         ans = min(ans, abs(2*temp-quadra))
-        print(j, k, temp, ans, dots[k:k+j])
-print(ans)
+        # print(j, k, temp, ans, dots[k:k+j])
+# print(ans)
 A = (quadra - ans)/2
 B = (quadra - ans)/2 + ans
 print(A, B)
