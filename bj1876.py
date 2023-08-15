@@ -13,18 +13,18 @@ for _ in range(int(sys.stdin.readline().strip())):
     theta = degree * pi / 180
     target = T, W / 2
     slope = tan(theta)
-    xs = W / 2 * slope
+    xs = W / (2 * slope)
     step = W / slope
     # print()
-    # print(target, theta, theta * 180.0 / pi, slope, xs, step)
+    print(target, theta, theta * 180.0 / pi, slope, xs, step)
     while xs + step < T:
         xs += step
-        # print(xs)
+        print(xs)
     ds = xs - r * sin(theta), r * cos(theta)
-    # print(xs, 0.0, *ds)
+    print(xs, 0.0, *ds)
     d_ = ds[0] + 1.0, ds[1] + slope
     D = abs(cross(ds, d_, ds, target) * cos(theta))
-    # print(D, D < R)
+    print(D, D < R)
     if D > R:
         print('no')
     else:
