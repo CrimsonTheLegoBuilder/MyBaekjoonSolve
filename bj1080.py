@@ -14,8 +14,8 @@ for i in range(N-2):
                         arr_a[i + k][j + l] -= 1
                     else:
                         arr_a[i + k][j + l] += 1
-print(arr_a)
-print(arr_b)
+# print(arr_a)
+# print(arr_b)
 for i in range(N):
     for j in range(M):
         if arr_a[i][j] != arr_b[i][j]:
