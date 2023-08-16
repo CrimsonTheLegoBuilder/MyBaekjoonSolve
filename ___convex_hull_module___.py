@@ -96,6 +96,36 @@ def inner_check(d, arr):  # return 0 if dot in polygon
     return flag
 
 
+def intersection_d(d1, d2, d3, d4):
+    if d1[0] - d2[0] == 0 and d3[1] - d4[1] == 0:
+        x = d1[0]
+        y = d3[1]
+    elif d3[0] - d4[0] == 0 and d1[1] - d2[1] == 0:
+        x = d3[0]
+        y = d1[1]
+    elif d1[0] - d2[0] == 0:
+        x = d1[0]
+        y = d3[1] + (d3[1] - d4[1]) * (d1[0] - d3[0]) / (d3[0] - d4[0])
+    elif d1[1] - d2[1] == 0:
+        x = d3[0] + (d3[0] - d4[0]) * (d1[1] - d3[1]) / (d3[1] - d4[1])
+        y = d1[1]
+    elif d3[0] - d4[0] == 0:
+        x = d3[0]
+        y = d1[1] + (d1[1] - d2[1]) * (d3[0] - d1[0]) / (d1[0] - d2[0])
+    elif d3[1] - d4[1] == 0:
+        x = d1[0] + (d1[0] - d2[0]) * (d3[1] - d1[1]) / (d1[1] - d2[1])
+        y = d3[1]
+    else:
+        a = (d1[1] - d2[1]) / (d1[0] - d2[0])
+        b = (d3[1] - d4[1]) / (d3[0] - d4[0])
+        c = (d1[0] - d2[0]) / (d1[1] - d2[1])
+        d = (d3[0] - d4[0]) / (d3[1] - d4[1])
+        x = (d3[1] - d1[1] + a * d1[0] - b * d3[0]) / (a - b)
+        y = (d3[0] - d1[0] + c * d1[1] - d * d3[1]) / (c - d)
+    cross_dots = (x, y)
+    return cross_dots
+
+
 def intersection_dots(hull1, hull2):
     cross_dots = []
     for i in range(len(hull1)):
