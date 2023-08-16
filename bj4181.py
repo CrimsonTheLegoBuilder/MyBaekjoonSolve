@@ -11,12 +11,12 @@ def monotone_chain(arr):  # get hull / sorting hull CCW
         return arr
     lower = []
     for dl in arr:
-        while len(lower) > 1 and cross(lower[-2], lower[-1], lower[-1], dl) <= 0:
+        while len(lower) > 1 and cross(lower[-2], lower[-1], lower[-1], dl) < 0:
             lower.pop()
         lower.append(dl)
     upper = []
     for du in reversed(arr):
-        while len(upper) > 1 and cross(upper[-2], upper[-1], upper[-1], du) <= 0:
+        while len(upper) > 1 and cross(upper[-2], upper[-1], upper[-1], du) < 0:
             upper.pop()
         upper.append(du)
     return lower[:-1] + upper[:-1]
