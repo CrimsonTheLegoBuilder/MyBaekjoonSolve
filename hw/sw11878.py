@@ -31,31 +31,58 @@
 #                     ans = 'error'
 #     print(f'#{t} {ans}')
 #
-for t in range(1, int(input())+1):
-    Order = list(input().split())
+# for t in range(1, int(input())+1):
+#     Order = list(input().split())
+#     stack = []
+#     ans = 'error'
+#     for o in Order:
+#         if o == '.':
+#             if len(stack) > 1:
+#                 stack = ['error']
+#             break
+#         if o.isnumeric():
+#             stack.append(int(o))
+#         else:
+#             if o != '.' and len(stack) < 2:
+#                 stack = ['error']
+#                 break
+#             if o == '+':
+#                 stack.append(stack.pop() + stack.pop())
+#             if o == '*':
+#                 stack.append(stack.pop() * stack.pop())
+#             if o == '-':
+#                 stack.append(-stack.pop() + stack.pop())
+#             if o == '/':
+#                 a, b = stack.pop(), stack.pop()
+#                 if not b:
+#                     stack = ['error']
+#                     break
+#                 stack.append(int(a**-1 * b))
+#     print(f'#{t} {stack[0]}')
+
+for tc in range(1, int(input())+1):
+    code = list(input().split())
+    ans = 0
     stack = []
-    ans = 'error'
-    for o in Order:
-        if o == '.':
-            if len(stack) > 1:
-                stack = ['error']
-            break
-        if o.isnumeric():
-            stack.append(int(o))
-        else:
-            if o != '.' and len(stack) < 2:
-                stack = ['error']
-                break
-            if o == '+':
+    for s in code:
+        if s.isnumeric():  # 숫자면
+            stack.append(int(s))  # stack에 숫자넣음
+        try:
+            if s == '+':
                 stack.append(stack.pop() + stack.pop())
-            if o == '*':
-                stack.append(stack.pop() * stack.pop())
-            if o == '-':
+            elif s == '-':
                 stack.append(-stack.pop() + stack.pop())
-            if o == '/':
-                a, b = stack.pop(), stack.pop()
-                if not b:
-                    stack = ['error']
-                    break
-                stack.append(int(a**-1 * b))
-    print(f'#{t} {stack[0]}')
+            elif s == '*':
+                stack.append(stack.pop() * stack.pop())
+            elif s == '/':
+                stack.append(int(stack.pop()**-1 * stack.pop()))
+            elif s == '.':
+                if len(stack) == 1:
+                    ans = stack[0]
+                else:
+                    ans = 'error'
+        except IndexError:
+            ans = 'error'
+        except ZeroDivisionError:
+            ans = 'error'
+    print(f'#{tc} {ans}')

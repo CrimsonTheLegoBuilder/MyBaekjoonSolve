@@ -1,15 +1,16 @@
 import sys
 
-N = int(sys.stdin.readline().strip())
-ans = 0
-y = 0
-x = N-1
-t = int(N / 2**.5)
-while x >= t:
-    while x**2 + (y+1)**2 <= N**2:
-        ans += 1
-        print(x, y, ans)
+N = int(sys.stdin.readline().strip()) // 2
+cnt = 0
+x, y = N-1, 0
+while x >= 0:
+    while x**2 + y**2 <= N**2:
+        cnt += 1
+        if x**2 + (y+1)**2 >= N**2:
+            if x**2 + (y+1)**2 == N**2:
+                y += 1
+            break
         y += 1
     x -= 1
-print(ans)
-print(((ans-1)*8)+4)
+# print(cnt)
+print(cnt*4)
