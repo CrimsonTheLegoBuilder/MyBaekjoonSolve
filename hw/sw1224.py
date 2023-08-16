@@ -16,8 +16,6 @@ for tc in range(1, 11):
         else:
             while stack and icp[token] <= isp[stack[-1]]:
                 result.append(stack.pop())
-                if not stack:
-                    break
             stack.append(token)
     while stack:
         result.append(stack.pop())
