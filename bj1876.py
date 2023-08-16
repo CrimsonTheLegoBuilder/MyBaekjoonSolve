@@ -23,7 +23,7 @@ for _ in range(int(sys.stdin.readline().strip())):
     ds = xs - r * sin(theta), r * cos(theta)
     # print(xs, 0.0, *ds)
     d_ = ds[0] + 1.0, ds[1] + slope
-    D = abs(cross(ds, d_, ds, target) * cos(theta) / 2)
+    D = abs(cross(ds, d_, d_, target) * cos(theta))
     # print(ds, d_, D, D < R, cos(theta), cos(theta))
     if D > R:
         print('no')

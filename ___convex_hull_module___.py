@@ -72,7 +72,7 @@ def monotone_chain_r(arr):  # reversed / get hull / sorting hull CW
     return lower[:-1] + upper[:-1]
 
 
-def rotating_calipers(hull):  # get largest distance of hull
+def rotating_calipers(hull):  # get the largest distance of hull
     b = 1
     l = len(hull)
     max_dist = 0
