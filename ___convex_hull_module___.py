@@ -31,11 +31,11 @@ def sort_by_angle(arr):  # compose dots' array sorted by slope [[x1, y1, vx1, vy
 
 def get_polygon_area(hull):  # get area
     pivot = (0, 0)
-    a = len(hull)
-    area = 0
-    for i in range(a):
-        area += cross(pivot, hull[i - 1], hull[i - 1], hull[i])
-    return abs(area/2)
+    len_hull = len(hull)
+    p_area = 0
+    for dh in range(len_hull):
+        p_area += cross(pivot, hull[dh - 1], hull[dh - 1], hull[dh])
+    return abs(p_area/2)
 
 
 def monotone_chain(arr):  # get hull / sorting hull CCW
@@ -86,12 +86,23 @@ def rotating_calipers(hull):  # get the largest distance of hull
     return max_dist
 
 
-def inner_check(d, arr):  # return 0 if dot in polygon
+def inner_check(d, hull):  # return 1 if dot in polygon
     flag = 1
-    for x in range(len(arr)):
-        if cross(d, arr[x - 1], arr[x - 1], arr[x]) < 0:
+    for di in range(len(hull)):
+        if cross(hull[di - 1], hull[di], hull[di], d) <= 0:
             flag = 0
-        if cross(d, arr[x - 1], arr[x - 1], arr[x]) == 0 and dot(arr[x - 1], d, d, arr[x]) < 0:
+    for di in range(len(hull)):
+        if cross(hull[di - 1], d, d, hull[di]) == 0 and dot(hull[di - 1], d, d, hull[di]) >= 0:
+            flag = 1
+    return flag
+
+
+def outer_check(d, hull):  # return 0 if dot in polygon
+    flag = 0
+    for di in range(len(hull)):
+        if cross(hull[di - 1], hull[di], hull[di], d) <= 0:
+            flag = 1
+        if cross(hull[di - 1], d, d, hull[di]) == 0 and dot(hull[di - 1], d, d, hull[di]) >= 0:
             flag = 0
     return flag
 
@@ -179,6 +190,12 @@ def intersection_dots(hull1, hull2):
     return cross_dots
 
 
+def cross_d(d1, d2, target_d):  # d = (x, y)
+    result1 = (d2[0] - d1[0]) * (target_d[1] - d2[1]) - (d2[1] - d1[1]) * (target_d[0] - d2[0])  # cross
+    result2 = (target_d[0] - d1[0]) * (d2[0] - target_d[0]) + (target_d[1] - d1[1]) * (d2[1] - target_d[1])  # dot
+    return (result1 == 0) * (result2 >= 0)
+
+
 def cross_s(s1, s2):  # s_ = (No, x1, y1, x2, y2)
     result1 = (s1[3] - s1[1]) * (s2[2] - s1[4]) - (s1[4] - s1[2]) * (s2[1] - s1[3])
     result2 = (s1[1] - s1[3]) * (s2[4] - s1[2]) - (s1[2] - s1[4]) * (s2[3] - s1[1])
@@ -196,7 +213,7 @@ def cross_s(s1, s2):  # s_ = (No, x1, y1, x2, y2)
     return flag1
 
 
-def cross_d(d, s):  # d = (x, y), s = (No, x1, y1, x2, y2)
+def cross_l(d, s):  # d = (x, y), s = (No, x1, y1, x2, y2)
     result1 = (s[3] - s[1]) * (d[1] - s[4]) - (s[4] - s[2]) * (d[0] - s[3])  # cross
     result2 = (d[0] - s[1]) * (s[3] - d[0]) + (d[1] - s[2]) * (s[4] - d[1])  # dot
     return (result1 == 0) * (result2 >= 0)
