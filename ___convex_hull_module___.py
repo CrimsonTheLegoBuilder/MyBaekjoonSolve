@@ -12,6 +12,18 @@ def dot(d1, d2, d3, d4):  # dot product / get projection / get Force
     return (d2[0] - d1[0]) * (d4[0] - d3[0]) + (d2[1] - d1[1]) * (d4[1] - d3[1])
 
 
+def rotate_90(d1, d2):
+    vy = d2[1] - d1[1]
+    vx = d2[0] - d1[0]
+    return d1[0] - vy, d1[1] + vx
+
+
+def rotate_270(d1, d2):
+    vy = d2[1] - d1[1]
+    vx = d2[0] - d1[0]
+    return d1[0] + vy, d1[1] - vx
+
+
 def cal_dist_square(d1, d2):  # get c^2 = a^2 + b^2
     return (d1[0] - d2[0])**2 + (d1[1] - d2[1])**2
 
@@ -107,7 +119,7 @@ def outer_check(d, hull):  # return 0 if dot in polygon
     return flag
 
 
-def intersection_d(d1, d2, d3, d4):
+def intersection_d(d1, d2, d3, d4):  # l1 = (d1, d2), l2 = (d3, d4)
     if d1[0] - d2[0] == 0 and d3[1] - d4[1] == 0:
         x = d1[0]
         y = d3[1]
