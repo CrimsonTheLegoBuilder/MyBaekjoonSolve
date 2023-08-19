@@ -4,6 +4,7 @@ sys.setrecursionlimit(10000)
 
 def dfs(r, c, d):
     global cnt
+    drc = ((0, 1), (1, 1), (1, 0))
     if r == N-1 and c == N-1:
         cnt += 1
         return
@@ -38,7 +39,6 @@ def dfs(r, c, d):
 N = int(sys.stdin.readline().strip())
 grid = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
 cnt = 0
-drc = ((0, 1), (1, 1), (1, 0))
 if grid[0][2] or grid[N-1][N-1]:
     print(0)
 else:
