@@ -11,10 +11,12 @@ def bt(cnt, x):
         #     print(*row)
         # print()
         for _ in range(N):
+            enemy = set()
             for idx in range(M):
                 if visited_a[idx]:
-                    kill += bfs(temp, N, idx, -1)
-            forward(temp)
+                    bfs(temp, N, idx, -1, enemy)
+            kill += len(enemy)
+            forward(temp, enemy)
         ans = max(ans, kill)
         return
     for i in range(x, M):
@@ -24,7 +26,7 @@ def bt(cnt, x):
     return
 
 
-def bfs(temp, n, x, v):
+def bfs(temp, n, x, v, enemy):
     queue = deque()
     visited = [[0] * M for _ in range(N)]
     queue.append((n, x, v))
@@ -35,14 +37,16 @@ def bfs(temp, n, x, v):
             nc = c + dc[i]
             if 0 <= nr < N and 0 <= nc < M and v < D:
                 if temp[nr][nc]:
-                    temp[nr][nc] = 0
-                    return 1
+                    enemy.add((nr, nc))
+                    return 0
                 visited[nr][nc] = 1 if not ~v else visited[r][c] + 1
                 queue.append((nr, nc, visited[nr][nc]))
     return 0
 
 
-def forward(temp):
+def forward(temp, enemy):
+    for r, c in enemy:
+        temp[r][c] = 0
     for j in range(M):
         if temp[N-1][j]:
             temp[N-1][j] = 0
