@@ -5,9 +5,9 @@ a = int(input())
 arr = [1] * 1_000_000
 arr[0] = 0
 arr[1] = 0
-m = int(1_000_000 ** 1/2)
+m = int(1_000_000 ** .5)
 
-for i in range(2, m):
+for i in range(2, m+2):
     if arr[i] == 1:
         for j in range(i + i, 1_000_000, i):
             arr[j] = 0
