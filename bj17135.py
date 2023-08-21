@@ -60,8 +60,8 @@ def forward(temp, enemy):
 N, M, D = map(int, sys.stdin.readline().strip().split())
 grid = [list(map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
 visited_a = [0] * M
-dr = (0, 0, -1)
-dc = (-1, 1, 0)
+dr = (0, -1, 0)
+dc = (-1, 0, 1)
 ans = 0
 bt(0, 0)
 print(ans)
