@@ -1,5 +1,5 @@
 import sys
-sys.stdin = open('input (8).txt')
+sys.stdin = open('input_keyword.txt')
 
 
 def find_m(d1, d2):
