@@ -10,7 +10,6 @@ for i in range(N-1, -1, -1):
         h, idx = stack.pop()
         ans[idx] = i+1
     stack.append((height, i))
-    print(stack)
     # print(ans)
     # print(stack)
 print(*ans)
