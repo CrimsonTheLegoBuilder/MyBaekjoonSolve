@@ -22,6 +22,17 @@ def scan(no):
     return 1
 
 
+def scan2(no):
+    pre = 10
+    while no:
+        cur = no % 10
+        if cur > pre:
+            return 0
+        pre = cur
+        no //= 10
+    return 1
+
+
 for tc in range(1, int(input())+1):
     stack = []
     N = int(input())
@@ -30,6 +41,7 @@ for tc in range(1, int(input())+1):
     for i in range(N-1):
         for j in range(i+1, N):
             a = numbers[i] * numbers[j]
-            if scan(numbers[i] * numbers[j]):
+            if scan2(numbers[i] * numbers[j]):
                 ans = max_(ans, a)
+    # bt(0)
     print(f'#{tc} {ans}')

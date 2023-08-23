@@ -42,3 +42,25 @@ for tc in range(1, int(input())+1):
     ans = 0
     reflect(0, 0, 1)  # 초기 방향은 1
     print(f'#{tc} {ans}')
+
+
+# def reflect(r, c):
+#     ans = 0
+#     dr, dc = 0, 1
+#     while True:
+#         r += dr
+#         c += dc
+#         if r < 0 or r >= N or c < 0 or c >= N:
+#             return ans
+#         if grid[r][c] == 1:
+#             ans += 1
+#             dr, dc = -dc, -dr
+#         if grid[r][c] == 2:
+#             ans += 1
+#             dr, dc = dc, dr
+#
+#
+# for tc in range(1, int(input())+1):
+#     N = int(input())
+#     grid = [tuple(map(int, input().split())) for _ in range(N)]
+#     print(f'#{tc} {reflect(0, 0)}')
