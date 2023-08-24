@@ -44,12 +44,12 @@ def cal_dist(d1, d2):  # get c = (a^2 + b^2)^.5
     return ((d1[0] - d2[0])**2 + (d1[1] - d2[1])**2)**.5
 
 
-def comp(d1, d2):  # compare by slope
+def cmp_s(d1, d2):  # compare by slope
     return (d1[1] * d2[0] > d1[0] * d2[1]) - (d1[1] * d2[0] < d1[0] * d2[1])
 
 
 def sort_by_angle(arr):  # compose dots' array sorted by slope [[x1, y1, vx1, vy1], [x2, y2...]]
-    arr.sort(key=cmp_to_key(comp))
+    arr.sort(key=cmp_to_key(cmp_s))
     return arr
 
 
