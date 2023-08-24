@@ -1,6 +1,10 @@
 import sys
 
 
+def cross(d1, d2, d3, d4):  # cross product / get CCW / get Torque / get area
+    return (d2[0] - d1[0]) * (d4[1] - d3[1]) - (d2[1] - d1[1]) * (d4[0] - d3[0])
+
+
 def cal_dist(d1, d2):  # get c = (a^2 + b^2)^.5
     return ((d1[0] - d2[0])**2 + (d1[1] - d2[1])**2)**.5
 
@@ -57,32 +61,18 @@ while True:
     d_2 = x1 + v1_[0], y1 + v1_[1]
     d_3 = x2, y2
     d_4 = x2 + v2_[0], y2 + v2_[1]
-    print(d_1, d_2, d_3, d_4)
-    centre = intersection_d(d_1, d_2, d_3, d_4)
-    print(centre)
+    # print(d_1, d_2, d_3, d_4)
+    in_center = intersection_d(d_1, d_2, d_3, d_4)
+    # print(in_center)
     a = cal_dist((x2, y2), (x3, y3))
     b = cal_dist((x1, y1), (x3, y3))
     c = cal_dist((x2, y2), (x1, y1))
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    r = abs(cross((x2, y2), (x3, y3), (x3, y3), in_center)) / a
+    d = cal_dist((x1, y1), in_center)
+    e = cal_dist((x2, y2), in_center)
+    f = cal_dist((x3, y3), in_center)
+    s = (a+b+c)/2
+    r1 = r * (s-r+d-e-f) / (2 * (s-a))
+    r2 = r * (s-r-d+e-f) / (2 * (s-b))
+    r3 = r * (s-r-d-e+f) / (2 * (s-c))
+    print(f'{r1:.6f} {r2:.6f} {r3:.6f}')
