@@ -7,23 +7,15 @@ stack = [(balloons[0][0], (float(balloons[0][1])))]
 ans = [stack[0][1]] + [0.0] * (N-1)
 for i in range(1, N):
     r = float(balloons[i][1])
+    x = balloons[i][0]
     while stack:
-        d = balloons[i][0] - stack[-1][0]
-        # print(d)
+        d = x - stack[-1][0]
+        r = min(r, d**2 / (4*stack[-1][1]))
         if r < stack[-1][1]:
-            if 2*(r * stack[-1][1])**.5 <= d:
-                break
-            else:
-                r = d**2 / (4*stack[-1][1])
-                break
+            break
         else:
-            if 2*(r * stack[-1][1])**.5 <= d:
-                stack.pop()
-            else:
-                r = d**2 / (4*stack[-1][1])
-        # print(stack)
+            stack.pop()
     stack.append((balloons[i][0], r))
-    # print(stack)
     ans[i] = stack[-1][1]
 for row in ans:
     print(row)
