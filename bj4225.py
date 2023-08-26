@@ -42,12 +42,12 @@ while True:
     ans = 12e12
     l = len(trash)
     for i in range(l):
+        temp = 0.0
         for j in range(l):
             if j == i or j == (i+1) % l:
                 continue
             D = line_to_dot(trash[i], trash[(i+1) % l], trash[j])
-            ans = min(ans, D)
-    # print(f'Case {tc}: {ans + 0.005:.2f}')
+            temp = max(temp, D)
+        ans = min(ans, temp)
+
     print(f'Case {tc}: {ceil(ans * 100)/100:.2f}')
-    # print(f'Case {tc}: {1.50:.2f}')
-    # print(f'Case {tc}: {ceil(1.5000001*100)/100:.2f}')

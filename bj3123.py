@@ -9,29 +9,18 @@ for i in range(N):
     roof[y][x] = 1
 
 ans = 0.0
-for i in range(Y):
-    for j in range(X):
-        if roof[i][j]:
-            if roof[i+1][j+1]:
+for j in range(Y):
+    for i in range(X):
+        u, l, r, d = roof[j][i], roof[j+1][i], roof[j][i+1], roof[j+1][i+1]
+        if u + l + r + d >= 3:
+            ans += 1.0
+        if u + l + r + d == 2:
+            if u & d | r & l:
                 ans += 1.0
-            elif not roof[i+1][j+1]:
-                if not roof[i+1][j] and not roof[i][j+1]:
-                    ans += pi/4
-                elif roof[i+1][j] and roof[i][j+1]:
-                    ans += 1.0
-                else:
-                    ans += pi/6 + 3**.5/4
-        elif not roof[i][j]:
-            if not roof[i+1][j+1]:
-                if not roof[i+1][j] and not roof[i][j+1]:
-                    continue
-                elif roof[i+1][j] and roof[i][j+1]:
-                    ans += 1.0
-                else:
-                    ans += pi/4
-            elif roof[i+1][j+1]:
-                if not roof[i+1][j] and not roof[i][j+1]:
-                    ans += pi/4
-                else:
-                    ans += pi/6 + 3**.5/4
+            else:
+                ans += pi/6 + 3**.5/4
+        if u + l + r + d == 1:
+            ans += pi/4
+        else:
+            continue
 print(ans)
