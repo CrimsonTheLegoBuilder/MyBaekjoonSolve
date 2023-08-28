@@ -13,4 +13,4 @@ for x in range(1, N+1):
         if x < q:
             break
         dp[x] = min(dp[x], dp[x-q] + 1)
-print(dp)
+print(dp[N])
