@@ -6,7 +6,8 @@ def bt(x):
     if x == N:
         # print(*perm)
         r1 = balls[perm[0]]
-        stack = [(r1, 0.0)]
+        stack = list()
+        stack.append((r1, 0.0))
         for j in perm[1:]:
             r = balls[j]
             r_ = stack[-1][0]
