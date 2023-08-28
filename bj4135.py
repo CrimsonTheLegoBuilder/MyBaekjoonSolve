@@ -13,6 +13,8 @@ def bt(x):
             d = 2 * (r * r_) ** .5 + stack[-1][1]
             while stack:
                 r_ = stack[-1][0]
+                if d - stack[-1][1] < 2 * (r * r_) ** .5 + stack[-1][1]:
+                    d = 2 * (r * r_) ** .5 + stack[-1][1]
                 if r_ > r:
                     break
                 else:
