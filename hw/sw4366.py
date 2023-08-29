@@ -1,4 +1,4 @@
-pow2 = [1 << i for i in range(40)]
+# pow2 = [1 << i for i in range(40)]
 pow3 = [3**i for i in range(40)]
 
 for tc in range(1, int(input())+1):
@@ -7,15 +7,16 @@ for tc in range(1, int(input())+1):
 
     a = 0
     for i in range(len(A)):
-        a += pow2[i] * A[i]
+        if A[i]:
+            a |= 1 << i
     b = 0
     for i in range(len(B)):
         b += pow3[i] * B[i]
     # print(a, b)
-    ans = 0
 
+    ans = 0
     for i in range(len(A)):
-        temp_a = a ^ pow2[i]
+        temp_a = a ^ 1 << i
         for j in range(len(B)):
             temp_b = b
             if not B[j]:
