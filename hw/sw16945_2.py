@@ -17,9 +17,9 @@ for tc in range(1, int(input())+1):
         b1, b2, b3 = sorted(deq2)
         flag1, flag2 = 0, 0
         if a1 == a2 == a3 or a1+1 == a2 == a3-1:
-            flag1 = 1
+            flag1 |= 1
         if b1 == b2 == b3 or b1+1 == b2 == b3-1:
-            flag2 = 1
+            flag2 |= 1
         if flag1 & flag2:
             ans |= 1
     print(f'#{tc} {ans}')
