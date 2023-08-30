@@ -110,7 +110,7 @@ def rotating_calipers(hull):  # get the largest distance of hull
     return max_dist
 
 
-def inner_check(d, hull):  # return 1 if dot in polygon
+def inner_check(d, hull):  # return 1 if dot in convex polygon
     flag = 1
     for di in range(len(hull)):
         if cross(hull[di - 1], hull[di], hull[di], d) <= 0:
@@ -121,7 +121,7 @@ def inner_check(d, hull):  # return 1 if dot in polygon
     return flag
 
 
-def outer_check(d, hull):  # return 0 if dot in polygon
+def outer_check(d, hull):  # return 0 if dot in convex polygon
     flag = 0
     for di in range(len(hull)):
         if cross(hull[di - 1], hull[di], hull[di], d) <= 0:
