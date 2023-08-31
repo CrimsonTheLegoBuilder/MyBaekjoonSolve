@@ -4,6 +4,7 @@ for tc in range(1, int(input())+1):
     deq2 = [0] * 10
     win1 = 0
     win2 = 0
+    ans = 0
     for j in range(12):
         deq1[card[j]] += (j % 2) ^ 1
         deq2[card[j]] += j % 2
@@ -18,8 +19,6 @@ for tc in range(1, int(input())+1):
             if deq2[i] == 3:
                 win2 = 2
         if win1 or win2:
-            ans = (win1 & 1) | (win2 & 2)
-            print(f'#{tc} {ans}')
+            ans = win1 | win2
             break
-    if not win1 and not win2:
-        print(f'#{tc} 0')
+    print(f'#{tc} {ans}')
