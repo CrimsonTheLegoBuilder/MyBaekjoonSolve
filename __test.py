@@ -9,12 +9,43 @@ from math import acos, sin, cos, isclose
 # print(73428**.5)
 
 
-a = (524+196)**2 + 44**2
-b = (524+44)**2 + 196**2
-c = (524+5)**2 + (196+49)**2
-print(a, b, c)
-
-'''
-383 49 524 196 44 524
-0 0 0 0 0 0
-'''
+# a = (524+196)**2 + 44**2
+# b = (524+44)**2 + 196**2
+# c = (524+5)**2 + (196+49)**2
+# print(a, b, c)
+#
+# '''
+# 383 49 524 196 44 524
+# 0 0 0 0 0 0
+# '''
+#
+#
+# n = int(input())
+# time = []
+# for _ in range(n) :
+#     time.append(list(map(int, input().split())))  # t, s
+# time.sort(key=lambda x:x[1], reverse=True)
+#
+# no_answer = False
+# ans = time[0][1] - time[0][0]
+# for i in range(1, n) :
+#     if time[i][0] > ans or ans < 0 :  # 불가능
+#         no_answer = True
+#         break
+#     if time[i][1] < ans :
+#         ans = time[i][1] - time[i][0]
+#     else :
+#         ans -= time[i][0]
+#
+# if no_answer :
+#     print(-1)
+# else :
+#     print(ans)
+#
+#
+# '''
+# 3
+# 4 21
+# 13 19
+# 4 20
+# '''
