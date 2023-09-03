@@ -82,7 +82,7 @@ while True:
             if not cross_s(hull, i, j) and non_convex_inner_check(hull, (i+0.5, j+0.5)):
                 ans += 1
     # print(ans)
-    # sys.stdout.write(f'{ans}\n')
+    sys.stdout.write(f'{ans}\n')
 
 
 '''
