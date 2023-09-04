@@ -14,6 +14,6 @@ for i in range(1, N+1):
             break
         dp[i] = min(dp[i], dp[i-h]+1)
 
-print(dp)
+print(dp[N])
 f.write(str(dp))
 f.close()
