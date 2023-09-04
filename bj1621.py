@@ -20,35 +20,34 @@ for i in range(K, N+1):
 print(dp[-1])  # 일단 최소 비용 출력
 cnt, idx = k[-1], k[-1]    # K개 가져가는 이벤트 발생 횟수
 print(cnt)     # 출력
-print(dp)
-print(k)
 
-# ans = [0] * (N+1)       # 각각의 이벤트가 일어난 시점을 담을 리스트
-# while N >= -1 and cnt:
-#     if k[N] == cnt and k[N-K] == cnt - 1 and dp[N] - dp[N-K] == C:
-#         # 만일 지금 보고 있는 시점이 K개 가져간 이벤트가 발생한 시점보다 앞인 건 확인했고
-#         # K개 앞을 보니 1 차이 나서 더 확실한 것 같은데
-#         # dp도 K개 앞을 보니 누적 비용이 C 차이 나기 까지 한다면?
-#         ans[cnt] = N - K + 1  # 확실히 답이다.
-#         N -= K-1           # 건너 뛰어 더 앞을 보자.
-#         cnt -= 1           # 하나 찾음
-#     N -= 1                 # 앞으로 간다
-# for i in range(1, idx):
-#     print(ans[i], end=' ')
-# print(ans[idx])
-
-
-ans = []       # 각각의 이벤트가 일어난 시점을 담을 리스트
+ans = [0] * (N+1)       # 각각의 이벤트가 일어난 시점을 담을 리스트
 while N >= -1 and cnt:
     if k[N] == cnt and k[N-K] == cnt - 1 and dp[N] - dp[N-K] == C:
         # 만일 지금 보고 있는 시점이 K개 가져간 이벤트가 발생한 시점보다 앞인 건 확인했고
         # K개 앞을 보니 1 차이 나서 더 확실한 것 같은데
         # dp도 K개 앞을 보니 누적 비용이 C 차이 나기 까지 한다면?
-        ans.append(N-K+1)  # 확실히 답이다.
+        ans[cnt] = N - K + 1  # 확실히 답이다.
         N -= K-1           # 건너 뛰어 더 앞을 보자.
         cnt -= 1           # 하나 찾음
     N -= 1                 # 앞으로 간다
-print(*sorted(ans))
+for i in range(1, idx):
+    print(ans[i], end=' ')
+if idx:
+    print(ans[idx])
+
+
+# ans = []       # 각각의 이벤트가 일어난 시점을 담을 리스트
+# while N >= -1 and cnt:
+#     if k[N] == cnt and k[N-K] == cnt - 1 and dp[N] - dp[N-K] == C:
+#         # 만일 지금 보고 있는 시점이 K개 가져간 이벤트가 발생한 시점보다 앞인 건 확인했고
+#         # K개 앞을 보니 1 차이 나서 더 확실한 것 같은데
+#         # dp도 K개 앞을 보니 누적 비용이 C 차이 나기 까지 한다면?
+#         ans.append(N-K+1)  # 확실히 답이다.
+#         N -= K-1           # 건너 뛰어 더 앞을 보자.
+#         cnt -= 1           # 하나 찾음
+#     N -= 1                 # 앞으로 간다
+# print(*sorted(ans))
 
 '''
 5
