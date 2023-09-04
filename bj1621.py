@@ -22,7 +22,7 @@ cnt, idx = k[-1], k[-1]    # K개 가져가는 이벤트 발생 횟수
 print(cnt)     # 출력
 
 ans = [0] * N       # 각각의 이벤트가 일어난 시점을 담을 리스트
-while N >= -1 and cnt:
+while N >= 0 and cnt:
     if k[N] == cnt and k[N-K] == cnt - 1 and dp[N] - dp[N-K] == C:
         # 만일 지금 보고 있는 시점이 K개 가져간 이벤트가 발생한 시점보다 앞인 건 확인했고
         # K개 앞을 보니 1 차이 나서 더 확실한 것 같은데
