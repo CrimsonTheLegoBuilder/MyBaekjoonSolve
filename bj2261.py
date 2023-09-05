@@ -36,13 +36,9 @@ def min_dist_2(s, e, mid, dist, arr):
     min_dist_ = dist
     band.sort(key=lambda y: y[1])
     for i in range(len(band)-1):
-        for j in range(i+1, len(band)):
-            x1, y1 = band[i]
-            x2, y2 = band[j]
-            if y1**2 + y2**2 >= min_dist_:
+        for j in range(i+1, i+7):
+            if j >= len(band) or cal_dist_square(band[i], band[j]) > min_dist_:
                 break
-            if x1**2 + x2**2 >= min_dist_:
-                continue
             min_dist_ = min(cal_dist_square(band[i], band[j]), min_dist_)
     return min_dist_
 
