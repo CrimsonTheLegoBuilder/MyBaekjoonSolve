@@ -14,7 +14,7 @@ def divide_and_conquer(s, e, arr):
     right = divide_and_conquer(mid, e, arr)
     min_2 = min(left, right)
     dist = min_dist_2(s, e, mid, min_2, arr)
-    return min(left, right, dist)
+    return min(min_2, dist)
 
 
 def min_dist(s, e, arr):
@@ -37,8 +37,12 @@ def min_dist_2(s, e, mid, dist, arr):
     band.sort(key=lambda y: y[1])
     for i in range(len(band)-1):
         for j in range(i+1, len(band)):
-            if cal_dist_square(band[i], band[j]) > min_dist_:
+            x1, y1 = band[i]
+            x2, y2 = band[j]
+            if y1**2 + y2**2 >= min_dist_:
                 break
+            if x1**2 + x2**2 >= min_dist_:
+                continue
             min_dist_ = min(cal_dist_square(band[i], band[j]), min_dist_)
     return min_dist_
 
