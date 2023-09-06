@@ -1,0 +1,60 @@
+/* 아래 코드는 수정하지 않습니다. */
+body {
+  font-family: Arial;
+  width: 800px;
+}
+
+section {
+  float: left;
+  margin-left: 4px;
+}
+
+aside { 
+  float: right;
+  margin-right: 4px;
+}
+
+.clearfix::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* 이곳에 코드를 작성합니다. */
+/* 모든 스타일 요소를 ***클래스 선택자***로 정의합니다. */
+
+/* 1. article 태그는 white로 나머지 시멘틱 태그는 lightgrey로 배경색을 설정합니다. */
+.white-b {
+  background-color: white;
+}
+.lightgrey-b {
+  background-color: lightgrey;
+}
+/* 2. header, nav, footer 태그의 margin을 4px로 설정합니다. */
+.margin {
+  margin: 4px
+}
+/* 3. 모든 semantic 태그의 padding을 4px로 설정합니다. */
+.padding {
+  padding: 4px
+}
+/* 4. h1 태그를 수평 중앙에 정렬합니다. */
+.text-align {
+  text-align: center;
+}
+/* 5. section 태그는 width 490px height 300px, 
+   aside 태그는 width 280px height 300px로 설정합니다.*/
+.section {
+  width: 490px;
+  height: 300px;
+}
+.aside {
+  width: 280px;
+  height: 300px;
+}
+/* 6. 모든 semantic 태그의 border 두께를 1px, 실선, 검은색으로 설정합니다. */
+.border {
+  border: 1px solid black;
+  border-radius: 4px
+}
+/* 7. 모든 semantic 태그의 border 모서리 반경을 4px로 설정합니다. */
