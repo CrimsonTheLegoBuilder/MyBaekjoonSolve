@@ -1,0 +1,45 @@
+/* 아래의 코드는 수정이 필요 없습니다. */
+
+@import url('https://fonts.googleapis.com/css?family=Baloo+2&display=swap');
+
+body {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.2rem;
+}
+
+/* 1~3번 문제 */
+h1 {
+  text-align: center;
+}
+
+.container {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+  border: 3px solid;
+  border-radius: 0.3rem;
+  background: #6fa4ed;
+}
+
+.container > .row {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.row {
+  background: #edf5fc;
+  border: 1px solid;
+}
+
+.item {
+    text-align: center;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    color: white;
+    border: 1px solid;
+    border-radius: 8px;
+    background: #1b365c;
+}
+
+.item > p {
+  margin: 0;
+}
