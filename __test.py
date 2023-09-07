@@ -1,5 +1,9 @@
 import sys
-from math import acos, sin, cos, isclose
+from math import acos, sin, cos, isclose, atan, atan2
+#
+# print(atan2(10, 0))
+# print(atan(10/0))
+
 # print(acos(4))
 # def cross(d1, d2, d3, d4):  # cross product / get CCW / get Torque / get area
 #     return (d2[0] - d1[0]) * (d4[1] - d3[1]) - (d2[1] - d1[1]) * (d4[0] - d3[0])
@@ -7,7 +11,6 @@ from math import acos, sin, cos, isclose
 # print(a)
 
 # print(73428**.5)
-
 
 # a = (524+196)**2 + 44**2
 # b = (524+44)**2 + 196**2
@@ -49,3 +52,15 @@ from math import acos, sin, cos, isclose
 # 13 19
 # 4 20
 # '''
+
+T = int(input())
+for test_case in range(1, T+1):
+    M, N, K = map(int, input().split())
+    adj = [[0] * M for _ in range(N)]
+    visited = [[0] * M for _ in range(N)]
+    for _ in range(K):
+        X, Y = map(int, input().split())
+        adj[Y][X] = 1
+    for row in adj:
+        print(*row)
+    print()
