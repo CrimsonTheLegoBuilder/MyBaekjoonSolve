@@ -7,7 +7,7 @@ N **= 2
 while x > -1:
     while True:
         cnt += 1
-        print(x, y)
+        # print(x, y)
         y += 1
         n = x*x + y*y
         if n >= N:
