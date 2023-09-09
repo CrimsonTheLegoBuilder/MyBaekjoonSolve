@@ -31,6 +31,61 @@ def is_collide(d1, d2, d3):
 def one_bounce(d1):
     pt = []
     # for h_ in HOLES:
+    return
+
+
+def hit_pos(d1):
+    coord = []
+    for h_ in HOLES:
+        vx_, vy_ = make_vector(d1, h_)
+        length = cal_length(d1, h_)
+        x, y = d1
+        x1 = x + vx_*(D/length)
+        y1 = y + vy_*(D/length)
+        flag = 1
+        for l1, l2 in boundary:
+            if cal_dist(l1, l2, d1) < D:
+                flag = 0
+        # for i in range(1, 6):
+        #     if is_collide():
+        #         flag = 0
+        if flag:
+            coord.append((x1, y1))
+    for i in range(6):
+        pass
+    return coord
+
+
+def is_cross(d1, d2, d3, d4):
+    flag1 = cross(d1, d2, d2, d3) * cross(d2, d1, d1, d4)
+    flag2 = cross(d3, d4, d4, d1) * cross(d4, d3, d3, d2)
+    return flag1 > 0 and flag2 > 0
+
+
+def crs_pos(d1, d2):
+    d_ = d1
+    for i in range(6):
+        d3, d4 = boundary[i]
+        if is_cross(d1, d2, d3, d4):
+            if d3[0] - d4[0] == 0 and d1[1] - d2[1] == 0:
+                x = d3[0]
+                y = d1[1]
+                d_ = x, y
+            elif d1[0] - d2[0] == 0 and d3[1] - d4[1] == 0:
+                x = d1[0]
+                y = d3[1]
+                d_ = x, y
+            elif d3[0] - d4[0] == 0:
+                x = d3[0]
+                y = d1[1] + (d1[1] - d2[1]) * (d3[0] - d1[0]) / (d1[0] - d2[0])
+                d_ = x, y
+            elif d3[1] - d4[1] == 0:
+                x = d1[0] + (d1[0] - d2[0]) * (d3[1] - d1[1]) / (d1[1] - d2[1])
+                y = d3[1]
+                d_ = x, y
+            if dot(d1, d_, d_, d2) > 0:
+                return d_
+    return
 
 
 N = 6
@@ -49,7 +104,7 @@ for i in range(1, len(balls)):
     t = balls[i]
     for h in HOLES:
         if dot(s, t, t, h) > 0:
-            print(h)
+            # print(h)
             vx2, vy2 = make_vector(t, h)
             l_ = cal_length(t, h)**.5
             x_, y_ = t
