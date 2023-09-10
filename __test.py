@@ -1,5 +1,5 @@
 import sys
-from math import acos, sin, cos, isclose, atan, atan2
+from math import acos, sin, cos, isclose, atan, atan2, degrees
 #
 # print(atan2(10, 0))
 # print(atan(10/0))
@@ -53,14 +53,16 @@ from math import acos, sin, cos, isclose, atan, atan2
 # 4 20
 # '''
 
-T = int(input())
-for test_case in range(1, T+1):
-    M, N, K = map(int, input().split())
-    adj = [[0] * M for _ in range(N)]
-    visited = [[0] * M for _ in range(N)]
-    for _ in range(K):
-        X, Y = map(int, input().split())
-        adj[Y][X] = 1
-    for row in adj:
-        print(*row)
-    print()
+# T = int(input())
+# for test_case in range(1, T+1):
+#     M, N, K = map(int, input().split())
+#     adj = [[0] * M for _ in range(N)]
+#     visited = [[0] * M for _ in range(N)]
+#     for _ in range(K):
+#         X, Y = map(int, input().split())
+#         adj[Y][X] = 1
+#     for row in adj:
+#         print(*row)
+#     print()
+
+print(degrees(atan2(-2, 10)))

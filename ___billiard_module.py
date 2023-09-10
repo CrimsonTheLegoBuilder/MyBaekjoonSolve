@@ -1,8 +1,8 @@
 from math import atan, atan2, degrees
 
 
-def cross(d1, d2, d3, d4):
-    return (d2[0]-d1[0])*(d4[1]-d3[1]) - (d2[1]-d1[1])*(d4[0]-d3[0])
+# def cross(d1, d2, d3, d4):
+#     return (d2[0]-d1[0])*(d4[1]-d3[1]) - (d2[1]-d1[1])*(d4[0]-d3[0])
 
 
 def dot(d1, d2, d3, d4):
@@ -19,7 +19,7 @@ def cal_length(d1, d2):
 
 N = 6  # 모든 공의 수
 HOLES = ((0, 0), (127, 0), (254, 0), (0, 127), (127, 127), (254, 127))
-balls = ((127.0, 63.5), (180.0, 100.0))
+balls = ((127.0, 63.5), (127.0, 100.0))
 D = 5.73
 s = balls[0]
 x, y = s

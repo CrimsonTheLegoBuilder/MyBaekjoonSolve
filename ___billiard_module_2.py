@@ -25,10 +25,11 @@ def cal_dist(d1, d2, d3):
 
 def is_collide(d1, d2, d3):
     dist = cal_dist(d1, d2, d3)
-    return dist < D*2
+    flag = dot(d1, d3, d3, d2) > 0
+    return dist < D*2 and flag
 
 
-def one_bounce(d1):
+def one_cushion(d1):
     pt = []
     # for h_ in HOLES:
     return
@@ -37,7 +38,7 @@ def one_bounce(d1):
 def hit_pos(d1):
     coord = []
     for h_ in HOLES:
-        vx_, vy_ = make_vector(d1, h_)
+        vx_, vy_ = make_vector(h_, d1)
         length = cal_length(d1, h_)
         x, y = d1
         x1 = x + vx_*(D/length)
@@ -46,9 +47,9 @@ def hit_pos(d1):
         for l1, l2 in boundary:
             if cal_dist(l1, l2, d1) < D:
                 flag = 0
-        # for i in range(1, 6):
-        #     if is_collide():
-        #         flag = 0
+        for i in range(1, 6):
+            if dot((x1, y1), balls[i], balls[i], h_) > 0 and is_collide((x1, y1), h_, balls[i]) < D+0.01:
+                flag = 0
         if flag:
             coord.append((x1, y1))
     for i in range(6):
@@ -88,9 +89,44 @@ def crs_pos(d1, d2):
     return
 
 
+def one_cushion_t2h(j):
+    candidate = []
+    d1 = balls[j]
+    x, y = d1
+    d2 = 508 - x - D, -y
+    d_ = crs_pos(d1, d2)
+    flag = 1
+    if d_ is not None:
+        for i in range(1, 6):
+            if i != j:
+                if is_collide(d1, d_, balls[i]) and is_collide((0, 0), d_, balls[i]):
+                    flag = 0
+    if flag:
+        vx, vy = make_vector(d2, d1)
+        l_ = cal_length(d2, d1) ** .5
+        d__ = x + vx*(D/l_), y + vy*(D/l_)
+        candidate.append(d__)
+    d2 = -x, 254 - y - D
+    d_ = crs_pos(d1, d2)
+    flag = 1
+    if d_ is not None:
+        for i in range(1, 6):
+            if i != j:
+                if is_collide(d1, d_, balls[i]) and is_collide((0, 0), d_, balls[i]):
+                    flag = 0
+    if flag:
+        vx, vy = make_vector(d2, d1)
+        l_ = cal_length(d2, d1) ** .5
+        d__ = x + vx*(D/l_), y + vy*(D/l_)
+        candidate.append(d__)
+
+    return
+
+
 N = 6
 HOLES = ((0, 0), (127, 0), (254, 0), (0, 127), (127, 127), (254, 127))
 target = ((0,), (1, 3, 5), (2, 4, 5))
+player = 0
 
 r = 2.865
 boundary = (((5.73, 2.865), (121.27, 2.865)), ((132.73, 2.865), (248.27, 2.865)), ((251.135, 5.73), (251.135, 121.27)),
@@ -111,8 +147,9 @@ for i in range(1, len(balls)):
             x1_, y1_ = x_ - vx2*(D/l_), y_ - vy2*(D/l_)
             x1, y1 = x1_ - x, y1_ - y
             angle = degrees(atan2(y1, x1))
-            l = cal_length(s, t)
-            v = cross(s, t, t, h)
+            t_ = x1, y1
+            l = cal_length(s, t_)
+            v = cross(s, t_, t_, h)
             theta = abs(atan(v/l))
             ans.append((theta, angle))
 
@@ -126,7 +163,7 @@ print(rt)
 s = balls[0]
 x, y = s
 player = 0
-for i in target[player][:2]:
+for i in target[player][1:]:
     t = balls[i]
     for h in HOLES:
         if dot(s, t, t, h) > 0:
