@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>계산결과</h1>
+  <p>
+    {{num1}} + {{num2}} = {{num3}}
+  </p>
+  <p>
+    {{num1}} - {{num2}} = {{num4}}
+  </p>
+  <p>
+    {{num1}} * {{num2}} = {{num5}}
+  </p>
+  {% if num2 == 0 %}
+    <p>계산할 수 없습니다</p>
+  {% else %}
+    <p>{{num1}} / {{num2}} = {{num6}}</p>
+  {% endif %} 
+</body>
+</html>
