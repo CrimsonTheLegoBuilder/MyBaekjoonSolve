@@ -65,4 +65,11 @@ from math import acos, sin, cos, isclose, atan, atan2, degrees
 #         print(*row)
 #     print()
 
-print(degrees(atan2(-2, 10)))
+# print(degrees(atan2(-2, 10)))
+
+
+def facto(n):
+    return n*facto(n-1) if n else 1
+
+
+print(facto(10))
