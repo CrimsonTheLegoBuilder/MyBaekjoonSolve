@@ -12,10 +12,11 @@ def dijkstra(p, d):
         if min_dist[cur] < dist:
             continue
         for w in range(N):
-            nxt_dist = dist + graph[p][w]
-            if nxt_dist < min_dist[w]:
-                min_dist[w] = nxt_dist
-                heappush(pq, (w, nxt_dist))
+            if graph[cur][w]:
+                nxt_dist = dist + graph[p][w]
+                if nxt_dist < min_dist[w]:
+                    min_dist[w] = nxt_dist
+                    heappush(pq, (w, nxt_dist))
     ans.append(min_dist[d])
 
 
