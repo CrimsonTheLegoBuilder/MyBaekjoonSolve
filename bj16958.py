@@ -13,7 +13,7 @@ def dijkstra(p, d):
             continue
         for w in range(N):
             if graph[cur][w]:
-                nxt_dist = dist + graph[p][w]
+                nxt_dist = dist + graph[cur][w]
                 if nxt_dist < min_dist[w]:
                     min_dist[w] = nxt_dist
                     heappush(pq, (w, nxt_dist))
