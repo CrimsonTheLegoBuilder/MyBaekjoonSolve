@@ -3,21 +3,22 @@ from heapq import heappop, heappush
 
 
 def dijkstra(p, d):
-    min_dist = [3000] * N
-    min_dist[p] = 0
-    pq = []
-    heappush(pq, (0, p))
-    while pq:
-        dist, cur = heappop(pq)
-        if min_dist[cur] < dist:
-            continue
-        for w in range(N):
-            if graph[cur][w]:
-                nxt_dist = dist + graph[cur][w]
-                if nxt_dist < min_dist[w]:
-                    min_dist[w] = nxt_dist
-                    heappush(pq, (nxt_dist, w))
-    ans.append(min_dist[d])
+    if min_dist[p][d] < 3000:
+        ans.append(min_dist[p][d])
+    else:
+        pq = []
+        heappush(pq, (0, p))
+        while pq:
+            dist, cur = heappop(pq)
+            if min_dist[p][cur] < dist:
+                continue
+            for w in range(N):
+                if graph[cur][w]:
+                    nxt_dist = dist + graph[cur][w]
+                    if nxt_dist < min_dist[p][w]:
+                        min_dist[p][w] = nxt_dist
+                        heappush(pq, (nxt_dist, w))
+        ans.append(min_dist[p][d])
 
 
 N, T = map(int, sys.stdin.readline().strip().split())
@@ -36,8 +37,11 @@ for i in range(N):
 #     print(*row)
 M = int(sys.stdin.readline().strip())
 ans = []
+min_dist = [[3000] * N for _ in range(N)]
 for _ in range(M):
     s, e = map(int, sys.stdin.readline().strip().split())
     dijkstra(s-1, e-1)
 for col in ans:
     print(col)
+for row in min_dist:
+    print(*row)
