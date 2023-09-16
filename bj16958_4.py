@@ -2,7 +2,7 @@ import sys
 # Thank you dlwoals0850!!!
 
 
-def cal_texi_dist(x1, y1, x2, y2):
+def cal_taxi_dist(x1, y1, x2, y2):
     return abs(x1-x2) + abs(y1-y2)
 
 
@@ -24,7 +24,7 @@ for i in range(N):
     xi, yi = info[i]
     for j in range(i+1, N):
         xj, yj = info[j]
-        dist = cal_texi_dist(xi, yi, xj, yj)
+        dist = cal_taxi_dist(xi, yi, xj, yj)
         graph[i][j] = dist
         graph[j][i] = dist
 
@@ -36,7 +36,7 @@ for i in not_special:
         xj, yj = info[j]
         # if cal_texi_dist(xi, yi, xj, yj) < min_dist:
         #     min_dist = cal_texi_dist(xi, yi, xj, yj)
-        min_dist = min(cal_texi_dist(xi, yi, xj, yj), min_dist)
+        min_dist = min(cal_taxi_dist(xi, yi, xj, yj), min_dist)
     to_spec[i] = min_dist
 
 for i in range(N):
