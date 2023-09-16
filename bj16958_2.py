@@ -44,5 +44,5 @@ for _ in range(M):
     dijkstra(s-1, e-1)
 for col in ans:
     print(col)
-for row in min_dist:
-    print(*row)
+# for row in min_dist:
+#     print(*row)
