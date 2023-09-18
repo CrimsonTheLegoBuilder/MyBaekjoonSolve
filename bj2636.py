@@ -33,6 +33,10 @@ queue = deque()
 
 hour = 1
 remain = 0
+for x in range(N):
+    for y in range(M):
+        if cheese[x][y]:
+            remain += 1
 while True:
     visited = [[0]*M for _ in range(N)]
     surface = []
