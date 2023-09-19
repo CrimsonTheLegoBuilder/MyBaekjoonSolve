@@ -9,7 +9,7 @@ def dfs(d, r, c):
         i += i_
         j += j_
         cnt += 1
-        print(d, cnt)
+        # print(d, cnt)
         if i < 0 or i >= N or j < 0 or j >= M:
             return 0, cnt
         if grid[i][j] == 'C':
