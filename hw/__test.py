@@ -34,7 +34,9 @@ parent = [i for i in range(10)]  # 이게 집합...?
 def find_set(x):
     if parent[x] == x:
         return x
-    return find_set(parent[x])
+    # return find_set(parent[x])     # 찾아서 반환
+    parent[x] = find_set(parent[x])  # 찾아서 수정 / 경로 압축
+    return parent[x]
 
 
 # union find
