@@ -16,4 +16,4 @@ while x > -1:
             break
     x -= 1
 # print(cnt)
-print(cnt*4)
+print(cnt << 2)

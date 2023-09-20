@@ -31,11 +31,12 @@ def union(v1, v2):
     v1 = find_set(v1)
     v2 = find_set(v2)
     if v1 == v2:
-        return
+        return 1
     if v1 < v2:
         P[v2] = v1
     else:
         P[v1] = v2
+    return 1
 
 
 N = int(sys.stdin.readline().strip())

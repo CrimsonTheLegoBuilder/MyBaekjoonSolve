@@ -9,12 +9,11 @@ def dfs(d, r, c):
         i += i_
         j += j_
         cnt += 1
-        # print(d, cnt)
         if i < 0 or i >= N or j < 0 or j >= M:
             return 0, cnt
         if grid[i][j] == 'C':
             return 0, cnt
-        if i == r and j == c:
+        if i == r and j == c and i_ == drc[d][0] and j_ == drc[d][1]:
             return 1, cnt
         if grid[i][j] == '/':
             i_, j_ = -j_, -i_
