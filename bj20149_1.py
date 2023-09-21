@@ -56,11 +56,11 @@ def intersection_d(d1, d2, d3, d4):  # l1 = (d1, d2), l2 = (d3, d4)
 
 x1, y1, x2, y2 = map(int, sys.stdin.readline().strip().split())
 d_1, d_2 = (x1, y1), (x2, y2)
-if x1 > x2:
+if d_1 > d_2:
     d_1, d_2 = d_2, d_1
 x3, y3, x4, y4 = map(int, sys.stdin.readline().strip().split())
 d_3, d_4 = (x3, y3), (x4, y4)
-if x3 > x4:
+if d_3 > d_4:
     d_3, d_4 = d_4, d_3
 if is_cross(d_1, d_2, d_3, d_4):
     print(1)
