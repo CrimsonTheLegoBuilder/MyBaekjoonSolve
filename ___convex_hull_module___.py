@@ -140,6 +140,10 @@ def outer_check(d, hull):  # return 0 if dot in convex polygon
 
 
 def intersection_d(d1, d2, d3, d4):  # l1 = (d1, d2), l2 = (d3, d4)
+    if d1 == d2 or d1 == d4:
+        return d1
+    if d2 == d3 or d2 == d4:
+        return d2
     if d1[0] - d2[0] == 0 and d3[1] - d4[1] == 0:
         x = d1[0]
         y = d3[1]
