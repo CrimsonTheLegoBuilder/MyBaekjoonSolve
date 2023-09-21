@@ -121,6 +121,14 @@ def inner_check(d, hull):  # return 1 if dot in convex polygon
     return flag
 
 
+def inner_check_strong(d1, arr):  # return 1 dot must inside convex polygon
+    flag = 1
+    for di in range(len(arr)):
+        if cross(arr[di-1], arr[di], arr[di], d1) <= 0:
+            flag = 0
+    return flag
+
+
 def outer_check(d, hull):  # return 0 if dot in convex polygon
     flag = 0
     for di in range(len(hull)):
