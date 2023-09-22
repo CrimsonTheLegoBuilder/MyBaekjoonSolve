@@ -13,8 +13,47 @@ python manage.py startapp my_app  / my_app 생성
 
 
 # 2. http://127.0.0.1:8000/hello로 받은 요청을 통해 my_app 앱의 views.py에 있는 hello 함수를 실행시킬 수 있도록 아래 urls.py를 작성하시오
-from django.urls import path
-from my_app import views
-urlpatterns = [
-    path('my_app/', views.hello)
-]
+# from django.urls import path
+# from my_app import views
+# urlpatterns = [
+#     path('my_app/', views.hello)
+# ]
+
+
+def kruskal():
+    edge.sort(key=lambda x: x[2])
+    cnt = 0
+    total = 0
+    for s, e, w in edge:
+        if find(s) != find(e):
+            total += w
+            cnt += 1
+            union(s, e)
+        if cnt == V:
+            break
+    return total
+
+
+def find(x):
+    if P[x] == x:
+        return x
+    P[x] = find(P[x])
+    return P[x]
+
+
+def union(x, y):
+    x = find(x)
+    y = find(y)
+    if x == y:
+        return 0
+    if x < y:
+        P[y] = x
+    else:
+        P[x] = y
+
+
+for tc in range(int(input())):
+    V, E = map(int, input().split())
+    edge = [tuple(map(int, input().split())) for _ in range(E)]
+    P = list(range(V+1))
+    print(f"#{tc+1} {kruskal()}")
