@@ -3,7 +3,7 @@ import sys
 
 def rotate_ccw(x, y, line):
     tmp = []
-    for x1, y1 in reversed(line):
+    for x1, y1 in reversed(line[:-1]):
         vx, vy = x - x1, y - y1
         x2, y2 = x - vy, y + vx
         tmp.append((x2, y2))
