@@ -4,7 +4,7 @@ import sys
 def rotate_ccw(x, y, line):
     tmp = []
     for x1, y1 in reversed(line[:-1]):
-        vx, vy = x - x1, y - y1
+        vx, vy = x1 - x, y1 - y
         x2, y2 = x - vy, y + vx
         tmp.append((x2, y2))
     x_, y_ = tmp[-1]
@@ -30,13 +30,37 @@ dxy = ((1, 0), (0, -1), (-1, 0), (0, 1))
 for order in info:
     xs, ys, ds, gs = order
     dragon = make_curve(xs, ys, ds, gs)
-    print(dragon)
+    # print(dragon)
     for i, j in dragon:
         dots.setdefault((i, j), 1)
 cnt = 0
 for i, j in dots.keys():
     if dots.get((i+1, j)) and dots.get((i, j+1)) and dots.get((i+1, j+1)):
         cnt += 1
-print(dots)
+# print(dots)
 print(cnt)
+
+'''
+20
+50 50 0 10
+50 50 1 10
+50 50 2 10
+50 50 3 10
+50 50 0 10
+50 50 1 10
+50 50 2 10
+50 50 3 10
+50 50 0 10
+50 50 1 10
+50 50 2 10
+50 50 3 10
+50 50 0 10
+50 50 1 10
+50 50 2 10
+50 50 3 10
+50 50 0 10
+50 50 1 10
+50 50 2 10
+50 50 3 10
+'''
 
