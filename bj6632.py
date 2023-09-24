@@ -71,9 +71,9 @@ while True:
         break
     hull = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
     # grid = [[0]*201 for _ in range(201)]
-    ccw = get_polygon_area(hull)
-    if ccw < 0:
-        hull.reverse()
+    # ccw = get_polygon_area(hull)
+    # if ccw < 0:
+    #     hull.reverse()
     dots = {}
     for i in range(-100, 101):
         for j in range(-100, 101):
@@ -112,6 +112,32 @@ while True:
 -95 95
 96 -95
 -97 100
+
+4
+1 1
+5 3
+5 4
+3 5
+0
+
+4
+0 0
+2 0
+2 2
+0 2
+5
+0 0
+0 -50
+-50 -51
+-51 -50
+-50 0
+5
+0 0
+0 -50
+50 -51
+51 -50
+50 0
+0
 
 # 6
 '''
