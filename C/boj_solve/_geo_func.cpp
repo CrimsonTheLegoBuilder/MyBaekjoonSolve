@@ -33,6 +33,22 @@ std::vector<Pos> pos_at_N(std::vector<Star>& P, int D) {
 	for (int i = 0; i < N; i++) { S.push_back({ P[i].x + P[i].vx * D, P[i].y + P[i].vy * D }); }
 	return S;
 }
+bool NCVXHIN(std::vector<Pos>& H, Pos& d) {
+	int cnt = 0, L = H.size();
+	for (int i = 0; i < L; i++) {
+		Pos d1 = H[i], d2 = H[(i + 1) % L];
+		if (d1.y > d2.y) std::swap(d1, d2);
+		if (!cross(d1, d, d, d2) && dot(d1, d, d, d2) >= 0) return 1;
+		if (d.x > std::max(d1.x, d2.x)) continue;
+		if (d.y <= d1.y) continue;
+		if (d.y > d2.y) continue;
+		if (d.y == d1.y && d.y == d2.y) continue;
+		if (cross(d1, d2, d2, d) < 0) continue;
+		if (d1.y < d.y && d.y <= d2.y) cnt++;
+		else if (cross(d1, d2, d2, d) > 0) cnt++;
+	}
+	return cnt % 2;
+}
 ll get_area(std::vector<Pos>& H) {
 	ll A = 0, L = H.size();
 	Pos pivot = { 0, 0 };

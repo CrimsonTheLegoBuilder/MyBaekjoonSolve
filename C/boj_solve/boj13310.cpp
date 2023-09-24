@@ -67,14 +67,10 @@ Pos ternary_search(std::vector<Star>& stars, int X) {
 	while (e - s >= 3) {
 		l = (s * 2 + e) / 3;
 		r = (s + e * 2) / 3;
-		SL = pos_at_N(stars, l);
-		HL = monotone_chain(SL);
-		L = rotating_calipers(HL);
-		SR = pos_at_N(stars, r);
-		HR = monotone_chain(SR);
-		R = rotating_calipers(HR);
-		if (L <= R) e = r;
-		else s = l;
+		SL = pos_at_N(stars, l); HL = monotone_chain(SL); L = rotating_calipers(HL);
+		SR = pos_at_N(stars, r); HR = monotone_chain(SR); R = rotating_calipers(HR);
+		if (L > R) s = l;
+		else e = r;
 	}
 	return { s, e + 1 };
 }
