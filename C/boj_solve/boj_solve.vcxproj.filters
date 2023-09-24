@@ -22,6 +22,9 @@
     <Filter Include="소스 파일\sliding_window">
       <UniqueIdentifier>{44fdbe4d-eb6d-40e5-920f-afa4d4710bc0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\implementation">
+      <UniqueIdentifier>{c10de3bb-e51c-4d9f-9fe6-7cd5cff12cae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="_geo_func.cpp">
@@ -41,6 +44,12 @@
     </ClCompile>
     <ClCompile Include="boj6632.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj26489.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj26574.cpp">
+      <Filter>소스 파일\implementation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
