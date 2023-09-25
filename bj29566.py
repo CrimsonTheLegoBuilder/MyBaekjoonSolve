@@ -23,8 +23,8 @@ else:
     # print(x_1, y_1)
     # print(x_2, y_2)
     if isclose((x3-x_1)**2+(y3-y_1)**2, float(r3**2)):
-        print(x_1, y_1)
+        print(f"{x_1:.6f} {y_1:.6f}")
     elif isclose((x3-x_2)**2+(y3-y_2)**2, float(r3**2)):
-        print(x_2, y_2)
+        print(f"{x_2:.6f} {y_2:.6f}")
     else:
         print('Impossible')

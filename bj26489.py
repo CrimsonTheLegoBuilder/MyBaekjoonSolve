@@ -1,8 +1,9 @@
 cnt = 0
 while 1:
-    a = input()
-    if a:
-        cnt += 1
-    else:
+    try:
+        a = input()
+        if a:
+            cnt += 1
+    except:
         print(cnt)
-        break
+        exit(0)
