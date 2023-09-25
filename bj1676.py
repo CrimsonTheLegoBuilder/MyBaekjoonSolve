@@ -14,4 +14,4 @@ def facto(x):
     return x * facto(x-1)
 
 
-print(str(facto(n))[-(31 * c + 6*s + a) - 1:])
+# print(str(facto(n))[-(31 * c + 6*s + a) - 1:])

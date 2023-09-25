@@ -28,7 +28,7 @@ for _ in range(N):
     else:
         seg.setdefault((-abs(x)//m, abs(y)//m), 0)
         seg[(-abs(x) // m, abs(y)//m)] += 1
-print(seg)
+# print(seg)
 ans = 0
 for vx, vy in seg:
     if seg.get((-vy, vx)):
