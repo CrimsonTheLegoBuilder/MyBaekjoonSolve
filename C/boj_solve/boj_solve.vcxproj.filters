@@ -25,6 +25,12 @@
     <Filter Include="소스 파일\implementation">
       <UniqueIdentifier>{c10de3bb-e51c-4d9f-9fe6-7cd5cff12cae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\graph_search">
+      <UniqueIdentifier>{fae80ec2-1f94-4776-906b-a57dd6127712}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\segment_tree">
+      <UniqueIdentifier>{914cfd7a-ef4e-44f6-92b1-d372ecf5b46d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="_geo_func.cpp">
@@ -45,14 +51,29 @@
     <ClCompile Include="boj6632.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj26489.cpp">
-      <Filter>소스 파일\implementation</Filter>
-    </ClCompile>
     <ClCompile Include="boj26574.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
     <ClCompile Include="boj28401_1.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj13310_1.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1260.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1275.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1275_1.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1321.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1321_1.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

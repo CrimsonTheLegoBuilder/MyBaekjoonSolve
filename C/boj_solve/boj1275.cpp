@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 typedef long long ll;
-
 std::vector<ll> tree;
 std::vector<ll> arr;
 
@@ -13,7 +13,7 @@ ll sum(int l, int r, int s, int e, int n) {
 	ll R = sum(m + 1, r, s, e, n * 2 + 1);
 	return L + R;
 }
-void update(int l, int r, int idx, int diff, int n) {
+void update(int l, int r, int idx, ll diff, int n) {
 	if (idx < l || r < idx) return;
 	tree[n] += diff;
 	if (l != r) {
@@ -27,14 +27,15 @@ ll init(int l, int r, int n) {
 	int m = (l + r) / 2;
 	ll L = init(l, m, n * 2);
 	ll R = init(m + 1, r, n * 2 + 1);
-	return tree[n] = L + R;
+	tree[n] = L + R;
+	return tree[n];
 }
 
 
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
-	int N, Q, I;
+	int N, Q;
 	std::cin >> N >> Q;
 	arr.resize(N);
 	for (int i = 0; i < N; i++) {
