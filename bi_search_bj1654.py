@@ -1,24 +1,19 @@
 import sys
 
-n, m = map(int, sys.stdin.readline().strip().split())
-wires = [float(sys.stdin.readline().strip()) for _ in range(n)]
-target = wires[0]
-den = 10000000
-start, end = 0, den
-ratio = 0
+N, M = map(int, sys.stdin.readline().strip().split())
+wires = sorted([int(sys.stdin.readline().strip()) for _ in range(N)])
+MAX = wires[-1]
 
-while abs(start - end) > 0.00001:
-    mid = (start + end) / 2
-    ratio = mid / den
-    line = target * ratio
-    total = 0
-    for i in range(n):
-        total += int(wires[i] / line)
-    # print(total)
-    if total < m:
-        end = mid
+# line = [i for i in range(MAX+1)]
+s, e = 1, MAX
+while s <= e:
+    m = s + e >> 1
+    tmp = 0
+    for i in range(N):
+        tmp += wires[i] // m
+    if tmp < M:
+        e = m - 1
     else:
-        start = mid
+        s = m + 1
 
-ans = target * ratio
-print(int(ans))
+print(e)
