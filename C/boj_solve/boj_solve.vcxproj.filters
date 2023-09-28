@@ -75,6 +75,12 @@
     <ClCompile Include="boj1321_1.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
+    <ClCompile Include="boj2042.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj2243.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

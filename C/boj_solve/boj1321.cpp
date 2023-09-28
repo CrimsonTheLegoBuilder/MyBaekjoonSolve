@@ -37,7 +37,6 @@ int bi_search(ll x, int N) {
 	while (s < e) {
 		m = s + e >> 1;
 		tmp = sum(0, N - 1, 0, m, 1);
-		//std::cout << tmp << " " << s << " " << m << " " << e << "\n";
 		if (tmp >= x) e = m;
 		else s = m + 1;
 	}
