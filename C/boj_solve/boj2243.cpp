@@ -17,11 +17,11 @@ void update(ll* F, int idx, int N, ll diff) {
 		idx += idx & -idx;
 	}
 }
-void init(ll* A, ll* F, int N) {
-	for (int i = 1; i <= N; i++) {
-		update(F, i, N, A[i]);
-	}
-}
+//void init(ll* A, ll* F, int N) {
+//	for (int i = 1; i <= N; i++) {
+//		update(F, i, N, A[i]);
+//	}
+//}
 ll bs(ll* F, ll x, int N) {
 	int l = 1, r = N, m;
 	while (l < r) {
