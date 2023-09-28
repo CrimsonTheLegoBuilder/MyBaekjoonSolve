@@ -112,7 +112,7 @@ def dfs():
 
 for tc in range(int(sys.stdin.readline().strip())):
     n = int(sys.stdin.readline().strip())
-    circles = sorted([tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)], key=cmp_to_key(comp))
+    circles = sorted([tuple(map(float, sys.stdin.readline().strip().split())) for _ in range(n)], key=cmp_to_key(comp))
     # print(tc, circles)
     print(f"{dfs():.12f}")
 
