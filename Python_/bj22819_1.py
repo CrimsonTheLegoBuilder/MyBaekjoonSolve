@@ -47,7 +47,9 @@ def get_slope(c1, c2):  # c_n = (cx, cy, cr)
         th += 2*pi
     p = asin((r2-r1)/c2c)
     th -= p
-    if th >= 2*pi:
+    if abs(th) < 0.00000001:
+        th = 0.0
+    elif th >= 2*pi:
         th -= 2*pi
     elif th < 0:
         th += 2*pi

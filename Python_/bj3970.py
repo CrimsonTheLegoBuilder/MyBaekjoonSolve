@@ -47,7 +47,9 @@ def get_slope(c1, c2):  # c_n = (cx, cy, cr)
         th += 2*pi
     p = asin((r2-r1)/c2c)
     th -= p
-    if th >= 2*pi:
+    if abs(th) < 0.00000001:
+        th = 0.0
+    elif th >= 2*pi:
         th -= 2*pi
     elif th < 0:
         th += 2*pi
@@ -87,6 +89,8 @@ def dfs():
     last = (0, nxt[0])
     while 1:
         min_s = 3 * pi
+        # print(nxt)
+        # print(last)
         p, s_p = nxt[0], nxt[2]
         for w in range(n):
             if w == p:
@@ -99,20 +103,30 @@ def dfs():
                 if min_s > tmp_s:
                     min_s = tmp_s
                     nxt = (w, circles[w][2], s_c)
+        # print(nxt, (p, nxt[0]), last)
         if (p, nxt[0]) == last:
             # print(hull)
             return cal_hull_r(hull)
         hull.append(nxt)
 
 
-for _ in range(int(sys.stdin.readline().strip())):
+for tc in range(int(sys.stdin.readline().strip())):
     n = int(sys.stdin.readline().strip())
-    circles = sorted([tuple(map(float, sys.stdin.readline().strip().split())) for _ in range(n)], key=cmp_to_key(comp))
-    # print(circles)
+    circles = sorted([tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)], key=cmp_to_key(comp))
+    # print(tc, circles)
     print(f"{dfs():.12f}")
 
 
 '''
+1
+4
+-71 -94 18
+69 -15 97 
+62 1 14
+52 88 35
+
+
+
 35
 1
 10.000 10.000 10.000

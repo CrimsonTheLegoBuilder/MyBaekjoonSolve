@@ -48,8 +48,12 @@ def get_slope(c1, c2):  # c_n = (cx, cy, cr)
     p = asin((r2-r1)/c2c)
     # print(th)
     # print(p)
+    # print(th, p)
     th -= p
-    if th >= 2*pi:
+    # print(th)
+    if abs(th) < 0.00000001:
+        th = 0.0
+    elif th >= 2*pi:
         th -= 2*pi
     elif th < 0:
         th += 2*pi
@@ -80,7 +84,7 @@ def dfs():
     for w in range(1, n):
         if not is_c_in_c(circles[p], circles[w]):
             tmp_s = get_slope(circles[p], circles[w])
-            # print(p, w, tmp_s)
+            print(p, w, tmp_s)
             if min_s > tmp_s:
                 min_s = tmp_s
                 nxt = (w, circles[w][2], tmp_s)
@@ -89,14 +93,14 @@ def dfs():
         return circles[0][2] * pi * 2
     hull.append(nxt)
     last = (0, nxt[0])
-    # cnt = 0
+    cnt = 0
     while 1:
-        # cnt += 1
-        # if cnt == 40:
-        #     print(hull)
-        #     return 0
+        cnt += 1
+        if cnt == 40:
+            print(hull)
+            return 0
         min_s = 3 * pi
-        # print(nxt)
+        print(nxt, last)
         p, s_p = nxt[0], nxt[2]
         for w in range(n):
             if w == p:
@@ -124,7 +128,7 @@ while 1:
     if not n:
         break
     circles = sorted([tuple(map(float, sys.stdin.readline().strip().split())) for _ in range(n)], key=cmp_to_key(comp))
-    # print(circles)
+    print(circles)
     print(f"{dfs():.12f}")
 
 
