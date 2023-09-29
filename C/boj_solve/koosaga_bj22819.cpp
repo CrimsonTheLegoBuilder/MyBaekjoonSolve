@@ -23,8 +23,8 @@ namespace CircleHull {
 	const real_t pi = acos(-1);  // pi = 3.14159265...
 
 	struct func {
-		// a: x coord ; b: y coord ; r : r of circle
-		// f(x) = a*sin(x) + b*cos(x) + r  : y coord after coord-trans
+		// a: y coord ; b: x coord ; r : r of circle
+		// f(x) = a*sin(x) + b*cos(x) + r
 		func_t a, b, r;
 		constexpr func operator+(func f) const { return { a + f.a, b + f.b, r + f.r }; }
 		constexpr func operator-(func f) const { return { a - f.a, b - f.b, r - f.r }; }
@@ -46,7 +46,8 @@ namespace CircleHull {
 	};
 
 	vector<arc> get_max(func p, func q, real_t l, real_t r) {
-		if (l >= r)
+		//std::cout << p.r << " " << "\n";
+		if (l >= r)  // judge by slope
 			return vector<arc>();  // ??
 		func delta = p - q;
 		if (abs(delta.a) < eps && abs(delta.b) < eps) {  //  if 2 circle's center is same
@@ -61,19 +62,26 @@ namespace CircleHull {
 
 		real_t phi = atan2l(delta.b, delta.a);  // absolute angle between 2 centers
 		real_t x1 = asin(abs(t)) + (t < 0 ? pi : 0);  // relative angle of tangent
+		//real_t x12 = asin(abs(t)) * 180.0 / pi;  // relative angle of tangent
+		//std::cout << phi << " " << "\n";
+		//std::cout << x1 << " " << x12 << "\n";
 		real_t x2 = pi - x1;
+		//std::cout << x2 << " " << "\n";
 		x1 = norm(x1 - phi);
 		x2 = norm(x2 - phi);
+		//std::cout << x1 << " " << x2 << "\n";
 		if (x1 > x2)
 			swap(x1, x2);
 
 		vector<arc> vec;
 		if (p.eval((x1 + x2) / 2) < q.eval((x1 + x2) / 2)) {  // 
-			vec = { {real_t(0), x1, p}, {x1, x2, q}, {x2, pi * 2, p} };  // CW
+			vec = { {real_t(0), x1, p}, {x1, x2, q}, {x2, pi * 2, p} };  // CW?
 		}
 		else {
-			vec = { {real_t(0), x1, q}, {x1, x2, p}, {x2, pi * 2, q} };  // CW
+			//std::cout << p.eval((x1 + x2) / 2) << " " << q.eval((x1 + x2) / 2) << "\n";
+			vec = { {real_t(0), x1, q}, {x1, x2, p}, {x2, pi * 2, q} };  // CW?
 		}
+		//std::cout << x1 << " " << x2 << "\n";
 
 		vector<arc> ret;
 		for (auto [lo, hi, f] : vec) {
@@ -108,7 +116,7 @@ namespace CircleHull {
 		cur = 0;
 		for (int i = 0; i < sz(ret); i++) {
 			if (i + 1 == sz(ret) || ret[i + 1].f != ret[i].f) {
-				r.push_back({ cur, ret[i].hi, ret[i].f });
+				r.push_back({ cur, ret[i].hi, ret[i].f });  //anlges are continue
 				cur = ret[i].hi;
 			}
 		}
@@ -156,8 +164,11 @@ namespace CircleHull {
 		using point = complex<real_t>;
 		vector<point> v;
 		real_t ans = 0;
+		//std::cout << hull.size();
 		for (auto& [lo, hi, f] : hull) {
 			ans += f.r * (hi - lo);
+			//std::cout << ((f.r+1) * (hi - lo)) << "\n";
+			//std::cout << "lo " << lo << " hi " << hi << " a " << f.a << " b " << f.b << " r " << f.r << "\n";
 			point x{ 1.0 * f.a, 1.0 * f.b };
 			point r{ 1.0 * f.r, 0.0 };
 			v.push_back(x + r * exp(point(0, lo)));
