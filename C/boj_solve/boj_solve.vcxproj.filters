@@ -31,6 +31,9 @@
     <Filter Include="소스 파일\segment_tree">
       <UniqueIdentifier>{914cfd7a-ef4e-44f6-92b1-d372ecf5b46d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\_test">
+      <UniqueIdentifier>{27af614a-c0dd-4e25-8dfd-9a8ac9d9ed41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="_geo_func.cpp">
@@ -83,6 +86,12 @@
     </ClCompile>
     <ClCompile Include="boj1615.cpp">
       <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="koosaga_bj22819.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>소스 파일\_test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

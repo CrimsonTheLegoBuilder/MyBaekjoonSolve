@@ -65,7 +65,7 @@ def cal_hull_r(hull):
         t = sc - sp
         if t < 0:
             t += 2*pi
-        r_h += r * t
+        r_h += (r + 10) * t
         x1, y1, r1 = circles[c1]
         x2, y2, r2 = circles[c2]
         r_h += (cal_dist((x1, y1), (x2, y2))**2 - (r1-r2)**2)**.5
@@ -84,7 +84,7 @@ def dfs():
                 min_s = tmp_s
                 nxt = (w, circles[w][2], tmp_s)
     if nxt is None:
-        return circles[0][2] * pi * 2
+        return (circles[0][2]+10) * pi * 2
     hull.append(nxt)
     last = (0, nxt[0])
     while 1:
@@ -107,13 +107,9 @@ def dfs():
         hull.append(nxt)
 
 
-while 1:
-    n = int(sys.stdin.readline().strip())
-    if not n:
-        break
-    circles = sorted([tuple(map(float, sys.stdin.readline().strip().split())) for _ in range(n)], key=cmp_to_key(comp))
-    # print(circles)
-    print(f"{dfs():.5f}")
+n = int(sys.stdin.readline().strip())
+circles = sorted([tuple(map(float, sys.stdin.readline().strip().split())) for _ in range(n)], key=cmp_to_key(comp))
+print(f"{dfs():.12f}")
 
 
 '''
