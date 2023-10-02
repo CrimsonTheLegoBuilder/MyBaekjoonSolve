@@ -93,6 +93,39 @@
     <ClCompile Include="test.cpp">
       <Filter>소스 파일\_test</Filter>
     </ClCompile>
+    <ClCompile Include="boj27957_koosaga_codeforce.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27957.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27957_1.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27957_half_plane.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27219.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27294.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27324.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1167.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1967.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj2638.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj10250.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

@@ -5,9 +5,10 @@
 #include <algorithm> // min, max, sort..
 #include <complex>   // complex no.
 #include <iomanip>   // setprecision
+//#include <bits/stdc++.h>
 using namespace std;
 using lint = long long;
-using pi = array<lint, 2>;  // pair ll * 2
+//using pi = array<lint, 2>;  // pair ll * 2
 #define sz(a) ((int)(a).size())
 #define all(a) (a).begin(), (a).end()
 
@@ -16,10 +17,11 @@ using pi = array<lint, 2>;  // pair ll * 2
 // Line segments are implicitly expressed as two endpoint (i, hi) - (i + 1, lo).
 // Code inspired by https://codeforces.com/gym/104334/submission/204263938
 // Thanks koosaga
+// this code is awesome...
 namespace CircleHull {
-	using func_t = int;
+	using func_t = long long;
 	using real_t = long double;
-	const func_t eps = 1e-9;     // tolerance
+	const real_t eps = 1e-9;     // tolerance
 	const real_t pi = acos(-1);  // pi = 3.14159265...
 
 	struct func {
@@ -48,7 +50,7 @@ namespace CircleHull {
 	vector<arc> get_max(func p, func q, real_t l, real_t r) {
 		//std::cout << p.r << " " << "\n";
 		if (l >= r)  // judge by slope
-			return vector<arc>();  // ??
+			return vector<arc>();
 		func delta = p - q;
 		if (abs(delta.a) < eps && abs(delta.b) < eps) {  //  if 2 circle's center is same
 			if (delta.r >= 0)
@@ -87,7 +89,7 @@ namespace CircleHull {
 		for (auto [lo, hi, f] : vec) {
 			lo = max(lo, l);
 			hi = min(hi, r);
-			if (lo >= hi)  // if CW continue
+			if (lo >= hi)  // if CW : continue (break)
 				continue;
 			ret.push_back({ lo, hi, f });
 		}
@@ -191,19 +193,16 @@ int main() {
 	ios_base::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
-	while (true) {
-		int n;
-		cin >> n;
-		if (n == 0)
-			break;
-		vector<CircleHull::func> a(n);
-		for (auto& x : a) {
-			double xa, xb, xr;
-			cin >> xa >> xb >> xr;
-			x.a = (int)round(1000 * xa);
-			x.b = (int)round(1000 * xb);
-			x.r = (int)round(1000 * xr);
-		}
-		cout << setprecision(69) << CircleHull::getPerimeter(a) / 1e3 << "\n";
+	int n;
+	cin >> n;
+	vector<CircleHull::func> a(n);
+	for (auto& x : a) {
+		lint xa, xb, xr;
+		cin >> xa >> xb >> xr;
+		x.a = xa;
+		x.b = xb;
+		x.r = xr;
 	}
+	cout << setprecision(69) << CircleHull::getPerimeter(a) << "\n";
+	return 0;
 }

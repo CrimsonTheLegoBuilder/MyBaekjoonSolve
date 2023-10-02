@@ -48,10 +48,10 @@ for d in range(N+1):
             if 0 <= ni < MAX and 0 <= nj <= F:
                 if linked_dic[ni].get(nj):
                     graph[d].append((linked_dic[ni][nj], cal_dist((i, j), (ni, nj))))
+print(dijkstra(0))
 # print(graph[:10])
 # print(cost[:10])
 # print(linked_dic[:10])
-print(dijkstra(0))
 # print(graph[:10])
 # print(cost[:10])
 

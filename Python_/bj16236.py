@@ -1,20 +1,15 @@
 import sys
-from collections import deque
 from heapq import heappop as h_pop
 from heapq import heappush as h_push
 
 
 def bfs(i, j):
     global V, cnt
-    # queue = deque()
     h = []
-    # queue.append((i, j))
     h_push(h, (0, i, j))
     ocean[i][j] = 0
     visited[i][j] = 0
-    # while queue:
     while h:
-        # r, c = queue.popleft()
         _, r, c = h_pop(h)
         if 0 < ocean[r][c] < V:
             ocean[r][c] = 9
@@ -28,11 +23,9 @@ def bfs(i, j):
             if 0 <= nr < N and 0 <= nc < N and not ~visited[nr][nc] and not ocean[nr][nc] > V:
                 if not ocean[nr][nc]:
                     visited[nr][nc] = visited[r][c] + 1
-                    # queue.append((nr, nc))
                     h_push(h, (visited[nr][nc], nr, nc))
                 elif ocean[nr][nc] <= V:
                     visited[nr][nc] = visited[r][c] + 1
-                    # queue.append((nr, nc))
                     h_push(h, (visited[nr][nc], nr, nc))
     return 0, 0, 0
 
@@ -57,10 +50,41 @@ while 1:
     # for row in visited:
     #     print(*row)
     # print()
-    for row in ocean:
-        print(*row)
-    print()
+    # for row in ocean:
+    #     print(*row)
+    # print()
     if not d:
         break
     total += d
 print(total)
+
+'''
+20
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 2 3 3 4 4
+0 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+9 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
+0 0 0 0 0 0 0 0 0 0 0 0 0 1 2 2 3 3 4 4
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 4
+
+5
+0 0 0 0 0
+1 0 0 0 2
+0 0 3 3 0
+3 3 0 0 9
+1 3 0 0 0
+'''
