@@ -37,6 +37,9 @@
     <Filter Include="소스 파일\prefix_sum">
       <UniqueIdentifier>{52ab682a-18c8-4bce-8923-7c9ff5039d39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\divide_conquer">
+      <UniqueIdentifier>{bd0faa58-8c64-40df-8e62-2dab4d28b829}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="_geo_func.cpp">
@@ -131,6 +134,15 @@
     </ClCompile>
     <ClCompile Include="boj25682.cpp">
       <Filter>소스 파일\prefix_sum</Filter>
+    </ClCompile>
+    <ClCompile Include="boj25682_1.cpp">
+      <Filter>소스 파일\prefix_sum</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1780.cpp">
+      <Filter>소스 파일\divide_conquer</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1780_1.cpp">
+      <Filter>소스 파일\divide_conquer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

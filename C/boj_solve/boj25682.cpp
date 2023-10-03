@@ -1,5 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
+#include <cstring>
+#include <algorithm>
 const int LEN = 2'001;
 int S1[LEN][LEN]{0};
 int S2[LEN][LEN]{0};
