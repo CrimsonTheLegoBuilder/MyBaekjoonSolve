@@ -40,7 +40,7 @@ p = cnt(0, n-1, 0, n-1)
 print(f"{p[0]}\n{p[1]}\n{p[2]}")
 
 
-
+'''
 import sys
 input = sys.stdin.readline
 cnt = [0, 0, 0]
@@ -65,3 +65,4 @@ conquer(0, 0, N)
 print(cnt[-1])
 print(cnt[0])
 print(cnt[1])
+'''

@@ -37,14 +37,14 @@
     <Filter Include="소스 파일\prefix_sum">
       <UniqueIdentifier>{52ab682a-18c8-4bce-8923-7c9ff5039d39}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\divide_conquer">
-      <UniqueIdentifier>{bd0faa58-8c64-40df-8e62-2dab4d28b829}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\matrix">
       <UniqueIdentifier>{03c20d5d-b636-4f88-9a76-add36feb3647}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\stack">
       <UniqueIdentifier>{1cb03d7e-badb-4c8c-9c08-af2f7b7d6295}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\divide_conquer">
+      <UniqueIdentifier>{bd0faa58-8c64-40df-8e62-2dab4d28b829}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +158,15 @@
     </ClCompile>
     <ClCompile Include="boj6549.cpp">
       <Filter>소스 파일\stack</Filter>
+    </ClCompile>
+    <ClCompile Include="boj25308.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj15829.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj11444.cpp">
+      <Filter>소스 파일\matrix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
