@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stack>
 #include <algorithm>
+#include <string.h>
 typedef long long ll;
 const int LEN = 100'002;
 ll box[LEN]{ 0 };
