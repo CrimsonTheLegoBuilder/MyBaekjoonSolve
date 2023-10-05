@@ -15,8 +15,12 @@ int N, T, x, y, vx, vy;
 std::vector<Star> stars;
 Pos min_day;
 
-ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x); }
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2.x - d1.x) * (d4.x - d3.x) + (d2.y - d1.y) * (d4.y - d3.y); }
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x);
+}
+ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return (d2.x - d1.x) * (d4.x - d3.x) + (d2.y - d1.y) * (d4.y - d3.y);
+}
 bool is_cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	bool f11 = cross(d1, d2, d2, d3) * cross(d2, d1, d1, d4) > 0;
 	bool f12 = cross(d3, d4, d4, d1) * cross(d4, d3, d3, d2) > 0;
@@ -27,7 +31,9 @@ bool is_cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 		(!cross(d3, d2, d2, d4) && dot(d3, d2, d2, d4) >= 0);
 	return f1 || f2;
 }
-ll cal_dist_sq(const Pos& d1, const Pos& d2) { return (d1.x - d2.x) * (d1.x - d2.x) + (d1.y - d2.y) * (d1.y - d2.y); }
+ll cal_dist_sq(const Pos& d1, const Pos& d2) {
+	return (d1.x - d2.x) * (d1.x - d2.x) + (d1.y - d2.y) * (d1.y - d2.y);
+}
 std::vector<Pos> pos_at_N(std::vector<Star>& P, int D) {
 	std::vector<Pos> S;
 	for (int i = 0; i < N; i++) { S.push_back({ P[i].x + P[i].vx * D, P[i].y + P[i].vy * D }); }

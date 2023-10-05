@@ -13,8 +13,12 @@ struct Pos {
 struct Star { ll x, y, vx, vy; };
 
 
-ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x); }
-ll cal_dist_sq(const Pos& d1, const Pos& d2) { return (d1.x - d2.x) * (d1.x - d2.x) + (d1.y - d2.y) * (d1.y - d2.y); }
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x);
+}
+ll cal_dist_sq(const Pos& d1, const Pos& d2) {
+	return (d1.x - d2.x) * (d1.x - d2.x) + (d1.y - d2.y) * (d1.y - d2.y);
+}
 std::vector<Pos> pos_at_N(std::vector<Star>& P, int D) {
 	std::vector<Pos> S;
 	for (int i = 0; i < P.size(); i++) { S.push_back({ P[i].x + P[i].vx * D, P[i].y + P[i].vy * D }); }
