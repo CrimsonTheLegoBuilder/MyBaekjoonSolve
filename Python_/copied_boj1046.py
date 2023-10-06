@@ -11,8 +11,8 @@ def search(x, y, pos, angle):
     x2 = x + 1 if angle[0] > 0 else x  # 교점
     y1 = y + 1 if angle[0] * angle[1] > 0 else y - 1  # 옆칸
     y2 = y + 1 if angle[0] * angle[1] > 0 else y  # 교점
-    y_nx = pos[1] + (angle[1]) * (x2 - pos[0])
     x_ny = pos[0] + ((y2 - pos[1]) / (angle[1]))
+    y_nx = pos[1] + (angle[1]) * (x2 - pos[0])
     if y + 1e-7 < y_nx and y_nx < y + 1 - 1e-7 and (x_ny < x - 1e-7 or x_ny > x + 1 + 1e-7):
         pos = [x2, y_nx]
         search(x1, y, pos, angle)

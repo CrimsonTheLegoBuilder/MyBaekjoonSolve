@@ -54,7 +54,7 @@
     <ClCompile Include="boj13310.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj28401.cpp">
+    <ClCompile Include="boj28401_cnvxhull.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj2096.cpp">
@@ -72,7 +72,7 @@
     <ClCompile Include="boj28401_1.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj13310_1.cpp">
+    <ClCompile Include="boj13310_CH_RC_TS.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj1260.cpp">
@@ -105,7 +105,7 @@
     <ClCompile Include="boj27957_koosaga_codeforce.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj27957.cpp">
+    <ClCompile Include="boj27957_hulldisks.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj27957_1.cpp">
@@ -168,7 +168,7 @@
     <ClCompile Include="test.cpp">
       <Filter>소스 파일\_test</Filter>
     </ClCompile>
-    <ClCompile Include="boj1046.cpp">
+    <ClCompile Include="boj1046_sweeping.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
