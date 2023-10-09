@@ -12,7 +12,7 @@ if cos_t > 1.0:
     print('Impossible')
 else:
     theta = acos(cos_t)
-    # print(theta)
+    print(theta)
     vx, vy = x2-x1, y2-y1
     vx1, vy1 = vx*cos(theta) - vy*sin(theta), vx*sin(theta) + vy*cos(theta)
     vx2, vy2 = vx*cos(-theta) - vy*sin(-theta), vx*sin(-theta) + vy*cos(-theta)
@@ -28,3 +28,10 @@ else:
         print(f"{x_2:.6f} {y_2:.6f}")
     else:
         print('Impossible')
+
+'''
+0 0 4 0 8 0
+16 12 8
+Impossible
+
+'''

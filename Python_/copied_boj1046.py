@@ -28,6 +28,7 @@ def search(x, y, pos, angle):
         search(x1, y1, pos, angle)  # 왼쪽부터 쓸고 나서 재귀로 끝까지 찍고 난 뒤에 오른쪽으로 다시 돌아간다
         if angle[1] > 0 and (y1 == -1 or y1 == h or box[y1][x] == '#'):
             p.append(pos)
+            open('p', 'w')
         if angle[1] < 0 and (x1 == -1 or x1 == w or box[y][x1] == '#'):
             p.append(pos)
 

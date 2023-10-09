@@ -46,6 +46,9 @@
     <Filter Include="소스 파일\divide_conquer">
       <UniqueIdentifier>{bd0faa58-8c64-40df-8e62-2dab4d28b829}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\2nd_BORAMAECUP">
+      <UniqueIdentifier>{6d0d34bc-059e-4b3c-8116-43ae674e14ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="_geo_func.cpp">
@@ -171,9 +174,33 @@
     <ClCompile Include="boj1046_sweeping.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="2nd_brmcup_B.cpp">
+      <Filter>소스 파일\2nd_BORAMAECUP</Filter>
+    </ClCompile>
+    <ClCompile Include="2nd_brmcup_C.cpp">
+      <Filter>소스 파일\2nd_BORAMAECUP</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3121_1.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3121.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj9382.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj9382_1.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj29566.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="boj9382.txt">
       <Filter>리소스 파일</Filter>
     </Text>
   </ItemGroup>
