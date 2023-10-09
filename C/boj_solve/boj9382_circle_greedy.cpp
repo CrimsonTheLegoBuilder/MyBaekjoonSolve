@@ -78,7 +78,7 @@ void get_inx(const Pos& u, const Pos& v, ld R, int N) {
 
 
 int main() {
-	freopen("boj9382.txt", "r", stdin);
+	//freopen("boj9382.txt", "r", stdin);
 	std::cout << std::fixed;
 	std::cout.precision(6);
 	while (1) {
