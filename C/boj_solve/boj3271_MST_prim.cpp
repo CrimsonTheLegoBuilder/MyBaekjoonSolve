@@ -84,3 +84,33 @@ int main() {
 	std::cout << W[I] << "\n";
 	return 0;
 }
+
+/*
+meadow.in
+3 2
+1 1
+2 3
+3 2
+meadow.out
+1.41
+meadow.in
+5 3
+1 1
+1 4
+1 5
+5 1
+5 5
+meadow.out
+3.00
+meadow.in
+7 4
+1 1
+3 9
+9 4
+2 2
+6 4
+5 5
+6 9
+meadow.out
+3.00
+*/
