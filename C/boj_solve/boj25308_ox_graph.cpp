@@ -1,4 +1,57 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
+typedef long long ll;
+typedef long double ld;
+ll cnt = 0;
+bool V[8]{ 0 };
+int S[8];
+
+struct Pos {
+	ld x, y;
+}P[8];
+
+ld cross(Pos& d1, Pos& d2, Pos& d3, Pos& d4) { return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x); }
+ld delta[8][2] = { {0, 2}, {-sqrt(2), sqrt(2)}, {-2, 0}, {-sqrt(2), -sqrt(2)}, {0, -2}, {sqrt(2), -sqrt(2)}, {2, 0}, {sqrt(2), sqrt(2)} };
+
+void dfs(int depth) {
+	if (depth > 2) {
+		if (cross(P[depth - 3], P[depth - 2], P[depth - 2], P[depth - 1]) < 0) {
+			//std::cout << cross(P[depth - 3], P[depth - 2], P[depth - 2], P[depth - 1]);
+			//std::cout << "x";
+			return;
+		}
+	}
+	if (depth == 8) {
+		for (int i = 5; i <= 7; i++) {
+			if (cross(P[i], P[(i + 1) % 8], P[(i + 1) % 8], P[(i + 2) % 8]) < 0) return;
+		}
+		cnt++;
+		return;
+	}
+	for (int i = 1; i < 8; i++) {
+		if (!V[i]) {
+			V[i] = 1;
+			P[depth].x = S[i] * delta[depth][0];
+			P[depth].y = S[i] * delta[depth][1];
+			dfs(depth + 1);
+			V[i] = 0;
+		}
+	}
+}
+
+int main() {
+	for (int i = 0; i < 8; i++) {
+		std::cin >> S[i];
+	}
+	P[0].x = S[0] * delta[0][0];
+	P[0].y = S[0] * delta[0][1];
+	dfs(1);
+	std::cout << cnt * 8;
+}
+
+/*
+#include <iostream>
 #include <algorithm>
 #include <vector>
 typedef long long ll;
@@ -105,15 +158,4 @@ int main() {
 	std::cout << min_day.x << "\n" << min_day.y << "\n";
 	return 0;
 }
-
-
-//ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2.x - d1.x) * (d4.x - d3.x) + (d2.y - d1.y) * (d4.y - d3.y); }
-//bool is_cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-//	bool f11 = cross(d1, d2, d2, d3) * cross(d2, d1, d1, d4) > 0;
-//	bool f12 = cross(d3, d4, d4, d1) * cross(d4, d3, d3, d2) > 0;
-//	bool f1 = f11 && f12;
-//	bool f2 = (cross(d1, d3, d3, d2) == 0 && dot(d1, d3, d3, d2) >= 0) ||
-//		(cross(d1, d4, d4, d2) == 0 && dot(d1, d4, d4, d2) >= 0) ||
-//		(cross(d3, d1, d1, d4) == 0 && dot(d3, d1, d1, d4) >= 0) ||
-//		(cross(d3, d2, d2, d4) == 0 && dot(d3, d2, d2, d4) >= 0);
-//	return f1 || f2;
+*/

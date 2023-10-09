@@ -195,6 +195,9 @@
     <ClCompile Include="boj29566.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj3271_MST.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
