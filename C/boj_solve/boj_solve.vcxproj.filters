@@ -51,46 +51,37 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="_geo_func.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj13310.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj28401_cnvxhull.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj2096.cpp">
       <Filter>소스 파일\sliding_window</Filter>
     </ClCompile>
-    <ClCompile Include="boj3830.cpp">
+    <ClCompile Include="boj3830_professor.cpp">
       <Filter>소스 파일\disjoint_set</Filter>
     </ClCompile>
-    <ClCompile Include="boj6632.cpp">
+    <ClCompile Include="boj6632_grid_scan.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj26574.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="boj28401_1.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj13310_CH_RC_TS.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj1260.cpp">
+    <ClCompile Include="boj1260_DFS_BFS.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj1275.cpp">
+    <ClCompile Include="boj1275_segtree.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj1275_1.cpp">
+    <ClCompile Include="boj1275_fenwick.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj1321.cpp">
+    <ClCompile Include="boj1321_segtree.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj1321_1.cpp">
+    <ClCompile Include="boj1321_fenwick.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
     <ClCompile Include="boj2042.cpp">
@@ -99,19 +90,13 @@
     <ClCompile Include="boj2243.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj1615.cpp">
+    <ClCompile Include="boj1615_linecross.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
     <ClCompile Include="koosaga_bj22819.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="boj27957_koosaga_codeforce.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj27957_hulldisks.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj27957_1.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj27957_half_plane.cpp">
@@ -126,46 +111,40 @@
     <ClCompile Include="boj27324.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="boj1167.cpp">
+    <ClCompile Include="boj1167_treesize_DFS.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj1967.cpp">
+    <ClCompile Include="boj1967_treesize_DFS.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj2638.cpp">
+    <ClCompile Include="boj2638_BFS_cheese.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
     <ClCompile Include="boj10250.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="boj25682.cpp">
+    <ClCompile Include="boj25682_Go.cpp">
       <Filter>소스 파일\prefix_sum</Filter>
     </ClCompile>
-    <ClCompile Include="boj25682_1.cpp">
-      <Filter>소스 파일\prefix_sum</Filter>
-    </ClCompile>
-    <ClCompile Include="boj1780.cpp">
+    <ClCompile Include="boj1780_paper.cpp">
       <Filter>소스 파일\divide_conquer</Filter>
     </ClCompile>
-    <ClCompile Include="boj1780_1.cpp">
-      <Filter>소스 파일\divide_conquer</Filter>
-    </ClCompile>
-    <ClCompile Include="boj2740.cpp">
+    <ClCompile Include="boj2740_M.cpp">
       <Filter>소스 파일\matrix</Filter>
     </ClCompile>
-    <ClCompile Include="boj10830.cpp">
+    <ClCompile Include="boj10830_MPOW.cpp">
       <Filter>소스 파일\matrix</Filter>
     </ClCompile>
-    <ClCompile Include="boj6549.cpp">
+    <ClCompile Include="boj6549_histogram.cpp">
       <Filter>소스 파일\stack</Filter>
     </ClCompile>
-    <ClCompile Include="boj25308.cpp">
+    <ClCompile Include="boj25308_ox_graph.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj15829.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="boj11444.cpp">
+    <ClCompile Include="boj11444_MPOW_fibo.cpp">
       <Filter>소스 파일\matrix</Filter>
     </ClCompile>
     <ClCompile Include="test.cpp">
@@ -180,23 +159,23 @@
     <ClCompile Include="2nd_brmcup_C.cpp">
       <Filter>소스 파일\2nd_BORAMAECUP</Filter>
     </ClCompile>
-    <ClCompile Include="boj3121_1.cpp">
+    <ClCompile Include="boj3121_Buildozer.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj3121.cpp">
-      <Filter>소스 파일\segment_tree</Filter>
-    </ClCompile>
-    <ClCompile Include="boj9382.cpp">
+    <ClCompile Include="boj9382_circle_greedy.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj9382_1.cpp">
+    <ClCompile Include="boj29566_3_circles.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj29566.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj3271_MST.cpp">
+    <ClCompile Include="boj3271_MST_prim.cpp">
       <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27957_koosaga_codeforce.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj19970_ky6.cpp">
+      <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

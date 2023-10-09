@@ -1,21 +1,6 @@
 import sys
 
 
-# def get_dots(order):
-#     line = []
-#     for o in range(len(order)-1):
-#         if order[o].isdigit():
-#             continue
-#         else:
-#             if order[o+1].isdigit():
-#                 line.append(L[order[o:o+2]])
-#             else:
-#                 line.append(L[order[o]])
-#     if not order[-1].isdigit():
-#         line.append(L[order[-1]])
-#     return line
-
-
 def dots(order):
     line = []
     i = 0
@@ -37,17 +22,14 @@ def get_mid_p(s):
     return d
 
 
-# get_mid_p = lambda s: ((s[0][0] + s[1][0]) // 2, (s[0][1] + s[1][1]) // 2, (s[0][2] + s[1][2]) // 2)
-
-
 L = {
     "A": (0, 2, 0),
-    "A1": (0, 2, 2),
     "B": (0, 0, 0),
-    "B1": (0, 0, 2),
     "C": (2, 0, 0),
-    "C1": (2, 0, 2),
     "D": (2, 2, 0),
+    "A1": (0, 2, 2),
+    "B1": (0, 0, 2),
+    "C1": (2, 0, 2),
     "D1": (2, 2, 2),
 }
 
