@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <set>
+#include <string.h>
 typedef long long ll;
 typedef long double ld;
 const int LEN = 1'001;

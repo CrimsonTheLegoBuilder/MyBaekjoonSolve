@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
+#include <cmath>
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-9;

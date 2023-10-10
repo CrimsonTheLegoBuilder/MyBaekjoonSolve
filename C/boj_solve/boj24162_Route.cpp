@@ -36,14 +36,14 @@ void dijkstra(int v, int N) {
 	while (!H.empty()) {
 		Toll p = H.top(); H.pop();
 		if (W[p.n] < p.w) continue;
-		if (p.n == 2) return;
+		//if (p.n == 2) return;
 		for (int w = 1; w <= N; w++) {
 			if (G[p.n][w] == -1) continue;
 			ll ct = p.w + G[p.n][w];
 			if (W[w] > ct && (p.d < 1 || dot(p.pre, pos[p.n], pos[p.n], pos[w]) >= 0)) {
 				W[w] = ct;
 				H.push({ ct, w, p.d + 1, pos[p.n] });
-				//std::cout << p.d << " " << dot(p.pre, pos[p.n], pos[p.n], pos[w]) << " DEBUG\n";
+				std::cout << p.d << " " << p.n << " " <<  w << " " << ct << " " << dot(p.pre, pos[p.n], pos[p.n], pos[w]) << " DEBUG\n";
 			}
 		}
 	}
