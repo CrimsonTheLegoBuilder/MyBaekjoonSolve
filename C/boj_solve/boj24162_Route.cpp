@@ -36,6 +36,7 @@ void dijkstra(int v, int N) {
 	while (!H.empty()) {
 		Toll p = H.top(); H.pop();
 		if (W[p.n] < p.w) continue;
+		if (p.n == 2) return;
 		for (int w = 1; w <= N; w++) {
 			if (G[p.n][w] == -1) continue;
 			ll ct = p.w + G[p.n][w];
