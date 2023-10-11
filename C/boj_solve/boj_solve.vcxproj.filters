@@ -177,7 +177,7 @@
     <ClCompile Include="boj19970_ky6.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj24162_Route.cpp">
+    <ClCompile Include="boj24162_Wrong.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
     <ClCompile Include="boj4618_eccentricity.cpp">
@@ -187,6 +187,12 @@
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
     <ClCompile Include="boj24162.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="bojBRONZE.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj24162_Route.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
   </ItemGroup>
