@@ -5,7 +5,8 @@ typedef long long ll;
 const int LEN = 101;
 const ll MAX = 10'000'000'000'000'000;
 int G[LEN][LEN];
-ll W[LEN];
+bool V[LEN]{};
+ll MIN = MAX, W[LEN];
 
 struct Pos {
 	ll x, y;
@@ -41,14 +42,32 @@ void dijkstra(int v, int d, int N) {
 			if (G[p.n][w] == -1) continue;
 			ll ct = p.w + G[p.n][w];
 			if (W[w] >= ct && (p.d < 1 || dot(p.pre, pos[p.n], pos[p.n], pos[w]) >= 0)) {
-			//if (W[w] > ct) {
+				//if (W[w] > ct) {
 				W[w] = ct;
 				H.push({ ct, w, p.d + 1, pos[p.n] });
 				//if (w == 1)
-				std::cout << p.d << " " << p.n << " " <<  w << " " << G[p.n][w] << " " << p.w << " " << ct << " " << dot(p.pre, pos[p.n], pos[p.n], pos[w]) << " DEBUG\n";
+				std::cout << p.d << " " << p.n << " " << w << " " << G[p.n][w] << " " << p.w << " " << ct << " " << dot(p.pre, pos[p.n], pos[p.n], pos[w]) << " DEBUG\n";
 			}
 		}
 	}
+}
+ll DFS(int v, int d, int pre, int N, ll S = 0) {
+	if (v == 2) {
+		if (S < MIN) MIN = S;
+		return S;
+	}
+	ll cost = MAX;
+	for (int w = 2; w <= N; w++) {
+		if ((v != w) && !V[w] && (G[v][w] > -1) && (S + G[v][w] < MIN) && (d < 1 || dot(pos[pre], pos[v], pos[v], pos[w]) >= 0)) {
+			V[w] = 1;
+			//std::cout << v << " " << w << " " << pre << " " << dot(pos[pre], pos[v], pos[v], pos[w]) << " " << S << "\n";
+			cost = std::min(cost, DFS(w, d + 1, v, N, S + G[v][w]));
+			V[w] = 0;
+		}
+
+	}
+	//std::cout << pre << " " << v << " " << S << " " << pos[pre].x << " " << pos[pre].y << " " << pos[v].x << " " << pos[v].y << "\n";
+	return cost;
 }
 
 
@@ -67,38 +86,13 @@ int main() {
 		std::cin >> u >> v >> c;
 		G[u][v] = G[v][u] = c;
 	}
-	dijkstra(1, 2, N);
-	ll MIN = W[2];
-	std::cout << "\n";
-	dijkstra(2, 1, N);
-	MIN = std::min({ MIN, W[1] });
-	std::cout << (MIN < MAX ? MIN : -1) << "\n";
+	ll A = DFS(1, 0, -1, N);
+	std::cout << A;
+	//dijkstra(1, 2, N);
+	//ll MIN = W[2];
+	//std::cout << "\n";
+	//dijkstra(2, 1, N);
+	//MIN = std::min({ MIN, W[1] });
+	//std::cout << (MIN < MAX ? MIN : -1) << "\n";
 	return 0;
 }
-
-	//for (const ll w : W) {
-	//	std::cout << w << " ";
-	//}
-	//std::cout << " DEBUG\n";
-
-//void dijkstra1(int v, int N) {
-//	for (int i = 1; i <= N; i++) { W[i] = MAX; }
-//	W[v] = 0;
-//	H.push({ 0, v, 0, pos[v] });
-//	while (!H.empty()) {
-//		Toll p = H.top(); H.pop();
-//		if (W[p.n] < p.w) continue;
-//		for (int w = 1; w <= N; w++) {
-//			if (G[p.n][w] > -1) {
-//				ll ct = p.w + G[p.n][w];
-//				if (W[w] > ct) {
-//					if (p.d < 1 || dot(p.pre, pos[p.n], pos[p.n], pos[w]) >= 0) {
-//						W[w] = ct;
-//						H.push({ ct, w, p.d + 1, pos[p.n] });
-//						//std::cout << p.d << " " << dot(p.pre, pos[p.n], pos[p.n], pos[w]) << " DEBUG\n";
-//					}
-//				}
-//			}
-//		}
-//	}
-//}
