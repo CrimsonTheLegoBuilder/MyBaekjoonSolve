@@ -45,7 +45,7 @@ void dijkstra(int v, int d, int N) {
 				W[w] = ct;
 				H.push({ ct, w, p.d + 1, pos[p.n] });
 				//if (w == 1)
-				std::cout << p.d << " " << p.n << " " <<  w << " " << G[p.n][w] << " " << p.w << " " << ct << " " << dot(p.pre, pos[p.n], pos[p.n], pos[w]) << " DEBUG\n";
+				//std::cout << p.d << " " << p.n << " " <<  w << " " << G[p.n][w] << " " << p.w << " " << ct << " " << dot(p.pre, pos[p.n], pos[p.n], pos[w]) << " DEBUG\n";
 			}
 		}
 	}
@@ -69,7 +69,7 @@ int main() {
 	}
 	dijkstra(1, 2, N);
 	ll MIN = W[2];
-	std::cout << "\n";
+	//std::cout << "\n";
 	dijkstra(2, 1, N);
 	MIN = std::min({ MIN, W[1] });
 	std::cout << (MIN < MAX ? MIN : -1) << "\n";
