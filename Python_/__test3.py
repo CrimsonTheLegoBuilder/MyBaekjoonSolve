@@ -13,7 +13,7 @@ def get_answer(start):
 
             cur_cost[nxt] = cur_cost[start] + adj_m[start][nxt]
 
-        min_value = 987654321987654321
+        min_value = 98765432198765432
         for nxt in range(1, N + 1):
             if visited[nxt]: continue
             if min_value <= cur_cost[nxt]: continue
@@ -29,7 +29,8 @@ M = int(input())
 adj_m = [[-1]*(N + 1) for _ in range(N + 1)]
 for _ in range(M):
     f, e, w = map(int, input().split())
-    adj_m[f][e] = w
+    if adj_m[f][e] == -1 or adj_m[f][e] > w:
+        adj_m[f][e] = w
 
 s, E = map(int, input().split())
 
