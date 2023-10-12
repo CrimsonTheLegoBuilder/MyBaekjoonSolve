@@ -9,8 +9,8 @@ ll pow(ll a, ll B) {
 	if (B == 1) return a;
 	int b = B >> 1;
 	ll A = pow(a, b);
-	if (B % 2) return (A * A * a) % MOD;
-	else return (A * A) % MOD;
+	if (B % 2) return ((A % MOD) * (A % MOD) * (a % MOD)) % MOD;
+	else return ((A * MOD) * (A % MOD)) % MOD;
 }
 
 
