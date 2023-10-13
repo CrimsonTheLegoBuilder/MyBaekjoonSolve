@@ -2,15 +2,19 @@
 #include <algorithm>
 typedef long long ll;
 // -2,147,483,648 ~ int ~ 2,147,483,647
-const int MOD = 1234567891;
+//const ll MOD = 37;
+const ll MOD = 1234567891;
 int arr[50];
 
-ll pow(ll a, ll B) {
+ll pow_(ll a, int B) {
+	if (!B) return 1;
 	if (B == 1) return a;
 	int b = B >> 1;
-	ll A = pow(a, b);
-	if (B % 2) return ((A % MOD) * (A % MOD) * (a % MOD)) % MOD;
-	else return ((A * MOD) * (A % MOD)) % MOD;
+	ll A = pow_(a, b);
+	A %= MOD;
+	//std::cout << A << "\n";
+	if (B % 2) return A * A % MOD * a % MOD;
+	else return A * A % MOD;
 }
 
 
@@ -18,13 +22,14 @@ ll pow(ll a, ll B) {
 int main() {
 	int n;
 	char x[51];
-	ll ans = 0;
+	ll ans = 0, tmp;
 	std::cin >> n >> x;
 	for (int i = 0; i < n; i++) {
-		arr[i] = x[i] - 96;
+		arr[i] = x[i] - 'a' + 1;
 	}
 	for (int i = 0; i < n; i++) {
-		ans += (arr[i] * pow(31, i));
+		tmp = pow_(31, i);
+		ans += tmp * arr[i];
 		ans %= MOD;
 	}
 	std::cout << ans;
