@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <set>
+#include <cstring>
 typedef long long ll;
 const int LEN = 100'001;
 ll MAX = 0;

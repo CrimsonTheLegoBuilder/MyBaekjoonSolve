@@ -46,6 +46,18 @@
     <Filter Include="소스 파일\divide_conquer">
       <UniqueIdentifier>{bd0faa58-8c64-40df-8e62-2dab4d28b829}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Kaist 13th">
+      <UniqueIdentifier>{92552a20-a238-476b-b89f-9beb3fe61d88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\bitmasking">
+      <UniqueIdentifier>{30095e83-a6ef-4878-84f5-b8a41970d657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\AtCoder">
+      <UniqueIdentifier>{fc5d257c-d368-4c83-81a0-549f102848ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\DP">
+      <UniqueIdentifier>{d9df2e60-8118-4511-a354-83eb066f7620}</UniqueIdentifier>
+    </Filter>
     <Filter Include="소스 파일\2nd_BORAMAECUP">
       <UniqueIdentifier>{6d0d34bc-059e-4b3c-8116-43ae674e14ec}</UniqueIdentifier>
     </Filter>
@@ -204,6 +216,33 @@
     <ClCompile Include="boj1920.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
+    <ClCompile Include="boj1169.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1169_1.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Q_B.cpp">
+      <Filter>소스 파일\Kaist 13th</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1074.cpp">
+      <Filter>소스 파일\bitmasking</Filter>
+    </ClCompile>
+    <ClCompile Include="JPRS2023A.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="JPRS2023B.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="JPRS2023C.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1446_dijkkstra.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1446_DP.cpp">
+      <Filter>소스 파일\DP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
@@ -212,5 +251,10 @@
     <Text Include="boj9382.txt">
       <Filter>리소스 파일</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="boj1169.input.txt">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -34,6 +34,8 @@ void solve(int N) {
 
 
 int main() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
 	int N;
 	std::cin >> N;
 	solve(N);
