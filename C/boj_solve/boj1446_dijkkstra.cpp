@@ -17,7 +17,7 @@ std::set<Info> G[LEN];
 
 int dijkstra() {
 	for (int i = 0; i <= D; i++) {
-		cost[i] = i+1;
+		cost[i] = i;
 	}
 	for (const Info& I : G[0]) {
 		if (cost[I.i] > I.c) {
@@ -36,7 +36,7 @@ int dijkstra() {
 		for (const Info& w : G[p.i]) {
 			//std::cout << w.i << " " << w.c << "\n";
 			int cnxt = cost[p.i] + w.c;
-			if (cost[w.i] > cnxt) {
+			if (cost[w.i] >= cnxt) {
 				cost[w.i] = cnxt;
 				Q.push({ cnxt, w.i });
 			}

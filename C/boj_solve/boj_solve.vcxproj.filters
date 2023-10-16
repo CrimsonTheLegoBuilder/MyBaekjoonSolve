@@ -261,6 +261,9 @@
     <ClCompile Include="boj13913_hideNseek4.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
+    <ClCompile Include="boj17071_hideNseek5.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
