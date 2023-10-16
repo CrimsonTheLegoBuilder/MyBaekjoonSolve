@@ -198,13 +198,10 @@
     <ClCompile Include="boj16783_buldozer.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj24162.cpp">
-      <Filter>소스 파일\graph_search</Filter>
-    </ClCompile>
     <ClCompile Include="bojBRONZE.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="boj24162_Route.cpp">
+    <ClCompile Include="boj24162_Route_dijkstra.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
     <ClCompile Include="boj10845.cpp">
@@ -242,6 +239,27 @@
     </ClCompile>
     <ClCompile Include="boj1446_DP.cpp">
       <Filter>소스 파일\DP</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1107.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3123.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1697_hideNseek.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj12851_hideNseek2.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj13549_hideNseek3_01BFS.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj13549_hideNseek3_DP.cpp">
+      <Filter>소스 파일\DP</Filter>
+    </ClCompile>
+    <ClCompile Include="boj13913_hideNseek4.cpp">
+      <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
