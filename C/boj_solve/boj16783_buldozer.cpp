@@ -3,7 +3,8 @@
 typedef long long ll;
 const int LEN = 2'001;
 
-int N, M, pos[LEN], ret;
+int N, M, pos[LEN];
+ll ret;
 char c;
 
 struct Pos {  //spots coord' and value
@@ -13,12 +14,15 @@ struct Pos {  //spots coord' and value
 struct Slope {  //segment's two point and slope
 	int u, v;
 	ll dx, dy;
-	bool operator < (const Slope& s) const { return dy * s.dx < dx * s.dy; }
-	bool operator == (const Slope& s) const { return dy * s.dx == dx * s.dy; }
+	bool operator < (const Slope& s) const {
+		if (dy * s.dx < dx * s.dy) return u < v;
+		return dy * s.dx < dx * s.dy;
+	}
+	bool operator == (const Slope& s) const {return dy * s.dx == dx * s.dy; }
 }slopes[LEN * LEN];
 
 struct LenNode {  //segment tree for cal subsequence max len
-	int max, llen, rlen, all;
+	ll max, llen, rlen, all;
 	LenNode operator + (const LenNode& r) const {
 		return {
 			std::max({max, r.max, rlen + r.llen}),
@@ -72,7 +76,7 @@ int main() {
 			slopes[M++] = { i, j, dx, dy };
 		}
 	}
-	std::sort(slopes, slopes + M);
+	std::stable_sort(slopes, slopes + M);
 
 	for (int i = 0; i < N; i++) {
 		pos[i] = i;  //cur. idx
