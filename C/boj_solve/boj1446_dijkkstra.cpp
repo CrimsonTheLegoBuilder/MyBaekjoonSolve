@@ -17,31 +17,27 @@ std::set<Info> G[LEN];
 
 int dijkstra() {
 	for (int i = 0; i <= D; i++) {
-		cost[i] = i;
+		cost[i] = LEN << 1;
 	}
-	for (const Info& I : G[0]) {
-		if (cost[I.i] > I.c) {
-			cost[I.i] = I.c;
-			Q.push(I);
-			//std::cout << cost[I.i] << " " << I.c << " " << I.i << "\n";
-		}
-	}
-	for (int i = 1; i <= D; i++) {
-		Q.push({ i, i });
-	}
+	Q.push({0, 0});
+	cost[0] = 0;
+	//for (int i = 1; i <= D; i++) {
+	//	Q.push({ i, i });
+	//}
 	while (!Q.empty()) {
 		Info p = Q.top(); Q.pop();
 		if (cost[p.i] < p.c) continue;
-		if (p.i == D) return p.c;
+		//if (p.i == D) return p.c;
 		for (const Info& w : G[p.i]) {
 			//std::cout << w.i << " " << w.c << "\n";
-			int cnxt = cost[p.i] + w.c;
-			if (cost[w.i] >= cnxt) {
+			int cnxt = p.c + w.c;
+			if (cost[w.i] > cnxt) {
 				cost[w.i] = cnxt;
 				Q.push({ cnxt, w.i });
 			}
 		}
 	}
+	return cost[D];
 }
 
 

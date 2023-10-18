@@ -15,10 +15,13 @@ struct Slope {  //segment's two point and slope
 	int u, v;
 	ll dx, dy;
 	bool operator < (const Slope& s) const {
-		if (dy * s.dx < dx * s.dy) return u < v;
+		if (dy * s.dx == dx * s.dy) {
+			if (u == s.u) return v < s.v;
+			return u < s.u;
+		}
 		return dy * s.dx < dx * s.dy;
 	}
-	bool operator == (const Slope& s) const {return dy * s.dx == dx * s.dy; }
+	bool operator == (const Slope& s) const { return dy * s.dx == dx * s.dy; }
 }slopes[LEN * LEN];
 
 struct LenNode {  //segment tree for cal subsequence max len
@@ -76,7 +79,8 @@ int main() {
 			slopes[M++] = { i, j, dx, dy };
 		}
 	}
-	std::stable_sort(slopes, slopes + M);
+	//std::stable_sort(slopes, slopes + M);
+	std::sort(slopes, slopes + M);
 
 	for (int i = 0; i < N; i++) {
 		pos[i] = i;  //cur. idx
@@ -99,6 +103,8 @@ int main() {
 	std::cout << ret;
 	return 0;
 }
+
+
 //ll V[LEN];
 	//for (int i = 0; i < N; i++) {
 	//	V[i] = dots[i].v;
