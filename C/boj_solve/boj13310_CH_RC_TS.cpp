@@ -95,6 +95,8 @@ Pos get_min(std::vector<Star>& stars, int X) {
 
 
 int main() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
 	int N, T, x, y, vx, vy;
 	std::vector<Star> stars;
 	Pos min_day;
