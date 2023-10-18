@@ -270,6 +270,15 @@
     <ClCompile Include="boj10167_goldmine.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
+    <ClCompile Include="boj9240_Robert_Hood.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj10254_highway.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7420.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
