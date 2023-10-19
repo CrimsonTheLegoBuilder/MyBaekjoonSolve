@@ -50,9 +50,10 @@ bool NCVXHIN(std::vector<Pos>& H, Pos& d) {
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
-	setbuf(stdout, NULL);
-	freopen("boj6632.txt", "r", stdin);
-	freopen("result.txt", "w", stdout);
+	std::cout.tie(0);
+	//setbuf(stdout, NULL);
+	//freopen("boj6632.txt", "r", stdin);
+	//freopen("result.txt", "w", stdout);
 	while (1) {
 		int N, x, y, cnt = 0, L;
 		std::vector<Pos> H;

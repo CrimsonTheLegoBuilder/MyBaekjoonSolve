@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -48,6 +49,8 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	//freopen("relay.in.4h.txt", "r", stdin);
+	//freopen("result.txt", "w", stdout);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {
 		std::cin >> B[i].x >> B[i].y;
