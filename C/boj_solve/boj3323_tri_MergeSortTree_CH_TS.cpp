@@ -16,19 +16,20 @@ std::vector<Pos> seg[LEN << 2];
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x);
 }
-std::vector<Pos> lower_monotone_chain(std::vector<Pos>& C) {
-	std::vector<Pos> H;
-	if (C.size() <= 2) {
-		for (const Pos& pos : C) H.push_back(pos);
-		return H;
+void lower_monotone_chain(std::vector<Pos>& H, const Pos C[], int s, int e) {
+	if (e - s <= 2) {
+		for (int i = s; i <= e; i++) {
+			H.push_back(C[i]);
+		}
+		return;
 	}
-	for (int i = 0; i < C.size(); i++) {
+	for (int i = s; i <= e; i++) {
 		while (H.size() > 1 && cross(H[H.size() - 2], H[H.size() - 1], H[H.size() - 1], C[i]) <= 0) {
 			H.pop_back();
 		}
 		H.push_back(C[i]);
 	}
-	return H;
+	return;
 }
 void init(int s, int e, int i = 1) {
 	if (s == e) {
@@ -37,10 +38,10 @@ void init(int s, int e, int i = 1) {
 	}
 	int m = s + e >> 1;
 	init(s, m, i << 1); init(m + 1, e, i << 1 | 1);
-	std::vector<Pos> C;
-	for (const Pos& p : seg[i << 1]) C.push_back(p);
-	for (const Pos& p : seg[i << 1 | 1]) C.push_back(p);
-	seg[i] = lower_monotone_chain(C);
+	//std::vector<Pos> C;
+	//for (const Pos& p : seg[i << 1]) C.push_back(p);
+	//for (const Pos& p : seg[i << 1 | 1]) C.push_back(p);
+	lower_monotone_chain(seg[i], pos, s, e);
 }
 
 Pos p1, p2;
@@ -72,8 +73,8 @@ int K, M;
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("4-tri.in", "r", stdin);
-	//freopen("4-tri.out", "w", stdout);
+	freopen("4-tri.in", "r", stdin);
+	freopen("4-tri.out", "w", stdout);
 	std::cin >> K >> M;
 	for (int i = 0; i < K; i++) {
 		std::cin >> pos[i].x >> pos[i].y;
