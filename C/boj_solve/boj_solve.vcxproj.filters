@@ -288,6 +288,12 @@
     <ClCompile Include="boj12801.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj3323_tri_MergeSortTree_CH_TS.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3323_NonRecursiveMergeSortTree_CH_TS.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
@@ -296,10 +302,30 @@
     <Text Include="boj9382.txt">
       <Filter>리소스 파일</Filter>
     </Text>
+    <Text Include="relay.in.4a.txt" />
+    <Text Include="relay.in.4b.txt" />
+    <Text Include="relay.in.4c.txt" />
+    <Text Include="relay.in.4d.txt" />
+    <Text Include="relay.in.4e.txt" />
+    <Text Include="relay.in.4f.txt" />
+    <Text Include="relay.in.4g.txt" />
+    <Text Include="relay.in.4h.txt" />
+    <Text Include="relay.in.4i.txt" />
+    <Text Include="relay.in.4j.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="boj1169.input.txt">
       <Filter>리소스 파일</Filter>
     </None>
+    <None Include="0-tri.in" />
+    <None Include="1-tri.in" />
+    <None Include="2-tri.in" />
+    <None Include="3-tri.in" />
+    <None Include="4-tri.in" />
+    <None Include="5-tri.in" />
+    <None Include="6-tri.in" />
+    <None Include="7-tri.in" />
+    <None Include="8-tri.in" />
+    <None Include="9-tri.in" />
   </ItemGroup>
 </Project>
