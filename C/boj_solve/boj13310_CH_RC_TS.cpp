@@ -52,7 +52,7 @@ ll rotating_calipers(std::vector<Pos>& H) {
 	ll MD = 0;
 	int i = 0, f2i = 1, l = H.size();
 	for (i; i <= l; i++) {
-		while ((f2i + 1) % l != i % l && cross(H[i % l], H[(i + 1) % l], H[f2i % l], H[(f2i + 1) % l]) > 0) {
+		while ((f2i + 1) % l != (i + 1) % l && cross(H[i % l], H[(i + 1) % l], H[f2i % l], H[(f2i + 1) % l]) > 0) {
 			if (MD < cal_dist_sq(H[i % l], H[f2i % l])) MD = cal_dist_sq(H[i % l], H[f2i % l]);
 			f2i++;
 		}

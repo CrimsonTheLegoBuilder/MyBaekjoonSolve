@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -9,12 +10,15 @@ using pi = pair<real_t, real_t>;
 
 const real_t eps = 1e-8;
 
+//real_t ccw(pi a, pi b, pi c) {
+//	real_t dx1 = b.first - a.first;
+//	real_t dy1 = b.second - a.second;
+//	real_t dx2 = c.first - a.first;
+//	real_t dy2 = c.second - a.second;
+//	return dx1 * dy2 - dy1 * dx2;
+//}
 real_t ccw(pi a, pi b, pi c) {
-	real_t dx1 = b.first - a.first;
-	real_t dy1 = b.second - a.second;
-	real_t dx2 = c.first - a.first;
-	real_t dy2 = c.second - a.second;
-	return dx1 * dy2 - dy1 * dx2;
+	return b.first * c.second - b.second * c.first;
 }
 
 namespace hpi {
