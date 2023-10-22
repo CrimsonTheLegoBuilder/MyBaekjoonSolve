@@ -7,7 +7,10 @@ const int LEN = 100'000;
 
 struct Pos {
 	ll x, y;
-	bool operator<(const Pos& p) const { return y * p.x > x * p.y; }
+	bool operator<(const Pos& p) const {
+		if (y * p.x > x * p.y) return (x + x + y * y < p.dist());
+		return y * p.x > x * p.y;
+	}
 	bool operator<=(const Pos& p) const { return y * p.x >= x * p.y; }
 	ll dist() const { return x + x + y * y; }
 }pos[LEN];

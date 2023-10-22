@@ -10,8 +10,7 @@ struct Pos {
 	ll x, y;
 	bool i;
 	bool operator<(const Pos& p) const {
-		if (x == p.x) return (y < p.y);
-		return x < p.x;
+		return (x == p.x ? y < p.y : x < p.x);
 	}
 }LB, LI, RB, RI, B[LEN];
 std::vector<Pos> I, BM, BR, BL, HR, HL;
@@ -49,7 +48,7 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("relay.in.4h.txt", "r", stdin);
+	//freopen("relay.in.3j", "r", stdin);
 	//freopen("result.txt", "w", stdout);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {

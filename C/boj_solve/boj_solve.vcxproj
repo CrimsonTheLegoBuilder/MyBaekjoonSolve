@@ -252,7 +252,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="boj3323_NonRecursiveMergeSortTree_CH_TS.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="boj3323_tri_MergeSortTree_CH_TS.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -268,7 +269,7 @@
     </ClCompile>
     <ClCompile Include="boj5631_bi_search.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="boj6549_histogram.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -310,6 +311,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="koosaga_2circles.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="koosaga_bj22819.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -342,17 +347,37 @@
     <Text Include="relay.in.4j.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="0-tri.in" />
-    <None Include="1-tri.in" />
-    <None Include="2-tri.in" />
-    <None Include="3-tri.in" />
-    <None Include="4-tri.in" />
-    <None Include="5-tri.in" />
-    <None Include="6-tri.in" />
-    <None Include="7-tri.in" />
-    <None Include="8-tri.in" />
-    <None Include="9-tri.in" />
     <None Include="boj1169.input.txt" />
+    <None Include="relay.in.1a" />
+    <None Include="relay.in.1b" />
+    <None Include="relay.in.1c" />
+    <None Include="relay.in.1d" />
+    <None Include="relay.in.1e" />
+    <None Include="relay.in.1f" />
+    <None Include="relay.in.1g" />
+    <None Include="relay.in.1h" />
+    <None Include="relay.in.1i" />
+    <None Include="relay.in.1j" />
+    <None Include="relay.in.2a" />
+    <None Include="relay.in.2b" />
+    <None Include="relay.in.2c" />
+    <None Include="relay.in.2d" />
+    <None Include="relay.in.2e" />
+    <None Include="relay.in.2f" />
+    <None Include="relay.in.2g" />
+    <None Include="relay.in.2h" />
+    <None Include="relay.in.2i" />
+    <None Include="relay.in.2j" />
+    <None Include="relay.in.3a" />
+    <None Include="relay.in.3b" />
+    <None Include="relay.in.3c" />
+    <None Include="relay.in.3d" />
+    <None Include="relay.in.3e" />
+    <None Include="relay.in.3f" />
+    <None Include="relay.in.3g" />
+    <None Include="relay.in.3h" />
+    <None Include="relay.in.3i" />
+    <None Include="relay.in.3j" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

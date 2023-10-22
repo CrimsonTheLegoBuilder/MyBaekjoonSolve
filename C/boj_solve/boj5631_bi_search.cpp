@@ -32,6 +32,7 @@ int main() {
 		std::cin >> h;
 		if (!h) return 0;
 		std::cout << "Case " << Q++ << ":\n";
+		H.clear(); A.clear(); B.clear();
 		H.resize(h);
 		for (int i = 0; i < h; i++) {
 			std::cin >> H[i].x >> H[i].y;
@@ -43,7 +44,7 @@ int main() {
 		}
 		std::sort(A.begin(), A.end());
 		std::sort(B.begin(), B.end());
-		for (int i = 1; i <= q; i++) {
+		for (int i = 0; i < q; i++) {
 			std::cin >> r1 >> r2;
 			int R1 = r1 * r1, R2 = r2 * r2;
 			ai = bi_search(A, R1);

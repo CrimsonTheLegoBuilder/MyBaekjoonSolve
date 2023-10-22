@@ -7,7 +7,10 @@ const int LEN = 1 << 17;
 
 struct Pos {
 	ll x, y;
-	bool operator<(const Pos& p) const { return y * p.x > x * p.y; }
+	bool operator<(const Pos& p) const { 
+		if (y * p.x > x * p.y) return (x + x + y * y < p.dist());
+		return y * p.x > x * p.y; 
+	}
 	bool operator<=(const Pos& p) const { return y * p.x >= x * p.y; }
 	ll dist() const { return x + x + y * y; }
 }pos[LEN];
@@ -38,7 +41,8 @@ void init(int K) {
 }
 
 Pos p1, p2;
-bool ternary_search(std::vector<Pos> H, const Pos& p1, const Pos& p2) {
+bool ternary_search(std::vector<Pos>& H, const Pos& p1, const Pos& p2) {
+	if (H.empty()) return 0;
 	int s = 0, e = H.size() - 1;
 	while (e - s >= 3) {
 		int l = (s * 2 + e) / 3;
@@ -88,8 +92,9 @@ int ubound(const Pos H[], int N, const Pos& p) {
 
 int K, M;
 int main() {
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
+	//std::cin.tie(0)->sync_with_stdio(0);
+	//std::cout.tie(0);
+	std::ios_base::sync_with_stdio(false); std::cin.tie(nullptr);
 	freopen("4-tri.in", "r", stdin);
 	freopen("4-tri.out", "w", stdout);
 	std::cin >> K >> M;
@@ -102,7 +107,7 @@ int main() {
 		std::cin >> p1.x >> p1.y >> p2.x >> p2.y;
 		if (p2 < p1) std::swap(p1, p2);
 		int l = lbound(pos, K, p1);
-		int r = ubound(pos, K, p2);
+		int r = ubound(pos, K, p2) - 1;
 		std::cout << (query(l, r, p1, p2) ? "Y\n" : "N\n");
 	}
 	return 0;
