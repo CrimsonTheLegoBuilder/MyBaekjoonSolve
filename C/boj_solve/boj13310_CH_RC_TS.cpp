@@ -6,10 +6,7 @@ typedef long long ll;
 const ll MAX = 10'000'000'000'000'000;
 struct Pos {
 	ll x, y;
-	bool operator<(const Pos& p) const {
-		if (x == p.x) return (y < p.y);
-		return x < p.x;
-	}
+	bool operator<(const Pos& p) const { x == p.x ? y < p.y : x < p.x; }
 };
 struct Vec { ll vx, vy; };
 struct Star { ll x, y, vx, vy; };

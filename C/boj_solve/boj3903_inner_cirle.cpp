@@ -6,7 +6,7 @@
 #include <cmath>
 typedef long long ll;
 typedef double ld;
-const int LEN = 50'001;
+const int LEN = 101;
 const ld TOL = 1e-8;
 int N;
 
@@ -29,9 +29,6 @@ ld cross(const Vec& v1, const Vec& v2) {
 ld cross(const Line& l1, const Line& l2) {
 	return l1.vy * l2.vx - l1.vx * l2.vy;  // a(vy) * x + b(-vx) * y + c == 0;
 }
-//ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-//	return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x);
-//}
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d2.x - d1.x), (d2.y - d1.y));
 }
@@ -39,23 +36,24 @@ ld dist(const Pos& d1, const Pos& d2) {
 //	p1 %= H.size(), p2 %= H.size();
 //	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
 //}
-Vec V(std::vector<Pos>& H, int p1) {
-	int p2 = (p1 + 1) % H.size();
-	p1 %= H.size();
-	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
-}
-ld rotating_calipers(std::vector<Pos>& H) {
-	int f = 0, l = H.size();
-	ld MD = 0;
-	for (int i = 0; i < l; i++) {
-		while (cross(V(H, i), V(H, f)) > -TOL) {
-			MD = std::max(MD, dist(H[i], H[f]));
-			f = (f + 1) % l;
-		}
-		MD = std::max(MD, dist(H[i], H[f]));
-	}
-	return MD;
-}
+//Vec V(std::vector<Pos>& H, int p1) {
+//	int p2 = (p1 + 1) % H.size();
+//	p1 %= H.size();
+//	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
+//}
+//ld rotating_calipers(std::vector<Pos>& H) {
+//	int f = 0, l = H.size();
+//	ld MD = 0;
+//	for (int i = 0; i < l; i++) {
+// 		//while (cross(V(H, i, i + 1), V(H, f, f + 1)) > -TOL) {
+//		while (cross(V(H, i), V(H, f)) > -TOL) {
+//			MD = std::max(MD, dist(H[i], H[f]));
+//			f = (f + 1) % l;
+//		}
+//		MD = std::max(MD, dist(H[i], H[f]));
+//	}
+//	return MD;
+//}
 
 Pos IP(const Line& l1, const Line& l2) {
 	//ld det = l1.vy * l2.vx - l1.vx * l2.vy;
@@ -98,11 +96,10 @@ bool DIM(Pos p[], ld m) {  //diameter
 	}
 	std::vector<Pos> INX;
 	if (!half_plane_inx(HP, INX)) return 0;
-	ld MD = rotating_calipers(INX);
-	return MD >= 2 * m;
+	else return 1;
 }
 ld bi_serach(Pos p[]) {
-	ld s = 0, e = 1e7, m;
+	ld s = 0, e = 1e5, m;
 	for (int i = 0; i < 50; i++) {
 		m = (s + e) / 2;
 		if (DIM(p, m)) s = m;
@@ -117,13 +114,17 @@ int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	//freopen("9-2circles.in", "r", stdin);
-	std::cin >> N;
-	for (int i = 0; i < N; i++) {
-		std::cin >> pos[i].x >> pos[i].y;
+	while (1) {
+		std::cin >> N;
+		if (!N) return 0;
+		for (int i = 0; i < N; i++) {
+			std::cin >> pos[i].x >> pos[i].y;
+		}
+		pos[N] = pos[0];
+		std::cout << std::fixed;
+		std::cout.precision(6);
+		std::cout << bi_serach(pos) << "\n";
+
 	}
-	pos[N] = pos[0];
-	std::cout << std::fixed;
-	std::cout.precision(3);
-	std::cout << bi_serach(pos) << "\n";
 }
 
