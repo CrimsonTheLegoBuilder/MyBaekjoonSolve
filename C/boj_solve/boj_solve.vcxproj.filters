@@ -279,12 +279,6 @@
     <ClCompile Include="boj7420.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj20670_CH_bi_search.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj5631_bi_search.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj12801.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -294,6 +288,21 @@
     <ClCompile Include="boj3323_NonRecursiveMergeSortTree_CH_TS.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
+    <ClCompile Include="koosaga_2circles.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj5255_2circles.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj5255_2C.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj5631_bi_search.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj20670_CH_bi_search.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
@@ -302,30 +311,160 @@
     <Text Include="boj9382.txt">
       <Filter>리소스 파일</Filter>
     </Text>
-    <Text Include="relay.in.4a.txt" />
-    <Text Include="relay.in.4b.txt" />
-    <Text Include="relay.in.4c.txt" />
-    <Text Include="relay.in.4d.txt" />
-    <Text Include="relay.in.4e.txt" />
-    <Text Include="relay.in.4f.txt" />
-    <Text Include="relay.in.4g.txt" />
-    <Text Include="relay.in.4h.txt" />
-    <Text Include="relay.in.4i.txt" />
-    <Text Include="relay.in.4j.txt" />
+    <Text Include="relay.in.4a.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4b.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4c.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4d.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4e.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4f.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4g.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4h.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4i.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="relay.in.4j.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="boj1169.input.txt">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="0-tri.in" />
-    <None Include="1-tri.in" />
-    <None Include="2-tri.in" />
-    <None Include="3-tri.in" />
-    <None Include="4-tri.in" />
-    <None Include="5-tri.in" />
-    <None Include="6-tri.in" />
-    <None Include="7-tri.in" />
-    <None Include="8-tri.in" />
-    <None Include="9-tri.in" />
+    <None Include="relay.in.1a">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1b">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1c">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1d">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1e">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1f">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1g">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1h">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1i">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.1j">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2a">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2b">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2c">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2d">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2e">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2f">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2g">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2h">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2i">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.2j">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3a">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3b">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3c">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3d">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3e">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3f">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3g">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3h">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3i">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="relay.in.3j">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="1-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="2-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="3-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="4-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="5-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="6-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="7-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="8-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="9-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="10-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

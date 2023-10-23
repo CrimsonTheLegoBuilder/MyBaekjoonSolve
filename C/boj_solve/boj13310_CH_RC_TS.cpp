@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 typedef long long ll;
 const ll MAX = 10'000'000'000'000'000;
 struct Pos {
@@ -10,11 +11,18 @@ struct Pos {
 		return x < p.x;
 	}
 };
+struct Vec { ll vx, vy; };
 struct Star { ll x, y, vx, vy; };
 
 
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x);
+}
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
+	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+}
+ll cross(const Vec& v1, const Vec& v2) {
+	return v1.vx * v2.vy - v1.vy * v2.vx;
 }
 ll cal_dist_sq(const Pos& d1, const Pos& d2) {
 	return (d1.x - d2.x) * (d1.x - d2.x) + (d1.y - d2.y) * (d1.y - d2.y);
@@ -32,7 +40,7 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 		return H;
 	}
 	for (int i = 0; i < C.size(); i++) {
-		while (H.size() > 1 && cross(H[H.size() - 2], H[H.size() - 1], H[H.size() - 1], C[i]) <= 0) {
+		while (H.size() > 1 && cross(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0) {
 			H.pop_back();
 		}
 		H.push_back(C[i]);
@@ -40,7 +48,7 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	H.pop_back();
 	int s = H.size() + 1;
 	for (int i = C.size() - 1; i >= 0; i--) {
-		while (H.size() > s && cross(H[H.size() - 2], H[H.size() - 1], H[H.size() - 1], C[i]) <= 0) {
+		while (H.size() > s && cross(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0) {
 			H.pop_back();
 		}
 		H.push_back(C[i]);
@@ -48,15 +56,32 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	H.pop_back();
 	return H;
 }
-ll rotating_calipers(std::vector<Pos>& H) {
+//ll rotating_calipers(std::vector<Pos>& H) {
+//	ll MD = 0;
+//	int i = 0, f2i = 1, l = H.size();
+//	for (i; i <= l; i++) {
+//		while ((f2i + 1) % l != (i + 1) % l && cross(H[i % l], H[(i + 1) % l], H[f2i % l], H[(f2i + 1) % l]) > 0) {
+//			if (MD < cal_dist_sq(H[i % l], H[f2i % l])) MD = cal_dist_sq(H[i % l], H[f2i % l]);
+//			f2i++;
+//		}
+//		if (MD < cal_dist_sq(H[i % l], H[f2i % l])) MD = cal_dist_sq(H[i % l], H[f2i % l]);
+//	}
+//	return MD;
+//}
+Vec V(std::vector<Pos>& H, int i) {
+	int f = (i + 1) % H.size();
+	i %= H.size();
+	return { H[f].x - H[i].x, H[f].y - H[i].y };
+}
+ll RC(std::vector<Pos>& H) {
 	ll MD = 0;
-	int i = 0, f2i = 1, l = H.size();
-	for (i; i <= l; i++) {
-		while ((f2i + 1) % l != (i + 1) % l && cross(H[i % l], H[(i + 1) % l], H[f2i % l], H[(f2i + 1) % l]) > 0) {
-			if (MD < cal_dist_sq(H[i % l], H[f2i % l])) MD = cal_dist_sq(H[i % l], H[f2i % l]);
-			f2i++;
+	int f = 0, l = H.size();
+	for (int i = 0; i < l; i++) {
+		while (cross(V(H, i), V(H, f)) > 0) {
+			MD = std::max(MD, cal_dist_sq(H[i], H[f]));
+			f = (f + 1) % l;
 		}
-		if (MD < cal_dist_sq(H[i % l], H[f2i % l])) MD = cal_dist_sq(H[i % l], H[f2i % l]);
+		MD = std::max(MD, cal_dist_sq(H[i], H[f]));
 	}
 	return MD;
 }
@@ -69,8 +94,10 @@ Pos ternary_search(std::vector<Star>& stars, int X) {
 	while (e - s >= 3) {
 		l = (s * 2 + e) / 3;
 		r = (s + e * 2) / 3;
-		SL = pos_at_N(stars, l); HL = monotone_chain(SL); DL = rotating_calipers(HL);
-		SR = pos_at_N(stars, r); HR = monotone_chain(SR); DR = rotating_calipers(HR);
+		//SL = pos_at_N(stars, l); HL = monotone_chain(SL); DL = rotating_calipers(HL);
+		//SR = pos_at_N(stars, r); HR = monotone_chain(SR); DR = rotating_calipers(HR);
+		SL = pos_at_N(stars, l); HL = monotone_chain(SL); DL = RC(HL);
+		SR = pos_at_N(stars, r); HR = monotone_chain(SR); DR = RC(HR);
 		if (DL > DR) s = l;
 		else e = r;
 	}
@@ -84,7 +111,7 @@ Pos get_min(std::vector<Star>& stars, int X) {
 	for (int i = days.x; i < days.y; i++) {
 		S = pos_at_N(stars, i);
 		H = monotone_chain(S);
-		MD = rotating_calipers(H);
+		MD = RC(H);
 		if (MIN > MD) {
 			MIN = MD; mind = i;
 		}

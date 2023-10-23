@@ -267,9 +267,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="boj5255_2C.cpp" />
     <ClCompile Include="boj5255_2circles.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="boj5631_bi_search.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -317,7 +318,7 @@
     </ClCompile>
     <ClCompile Include="koosaga_2circles.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="koosaga_bj22819.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -351,6 +352,16 @@
     <Text Include="relay.in.4j.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="1-2circles.in" />
+    <None Include="10-2circles.in" />
+    <None Include="2-2circles.in" />
+    <None Include="3-2circles.in" />
+    <None Include="4-2circles.in" />
+    <None Include="5-2circles.in" />
+    <None Include="6-2circles.in" />
+    <None Include="7-2circles.in" />
+    <None Include="8-2circles.in" />
+    <None Include="9-2circles.in" />
     <None Include="boj1169.input.txt" />
     <None Include="relay.in.1a" />
     <None Include="relay.in.1b" />

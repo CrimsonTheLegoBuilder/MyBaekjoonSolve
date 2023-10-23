@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -10,7 +11,6 @@ const ld TOL = 1e-8;
 int N;
 
 bool z(ld x) { return std::fabs(x) < TOL; }  // x == zero ?
-//struct P { int x, y; };
 struct Pos { ld x, y; }pos[LEN];
 struct Vec { ld vy, vx; };
 struct Line {
@@ -35,10 +35,10 @@ ld cross(const Line& l1, const Line& l2) {
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d2.x - d1.x), (d2.y - d1.y));
 }
-Vec V(std::vector<Pos>& H, int p1, int p2) {
-	p1 %= H.size(), p2 %= H.size();
-	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
-}
+//Vec V(std::vector<Pos>& H, int p1, int p2) {
+//	p1 %= H.size(), p2 %= H.size();
+//	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
+//}
 Vec V(std::vector<Pos>& H, int p1) {
 	int p2 = (p1 + 1) % H.size();
 	p1 %= H.size();
@@ -81,18 +81,13 @@ bool half_plane_inx(std::vector<Line>& L, std::vector<Pos>& INX) {
 	}
 	while (D.size() > 2 && CW(D[D.size() - 2], D.back(), D[0])) D.pop_back();
 	while (D.size() > 2 && CW(D.back(), D[0], D[1])) D.pop_front();
-	//std::cout << D.size() << "\n";
 	if (D.size() < 3) return 0;
 	std::vector<Pos> h;
 	for (int i = 0; i < D.size(); i++) {
 		Line cur = D[i], nxt = D[(i + 1) % D.size()];
-		//std::cout << cur.vx << " " << cur.vy << "\n";
 		if (cross(cur, nxt) <= TOL) return 0;
 		h.push_back(IP(cur, nxt));
 	}
-	//for (const Pos& p : h) {
-	//	std::cout << p.x << " " << p.y << "\n";
-	//}
 	INX = h;
 	return 1;
 }
@@ -107,7 +102,6 @@ bool DIM(Pos p[], ld m) {  //diameter
 	std::vector<Pos> INX;
 	if (!half_plane_inx(HP, INX)) return 0;
 	ld MD = rotating_calipers(INX);
-	//std::cout << MD << " " << m << "\n";
 	return MD >= 2 * m;
 }
 ld bi_serach(Pos p[]) {
@@ -125,6 +119,7 @@ ld bi_serach(Pos p[]) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	//freopen("9-2circles.in", "r", stdin);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {
 		std::cin >> pos[i].x >> pos[i].y;

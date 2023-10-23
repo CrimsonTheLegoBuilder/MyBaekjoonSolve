@@ -13,9 +13,13 @@ struct Pos {
 	}
 }C1, C2;
 std::vector<Pos> A, H;
+struct Vec { ll vx, vy; };
 
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x);
+}
+ll cross(const Vec& v1, const Vec& v2) {
+	return v1.vx * v2.vy - v1.vy * v2.vx;
 }
 ll cal_dist_sq(const Pos& d1, const Pos& d2) {
 	return (d1.x - d2.x) * (d1.x - d2.x) + (d1.y - d2.y) * (d1.y - d2.y);
@@ -44,6 +48,12 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	H.pop_back();
 	return H;
 }
+Vec V(std::vector<Pos>& H, int i) {
+	int f = (i + 1) % H.size();
+	i %= H.size();
+	return { H[f].x - H[i].x, H[f].y - H[i].y };
+
+}
 ll rotating_calipers(std::vector<Pos>& H) {
 	ll MD = 0;
 	int i = 0, f2i = 1, l = H.size();
@@ -60,6 +70,31 @@ ll rotating_calipers(std::vector<Pos>& H) {
 		MD = cal_dist_sq(H[i % l], H[f2i % l]);
 		C1.x = H[i % l].x, C1.y = H[i % l].y;
 		C2.x = H[f2i % l].x, C2.y = H[f2i % l].y;
+		}
+	}
+	return MD;
+}
+ll RC(std::vector<Pos>& H) {
+	ll MD = 0;
+	int f = 0, l = H.size();
+	for (int i = 0; i < l; i++) {
+		while (cross(V(H, i), V(H, f)) > 0) {
+			if (MD < cal_dist_sq(H[i], H[f])) {
+				MD = cal_dist_sq(H[i], H[f]);
+				C1.x = H[i].x, C1.y = H[i].y;
+				C2.x = H[f].x, C2.y = H[f].y;
+			}
+			f = (f + 1) % l;
+			//if (MD < cal_dist_sq(H[i], H[f])) {
+			//	MD = cal_dist_sq(H[i], H[f]);
+			//	C1.x = H[i].x, C1.y = H[i].y;
+			//	C2.x = H[f].x, C2.y = H[f].y;
+			//}
+		}
+		if (MD < cal_dist_sq(H[i], H[f])) {
+			MD = cal_dist_sq(H[i], H[f]);
+			C1.x = H[i].x, C1.y = H[i].y;
+			C2.x = H[f].x, C2.y = H[f].y;
 		}
 	}
 	return MD;
@@ -81,7 +116,7 @@ int main() {
 			std::cin >> A[i].x >> A[i].y;
 		}
 		H = monotone_chain(A);
-		MD = rotating_calipers(H);
+		MD = RC(H);
 		std::cout << C1.x << " " << C1.y << " " << C2.x << " " << C2.y << "\n";
 	}
 	return 0;

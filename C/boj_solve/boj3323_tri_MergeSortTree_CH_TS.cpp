@@ -7,10 +7,7 @@ const int LEN = 100'000;
 
 struct Pos {
 	ll x, y;
-	bool operator<(const Pos& p) const {
-		if (y * p.x > x * p.y) return (x + x + y * y < p.dist());
-		return y * p.x > x * p.y;
-	}
+	bool operator<(const Pos& p) const { return y * p.x > x * p.y; }
 	bool operator<=(const Pos& p) const { return y * p.x >= x * p.y; }
 	ll dist() const { return x + x + y * y; }
 }pos[LEN];
@@ -48,14 +45,14 @@ void init(int s, int e, int i = 1) {
 }
 
 Pos p1, p2;
-bool ternary_search(std::vector<Pos> H) {
+bool ternary_search(std::vector<Pos>& H) {
 	int s = 0, e = H.size() - 1;
 	while (e - s >= 3) {
 		int l = (s * 2 + e) / 3;
 		int r = (s + e * 2) / 3;
 		ll L = cross(p1, p2, p2, H[l]);
 		ll R = cross(p1, p2, p2, H[r]);
-		if (L <= 0 || R <= 0) return 1;
+		//if (L <= 0 || R <= 0) return 1;
 		if (L < R) e = r;
 		else s = l;
 	}
@@ -76,8 +73,8 @@ int K, M;
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("4-tri.in", "r", stdin);
-	freopen("4-tri.out", "w", stdout);
+	//freopen("4-tri.in", "r", stdin);
+	//freopen("4-tri.out", "w", stdout);
 	std::cin >> K >> M;
 	for (int i = 0; i < K; i++) {
 		std::cin >> pos[i].x >> pos[i].y;
