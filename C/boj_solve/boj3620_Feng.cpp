@@ -53,14 +53,14 @@ ld rotating_calipers(std::vector<Pos>& H) {
 			if (MD < dist(H[i], H[f])) {
 				MD = dist(H[i], H[f]);
 				P1 = H[i], P2 = H[f];
-				std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
+				//std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
 			}
 			f = (f + 1) % l;
 		}
 		if (MD < dist(H[i], H[f])) {
 			MD = dist(H[i], H[f]);
 			P1 = H[i], P2 = H[f];
-			std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
+			//std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
 		}
 	}
 	return MD;
