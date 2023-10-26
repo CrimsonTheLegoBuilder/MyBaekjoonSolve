@@ -321,6 +321,24 @@
     <ClCompile Include="boj11909_escape.cpp">
       <Filter>소스 파일\DP</Filter>
     </ClCompile>
+    <ClCompile Include="boj1535_knapsack.cpp">
+      <Filter>소스 파일\DP</Filter>
+    </ClCompile>
+    <ClCompile Include="boj12865_knapsack.cpp">
+      <Filter>소스 파일\DP</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3800_Art_Gallery.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj21048_big_brother.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="koosaga_boj7890_splaytree_voronoi.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7949_CH_re.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
@@ -482,6 +500,12 @@
       <Filter>리소스 파일</Filter>
     </None>
     <None Include="10-2circles.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="bigbrother\15-star_250000.in">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="bigbrother\34-random-nonempty.in">
       <Filter>리소스 파일</Filter>
     </None>
   </ItemGroup>

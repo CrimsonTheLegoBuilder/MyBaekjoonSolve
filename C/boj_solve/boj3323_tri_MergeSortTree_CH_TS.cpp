@@ -9,7 +9,7 @@ struct Pos {
 	ll x, y;
 	bool operator<(const Pos& p) const { return y * p.x > x * p.y; }
 	bool operator<=(const Pos& p) const { return y * p.x >= x * p.y; }
-	ll dist() const { return x + x + y * y; }
+	ll dist() const { return x * x + y * y; }
 }pos[LEN];
 std::vector<Pos> seg[LEN << 2];
 
