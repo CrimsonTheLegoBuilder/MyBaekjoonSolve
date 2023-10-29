@@ -113,7 +113,6 @@ ld bi_serach(Pos p[]) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("9-2circles.in", "r", stdin);
 	while (1) {
 		std::cin >> N;
 		if (!N) return 0;
@@ -127,4 +126,3 @@ int main() {
 
 	}
 }
-

@@ -339,6 +339,36 @@
     <ClCompile Include="boj7949_CH_re.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj13329_sweeping.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1005_t_sort.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj5594.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="sw1288_insomnia.cpp">
+      <Filter>소스 파일\bitmasking</Filter>
+    </ClCompile>
+    <ClCompile Include="sw10726.cpp">
+      <Filter>소스 파일\bitmasking</Filter>
+    </ClCompile>
+    <ClCompile Include="boj22962_Picks_theorem.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj11962.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC326A.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC326C.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC326F.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
