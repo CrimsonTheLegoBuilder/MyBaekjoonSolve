@@ -369,6 +369,15 @@
     <ClCompile Include="ABC326F.cpp">
       <Filter>소스 파일\AtCoder</Filter>
     </ClCompile>
+    <ClCompile Include="boj28098.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3878.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1068_tree.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

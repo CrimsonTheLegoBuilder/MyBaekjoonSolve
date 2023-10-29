@@ -21,6 +21,29 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3) {
 bool X(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (!cross(d1, d3, d2) && (dot(d1, d3, d2) >= 0));
 }
+bool I(std::vector<Pos>& H, const Pos& x) {
+	int h = H.size() - 1;
+	if (h < 2 || cross(H[0], H[1], x) < 0 || cross(H[0], H[h], x) > 0) return 0;
+	if (X(H[0], H[1], x) || X(H[0], H[h], x)) return 1;
+	int s = 0, e = h, m;
+	while (s + 1 < e) {
+		m = s + e >> 1;
+		ll C = cross(H[0], H[m], x);
+		if (!C) return (dot(H[0], x, H[m]) >= 0);
+		else if (C > 0) s = m;
+		else e = m;
+	}
+	return cross(H[s], H[e], x) > 0 || X(H[s], H[e], x);
+}
+ll A(std::vector<Pos>& H) {  // return area * 2;
+	Pos p = { 0, 0 };
+	int l = H.size();
+	ll a = 0;
+	for (int i = 0; i < l; i++) {
+		a += cross(p, H[i], H[(i + 1) % l]);
+	}
+	return a;
+}
 std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	std::vector<Pos> H;
 	std::sort(C.begin(), C.end());
@@ -49,30 +72,6 @@ std::vector<Pos> H, D;
 ll GCD(ll x, ll y) {
 	if (!y) return x;
 	return GCD(y, x % y); 
-}
-ll A(std::vector<Pos>& H) {  // return area * 2;
-	Pos p = { 0, 0 };
-	int l = H.size();
-	ll a = 0;
-	for (int i = 0; i < l; i++) {
-		a += cross(p, H[i], H[(i + 1) % l]);
-	}
-	return a;
-}
-bool I(std::vector<Pos>& H, const Pos& x) {
-	int h = H.size() - 1;
-	if (h < 2 || cross(H[0], H[1], x) < 0 || cross(H[0], H[h], x) > 0) return 0;
-	if (X(H[0], H[1], x) || X(H[0], H[h], x) > 0) return 1;
-	int s = 0, e = h, m;
-	while (s + 1 < e) {
-		m = s + e >> 1;
-		ll C = cross(H[0], H[m], x);
-		if (!C) return (dot(H[0], x, H[m]) >= 0);
-		else if (C > 0) s = m;
-		else e = m;
-	}
-	//if (X(H[s], H[e], x)) return 1;
-	return cross(H[s], H[e], x) >= 0;
 }
 
 
@@ -115,6 +114,7 @@ int main() {
 		vx = std::abs(H[i].x - H[(i + 1) % l].x);
 		vy = std::abs(H[i].y - H[(i + 1) % l].y);
 		b += GCD(vx, vy);
+		//b += std::gcd(vx, vy);
 	}
 	//Pick`s Theorem : A = i + b/2 - 1
 	// 2i = 2A - b + 2
