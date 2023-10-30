@@ -5,7 +5,7 @@ int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	while (std::cin >> a >> b) {
-		std::cout << a + b;
+		std::cout << a + b << "\n";
 	}
 	return 0;
 }
