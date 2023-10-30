@@ -378,6 +378,15 @@
     <ClCompile Include="boj1068_tree.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
+    <ClCompile Include="boj4743.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7057.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj10951.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
