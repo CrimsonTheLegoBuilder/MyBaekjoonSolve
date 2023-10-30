@@ -68,14 +68,14 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	H.pop_back();
 	return H;
 }
+//ll GCD(ll x, ll y) {
+//	if (!y) return x;
+//	return GCD(y, x % y); 
+//}
+
+
+
 std::vector<Pos> H, D;
-ll GCD(ll x, ll y) {
-	if (!y) return x;
-	return GCD(y, x % y); 
-}
-
-
-
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -99,8 +99,8 @@ int main() {
 		else if (H.size() == 2) {
 			vx = std::abs(H[0].x - H[1].x);
 			vy = std::abs(H[0].y - H[1].y);
-			int cnt = GCD(vx, vy) + 1;
-			//int cnt = std::gcd(vx, vy) + 1;
+			//int cnt = GCD(vx, vy) + 1;
+			int cnt = std::gcd(vx, vy) + 1;
 			for (int i = 0; i < M; i++) {
 				std::cin >> s.x >> s.y;
 				if (X(H[0], H[1], s)) cnt--;
@@ -113,8 +113,8 @@ int main() {
 	for (int i = 0; i < l; i++) {
 		vx = std::abs(H[i].x - H[(i + 1) % l].x);
 		vy = std::abs(H[i].y - H[(i + 1) % l].y);
-		b += GCD(vx, vy);
-		//b += std::gcd(vx, vy);
+		//b += GCD(vx, vy);
+		b += std::gcd(vx, vy);
 	}
 	//Pick`s Theorem : A = i + b/2 - 1
 	// 2i = 2A - b + 2
