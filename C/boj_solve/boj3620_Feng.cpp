@@ -53,7 +53,7 @@ ld rotating_calipers(std::vector<Pos>& H) {
 	}
 	ld MD = 0;
 	for (int i = 0; i < l; i++) {
-		while (cross(V(H, i), V(H, f)) > -TOL) {
+		while (cross(V(H, i), V(H, f)) > TOL) {
 			if (MD < dist(H[i], H[f])) {
 				MD = dist(H[i], H[f]);
 				P1 = H[i], P2 = H[f];
