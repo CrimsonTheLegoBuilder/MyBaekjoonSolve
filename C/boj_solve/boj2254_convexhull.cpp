@@ -99,3 +99,12 @@ int main() {
 
 //for (const Pos& i : H) { std::cout << i.x << " " << i.y << " " << cnt << "\n"; }
 //std::cout << I(H, P) << " " << A(H) << " DEBUG\n";
+
+
+/*
+4 2
+0 0
+0 4
+6 4
+6 0
+*/

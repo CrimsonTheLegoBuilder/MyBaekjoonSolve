@@ -47,6 +47,10 @@ Vec V(std::vector<Pos>& H, int p1) {
 }
 ld rotating_calipers(std::vector<Pos>& H) {
 	int f = 0, l = H.size();
+	if (l <= 2) {
+		P1 = H[0], P2 = H[l - 1];
+		return dist(H[0], H[l - 1]);
+	}
 	ld MD = 0;
 	for (int i = 0; i < l; i++) {
 		while (cross(V(H, i), V(H, f)) > -TOL) {
