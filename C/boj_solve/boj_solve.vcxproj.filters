@@ -387,6 +387,9 @@
     <ClCompile Include="boj10951.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
+    <ClCompile Include="boj13329_splay_tree.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

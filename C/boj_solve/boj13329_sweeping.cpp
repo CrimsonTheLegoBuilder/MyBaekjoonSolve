@@ -9,15 +9,15 @@ int N, M, v;
 bool visible[LEN];
 
 struct Pos {
-	ll x, y;
+	int x, y;
 	int i;
-	bool operator < (const Pos& p) const { return y * p.x < x * p.y; }
+	bool operator < (const Pos& p) const { return (ll)y * p.x < (ll)x * p.y; }
 	//bool operator <= (const Pos& p) const { return y * p.x <= x * p.y; }
 }s, e, S[LEN], E[LEN];
 std::vector<Pos> meteor, A;
 
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+	return (ll)(d2.x - d1.x) * (ll)(d3.y - d2.y) - (ll)(d2.y - d1.y) * (ll)(d3.x - d2.x);
 }
 
 struct Idx {
