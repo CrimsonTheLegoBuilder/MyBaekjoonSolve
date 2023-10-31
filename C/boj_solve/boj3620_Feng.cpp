@@ -7,7 +7,7 @@
 typedef long long ll;
 typedef double ld;
 const int LEN = 1'001;
-const ld TOL = 1e-8;
+const ld TOL = 1e-6;
 int N;
 ld R;
 
@@ -105,7 +105,7 @@ void DIM(Pos p[], ld m) {  //diameter
 	for (int i = 0; i < N; i++) {
 		ld dy = p[i + 1].y - p[i].y;
 		ld dx = p[i].x - p[i + 1].x;  // -(p[i + 1].x - p[i].x)
-		ld c = dy * p[i].x + dx * p[i].y - hypot(dy, dx) * m;
+		ld c = dy * p[i].x + dx * p[i].y - hypot(dy, dx) * m + 0.00001;
 		HP.push_back({ dy, dx, c });
 	}
 	std::vector<Pos> INX;
@@ -131,4 +131,12 @@ int main() {
 	std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
 	return 0;
 }
+
+/*
+4 2
+0 0
+0 4
+6 4
+6 0
+*/
 
