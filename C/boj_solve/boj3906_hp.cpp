@@ -6,9 +6,8 @@
 #include <cmath>
 typedef long long ll;
 typedef long double ld;
-const int LEN = 1'001;
 const ld TOL = 1e-8;
-int T, N;
+int N;
 
 bool z(ld x) { return std::fabs(x) < TOL; }  // x == zero ?
 struct Pos { ld x, y; };
@@ -36,35 +35,6 @@ ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d2.x - d1.x), (d2.y - d1.y));
 }
-//Vec V(std::vector<Pos>& H, int p1, int p2) {
-//	p1 %= H.size(), p2 %= H.size();
-//	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
-//}
-//Vec V(std::vector<Pos>& H, int p1) {
-//	int p2 = (p1 + 1) % H.size();
-//	p1 %= H.size();
-//	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
-//}
-//ld rotating_calipers(std::vector<Pos>& H) {
-//	int f = 0, l = H.size();
-//	ld MD = 0;
-//	for (int i = 0; i < l; i++) {
-//		while (cross(V(H, i), V(H, f)) > -TOL) {
-//			if (MD < dist(H[i], H[f])) {
-//				MD = dist(H[i], H[f]);
-//				P1 = H[i], P2 = H[f];
-//				//std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
-//			}
-//			f = (f + 1) % l;
-//		}
-//		if (MD < dist(H[i], H[f])) {
-//			MD = dist(H[i], H[f]);
-//			P1 = H[i], P2 = H[f];
-//			//std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
-//		}
-//	}
-//	return MD;
-//}
 ld A(std::vector<Pos>& H) {
 	Pos O = { 0, 0 };
 	int l = H.size();
@@ -105,7 +75,7 @@ bool half_plane_inx(std::vector<Line>& L, std::vector<Pos>& INX) {
 	INX = h;
 	return 1;
 }
-ld trial(std::vector<Pos>& p) {  //area
+bool trial(std::vector<Pos>& p) {
 	std::vector<Line> HP;
 	for (int i = 0; i < N; i++) {
 		ld dy = p[(i + 1) % N].y - p[i].y;
@@ -115,8 +85,7 @@ ld trial(std::vector<Pos>& p) {  //area
 	}
 	std::vector<Pos> INX;
 	if (!half_plane_inx(HP, INX)) return 0;
-	ld area = A(INX);
-	return area;
+	return 1;
 }
 
 
@@ -128,18 +97,13 @@ int main() {
 	std::cout << std::fixed;
 	std::cout.precision(2);
 	//freopen("D.dat", "r", stdin);
-	std::cin >> T;
-	while (T--) {
+	while (1) {
 		std::cin >> N;
+		if (!N) return 0;
 		pos.resize(N);
 		for (int i = 0; i < N; i++) {
 			std::cin >> pos[i].x >> pos[i].y;
 		}
-		if (z(A(pos))) {
-			std::cout << "0.00\n"; continue;
-		}
-		if (A(pos) < 0) std::reverse(pos.begin(), pos.end());
 		std::cout << trial(pos) << "\n";
 	}
-	return 0;
 }
