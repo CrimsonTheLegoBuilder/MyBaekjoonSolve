@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 typedef long long ll;
-const ll MAX = 10'000'000'000'000'000;
+const ll MAX = 1e16;
 struct Pos {
 	ll x, y;
 	bool operator<(const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }

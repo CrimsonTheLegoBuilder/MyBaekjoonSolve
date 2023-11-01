@@ -46,6 +46,7 @@ void monotone_chain(std::vector<Pos>& C, std::vector<Pos>& H) {
 	}
 	H.pop_back();
 	//return H;
+	return;
 }
 bool I(std::vector<Pos>& H, const Pos& x) {
 	int h = H.size() - 1;

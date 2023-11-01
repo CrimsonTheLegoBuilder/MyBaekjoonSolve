@@ -15,7 +15,7 @@ bool z(ld x) { return std::fabs(x) < TOL; }  // x == zero ?
 struct Pos { ld x, y; }P1, P2, pos[LEN];
 struct Vec { ld vy, vx; };
 struct Line {
-	ld vy, vx, c;  // a(vy) * x + b(-vx) * y + c == 0;
+	ld vy, vx, c;  // a(vy) * x + b(-vx) * y - c == 0;
 	bool operator < (const Line& l) const {
 		bool f1 = z(vy) ? vx > 0 : vy > 0;
 		bool f2 = z(l.vy) ? l.vx > 0 : l.vy > 0;  // sort CCW
@@ -25,10 +25,10 @@ struct Line {
 	}
 };
 ld cross(const Vec& v1, const Vec& v2) {
-	return v1.vy * v2.vx - v1.vx * v2.vy;  // a(vy) * x + b(-vx) * y + c == 0;
+	return v1.vy * v2.vx - v1.vx * v2.vy;  // a(vy) * x + b(-vx) * y - c == 0;
 }
 ld cross(const Line& l1, const Line& l2) {
-	return l1.vy * l2.vx - l1.vx * l2.vy;  // a(vy) * x + b(-vx) * y + c == 0;
+	return l1.vy * l2.vx - l1.vx * l2.vy;  // a(vy) * x + b(-vx) * y - c == 0;
 }
 //ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 //	return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x);
