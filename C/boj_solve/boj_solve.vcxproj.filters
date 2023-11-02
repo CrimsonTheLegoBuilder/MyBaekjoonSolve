@@ -381,9 +381,6 @@
     <ClCompile Include="boj4743.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj7057.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj10951.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
@@ -399,13 +396,19 @@
     <ClCompile Include="boj3679.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj1162_dijkstra.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj5383_HPI_CHIN.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj7057_lineCHcross.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1162_dijkstra.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7057_lineCHcross_sep.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

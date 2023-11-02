@@ -14,7 +14,7 @@ bool z(ld x) { return std::fabs(x) < TOL; }  // x == zero ?
 struct Pos { ld x, y; }pos[LEN];
 struct Vec { ld vy, vx; };
 struct Line {
-	ld vy, vx, c;  // a(vy) * x + b(-vx) * y - c == 0;
+	ld vy, vx, c;  // a(vy) * x + b(vx) * y - c == 0;
 	bool operator < (const Line& l) const {
 		bool f1 = z(vy) ? vx > 0 : vy > 0;
 		bool f2 = z(l.vy) ? l.vx > 0 : l.vy > 0;  // sort CCW
@@ -24,10 +24,10 @@ struct Line {
 	}
 };
 ld cross(const Vec& v1, const Vec& v2) {
-	return v1.vy * v2.vx - v1.vx * v2.vy;  // a(vy) * x + b(-vx) * y - c == 0;
+	return v1.vy * v2.vx - v1.vx * v2.vy;  // a(vy) * x + b(vx) * y - c == 0;
 }
 ld cross(const Line& l1, const Line& l2) {
-	return l1.vy * l2.vx - l1.vx * l2.vy;  // a(vy) * x + b(-vx) * y - c == 0;
+	return l1.vy * l2.vx - l1.vx * l2.vy;  // a(vy) * x + b(vx) * y - c == 0;
 }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
@@ -35,35 +35,6 @@ ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d2.x - d1.x), (d2.y - d1.y));
 }
-//Vec V(std::vector<Pos>& H, int p1, int p2) {
-//	p1 %= H.size(), p2 %= H.size();
-//	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
-//}
-//Vec V(std::vector<Pos>& H, int p1) {
-//	int p2 = (p1 + 1) % H.size();
-//	p1 %= H.size();
-//	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
-//}
-//ld rotating_calipers(std::vector<Pos>& H) {
-//	int f = 0, l = H.size();
-//	ld MD = 0;
-//	for (int i = 0; i < l; i++) {
-//		while (cross(V(H, i), V(H, f)) > -TOL) {
-//			if (MD < dist(H[i], H[f])) {
-//				MD = dist(H[i], H[f]);
-//				P1 = H[i], P2 = H[f];
-//				//std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
-//			}
-//			f = (f + 1) % l;
-//		}
-//		if (MD < dist(H[i], H[f])) {
-//			MD = dist(H[i], H[f]);
-//			P1 = H[i], P2 = H[f];
-//			//std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
-//		}
-//	}
-//	return MD;
-//}
 ld A(std::vector<Pos>& H) {
 	Pos O = { 0, 0 };
 	int l = H.size();
@@ -74,8 +45,7 @@ ld A(std::vector<Pos>& H) {
 	return a / 2;
 }
 Pos IP(const Line& l1, const Line& l2) {
-	//ld det = l1.vy * l2.vx - l1.vx * l2.vy;
-	ld det = cross(l1, l2);
+	ld det = cross(l1, l2);  //ld det = l1.vy * l2.vx - l1.vx * l2.vy;
 	return { (l1.c * l2.vx - l1.vx * l2.c) / det, (l1.vy * l2.c - l1.c * l2.vy) / det };
 }
 bool CW(const Line& l1, const Line& l2, const Line& l) {
@@ -109,7 +79,7 @@ ld trial(Pos p[]) {  //area
 	for (int i = 0; i < N; i++) {
 		ld dy = p[i + 1].y - p[i].y;
 		ld dx = p[i].x - p[i + 1].x;  // -(p[i + 1].x - p[i].x)
-		ld c = dy * p[i].x + dx * p[i].y; // -hypot(dy, dx) * m;
+		ld c = dy * p[i].x + dx * p[i].y; // -hypot(dy, dx) * x;
 		HP.push_back({ dy, dx, c });
 	}
 	std::vector<Pos> INX;
@@ -117,7 +87,6 @@ ld trial(Pos p[]) {  //area
 	ld area = A(INX);
 	return area;
 }
-
 
 
 
@@ -136,3 +105,35 @@ int main() {
 	std::cout << trial(pos) << "\n";
 	return 0;
 }
+
+
+
+//Vec V(std::vector<Pos>& H, int p1, int p2) {
+//	p1 %= H.size(), p2 %= H.size();
+//	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
+//}
+//Vec V(std::vector<Pos>& H, int p1) {
+//	int p2 = (p1 + 1) % H.size();
+//	p1 %= H.size();
+//	return { H[p2].x - H[p1].x, H[p2].y - H[p1].y };
+//}
+//ld rotating_calipers(std::vector<Pos>& H) {
+//	int f = 0, l = H.size();
+//	ld MD = 0;
+//	for (int i = 0; i < l; i++) {
+//		while (cross(V(H, i), V(H, f)) > -TOL) {
+//			if (MD < dist(H[i], H[f])) {
+//				MD = dist(H[i], H[f]);
+//				P1 = H[i], P2 = H[f];
+//				//std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
+//			}
+//			f = (f + 1) % l;
+//		}
+//		if (MD < dist(H[i], H[f])) {
+//			MD = dist(H[i], H[f]);
+//			P1 = H[i], P2 = H[f];
+//			//std::cout << P1.x << " " << P1.y << " " << P2.x << " " << P2.y << "\n";
+//		}
+//	}
+//	return MD;
+//}
