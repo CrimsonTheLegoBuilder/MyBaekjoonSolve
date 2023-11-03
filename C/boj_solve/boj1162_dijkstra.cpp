@@ -40,12 +40,6 @@ ll dijkstra(int K, int v = 1) {
 			if (cur.pave < K && DP[cur.pave + 1][w.i] > cur.cost) {  //pave
 				DP[cur.pave + 1][w.i] = cur.cost;
 				H.push({ cur.cost, w.i, cur.pave + 1 });
-
-				//optimization
-				for (int i = cur.pave + 2; i <= K; i++) {
-					if (DP[i][w.i] < DP[cur.pave][cur.i]) break;
-					DP[i][w.i] = DP[cur.pave][cur.i];
-				}
 			}
 		}
 	}

@@ -35,11 +35,14 @@ bool DFS(int i) {
 
 
 int main() {
+	std::cin.tie()->sync_with_stdio(0);
+	std::cout.tie(0);
 	std::cin >> N >> M >> S >> V;
 	for (int i = 0; i < N; i++) { std::cin >> R[i].x >> R[i].y; }
 	for (int i = 0; i < M; i++) { std::cin >> H[i].x >> H[i].y; }
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
+			//if (dist(g[i], H[j]) <= S * V) G[i].push_back(j);
 			if (dist(R[i], H[j]) - S * V < -TOL) G[i].push_back(j);
 		}
 	}
