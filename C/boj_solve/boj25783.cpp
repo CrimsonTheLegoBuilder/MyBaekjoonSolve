@@ -22,11 +22,6 @@ struct Line {
 		ld ccw = vy * l.vx - vx * l.vy;  // ccw == 0 : parallel
 		return z(ccw) ? c * hypot(l.vx, l.vy) < l.c * hypot(vx, vy) : ccw > 0;  // sort by distance
 	}
-	//bool operator < (const Line& l) const {
-	//	ld ccw = vy * l.vx - vx * l.vy;  // ccw == 0 : parallel
-	//	if (z(ccw)) return c * hypot(l.vx, l.vy) < l.c * hypot(vx, vy);  // sort by distance
-	//	return ccw > 0;
-	//}
 };
 ld cross(const Vec& v1, const Vec& v2) {
 	return v1.vy * v2.vx - v1.vx * v2.vy;  // a(vy) * x + b(-vx) * y - c == 0;

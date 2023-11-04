@@ -417,6 +417,27 @@
     <ClCompile Include="boj2191.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
+    <ClCompile Include="boj2268.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj4376.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="codetest.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1151_CH.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC327A.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC327B.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC327D.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
