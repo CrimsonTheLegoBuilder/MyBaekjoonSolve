@@ -4,9 +4,9 @@
 #include <cstring>
 typedef long long ll;
 const int LEN = 1'000'001;
-int N, M, A[LEN], b;
+int N, M, A[LEN];
 bool a;
-ll c, diff, SEG[LEN << 2];
+ll b, c, diff, SEG[LEN << 2];
 
 ll Sum(int l, int r, int s = 1, int e = N, int i = 1) {
 	if (r < s || e < l) return 0;
@@ -37,7 +37,10 @@ int main() {
 	std::cin >> N >> M;
 	while (M--) {
 		std::cin >> a >> b >> c;
-		if (!a) std::cout << Sum(b, c) << "\n";
+		if (!a) {
+			if (b > c) std::swap(b, c);
+			std::cout << Sum(b, c) << "\n";
+		}
 		else Update(b, c);
 	}
 	return 0;

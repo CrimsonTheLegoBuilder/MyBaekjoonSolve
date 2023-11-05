@@ -4,13 +4,14 @@
 #include <cmath>
 #include <numeric>
 typedef long long ll;
+const int LEN = 500'000;
 int N, M, vx, vy;
 
 struct Pos {
 	ll x, y;
 	bool operator<(const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator==(const Pos& p) const { return x == p.x && y == p.y; }
-}s;
+}S[LEN];
 
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
@@ -85,13 +86,15 @@ int main() {
 		std::cin >> D[i].x >> D[i].y;
 	}
 	H = monotone_chain(D);
+	for (int i = 0; i < M; i++) {
+		std::cin >> S[i].x >> S[i].y;
+	}
 	ll area = A(H);
 	if (!area) {
 		if (H.size() == 1) {
 			bool f = 1;
 			for (int i = 0; i < M; i++) {
-				std::cin >> s.x >> s.y;
-				if (s == H[0]) f = 0;
+				if (S[i] == H[0]) f = 0;
 			}
 			std::cout << f << "\n";
 			return 0;
@@ -102,8 +105,7 @@ int main() {
 			//int cnt = GCD(vx, vy) + 1;
 			int cnt = std::gcd(vx, vy) + 1;
 			for (int i = 0; i < M; i++) {
-				std::cin >> s.x >> s.y;
-				if (X(H[0], H[1], s)) cnt--;
+				if (X(H[0], H[1], S[i])) cnt--;
 			}
 			std::cout << cnt << "\n";
 			return 0;
@@ -124,12 +126,56 @@ int main() {
 
 	t += b;
 	for (int i = 0; i < M; i++) {
-		std::cin >> s.x >> s.y;
-		if (I(H, s)) t--;
+		if (I(H, S[i])) t--;
 	}
 	std::cout << t << "\n";
 	return 0;
 }
+//	ll area = A(H);
+//	if (!area) {
+//		if (H.size() == 1) {
+//			bool f = 1;
+//			for (int i = 0; i < M; i++) {
+//				std::cin >> s.x >> s.y;
+//				if (s == H[0]) f = 0;
+//			}
+//			std::cout << f << "\n";
+//			return 0;
+//		}
+//		else if (H.size() == 2) {
+//			vx = std::abs(H[0].x - H[1].x);
+//			vy = std::abs(H[0].y - H[1].y);
+//			//int cnt = GCD(vx, vy) + 1;
+//			int cnt = std::gcd(vx, vy) + 1;
+//			for (int i = 0; i < M; i++) {
+//				std::cin >> s.x >> s.y;
+//				if (X(H[0], H[1], s)) cnt--;
+//			}
+//			std::cout << cnt << "\n";
+//			return 0;
+//		}
+//	}
+//	int l = H.size(), b = 0;
+//	for (int i = 0; i < l; i++) {
+//		vx = std::abs(H[i].x - H[(i + 1) % l].x);
+//		vy = std::abs(H[i].y - H[(i + 1) % l].y);
+//		//b += GCD(vx, vy);
+//		b += std::gcd(vx, vy);
+//	}
+//	//Pick`s Theorem : A = i + b/2 - 1
+//	// 2i = 2A - b + 2
+//	ll t = area - b + 2;
+//	t >>= 1;
+//	//std::cout << t << " " << b << " " << area << " DEBUG\n";
+//
+//	t += b;
+//	for (int i = 0; i < M; i++) {
+//		std::cin >> s.x >> s.y;
+//		if (I(H, s)) t--;
+//	}
+//	std::cout << t << "\n";
+//	return 0;
+//}
 
 
 /*
