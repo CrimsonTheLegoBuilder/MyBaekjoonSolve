@@ -97,6 +97,7 @@ int main() {
 	std::cout.precision(9);
 	//freopen("bigbrother/15-star_250000.in", "r", stdin);
 	//freopen("bigbrother/34-random-nonempty.in", "r", stdin);
+	//freopen("bigbrother/03-uniform-octa-d.in", "r", stdin);
 	std::cin >> N;
 	for (int i = N; i > 0; i--) {
 		std::cin >> pos[i].x >> pos[i].y;
