@@ -5,6 +5,7 @@
 #include <deque>
 #include <cmath>
 #include <cstring>
+#include <cassert>
 typedef long long ll;
 typedef double ld;
 const int LEN = 125'001;
@@ -24,6 +25,7 @@ struct Line {
 		ld ccw = vy * l.vx - vx * l.vy;  // ccw == 0 : parallel
 		return z(ccw) ? c * hypot(l.vx, l.vy) < l.c * hypot(vx, vy) : ccw > 0;  // sort by distance
 	}
+	ld operator / (const Line& l) const { return vy * l.vx - vx * l.vy; }  //cross
 };
 Line L(const Pos& s, const Pos& e) {
 	ld dy = e.y - s.y;
@@ -34,9 +36,9 @@ Line L(const Pos& s, const Pos& e) {
 ld cross(const Vec& v1, const Vec& v2) {
 	return v1.vy * v2.vx - v1.vx * v2.vy;  // a(vy) * x + b(vx) * y - c == 0;
 }
-ld cross(const Line& l1, const Line& l2) {
-	return l1.vy * l2.vx - l1.vx * l2.vy;  // a(vy) * x + b(vx) * y - c == 0;
-}
+//ld cross(const Line& l1, const Line& l2) {
+//	return l1.vy * l2.vx - l1.vx * l2.vy;  // a(vy) * x + b(vx) * y - c == 0;
+//}
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 }
@@ -44,11 +46,13 @@ ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d2.x - d1.x), (d2.y - d1.y));
 }
 Pos IP(const Line& l1, const Line& l2) {
-	ld det = cross(l1, l2);  //ld det = l1.vy * l2.vx - l1.vx * l2.vy;
+	//ld det = cross(l1, l2);  //ld det = l1.vy * l2.vx - l1.vx * l2.vy;
+	ld det = l1 / l2;  //ld det = l1.vy * l2.vx - l1.vx * l2.vy;
 	return { (l1.c * l2.vx - l1.vx * l2.c) / det, (l1.vy * l2.c - l1.c * l2.vy) / det };
 }
 bool CW(const Line& l1, const Line& l2, const Line& l) {
-	if (cross(l1, l2) <= 0) return 0;
+	//if (cross(l1, l2) <= 0) return 0;
+	if (l1 / l2 <= 0) return 0;
 	Pos p = IP(l1, l2);
 	return l.vy * p.x + l.vx * p.y >= l.c;
 }
@@ -56,7 +60,8 @@ bool half_plane_inx(std::vector<Line>& L, std::vector<Pos>& INX) {
 	std::deque<Line> D;
 	std::sort(L.begin(), L.end());
 	for (const Line& l : L) {
-		if (!D.empty() && z(cross(D.back(), l))) continue;
+		//if (!D.empty() && z(cross(D.back(), l))) continue;
+		if (!D.empty() && z(D.back() / l)) continue;
 		while (D.size() >= 2 && CW(D[D.size() - 2], D.back(), l)) D.pop_back();
 		while (D.size() >= 2 && CW(l, D[0], D[1])) D.pop_front();
 		D.push_back(l);
@@ -67,7 +72,8 @@ bool half_plane_inx(std::vector<Line>& L, std::vector<Pos>& INX) {
 	std::vector<Pos> h;
 	for (int i = 0; i < D.size(); i++) {
 		Line cur = D[i], nxt = D[(i + 1) % D.size()];
-		if (cross(cur, nxt) <= TOL) return 0;
+		//if (cross(cur, nxt) <= TOL) return 0;
+		if (cur / nxt <= TOL) return 0;
 		h.push_back(IP(cur, nxt));
 	}
 	INX = h;
@@ -109,12 +115,19 @@ void trial(Pos p[]) {  //inner check
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("C.in", "r", stdin);
-	freopen("C.ans", "w", stdout);
+	//freopen("C.in", "r", stdin);
+	//freopen("C.ans", "w", stdout);
 	std::cin >> T;
 	while (T--) {
 		std::cin >> N;
-		for (int i = 1; i <= N; i++) { std::cin >> pos[i].x >> pos[i].y; }
+		for (int i = 1; i <= N; i++) {
+			//std::cout << T << " " << i << "\n";
+			std::cin >> pos[i].x >> pos[i].y;
+			assert(pos[i].x < (2ll << 28));
+			assert(pos[i].x >= 0);
+			assert(pos[i].y < (2ll << 28));
+			assert(pos[i].y >= 0);
+		}
 		std::cin >> K;
 		while (K--) { trial(pos); }
 	}
