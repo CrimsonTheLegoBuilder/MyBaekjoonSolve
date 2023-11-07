@@ -8,17 +8,17 @@ int T, N, E, u, v, V[LEN];
 std::vector<int> G[LEN];
 bool F;
 
-bool DFS(int v) {
-	bool f = 1;
-	for (const int& w : G[v]) {
-		if (!~V[w]) {
-			V[w] = V[v] ^ 1;
-			f = DFS(w);
-		}
-		else if (V[w] == V[v]) return 0;
-	}
-	return f;
-}
+//bool DFS(int v) {
+//	bool f = 1;
+//	for (const int& w : G[v]) {
+//		if (!~V[w]) {
+//			V[w] = V[v] ^ 1;
+//			f = DFS(w);
+//		}
+//		else if (V[w] == V[v]) return 0;
+//	}
+//	return f;
+//}
 bool DFS2(int v, int p) {
 	V[v] = !~p ? 1 : V[p] ^ 1;
 	bool f = 1;
