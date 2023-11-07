@@ -166,20 +166,12 @@ namespace CircleHull {
 		using point = complex<real_t>;
 		vector<point> v;
 		real_t ans = 0;
-		//std::cout << hull.size();
 		for (auto& [lo, hi, f] : hull) {
 			ans += f.r * (hi - lo);
-			//std::cout << ((f.r+1) * (hi - lo)) << "\n";
-			//std::cout << "lo " << lo << " hi " << hi << " a " << f.a << " b " << f.b << " r " << f.r << "\n";
 			point x{ 1.0 * f.a, 1.0 * f.b };
 			point r{ 1.0 * f.r, 0.0 };
-			//std::cout << point(0, lo) << "\n";
 			v.push_back(x + r * exp(point(0, lo)));
-			//std::cout << (x + r * exp(point(0, lo))) << "\n";
-			//std::cout << abs(x + r * exp(point(0, lo))) << "\n";
 			v.push_back(x + r * exp(point(0, hi)));
-			//std::cout << (x + r * exp(point(0, hi))) << "\n";
-			//std::cout << abs(x + r * exp(point(0, hi))) << "\n";
 		}
 		for (int i = 0; i < sz(v); i += 2) {
 			ans += abs(v[(i + sz(v) - 1) % sz(v)] - v[i]);
