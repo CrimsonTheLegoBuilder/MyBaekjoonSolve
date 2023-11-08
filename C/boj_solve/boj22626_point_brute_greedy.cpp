@@ -19,7 +19,7 @@ struct Pos {
 	Pos operator + (const Pos& p) const { return { x + p.x , y + p.y }; }
 	bool operator == (const Pos& p) const { return z(x - p.x) && z(y - p.y); }
 	bool operator != (const Pos& p) const { return !z(x - p.x) || !z(y - p.y); }
-}P[LEN][2], p1, p2, p3, p4;
+}P[LEN][2];
 Line L(const Pos& d1, const Pos& d2) {
 	ld vy = d2.y - d1.y, vx = d1.x - d2.x;
 	ld c = vy * d1.x + vx * d1.y;
@@ -60,6 +60,7 @@ void brute() {
 	for (int i = 0; i < N; i++) {
 		std::cin >> P[i][0].x >> P[i][0].y >> P[i][1].x >> P[i][1].y;
 	}
+	Pos p1, p2, p3, p4;
 	Line l1 = L(P[0][0], P[0][1]);
 	Line l2 = L(P[1][0], P[1][1]);
 	Line l3 = L(P[2][0], P[2][1]);
