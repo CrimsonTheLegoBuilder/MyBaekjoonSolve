@@ -471,7 +471,10 @@
     <ClCompile Include="boj27957_half_plane.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj22626_point_brute_greedy.cpp">
+    <ClCompile Include="boj20150.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1288_voronoi_ON_2.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
