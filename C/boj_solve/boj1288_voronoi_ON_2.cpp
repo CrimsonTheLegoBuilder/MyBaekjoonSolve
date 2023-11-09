@@ -156,3 +156,23 @@ int main() {
 //ld cross(const Vec& v1, const Vec& v2) {
 //	return v1.vy * v2.vx - v1.vx * v2.vy;  // a(vy) * x + b(vx) * y - c == 0;
 //}
+
+
+/*
+
+13 6
+1 1 0
+3 1 0
+5 1 0
+1 3 0
+5 3 0
+1 5 0
+3 5 0
+5 5 0
+2 2 1
+4 2 1
+3 3 1
+2 4 1
+4 4 1
+
+*/

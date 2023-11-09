@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <cstring>
 const int LEN = 500'001;
 int N, K, V[2][LEN], B[LEN];
 
@@ -9,12 +10,14 @@ struct P {
 std::queue<P> Q;
 
 int BFS(int v, int K) {
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < LEN; j++) {
-            V[i][j] = -1;
-            B[j] = -1;
-        }
-    }
+    memset(V, -1, sizeof V);
+    memset(B, -1, sizeof B);
+    //for (int i = 0; i < 2; i++) {
+    //    for (int j = 0; j < LEN; j++) {
+    //        V[i][j] = -1;
+    //        B[j] = -1;
+    //    }
+    //}
     V[0][v] = 0;
     Q.push({ v, 0 });
     while (!Q.empty()) {
@@ -27,7 +30,7 @@ int BFS(int v, int K) {
             V[p.d + 1 & 1][p.i + 1] = V[p.d & 1][p.i] + 1;
             Q.push({ p.i + 1, p.d + 1 });
         }
-        if (p.i << 1 < LEN && !~V[p.d + 1 & 1][p.i << 1]) {
+        if ((p.i << 1) < LEN && !~V[p.d + 1 & 1][p.i << 1]) {
             V[p.d + 1 & 1][p.i << 1] = V[p.d & 1][p.i] + 1;
             Q.push({ p.i << 1, p.d + 1 });
         }
