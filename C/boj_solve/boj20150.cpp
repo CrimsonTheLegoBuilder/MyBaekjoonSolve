@@ -14,27 +14,23 @@ struct Pos {
 	bool operator < (const Pos& p) const {
 		return x == p.x ? (d == p.d ? y < p.y : d > p.d) : x < p.x;
 	}
-}pos[LEN << 1];
+} pos[LEN << 1];
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (ll)(d2.x - d1.x) * (d3.y - d2.y) - (ll)(d2.y - d1.y) * (d3.x - d2.x);
 }
 int C(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ll tmp = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
-	if (!tmp) return 0;
-	if (tmp > 0) return 1;
-	if (tmp < 0) return -1;
+	ll ccw = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+	return ccw > 0 ? 1 : ccw < 0 ? -1 : 0;
 }
 int D(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ll tmp = (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
-	if (!tmp) return 0;
-	if (tmp > 0) return 1;
-	if (tmp < 0) return -1;
+	ll dot = (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
+	return dot > 0 ? 1 : dot < 0 ? -1 : 0;
 }
 struct Seg {
 	Pos l, r;
 	bool operator < (const Seg& x) const {
-		if (x.l < l) return cross(x.l, x.r, l) < 0;
-		return cross(l, r, x.l) > 0;
+		if (x.l < l) return cross(x.r, x.l, l) > 0;
+		return cross(x.r, x.l, r) > 0;
 	}
 } seg[LEN];
 bool X(int a, int b) {
@@ -223,3 +219,48 @@ int main() {
 //		!C(d3, d4, d2) && D(d3, d2, d4) >= 0;
 //	return F1 || F2;
 //}
+
+
+/*
+
+8
+0 0 9 0
+1 5 8 1
+1 -5 9 -1
+2 -7 9 -2
+11 1 15 5
+11 0 15 0
+11 -1 15 -2
+9 -5 11 5
+5 10 15 -10
+
+
+12
+0 0 2 0
+1 1 1 3
+1 -1 1 -3
+3 1 3 -1
+2 2 4 2
+2 -2 4 -2
+4 0 6 0
+5 1 5 3
+5 -1 5 -3
+7 1 7 -1
+6 2 8 2
+-6 2 -8 2
+
+12
+0 0 2 0
+1 1 1 3
+1 -1 1 -3
+3 1 3 -1
+2 2 4 2
+2 -2 4 -2
+4 0 6 0
+5 1 5 3
+5 -1 5 -3
+7 1 7 -1
+6 2 8 2
+-6 2 -8 2
+
+*/

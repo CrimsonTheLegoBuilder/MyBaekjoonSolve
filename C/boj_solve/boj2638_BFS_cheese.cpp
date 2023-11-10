@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <cstring>
 typedef long long ll;
 const int LEN = 100;
 int grid[LEN][LEN];
@@ -17,9 +18,10 @@ bool BFS(int r, int c, int N, int M) {
 	V[r][c] = 1;
 	while (!Q.empty()) {
 		Pos p = Q.front(); Q.pop();
+		//std::cout << p.r << " " << p.c << "\n";
 		for (int i = 0; i < 4; i++) {
 			int nr = p.r + drc[i][0], nc = p.c + drc[i][1];
-			if (0 <= nr < N && 0 <= nc < M) {
+			if (0 <= nr && nr < N && 0 <= nc && nc < M) {
 				if (!grid[nr][nc] && !V[nr][nc]) {
 					Q.push({ nr,nc });
 					V[nr][nc] = 1;
@@ -43,7 +45,7 @@ bool BFS(int r, int c, int N, int M) {
 		h++;
 		return 0;
 	}
-	else return 1;
+	return 1;
 }
 
 

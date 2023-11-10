@@ -16,6 +16,9 @@ bool z(ld x) { return std::fabs(x) < TOL; }  // x == zero ?
 struct Pos {
 	ld x, y;
 	bool c;
+	bool operator < (const Pos& p) const {
+		Pos pivot = { x, y - 1 };
+	}
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator * (const ld& s) const { return { x * s, y * s }; }
 }pos[LEN], pu, pr, pl, pd;
@@ -101,13 +104,12 @@ bool half_plane_inx(std::vector<Line>& L, std::vector<Pos>& INX) {
 }
 std::vector<Line> HP;
 std::vector<Pos> inx;
-void brute() {
+void solve() {
 	std::cin >> N >> X;
 	pu = { X, X }, pr = { X, 0 }, pl = { 0, X }, pd = { 0, 0 };
 	ld fld = X * X, occ = 0, enm = 0;  //total field, occupied, enemy's
 	for (int i = 0; i < N; i++) { std::cin >> pos[i].x >> pos[i].y >> pos[i].c; }
 	for (int i = 0; i < N; i++) {
-		if (pos[i].c) continue;
 		HP.clear(); inx.clear();
 		HP.push_back(L(pr, pu)); HP.push_back(L(pu, pl));
 		HP.push_back(L(pl, pd)); HP.push_back(L(pd, pr));
@@ -120,13 +122,12 @@ void brute() {
 		}
 		f = half_plane_inx(HP, inx);
 		//std::cout << f << " DEBUG\n";
-		//if (pos[i].c) enm += A(inx);
-		//else occ += A(inx);
-		occ += A(inx);
+		if (pos[i].c) enm += A(inx);
+		else occ += A(inx);
 	}
 	//std::cout << fld << " DEBUG\n";
-	//std::cout << occ << " " << enm << "\n";
-	std::cout << occ << " " << (fld - occ) << "\n";
+	std::cout << occ << " " << enm << "\n";
+	//std::cout << occ << " " << (fld - occ) << "\n";
 }
 
 
@@ -136,7 +137,7 @@ int main() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(1);
-	brute();
+	solve();
 	return 0;
 }
 

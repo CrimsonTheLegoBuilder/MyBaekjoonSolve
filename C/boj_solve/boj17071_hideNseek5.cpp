@@ -14,8 +14,8 @@ int BFS(int v, int K) {
     memset(B, -1, sizeof B);
     //for (int i = 0; i < 2; i++) {
     //    for (int j = 0; j < LEN; j++) {
-    //        V[i][j] = -1;
-    //        B[j] = -1;
+    //        V[i][j] = LEN + 1;
+    //        B[j] = LEN + 1;
     //    }
     //}
     V[0][v] = 0;
