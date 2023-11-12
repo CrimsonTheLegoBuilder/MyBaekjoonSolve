@@ -1,49 +1,54 @@
-sudoku = []
-flag = 0
+import sys
 
-for _ in range(9):
-    row = list(map(int, input().split()))
-    sudoku.append(row)
+n = int(sys.stdin.readline().strip())
+arr = [list(map(int, sys.stdin.readline().strip().split())) for _ in range(6)]
+# direction = [4, 2, 3, 1]
+ans = int()
 
-for c in sudoku:
-    row_set = set(c)
+for i in range(6):
+    if ((arr[i][0] == 1) & (arr[i - 1][0] == 4)) | ((arr[i][0] == 4) & (arr[i - 1][0] == 2)) | \
+            ((arr[i][0] == 2) & (arr[i - 1][0] == 3)) | ((arr[i][0] == 3) & (arr[i - 1][0] == 1)):
+        area2 = arr[i][1] * arr[i - 1][1]
+        idx1 = (i + 2) % 6
+        idx2 = (i + 3) % 6
+        area1 = arr[idx1][1] * arr[idx2][1]
+        ans = n * (area1 - area2)
 
-    if len(row_set) != 9:
-        print('No')
-        flag += 1
-        exit(0)
+print(ans)
 
-if flag != 1:
-    for i in range(9):
-        column = set()
-        for j in sudoku:
-            column.add(j[i])
+'''
+1
+2 2
+3 2
+1 1
+4 1
+1 1
+4 1
 
-        if len(column) != 9:
-            print('No')
-            flag += 1
-            exit(0)
+1
+4 2
+2 1
+3 1
+2 1
+3 1
+1 2
 
-if flag != 1:
-    for b in range(0, 9, 3):
-        box1 = set()
-        box2 = set()
-        box3 = set()
-        for k in range(b, b+3):
-            box1.add(sudoku[0][k])
-            box1.add(sudoku[1][k])
-            box1.add(sudoku[2][k])
-            box2.add(sudoku[3][k])
-            box2.add(sudoku[4][k])
-            box2.add(sudoku[5][k])
-            box3.add(sudoku[6][k])
-            box3.add(sudoku[7][k])
-            box3.add(sudoku[8][k])
+1
+3 2
+1 2
+4 1
+2 1
+4 1
+2 1
 
-        if len(box1) != 9 or len(box2) != 9 or len(box3) != 9:
-            print('No')
-            flag += 1
-            exit(0)
+1
+4 2
+2 2
+3 1
+1 1
+3 1
+1 1
 
-if flag != 1:
-    print('Yes')
+
+
+'''
