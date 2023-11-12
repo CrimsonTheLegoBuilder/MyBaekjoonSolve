@@ -323,8 +323,8 @@ int main() {
 		gph[1].push_back(0);
 	}
 	else {
-		auto dt = delaunay(v);
-		for (auto [x, y, z] : dt) {
+		vector<tuple<pt, pt, pt>> dt = delaunay(v);
+		for (const tuple<pt, pt, pt>& [x, y, z] : dt) {
 			int xp = x.idx;
 			int yp = y.idx;
 			int zp = z.idx;
