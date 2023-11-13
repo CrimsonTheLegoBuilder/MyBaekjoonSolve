@@ -40,9 +40,10 @@ int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(3);
-	//freopen("mobilizationin/Mobilization-1001.in", "r", stdin);
+	std::cout.precision(2);
+	freopen("mobilizationin/Mobilization-1003.in", "r", stdin);
 	std::cin >> N >> B;
+	C.push_back({ 0, 0 });
 	for (int i = 0; i < N; i++) {
 		std::cin >> c >> h >> p;
 		x = (B / c) * h, y = (B / c) * p;
