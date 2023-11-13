@@ -42,7 +42,8 @@ void solve() {
 			Hh.pop();
 		}
 		if (Q == 3) {
-			while (!Hl.empty() && !V[-Hl.top().p]) {
+			while (!Hl.empty() && !
+				V[-Hl.top().p]) {
 				//V[-Hl.top().p] = 1;
 				Hl.pop();
 			}
