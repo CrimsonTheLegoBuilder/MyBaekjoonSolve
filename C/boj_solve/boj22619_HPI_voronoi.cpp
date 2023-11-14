@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -7,9 +6,9 @@
 #include <cstring>
 typedef long long ll;
 typedef long double ld;
+const int LEN = 10;
 const ld TOL = 1e-9;
-bool f;
-std::string F;
+int N, M;
 
 bool z(ld x) { return std::fabs(x) < TOL; }  // x == zero ?
 struct Pos {
@@ -17,7 +16,7 @@ struct Pos {
 	bool c;
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator * (const ld& s) const { return { x * s, y * s }; }
-} s, e;
+} I[LEN], C[LEN];
 struct Line {
 	ld vy, vx, c;  // a(vy) * x + b(vx) * y - c == 0;
 	bool operator < (const Line& l) const {
@@ -33,15 +32,15 @@ struct Line {
 Line L(const Pos& s, const Pos& e) {  //line consist with two point
 	ld dy = e.y - s.y;
 	ld dx = s.x - e.x;  // -(e.x - s.x)
-	ld c = dy * s.x + dx * s.y;// -hypot(dy, dx) * 1e-4;
+	ld c = dy * s.x + dx * s.y;// -hypot(dy, dx) * TOL;
 	return { dy, dx, c };
 }
 Line L(const Line& l, const Pos& p) {  //line consist with vector && pos
-	ld c = l.vy * p.x + l.vx * p.y;// -hypot(l.vy, l.vx) * 1e-4;
+	ld c = l.vy * p.x + l.vx * p.y;
 	return { l.vy, l.vx, c };
 }
 Line LBX(const Pos& s, const Pos& e) {  //line bisector
-	Pos m = (s + e) * .5;  //middle point
+	Pos m = (s + e) * .5; //middle point
 	Line l = ~L(s, e);     //s=>e line => rotate PI/2
 	return L(l, m);
 }
@@ -62,7 +61,7 @@ Pos IP(const Line& l1, const Line& l2) {
 	ld det = l1 / l2;  //ld det = l1.vy * l2.vx - l1.vx * l2.vy;
 	return { (l1.c * l2.vx - l1.vx * l2.c) / det, (l1.vy * l2.c - l1.c * l2.vy) / det };
 }
-bool CW(const Line& l1, const Line& l2, const Line& l) { 
+bool CW(const Line& l1, const Line& l2, const Line& l) {
 	if (l1 / l2 <= 0) return 0;
 	Pos p = IP(l1, l2);
 	return l.vy * p.x + l.vx * p.y >= l.c;
@@ -91,33 +90,23 @@ bool HPI(std::vector<Line>& L, std::vector<Pos>& INX) {
 std::vector<Line> HP;
 std::vector<Pos> inx;
 void brute() {
-	//freopen("hottercolder.in", "r", stdin);
-	inx = { { 0, 0 }, { 10, 0 }, { 10, 10 }, { 0, 10 } };
-	s = { 0, 0 };
-	while (std::cin >> e.x >> e.y >> F) {
-		HP.clear();
-		//std::cout << inx.size() << "\n";
-		for (int i = 0; i < inx.size(); i++) {
-			HP.push_back(L(inx[i], inx[(i + 1) % inx.size()]));
-			//std::cout << inx[i].x << " " << inx[i].y << "\n";
-  		}
-		if (F == "Hotter") {
-			Line lbx = LBX(e, s);
-			HP.push_back(lbx);
+	bool f = 0;
+	std::cin >> N >> M;
+	for (int i = 0; i < N; i++) { std::cin >> I[i].x >> I[i].y; }
+	for (int i = 0; i < M; i++) { std::cin >> C[i].x >> C[i].y; }
+	for (int i = 0; i < M; i++) {
+		HP.clear(), inx.clear();
+		for (int j = 0; j < N; j++) {
+			Pos cur = I[j], nxt = I[(j + 1) % N];
+			HP.push_back(L(cur, nxt));
 		}
-		else if (F == "Colder") {
-			Line lbx = LBX(s, e);
-			HP.push_back(lbx);
-		}
-		else if (F == "Same") {
-			Line l1 = LBX(s, e), l2 = LBX(e, s);
-			HP.push_back(l1); HP.push_back(l2);
+		for (int j = 0; j < M; j++) {
+			if (i == j) continue;
+			HP.push_back(LBX(C[i], C[j]));
 		}
 		f = HPI(HP, inx);
 		if (f) std::cout << A(inx) << "\n";
-		else std::cout << "0.00\n", inx.clear();
-		s = e;
-
+		else std::cout << "0.0000000\n";
 	}
 	return;
 }
@@ -128,7 +117,7 @@ int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(2);
+	std::cout.precision(7);
 	brute();
 	return 0;
 }
@@ -148,8 +137,3 @@ int main() {
 //	}
 //	return cross(H[s], H[e], x) > TOL;
 //}
-//ld cross(const Vec& v1, const Vec& v2) {
-//	return v1.vy * v2.vx - v1.vx * v2.vy;  // a(vy) * x + b(vx) * y - c == 0;
-//}
-
-
