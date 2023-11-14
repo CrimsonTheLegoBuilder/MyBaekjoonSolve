@@ -7,7 +7,6 @@
 #include <cstring>
 typedef long long ll;
 typedef long double ld;
-const int LEN = 100;
 const ld TOL = 1e-9;
 bool f;
 std::string F;
