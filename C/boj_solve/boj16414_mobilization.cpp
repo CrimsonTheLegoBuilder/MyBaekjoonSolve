@@ -23,10 +23,12 @@ void upper_hull(std::vector<Pos>& C, std::vector<Pos>& H) {
 	std::sort(C.begin(), C.end());
 	if (C.size() <= 2) {
 		for (const Pos& d : C) H.push_back(d);
+		std::reverse(H.begin(), H.end());
 		return;
 	}
 	for (int i = C.size() - 1; i >= 0; i--) {
-		while (H.size() > 1 && (cross(H[H.size() - 2], H[H.size() - 1], C[i]) < 0 || z(cross(H[H.size() - 2], H[H.size() - 1], C[i])))) H.pop_back();
+		while (H.size() > 1 && (cross(H[H.size() - 2], H[H.size() - 1], C[i]) < 0 ||
+			z(cross(H[H.size() - 2], H[H.size() - 1], C[i])))) H.pop_back();
 		H.push_back(C[i]);
 	}
 	return;
@@ -41,9 +43,8 @@ int main() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(2);
-	freopen("mobilizationin/Mobilization-1003.in", "r", stdin);
+	//freopen("mobilizationin/Mobilization-1003.in", "r", stdin);
 	std::cin >> N >> B;
-	C.push_back({ 0, 0 });
 	for (int i = 0; i < N; i++) {
 		std::cin >> c >> h >> p;
 		x = (B / c) * h, y = (B / c) * p;
