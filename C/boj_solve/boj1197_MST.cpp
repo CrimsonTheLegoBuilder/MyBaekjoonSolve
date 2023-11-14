@@ -39,13 +39,14 @@ ll prim(int v, int N) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	int s, e, c;
+	int s, e, c, start;
 	std::cin >> N >> E;
 	for (int i = 0; i < N; i++) {
 		std::cin >> s >> e >> c;
 		G[s].push_back({ e, c });
 		G[e].push_back({ s, c });
+		start = s;
 	}
-	std::cout << prim(1, N) << "\n";
+	std::cout << prim(s, N) << "\n";
 	return 0;
 }
