@@ -18,7 +18,8 @@ std::vector<Info> G[LEN];
 std::priority_queue<Info> Q;
 
 ll prim(int v, int N) {
-	int total = 0, cnt = 0;
+	int cnt = 0;
+	ll total = 0;
 	Q.push({ 1, 0 });
 	while (!Q.empty()) {
 		Info cur = Q.top(); Q.pop();
