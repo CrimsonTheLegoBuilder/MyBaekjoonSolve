@@ -20,7 +20,7 @@ std::priority_queue<Info> Q;
 ll prim(int v, int N) {
 	int cnt = 0;
 	ll total = 0;
-	Q.push({ 1, 0 });
+	Q.push({ v, 0 });
 	while (!Q.empty()) {
 		Info cur = Q.top(); Q.pop();
 		if (MST[cur.i]) continue;
@@ -40,14 +40,14 @@ ll prim(int v, int N) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	int s, e, c, start;
+	int s, e, c, start = 1;
 	std::cin >> N >> E;
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < E; i++) {
 		std::cin >> s >> e >> c;
 		G[s].push_back({ e, c });
 		G[e].push_back({ s, c });
 		start = s;
 	}
-	std::cout << prim(s, N) << "\n";
+	std::cout << prim(start, N) << "\n";
 	return 0;
 }
