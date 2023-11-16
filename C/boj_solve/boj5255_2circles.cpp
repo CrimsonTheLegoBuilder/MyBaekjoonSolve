@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -125,6 +126,7 @@ ld bi_serach(Pos p[]) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	freopen("1-2circles.in", "r", stdin);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {
 		std::cin >> pos[i].x >> pos[i].y;

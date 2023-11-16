@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <iostream>
+//#include <iostream>
 #include <algorithm>
 #include <vector>
 #include <cmath>
