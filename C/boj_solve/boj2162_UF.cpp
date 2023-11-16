@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -7,18 +9,18 @@ typedef long long ll;
 const int LEN = 3'001;
 int N, P[LEN];
 
-struct Pos { ll x, y; };
-//struct Pos { int x, y; };
+//struct Pos { ll x, y; };
+struct Pos { int x, y; };
 struct Seg { Pos l, r; } S[LEN];
 
 int C(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ll ccw = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
-	//int ccw = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+	//ll ccw = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+	int ccw = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 	return ccw > 0 ? 1 : ccw < 0 ? -1 : 0;
 }
 int D(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ll dot = (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
-	//int dot = (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
+	//ll dot = (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
+	int dot = (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
 	return dot > 0 ? 1 : dot < 0 ? -1 : 0;
 }
 bool X(int a, int b) {
@@ -32,11 +34,13 @@ bool X(int a, int b) {
 }
 void init() {
 	memset(P, -1, sizeof P);
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-	std::cin >> N;
+	//std::cin.tie(0)->sync_with_stdio(0);
+	//std::cout.tie(0);
+	scanf("%d", &N);
+	//std::cin >> N;
 	for (int i = 1; i <= N; i++) {
-		std::cin >> S[i].l.x >> S[i].l.y >> S[i].r.x >> S[i].r.y;
+		//std::cin >> S[i].l.x >> S[i].l.y >> S[i].r.x >> S[i].r.y;
+		scanf("%d%d%d%d", &S[i].l.x, &S[i].l.y, &S[i].r.x, &S[i].r.y);
 	}
 }
 
@@ -76,6 +80,7 @@ int main() {
 			cnt++, MAX = std::min(MAX, P[i]);
 		}
 	}
-	std::cout << cnt << "\n" << -MAX << "\n";
+	//std::cout << cnt << "\n" << -MAX << "\n";
+	printf("%d\n%d\n", cnt, -MAX);
 	return 0;
 }

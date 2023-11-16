@@ -16,9 +16,6 @@
     <Filter Include="소스 파일\geometry">
       <UniqueIdentifier>{a1eb5226-1f49-480a-a859-4d43e4bbcc51}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\disjoint_set">
-      <UniqueIdentifier>{c74ad989-64e9-4c10-800b-4220150b3803}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\sliding_window">
       <UniqueIdentifier>{44fdbe4d-eb6d-40e5-920f-afa4d4710bc0}</UniqueIdentifier>
     </Filter>
@@ -39,9 +36,6 @@
     </Filter>
     <Filter Include="소스 파일\matrix">
       <UniqueIdentifier>{03c20d5d-b636-4f88-9a76-add36feb3647}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\stack">
-      <UniqueIdentifier>{1cb03d7e-badb-4c8c-9c08-af2f7b7d6295}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\divide_conquer">
       <UniqueIdentifier>{bd0faa58-8c64-40df-8e62-2dab4d28b829}</UniqueIdentifier>
@@ -68,9 +62,6 @@
     </ClCompile>
     <ClCompile Include="boj2096.cpp">
       <Filter>소스 파일\sliding_window</Filter>
-    </ClCompile>
-    <ClCompile Include="boj3830_professor.cpp">
-      <Filter>소스 파일\disjoint_set</Filter>
     </ClCompile>
     <ClCompile Include="boj6632_grid_scan.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -143,9 +134,6 @@
     </ClCompile>
     <ClCompile Include="boj10830_MPOW.cpp">
       <Filter>소스 파일\matrix</Filter>
-    </ClCompile>
-    <ClCompile Include="boj6549_histogram.cpp">
-      <Filter>소스 파일\stack</Filter>
     </ClCompile>
     <ClCompile Include="boj25308_ox_graph.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -402,12 +390,6 @@
     <ClCompile Include="boj7057_lineCHcross_sep.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj1045.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj9489.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj2191.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
@@ -471,31 +453,10 @@
     <ClCompile Include="boj27957_half_plane.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj20150.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj1288_voronoi_ON_2.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="ABC328A.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj1197_MST.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj1778.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj24511.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj26470_voronoi_ON2.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj2805.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj3755_doublequeue.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="koosaga_26470_voronoi.cpp">
@@ -510,11 +471,50 @@
     <ClCompile Include="boj4380_HPI.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj22619_HPI_voronoi.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj30149_HPI.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj2162_UF.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1778_UF.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1647_prim.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1197_MST.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1045.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj2805.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj9489.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj20150.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj26470_voronoi_ON2.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj22619_HPI_voronoi.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj24511.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3755_doublequeue.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj6549_histogram.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3830_professor.cpp">
+      <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
