@@ -276,9 +276,6 @@
     <ClCompile Include="koosaga_2circles.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="boj5255_2circles.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj5255_2C.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -517,6 +514,9 @@
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
     <ClCompile Include="boj2125_CH_dijkstra.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3527_HPI_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
