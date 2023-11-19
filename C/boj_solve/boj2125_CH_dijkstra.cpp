@@ -162,10 +162,10 @@ bool X(int i, const Pos& d1, const Pos& d2) {
 	return X(d1, d2, pl, pu);
 }
 bool hull_init() {
-	//std::cin.tie(0)->sync_with_stdio(0);
-	//std::cout.tie(0);
-	//std::cout << std::fixed;
-	//std::cout.precision(7);
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(7);
 	std::cin >> N >> x >> y >> u >> v;
 	if (!N) return 0;
 	t = -1;
@@ -212,29 +212,44 @@ bool graph_init() {
 
 
 int main() {
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-	std::cout << std::fixed;
-	std::cout.precision(7);
-	freopen("e_mothy.in", "r", stdin);
-	freopen("e_mothy.out", "w", stdout);
-	std::cin >> T;
-	while (T--) {
-		if (!hull_init()) {
-			std::cout << dist(pos[0], pos[1]) << "\n";
-			continue;
-		}
-		if (!graph_init()) {
-			std::cout << "-1\n";
-			continue;
-		}
-		ld cost = dijkstra(0, 1);
-		//std::cout << cost << "\n";
-		if (cost > 1e16) std::cout << "-1\n";
-		else std::cout << cost << "\n";
+	if (!hull_init()) {
+		std::cout << dist(pos[0], pos[1]) << "\n";
+		return 0;
 	}
+	if (!graph_init()) {
+		std::cout << "-1\n";
+		return 0;
+	}
+	ld cost = dijkstra(0, 1);
+	if (cost > 1e16) std::cout << "-1\n";
+	else std::cout << cost << "\n";
 	return 0;
 }
+
+
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cout << std::fixed;
+//	std::cout.precision(7);
+//	freopen("e_mothy.in", "r", stdin);
+//	freopen("e_mothy.out", "w", stdout);
+//	std::cin >> T;
+//	while (T--) {
+//		if (!hull_init()) {
+//			std::cout << dist(pos[0], pos[1]) << "\n";
+//			continue;
+//		}
+//		if (!graph_init()) {
+//			std::cout << "-1\n";
+//			continue;
+//		}
+//		ld cost = dijkstra(0, 1);
+//		if (cost > 1e16) std::cout << "-1\n";
+//		else std::cout << cost << "\n";
+//	}
+//	return 0;
+//}
 
 
 //int dot(const Pos& d1, const Pos& d2, const Pos& d3) {
