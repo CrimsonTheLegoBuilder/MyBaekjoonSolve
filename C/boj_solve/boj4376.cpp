@@ -57,8 +57,8 @@ bool DFS(int i) {
 int main() {
 	std::cin.tie()->sync_with_stdio(0);
 	std::cout.tie(0);
- 	freopen("gopherin.txt", "r", stdin);
- 	freopen("gophero.txt", "w", stdout);
+ 	//freopen("gopherin.txt", "r", stdin);
+ 	//freopen("gophero.txt", "w", stdout);
 	while (std::cin >> N >> M >> S >> V) {
 		for (int i = 0; i < N; i++) { std::cin >> g[i].x >> g[i].y; }
 		for (int i = 0; i < M; i++) { std::cin >> H[i].x >> H[i].y; }

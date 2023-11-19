@@ -4,7 +4,7 @@
 #include <cstring>
 #include <cmath>
 typedef long double ld;
-const int LEN = 100;
+const int LEN = 101;
 const ld TOL = 1e-8;
 int N, M, match[LEN];
 bool done[LEN];

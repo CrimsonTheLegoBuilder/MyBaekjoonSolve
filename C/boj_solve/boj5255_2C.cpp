@@ -52,11 +52,11 @@ bool CW(const Line& l1, const Line& l2, const Line& l) {
 	Pos p = IP(l1, l2);
 	return l.vy * p.x + l.vx * p.y >= l.c;
 }
-bool half_plane_inx(std::vector<Line>& L, std::vector<Pos>& INX) {
+bool HPI(std::vector<Line>& HP, std::vector<Pos>& INX) {
 	std::deque<Line> D;
-	std::sort(L.begin(), L.end());
-	for (const Line& l : L) {
-		if (!D.empty() && z(cross(D.back(), l))) continue;
+	std::sort(HP.begin(), HP.end());
+	for (const Line& l : HP) {
+		if (!D.empty() && z(D.back() / l)) continue;
 		while (D.size() >= 2 && CW(D[D.size() - 2], D.back(), l)) D.pop_back();
 		while (D.size() >= 2 && CW(l, D[0], D[1])) D.pop_front();
 		D.push_back(l);
@@ -82,13 +82,13 @@ bool DIM(Pos p[], ld m) {  //diameter
 		HP.push_back({ dy, dx, c });
 	}
 	std::vector<Pos> INX;
-	if (!half_plane_inx(HP, INX)) return 0;
+	if (!HPI(HP, INX)) return 0;
 	ld MD = rotating_calipers(INX);
 	return MD >= 2 * m;
 }
 ld bi_serach(Pos p[]) {
 	ld s = 0, e = 1e7, m;
-	for (int i = 0; i < 50; i++) {
+	while (!z(s - e)) {
 		m = (s + e) / 2;
 		if (DIM(p, m)) s = m;
 		else e = m;
@@ -103,10 +103,21 @@ int main() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	//freopen("1-2circles.in", "r", stdin);
+	//freopen("9-2circles.in", "r", stdin);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) { std::cin >> pos[i].x >> pos[i].y; }
 	pos[N] = pos[0];
 	std::cout << bi_serach(pos) << "\n";
 }
 
+
+
+//ld bi_serach(Pos p[]) {
+//	ld s = 0, e = 1e7, m;
+//	for (int i = 0; i < 50; i++) {
+//		m = (s + e) / 2;
+//		if (DIM(p, m)) s = m;
+//		else e = m;
+//	}
+//	return s;
+//}
