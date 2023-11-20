@@ -65,7 +65,7 @@ struct Info {
 	ld c;
 	bool operator < (const Info& w) const { return c > w.c; }
 };
-std::vector<Info> G[LEN];
+std::vector<Info> G[LEN << 1];
 std::priority_queue<Info> Q;
 ld dijkstra(int v, int i) {
 	for (int j = 0; j < M + 2; j++) C[j] = MAX;
