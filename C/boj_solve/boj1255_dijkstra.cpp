@@ -11,7 +11,7 @@ typedef double ld;
 const int LEN = 55;
 const ld MAX = 1e17;
 int N, M;
-ld C[LEN];
+ld C[LEN << 1];
 
 struct Pos { int x, y, v; } people[LEN], corner[LEN << 1];
 struct Seg { Pos l, r; } wall[LEN];
@@ -132,8 +132,10 @@ void compose_graph_with_(const Pos& p) {
 
 int main() {
 	if (!pos_init()) {
-		for (int i = 0; i < N; i++)
-			printf("%.1lf\n", (ld)people[i].y);
+		ld cost = -1;
+		for (int i = 0; i < N; i++) cost = std::max(cost, ((ld)people[i].y / people[i].v));
+		printf("%.1lf\n", cost);
+		return 0;
 	}
 	if (!N) return 0;
 
