@@ -51,9 +51,10 @@ bool pos_init() {
 	int t = -1;
 	for (int i = 0; i < M; i++) {
 		scanf(" (%d,%d)", &wall[i].l.x, &wall[i].l.y);
-		scanf(" %s", &a);
+		scanf(" %c", &a);
 		scanf(" (%d,%d)", &wall[i].r.x, &wall[i].r.y);
 		//printf("%d %d %d %d\n", wall[i].l.x, wall[i].l.y, wall[i].r.x, wall[i].r.y);
+		//printf("%c", a);
 		corner[++t] = wall[i].l;
 		corner[++t] = wall[i].r;
 	}
@@ -132,6 +133,7 @@ void compose_graph_with_(const Pos& p) {
 
 int main() {
 	if (!pos_init()) {
+		if (!N) return 0;
 		ld cost = -1;
 		for (int i = 0; i < N; i++) cost = std::max(cost, ((ld)people[i].y / people[i].v));
 		printf("%.1lf\n", cost);
