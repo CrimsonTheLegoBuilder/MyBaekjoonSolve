@@ -195,7 +195,7 @@ bool graph_init() {
 			Pos s = pos[i], e = pos[j];
 			bool f = 1;
 			for (int k = 0; k < N; k++) {
-				if (X(k, s, e)) f = 0;
+				if (X(k, s, e)) { f = 0; break; }
 			}
 			if (f) {
 				ld c = dist(s, e);
