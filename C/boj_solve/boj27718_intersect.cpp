@@ -2,7 +2,7 @@
 #include <algorithm>
 typedef long long ll;
 const int LEN = 2'001;
-int N, T[LEN][LEN]{ 0 };
+int N;// , T[LEN][LEN]{ 0 };
 
 struct Pos { 
 	ll x, y;
@@ -59,20 +59,28 @@ void pos_init() {
 }
 void brute() {
 	for (int i = 0; i < N; i++) {
-		for (int j = i; j < N; j++) {
-			int condition = intersect(segs[i], segs[j]);
-			T[i][j] = T[j][i] = condition;
-		}
+		for (int j = 0; j < N; j++) std::cout << intersect(segs[i], segs[j]);
+		std::cout << "\n";
 	}
 	return;
 }
-void print() {
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) std::cout << T[i][j];
-		std::cout << "\n";
-	}
-}
-int main() { pos_init(); brute(); print(); return 0; }
+//void brute() {
+//	for (int i = 0; i < N; i++) {
+//		for (int j = i; j < N; j++) {
+//			int condition = intersect(segs[i], segs[j]);
+//			T[i][j] = T[j][i] = condition;
+//		}
+//	}
+//	return;
+//}
+//void print() {
+//	for (int i = 0; i < N; i++) {
+//		for (int j = 0; j < N; j++) std::cout << T[i][j];
+//		std::cout << "\n";
+//	}
+//}
+//int main() { pos_init(); brute(); print(); return 0; }
+int main() { pos_init(); brute(); return 0; }
 
 //bool intersect(const Pos& d1, const Pos& d2, const Seg& s) {
 //	bool F1 = CCW(d1, d2, s.l) * CCW(d2, d1, s.r) > 0 && CCW(s.l, s.r, d1) * CCW(s.r, s.l, d2) > 0;
