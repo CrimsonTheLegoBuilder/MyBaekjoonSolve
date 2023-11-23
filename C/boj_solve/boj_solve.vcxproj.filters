@@ -294,7 +294,7 @@
     <ClCompile Include="boj17386.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj20149_intersection.cpp">
+    <ClCompile Include="boj20149_intersection3.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj3620_Feng.cpp">
@@ -492,7 +492,7 @@
     <ClCompile Include="boj9489.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="boj20150.cpp">
+    <ClCompile Include="boj20150_intersection4.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj26470_voronoi_ON2.cpp">
@@ -532,6 +532,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="boj20151_intersection5.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj20151_set.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
