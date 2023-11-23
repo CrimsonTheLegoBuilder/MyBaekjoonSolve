@@ -29,6 +29,7 @@ int D(const Pos& d1, const Pos& d2, const Pos& d3) {
 struct Seg {
 	Pos l, r;
 	bool operator < (const Seg& x) const {
+
 		if (x.l < l) return cross(x.r, x.l, l) > 0;
 		return cross(x.r, x.l, r) > 0;
 	}
@@ -236,7 +237,7 @@ int main() {
 
 
 12
-0 0 2 0
+0 0 25 0
 1 1 1 3
 1 -1 1 -3
 3 1 3 -1
