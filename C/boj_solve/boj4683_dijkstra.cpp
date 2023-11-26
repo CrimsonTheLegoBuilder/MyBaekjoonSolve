@@ -45,9 +45,9 @@ bool pos_init() {
 		POS.push_back({ x, b });
 		POS.push_back({ x, c });
 		POS.push_back({ x, d });
-		wall[++M] = { { x, 0}, { x, a} };
-		wall[++M] = { { x, b}, { x, c} };
-		wall[++M] = { { x, d}, { x, 10 } };
+		wall[++M] = { { x, 0 }, { x, a } };
+		wall[++M] = { { x, b }, { x, c } };
+		wall[++M] = { { x, d }, { x, 10 } };
 		K += 4;
 	}
 	return 1;
@@ -91,7 +91,6 @@ void graph_init() {
 	}
 	return;
 }
-
 
 
 

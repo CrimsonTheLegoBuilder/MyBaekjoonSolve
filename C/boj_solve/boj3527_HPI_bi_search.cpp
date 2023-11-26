@@ -46,7 +46,7 @@ bool CW(const Line& l1, const Line& l2, const Line& l) {
 }
 bool HPI(std::vector<Line>& HP, std::vector<Pos>& INX) {
 	std::deque<Line> D;
-	std::sort(HP.begin(), HP.end());
+	//std::sort(HP.begin(), HP.end());
 	for (const Line& l : HP) {
 		if (!D.empty() && z(D.back() / l)) continue;
 		while (D.size() >= 2 && CW(D[D.size() - 2], D.back(), l)) D.pop_back();
@@ -74,19 +74,19 @@ bool AREA(Pos p[], int m, int N) {  //area
 		HP.push_back({ dy, dx, c });
 	}
 	std::vector<Pos> INX;
-	if (!HPI(HP, INX)) return 0;
-	ld area = A(INX);
-	return !z(area);
-
+	return HPI(HP, INX);
+	//if (!HPI(HP, INX)) return 0;
+	//ld area = A(INX);
+	//return !z(area);
 }
-int bi_serach(Pos p[], int N) {
+int bi_search(Pos p[], int N) {
 	int s = 1, e = N - 1, m;
 	while (s < e) {
 		m = s + e >> 1;
 		if (AREA(p, m, N)) s = m + 1;
 		else e = m;
 	}
-	return s;
+	return s - 1;
 }
 
 
@@ -100,10 +100,38 @@ int main() {
 		std::cout << "1\n";
 		return 0;
 	}
-	std::cout << bi_serach(pos, N) - 1 << "\n";
+	std::cout << bi_search(pos, N) << "\n";
 	return 0;
 }
-
+//#include <string>
+//int solve() {
+//	std::cin >> N;
+//	if (N < 5) return 1;
+//	for (int i = N - 1; i >= 0; --i) std::cin >> pos[i].x >> pos[i].y;
+//	return bi_search(pos, N);
+//}
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	// freopen("jungleans", "w", stdout);
+//	for (int i = 1; i < 81; i++) {
+//		std::string num;
+//		if (i < 10) num = "0" + std::to_string(i);
+//		else num = std::to_string(i);
+//		std::string filename = "jungleoutpost/" + num;
+//		char chfilename[50];
+//		strcpy(chfilename, filename.c_str());
+//		//std::cout << chfilename << "\n";
+//		freopen(chfilename, "r", stdin);
+//		int ret = solve();
+//		std::string answerfile = "jungleoutpost/" + num + ".a";
+//		strcpy(chfilename, answerfile.c_str());
+//		freopen(chfilename, "r", stdin);
+//		int ans;
+//		std::cin >> ans;
+//		printf("#%d %d %d %d\n", i, ret, ans, ret == ans);
+//	}
+//	return 0;
+//}
 
 //#include <cstring>
 //#include <string>
@@ -160,4 +188,129 @@ int main() {
 //		MD = std::max(MD, dist(H[i], H[f]));
 //	}
 //	return MD;
+//}
+
+
+
+//#define _CRT_SECURE_NO_WARNINGS
+//#include <iostream>
+//#include <algorithm>
+//#include <vector>
+//#include <deque>
+//#include <cmath>
+//typedef long long ll;
+//typedef double ld;
+//const int LEN = 50'000;
+//const ld TOL = 1e-9;
+//int N;
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//struct Pos { ld x, y; } pos[LEN];
+//struct Vec {
+//	ld vy, vx;
+//	bool operator < (const Vec& v) const {
+//		return z(vy - v.vy) ? vx < v.vx : vy < v.vy;
+//	}
+//	bool operator == (const Vec& v) const {
+//		return (z(vy - v.vy) && z(vx - v.vx));
+//	}
+//	ld operator / (const Vec& v) const {
+//		return vy * v.vx - vx * v.vy;
+//	}
+//};
+//const Vec Zero = { 0, 0 };
+//const Pos Pivot = { 0, 0 };
+//struct Line {
+//	Vec s;
+//	ld c;
+//	bool operator < (const Line& l) const {
+//		bool f1 = Zero < s;
+//		bool f2 = Zero < l.s;
+//		if (f1 != f2) return f1;
+//		ld ccw = s / l.s;
+//		return z(ccw) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : ccw > 0;
+//	}
+//	ld operator / (const Line& l) const { return s / l.s; }
+//};
+//ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
+//	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+//}
+//ld area(const std::vector<Pos>& H) {
+//	int l = H.size();
+//	ld a = 0;
+//	for (int i = 0; i < l; i++) {
+//		a += cross(Pivot, H[i], H[(i + 1) % l]);
+//	}
+//	return a / 2;
+//}
+//Pos intersection(const Line& l1, const Line& l2) {
+//	Vec v1 = l1.s, v2 = l2.s;
+//	ld det = v1 / v2;
+//	return {
+//		(l1.c * v2.vx - l2.c * v1.vx) / det,
+//		(l2.c * v1.vy - l1.c * v2.vy) / det
+//	};
+//}
+//bool CW(const Line& l1, const Line& l2, const Line& target) {
+//	if (l1.s / l2.s < TOL) return 0;
+//	Pos p = intersection(l1, l2);
+//	return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
+//}
+//bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
+//	std::deque<Line> dq;
+//	std::sort(HP.begin(), HP.end());
+//	for (const Line& l : HP) {
+//		if (!dq.empty() && z(dq.back() / l)) continue;
+//		while (dq.size() >= 2 && CW(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
+//		while (dq.size() >= 2 && CW(l, dq.front(), dq[1])) dq.pop_front();
+//		dq.push_back(l);
+//	}
+//	while (dq.size() >= 3 && CW(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
+//	while (dq.size() >= 3 && CW(dq.back(), dq.front(), dq[1])) dq.pop_front();
+//	for (int i = 0; i < dq.size(); i++) {
+//		Line cur = dq[i], nxt = dq[(i + 1) % dq.size()];
+//		if (cur / nxt < TOL) {
+//			hull.clear();
+//			return 0;
+//		}
+//		hull.push_back(intersection(cur, nxt));
+//	}
+//	return 1;
+//}
+//bool f(int m) {
+//	std::vector<Line> HP;
+//	ld dy, dx, c;
+//	for (int i = 0, j = m; i < N; i++, j = (j + 1) % N) {
+//		dy = pos[j].y - pos[i].y;
+//		dx = pos[i].x - pos[j].x;
+//		c = dy * pos[i].x + dx * pos[i].y;
+//		HP.push_back({ {dy, dx}, c });
+//	}
+//	std::vector<Pos> hull;
+//	//if (!half_plane_intersection(HP, hull)) return 0;
+//	//ld a = area(hull);
+//	//return !z(a);
+//	return half_plane_intersection(HP, hull);
+//}
+//int bi_search() {
+//	int s = 1, e = N - 1, m;
+//	while (s < e) {
+//		m = s + e >> 1;
+//		if (f(m)) s = m + 1;
+//		else e = m;
+//	}
+//	return s;
+//}
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> N;
+//	for (int i = N - 1; i >= 0; i--) { std::cin >> pos[i].x >> pos[i].y; }
+//	if (N <= 4) {
+//		std::cout << "1\n";
+//		return 0;
+//	}
+//	std::cout << bi_search() - 1 << "\n";
+//	return 0;
 //}
