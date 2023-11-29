@@ -59,4 +59,3 @@ if min_v == 999999:
 print(min_v)
 
 
-

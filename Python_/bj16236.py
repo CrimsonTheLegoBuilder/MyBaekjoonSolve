@@ -56,7 +56,7 @@ while 1:
     if not d:
         break
     total += d
-print(total)
+# print(total)
 
 '''
 20

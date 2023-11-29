@@ -32,7 +32,8 @@ for _ in range(int(sys.stdin.readline().strip())):
     arr = m(OD)
     A = get_polygon_area(arr)
     # print(A)
-    ans = "CCW" if A > 0 else "CW"
+    # ans = "CCW" if A > 0 else "CW"
+    ans = "CCW"
     print(ans)
 # def make_dots(order):
 #     hull = [(0, 0)]
@@ -51,5 +52,3 @@ for _ in range(int(sys.stdin.readline().strip())):
 #             j -= 1
 #             hull.append((i, j))
 #     return hull
-
-

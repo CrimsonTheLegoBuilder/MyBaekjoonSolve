@@ -96,9 +96,6 @@
     <ClCompile Include="boj1615_linecross.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="koosaga_bj22819.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj27957_hulldisks.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -167,9 +164,6 @@
     </ClCompile>
     <ClCompile Include="boj3271_MST_prim.cpp">
       <Filter>소스 파일\graph_search</Filter>
-    </ClCompile>
-    <ClCompile Include="boj27957_koosaga_codeforce.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="boj19970_ky6.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -273,9 +267,6 @@
     <ClCompile Include="boj3323_NonRecursiveMergeSortTree_CH_TS.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="koosaga_2circles.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj5255_2C.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -314,9 +305,6 @@
     </ClCompile>
     <ClCompile Include="boj21048_big_brother.cpp">
       <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="koosaga_boj7890_splaytree_voronoi.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="boj7949_CH_re.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -390,9 +378,6 @@
     <ClCompile Include="boj2191.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="codetest.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj1151_CH.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -413,12 +398,6 @@
     </ClCompile>
     <ClCompile Include="boj22942_stack.cpp">
       <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="soldierv2.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Mobilization_tgr.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="boj22626_point_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -441,9 +420,6 @@
     <ClCompile Include="boj4376.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj23194.cpp">
-      <Filter>소스 파일\graph_search</Filter>
-    </ClCompile>
     <ClCompile Include="boj25783.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
@@ -452,18 +428,6 @@
     </ClCompile>
     <ClCompile Include="boj1288_voronoi_ON_2.cpp">
       <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="ABC328A.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="koosaga_26470_voronoi.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="sw3282_knapsack.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="boj4380_HPI.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -525,16 +489,40 @@
     <ClCompile Include="boj1255_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj1255_cross_dijkstra.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="boj27718_intersect.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj20151_intersection5.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj20151_set.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj23194_HPI.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj4683_dijkstra.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1255_cross_dijkstra.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj9562_hullDisks.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1806.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj30483_HPI_bi_search.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27718_intersect.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj15657_N_and_M_8.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj21065_voronoi_brute.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj21065_DEBUG.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

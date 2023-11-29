@@ -39,4 +39,4 @@ for _ in range(int(sys.stdin.readline().strip())):
             else:
                 dist = abs(torque) / arm
                 ans = min(ans, dist)
-    print(ans/2)
+    # print(ans/2)
