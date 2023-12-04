@@ -142,6 +142,8 @@ ld getArea(std::vector<arc>& H) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(5);
 	int T; std::cin >> T;
 	while (T--) {
 		int n; std::cin >> n;
@@ -157,7 +159,7 @@ int main() {
 		std::vector<arc> Hull = HullDisks(Circles);
 		R = getPerimeter(Hull);
 		//A = getArea(Hull);
-		std::cout << std::setprecision(50) << R << "\n";
+		std::cout << R << "\n";
 		//std::cout << std::setprecision(50) << A << "\n";
 	}
 	return 0;

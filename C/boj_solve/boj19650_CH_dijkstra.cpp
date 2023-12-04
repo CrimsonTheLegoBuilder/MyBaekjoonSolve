@@ -167,10 +167,10 @@ bool hull_init() {
 	std::cout << std::fixed;
 	std::cout.precision(7);
 	std::cin >> x >> y >> u >> v >> N;
-	if (!N) return 0;
 	t = -1;
 	pos[++t] = { x, y };
 	pos[++t] = { u, v };
+	if (!N) return 0;
 	for (int i = 0; i < N; i++) {
 		std::cin >> M;
 		tmp.resize(M);

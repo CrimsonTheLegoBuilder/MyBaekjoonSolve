@@ -180,35 +180,124 @@
 //	return 0;
 //}
 
-#include <iostream>
-#include <algorithm>
-using namespace std;
-typedef long long ll;
+//#include <iostream>
+//#include <algorithm>
+//using namespace std;
+//typedef long long ll;
+//
+//int main() {
+//	ll N, x, cnt = 0;
+//	cin >> N;
+//	while (N--) {
+//		cin >> x;
+//		cnt += x;
+//	}
+//	//cout << (!cnt ? "Stay\n" : cnt > 0 ? "Right\n" : "Left\n");
+//	return 0;
+//}
 
-int main() {
-	ll N, x, cnt = 0;
-	cin >> N;
-	while (N--) {
-		cin >> x;
-		cnt += x;
-	}
-	//cout << (!cnt ? "Stay\n" : cnt > 0 ? "Right\n" : "Left\n");
-	return 0;
-}
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//int N;
+//void solve() {
+//	std::cin >> N;
+//	if (620 <= N) std::cout << "Red\n";
+//	if (590 <= N) std::cout << "Orange\n";
+//	if (570 <= N) std::cout << "Yellow\n";
+//	if (495 <= N) std::cout << "Green\n";
+//	if (450 <= N) std::cout << "Blue\n";
+//	if (425 <= N) std::cout << "Indigo\n";
+//	if (380 <= N) std::cout << "Violet\n";
+//	return;
+//}
+//int main() { solve(); return 0; }
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//using namespace std;
+//typedef long long ll;
+//
+//int main() {
+//	std::string name;
+//	int age, weight;
+//	while (1) {
+//		std::cin >> name >> age >> weight;
+//		if (name == "#") break;
+//		if (age > 17 || weight >= 80) std::cout << name << " Senior\n";
+//		//else std::cout << name << " Junior\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//using namespace std;
+//typedef long long ll;
+//
+//int main() {
+//	int N;
+//	std::cin >> N;
+//	N++;
+//	while (N--) {
+//		for (int i = N; i > 0; i--) {
+//			std::cout << '*';
+//		}
+//		//std::cout << "\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//using namespace std;
+//typedef long long ll;
+//
+//int main() {
+//	int N;
+//	std::cin >> N;
+//	N++;
+//	while (N-- > 1) std::cout << N << "\n";
+//	
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//typedef long long ll;
+//
+//int main() {
+//	int A, B, C, D;
+//	std::cin >> A >> B >> C >> D;
+//	A += D / 3600;
+//	D %= 3600;
+//	B += D / 60;
+//	D %= 60;
+//	C += D;
+//
+//	if (C > 59) B += 1, C %= 60;
+//	if (B > 59) A += 1, B %= 60;
+//	if (A > 23) A %= 24;
+//
+//	//std::cout << A << " " << B << " " << C << "\n";
+//	return 0;
+//}
 
 #include <iostream>
 #include <algorithm>
 #include <cstring>
-int N;
-void solve() {
-	std::cin >> N;
-	if (620 <= N) std::cout << "Red\n";
-	if (590 <= N) std::cout << "Orange\n";
-	if (570 <= N) std::cout << "Yellow\n";
-	if (495 <= N) std::cout << "Green\n";
-	if (450 <= N) std::cout << "Blue\n";
-	if (425 <= N) std::cout << "Indigo\n";
-	if (380 <= N) std::cout << "Violet\n";
-	return;
+typedef long long ll;
+int arr[3];
+
+int main() {
+	//int A, B, C;
+	//std::cin >> A >> B >> C;
+	std::cin >> arr[0] >> arr[1] >> arr[2];
+	std::sort(arr, arr + 3);
+	//std::cout << arr[0] << " " << arr[1] << " " << arr[2] << "\n";
+	return 0;
 }
-//int main() { solve(); return 0; }

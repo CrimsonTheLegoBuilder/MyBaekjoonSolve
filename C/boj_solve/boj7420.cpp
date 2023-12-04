@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 typedef long long ll;
 typedef long double ld;
 int N;
