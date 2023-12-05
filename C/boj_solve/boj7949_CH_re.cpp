@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
+#include <cstring>
 typedef long long ll;
 const int LEN = 5000;
 int T, N, cnt = 1;
@@ -55,19 +56,6 @@ ll A(std::vector<Pos>& H) {
 	}
 	return area;
 }
-//bool I(std::vector<Pos>& H, const Pos& x) {
-//	int h = H.size() - 1;
-//	if (h < 2 || cross(H[0], H[1], x) <= 0 || cross(H[0], H[h], x) >= 0) return 0;
-//	int s = 0, e = h, m;
-//	while (s + 1 < e) {
-//		m = s + e >> 1;
-//		ll C = cross(H[0], H[m], x);
-//		if (!C) return (dot(H[0], H[m], x) < 0);
-//		else if (C > 0) s = m;
-//		else e = m;
-//	}
-//	return cross(H[s], H[e], x) > 0;
-//}
 void brute(std::vector<Pos>& C) {
 	std::vector<Pos> H = monotone_chain(C), tmp;
 	while (A(H)) {
@@ -88,6 +76,8 @@ int main() {
 	int x, y;
 	std::cin >> T;
 	while (T--) {
+		C.clear();
+		memset(idx, 0, sizeof idx);
 		std::cin >> N;
 		for (int i = 0; i < N; i++) {
 			std::cin >> x >> y;

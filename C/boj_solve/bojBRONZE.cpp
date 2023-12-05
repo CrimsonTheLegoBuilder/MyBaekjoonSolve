@@ -287,17 +287,102 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//typedef long long ll;
+//int arr[3];
+//
+//int main() {
+//	//int A, B, C;
+//	//std::cin >> A >> B >> C;
+//	std::cin >> arr[0] >> arr[1] >> arr[2];
+//	std::sort(arr, arr + 3);
+//	//std::cout << arr[0] << " " << arr[1] << " " << arr[2] << "\n";
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//typedef long long ll;
+////int arr[3];
+//
+//int main() {
+//	int N, M, A, B, C, D, E;
+//	std::cin >> N >> M >> A >> B >> C >> D >> E;
+//	N *= M;
+//	std::cout << A - N << " ";
+//	std::cout << B - N << " ";
+//	std::cout << C - N << " ";
+//	std::cout << D - N << " ";
+//	//std::cout << E - N << "\n";
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//typedef long long ll;
+//
+//int main() {
+//	int R1, R2, S;
+//	std::cin >> R1 >> S;
+//	S <<= 1;
+//	//std::cout << S - R1;
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//typedef long long ll;
+//
+//int main() {
+//	int x, y, a, b;
+//	std::cin >> x >> y;
+//	b = (x - y) >> 1;
+//	if (x - b != y + b) std::cout << "-1\n";
+//	else {
+//		a = x - b;
+//		//std::cout << a << " " << b << "\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+////#include <cstring>
+//#include <string>
+//typedef long long ll;
+//int N;
+//
+//int main() {
+//	std::string X;
+//	std::cin >> N;
+//	std::cin.ignore();
+//	for (int i = 1; i <= N; i++) {
+//		//getline(std::cin, X, '\n');
+//		getline(std::cin, X);
+//		std::cout << i << ". " << X << "\n";
+//	}
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cstring>
+#include <string>
 typedef long long ll;
-int arr[3];
+int N, x, y;
 
 int main() {
-	//int A, B, C;
-	//std::cin >> A >> B >> C;
-	std::cin >> arr[0] >> arr[1] >> arr[2];
-	std::sort(arr, arr + 3);
-	//std::cout << arr[0] << " " << arr[1] << " " << arr[2] << "\n";
+	std::cin >> N;
+	for (int i = 1; i <= N; i++) {
+		std::cin >> x >> y;
+		if (x < y) std::cout << "NO ";
+		else std::cout << "MMM ";
+		//std::cout << "BRAINS\n";
+	}
 	return 0;
 }

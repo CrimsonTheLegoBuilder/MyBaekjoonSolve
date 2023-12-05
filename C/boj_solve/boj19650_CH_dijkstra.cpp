@@ -6,7 +6,7 @@
 #include <cstring>
 #include <queue>
 typedef long long ll;
-typedef long double ld;
+typedef double ld;
 const int LEN = 102;
 const ll MAXi = 1e17;
 const ld MAXd = 1e17;
@@ -46,8 +46,8 @@ ld dijkstra(int v, int g) {
 	}
 	return V[g];
 }
-int cross(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
+	return (ll)(d2.x - d1.x) * (d3.y - d2.y) - (ll)(d2.y - d1.y) * (d3.x - d2.x);
 }
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d1.x - d2.x), (d1.y - d2.y));
@@ -139,11 +139,11 @@ Pos ternary_search(std::vector<Pos>& H, const Pos& p1, const Pos& p2, bool f = 0
 	return EX;
 }
 int C(const Pos& d1, const Pos& d2, const Pos& d3) {
-	int ccw = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+	ll ccw = (ll)(d2.x - d1.x) * (d3.y - d2.y) - (ll)(d2.y - d1.y) * (d3.x - d2.x);
 	return ccw > 0 ? 1 : ccw < 0 ? -1 : 0;
 }
 int D(const Pos& d1, const Pos& d2, const Pos& d3) {
-	int dot = (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
+	ll dot = (ll)(d2.x - d1.x) * (d3.x - d2.x) + (ll)(d2.y - d1.y) * (d3.y - d2.y);
 	return dot > 0 ? 1 : dot < 0 ? -1 : 0;
 }
 bool X(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
@@ -152,6 +152,7 @@ bool X(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 bool X(int i, const Pos& d1, const Pos& d2) {
 	if (I(hulls[i].H, d1) || I(hulls[i].H, d2)) return 1;
 	int h = hulls[i].H.size();
+	if (h < 3) return 0;
 	for (int j = 0; j < h; j++) {
 		Pos cur = hulls[i].H[j], nxt = hulls[i].H[(j + 1) % h];
 		if ((!C(cur, nxt, d1) && D(cur, d1, nxt) > 0) && C(cur, nxt, d2) > 0) return 1;
@@ -201,7 +202,6 @@ bool graph_init() {
 				ld c = dist(s, e);
 				G[i].push_back({ j, c });
 				G[j].push_back({ i, c });
-				//std::cout << "graph_init DEBUG\n";
 			}
 		}
 	}
@@ -225,42 +225,3 @@ int main() {
 	else std::cout << cost << "\n";
 	return 0;
 }
-
-
-//int main() {
-//	std::cin.tie(0)->sync_with_stdio(0);
-//	std::cout.tie(0);
-//	std::cout << std::fixed;
-//	std::cout.precision(7);
-//	freopen("e_mothy.in", "r", stdin);
-//	freopen("e_mothy.out", "w", stdout);
-//	std::cin >> T;
-//	while (T--) {
-//		if (!hull_init()) {
-//			std::cout << dist(pos[0], pos[1]) << "\n";
-//			continue;
-//		}
-//		if (!graph_init()) {
-//			std::cout << "-1\n";
-//			continue;
-//		}
-//		ld cost = dijkstra(0, 1);
-//		if (cost > 1e16) std::cout << "-1\n";
-//		else std::cout << cost << "\n";
-//	}
-//	return 0;
-//}
-
-
-//int dot(const Pos& d1, const Pos& d2, const Pos& d3) {
-//	return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
-//}
-
-//bool X(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-//	bool F1 = C(d1, d2, d3) * C(d2, d1, d4) > 0 && C(d3, d4, d1) * C(d4, d3, d2) > 0;
-//	bool F2 = !C(d1, d2, d3) && D(d1, d3, d2) >= 0 ||
-//		!C(d1, d2, d4) && D(d1, d4, d2) >= 0 ||
-//		!C(d3, d4, d1) && D(d3, d1, d4) >= 0 ||
-//		!C(d3, d4, d2) && D(d3, d2, d4) >= 0;
-//	return F1 || F2;
-//}
