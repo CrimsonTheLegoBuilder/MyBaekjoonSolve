@@ -80,6 +80,6 @@ int main() {
 		C.push_back({ x, y, i });
 	}
 	brute(C);
-	for (int i = 0; i < N; i++) std::cout << idx[i] << " ";
+	//for (int i = 0; i < N; i++) std::cout << idx[i] << " ";
 	return 0;
 }

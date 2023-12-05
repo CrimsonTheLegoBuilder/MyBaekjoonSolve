@@ -95,7 +95,7 @@ int main() {
 		for (int i = 0; i < M; i++) push_back(P);
 		HD = monotone_chain(D); HP = monotone_chain(P);
 		bool F = brute();
-		std::cout << "Case " << T++ << ": It is" << (F ? " not " : " ") << "possible to separate the two groups of vendors.\n\n";
+		//std::cout << "Case " << T++ << ": It is" << (F ? " not " : " ") << "possible to separate the two groups of vendors.\n\n";
 		D.clear(); P.clear();
 	}
 }

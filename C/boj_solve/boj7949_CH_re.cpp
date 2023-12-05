@@ -84,7 +84,7 @@ int main() {
 			C.push_back({ x, y, i });
 		}
 		brute(C);
-		std::cout << cnt << "\n";
+		//std::cout << cnt << "\n";
 	}
 	return 0;
 }
