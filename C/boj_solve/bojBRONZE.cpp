@@ -369,20 +369,59 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//#include <string>
+//typedef long long ll;
+//int N, x, y;
+//
+//int main() {
+//	std::cin >> N;
+//	for (int i = 1; i <= N; i++) {
+//		std::cin >> x >> y;
+//		if (x < y) std::cout << "NO ";
+//		else std::cout << "MMM ";
+//		//std::cout << "BRAINS\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//#include <string>
+//typedef long long ll;
+//int N, Q, W, E;
+//
+//int main() {
+//	std::cin >> N;
+//	//std::cout << "Gnomes:\n";
+//	while (N--) {
+//		std::cin >> Q >> W >> E;
+//		bool f1 = Q < W && W < E;
+//		bool f2 = Q > W && W > E;
+//		std::cout << (f1 || f2 ? "O" : "Uno");
+//		std::cout << "rdered\n";
+//	}
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
-#include <cstring>
-#include <string>
+#include <cmath>
 typedef long long ll;
-int N, x, y;
+typedef double ld;
+ld N;
 
 int main() {
-	std::cin >> N;
-	for (int i = 1; i <= N; i++) {
-		std::cin >> x >> y;
-		if (x < y) std::cout << "NO ";
-		else std::cout << "MMM ";
-		//std::cout << "BRAINS\n";
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(2);
+	while (1) {
+		std::cin >> N;
+		if (!N) return 0;
+		//std::cout << (1 + N + N * N + N * N * N + N * N * N * N) << "\n";
 	}
-	return 0;
 }
