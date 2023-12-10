@@ -41,7 +41,7 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C, int id) {
 		H.push_back(C[i]);
 	}
 	H.pop_back();
-	for (const Pos& d : H) { idx[d.i] = id; }
+	if (H.size() > 2) for (const Pos& d : H) { idx[d.i] = id; }
 	return H;
 }
 ll A(std::vector<Pos>& H) {
@@ -65,6 +65,7 @@ void brute(std::vector<Pos>& C) {
 		}
 		H = monotone_chain(tmp, cnt);
 	}
+	return;
 }
 
 
@@ -80,6 +81,6 @@ int main() {
 		C.push_back({ x, y, i });
 	}
 	brute(C);
-	//for (int i = 0; i < N; i++) std::cout << idx[i] << " ";
+	for (int i = 0; i < N; i++) std::cout << idx[i] << " ";
 	return 0;
 }

@@ -116,7 +116,7 @@ ld bi_search() {
 	ld s = min_x, e = max_x, m = min_x;
 	//int t = 50;
 	//while (t--) {
-	while (!z(e - s)) {
+	while (e - s > 1e-3) {
 		m = (s + e) * .5;
 		ld tmp = f(m);
 		//std::cout << "m x: " << m << " area: " << tmp << "\n";

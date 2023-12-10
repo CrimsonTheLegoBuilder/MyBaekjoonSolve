@@ -97,8 +97,3 @@ int main() {
 	}
 	return 0;
 }
-		
-		//if (I(H, L) || I(H, R)) {
-		//	std::cout << "GOOD\n";
-		//	continue;
-		//}

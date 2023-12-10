@@ -5,7 +5,7 @@
 #include <cstring>
 typedef long long ll;
 const int LEN = 5000;
-int T, N, cnt = 1;
+int T, N, cnt;
 bool idx[LEN];
 
 
@@ -26,6 +26,7 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	std::sort(C.begin(), C.end());
 	if (C.size() <= 2) {
 		for (const Pos& pos : C) H.push_back(pos);
+		for (const Pos& i : H) { idx[i.i] = 1; }
 		return H;
 	}
 	for (int i = 0; i < C.size(); i++) {
@@ -66,6 +67,8 @@ void brute(std::vector<Pos>& C) {
 		}
 		H = monotone_chain(tmp);
 	}
+	if (H.size()) cnt++;
+	return;
 }
 
 
@@ -73,9 +76,10 @@ void brute(std::vector<Pos>& C) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	int x, y;
+	ll x, y;
 	std::cin >> T;
 	while (T--) {
+		cnt = 0;
 		C.clear();
 		memset(idx, 0, sizeof idx);
 		std::cin >> N;
@@ -84,7 +88,7 @@ int main() {
 			C.push_back({ x, y, i });
 		}
 		brute(C);
-		//std::cout << cnt << "\n";
+		std::cout << cnt << "\n";
 	}
 	return 0;
 }

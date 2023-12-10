@@ -543,6 +543,18 @@
     <ClCompile Include="boj2748_fibo.cpp">
       <Filter>소스 파일\DP</Filter>
     </ClCompile>
+    <ClCompile Include="boj6850.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj14427.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj14428.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj10746_cnvxhull_ter_search.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

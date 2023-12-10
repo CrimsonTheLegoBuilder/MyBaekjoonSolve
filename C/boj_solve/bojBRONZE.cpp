@@ -407,21 +407,109 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//typedef long long ll;
+//typedef double ld;
+//ld N;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cout << std::fixed;
+//	std::cout.precision(2);
+//	while (1) {
+//		std::cin >> N;
+//		if (!N) return 0;
+//		//std::cout << (1 + N + N * N + N * N * N + N * N * N * N) << "\n";
+//	}
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//typedef long long ll;
+//typedef long double ld;
+//ld N;
+//const ld G = 0.167;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cout << std::fixed;
+//	std::cout.precision(2);
+//	while (1) {
+//		std::cin >> N;
+//		if (N < 0) return 0;
+//		std::cout << "Objects weighing ";
+//		std::cout << N;
+//		std::cout << " on Earth will weigh ";
+//		//std::cout << N * G << " on the moon.\n";
+//	}
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//typedef long long ll;
+//ll N;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> N;
+//	ll t = 0;
+//	while (N--) {
+//		std::cout << ++t << " ";
+//		if (!(t % 6)) std::cout << "Go! ";
+//	}
+//	//if (t % 6) std::cout << "Go! ";
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll N;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> N;
+//	while (N--) {
+//		std::string S;
+//		std::cin >> S;
+//		std::cout << S[0];
+//		for (int i = 1; i < S.size(); i++) {
+//			if (S[i] != S[i - 1]) std::cout << S[i];
+//		}
+//		//std::cout << "\n";
+//	}
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 typedef long long ll;
-typedef double ld;
-ld N;
+ll N;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cout << std::fixed;
-	std::cout.precision(2);
-	while (1) {
-		std::cin >> N;
-		if (!N) return 0;
-		//std::cout << (1 + N + N * N + N * N * N + N * N * N * N) << "\n";
+	std::cin >> N;
+	while (N--) {
+		std::string S;
+		std::cin >> S;
+		for (int i = 0; i < S.size(); i++) {
+			if (64 < S[i] && S[i] < 91) std::cout << (char)(S[i] + 32);
+			else std::cout << S[i];
+		}
+		//std::cout << "\n";
 	}
+	return 0;
 }
