@@ -4,20 +4,21 @@
 #include <vector>
 #include <cmath>
 typedef long long ll;
-int N, Q, q, cnt, LEN = 1000;
+int N, Q, q, cnt, LEN = 8000;
 ll A, B, C;
 
 struct Pos {
 	ll x, y;
 	bool operator<(const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 } P;
-std::vector<Pos> T, LH, UH;
+std::vector<Pos> T, LH, UH, BF;
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
 std::vector<Pos> lower_hull(std::vector<Pos>& T) {  //lower monotone chain
 	std::vector<Pos> H;
+	std::sort(T.begin(), T.end());
 	if (T.size() <= 2) {
 		for (const Pos& pos : T) H.push_back(pos);
 		return H;
@@ -30,6 +31,7 @@ std::vector<Pos> lower_hull(std::vector<Pos>& T) {  //lower monotone chain
 }
 std::vector<Pos> upper_hull(std::vector<Pos>& T) {  //upper monotone_chain
 	std::vector<Pos> H;
+	std::sort(T.begin(), T.end());
 	if (T.size() <= 2) {
 		for (int i = T.size() - 1; i >= 0; i--) H.push_back(T[i]);
 		return H;
@@ -66,12 +68,18 @@ int bi_search(const ll& A, const ll& B, const ll& C, const std::vector<Pos>& H, 
 void query(int q) {
 	if (q == 1) {
 		std::cin >> P.x >> P.y;
-		T.push_back(P);
+		//T.push_back(P);
+		BF.push_back(P);
 		cnt++;
 		if (cnt == LEN) {
-			cnt = 0; N += LEN;
-			std::sort(T.begin(), T.end());
-			LH = lower_hull(T), UH = upper_hull(T);
+			cnt = 0; //N += LEN;
+			//std::sort(T.begin(), T.end());
+			for (const Pos& d : BF) {
+				LH.push_back(d);
+				UH.push_back(d);
+			}
+			LH = lower_hull(LH), UH = upper_hull(UH);
+			BF.clear();
 		}
 		return;
 	}
@@ -82,8 +90,8 @@ void query(int q) {
 		int d = bi_search(A, B, C, LH);
 		int u = -bi_search(A, B, C, UH, 1);
 		if (d * u > 0) {
-			for (int i = N; i < T.size(); i++) {
-				Pos t = T[i];
+			for (int i = 0; i < BF.size(); i++) {
+				Pos t = BF[i];
 				ll cur = A * t.x + B * t.y - C;
 				if (d * cur <= 0) { F = 1; break; }
 			}
@@ -95,8 +103,8 @@ void query(int q) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("fencing_gold/4.in", "r", stdin);
-	//freopen("fencing_gold/out.txt", "w", stdout);
+	freopen("fencing_gold/14.in", "r", stdin);
+	freopen("fencing_gold/out.txt", "w", stdout);
 	std::cin >> N >> Q;
 	T.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> T[i].x >> T[i].y;
