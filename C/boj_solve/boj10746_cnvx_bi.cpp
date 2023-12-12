@@ -16,18 +16,18 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
-void half_monotone_chain(std::vector<Pos>& C, std::vector<Pos>& H, bool r = 0) {
+void half_monotone_chain(std::vector<Pos>& T, std::vector<Pos>& H, bool r = 0) {
 	if (!r) std::sort(T.begin(), T.end());
-	if (r) std::reverse(C.begin(), C.end());
+	if (r) std::reverse(T.begin(), T.end());
 	H.clear();
-	if (C.size() <= 2) {
-		for (const Pos& pos : C) H.push_back(pos);
+	if (T.size() <= 2) {
+		for (const Pos& pos : T) H.push_back(pos);
 		return;
 	}
-	for (int i = 0; i < C.size(); i++) {
-		while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0) H.pop_back();
+	for (int i = 0; i < T.size(); i++) {
+		while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], T[i]) <= 0) H.pop_back();
 
-		H.push_back(C[i]);
+		H.push_back(T[i]);
 	}
 	return;
 }

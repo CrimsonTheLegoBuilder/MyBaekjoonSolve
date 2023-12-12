@@ -16,27 +16,27 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
-std::vector<Pos> lower_hull(std::vector<Pos>& C) {  //lower monotone chain
+std::vector<Pos> lower_hull(std::vector<Pos>& T) {  //lower monotone chain
 	std::vector<Pos> H;
-	if (C.size() <= 2) {
-		for (const Pos& pos : C) H.push_back(pos);
+	if (T.size() <= 2) {
+		for (const Pos& pos : T) H.push_back(pos);
 		return H;
 	}
-	for (int i = 0; i < C.size(); i++) {
-		while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0) H.pop_back();
-		H.push_back(C[i]);
+	for (int i = 0; i < T.size(); i++) {
+		while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], T[i]) <= 0) H.pop_back();
+		H.push_back(T[i]);
 	}
 	return H;
 }
-std::vector<Pos> upper_hull(std::vector<Pos>& C) {  //upper monotone_chain
+std::vector<Pos> upper_hull(std::vector<Pos>& T) {  //upper monotone_chain
 	std::vector<Pos> H;
-	if (C.size() <= 2) {
-		for (int i = C.size() - 1; i >= 0; i--) H.push_back(C[i]);
+	if (T.size() <= 2) {
+		for (int i = T.size() - 1; i >= 0; i--) H.push_back(T[i]);
 		return H;
 	}
-	for (int i = C.size() - 1; i >= 0; i--) {
-		while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0) H.pop_back();
-		H.push_back(C[i]);
+	for (int i = T.size() - 1; i >= 0; i--) {
+		while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], T[i]) <= 0) H.pop_back();
+		H.push_back(T[i]);
 	}
 	return H;
 }
@@ -95,8 +95,8 @@ void query(int q) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("fencing_gold/13.in", "r", stdin);
-	freopen("fencing_gold/out.txt", "w", stdout);
+	//freopen("fencing_gold/4.in", "r", stdin);
+	//freopen("fencing_gold/out.txt", "w", stdout);
 	std::cin >> N >> Q;
 	T.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> T[i].x >> T[i].y;
