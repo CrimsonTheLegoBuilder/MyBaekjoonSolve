@@ -491,25 +491,76 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll N;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> N;
+//	while (N--) {
+//		std::string S;
+//		std::cin >> S;
+//		for (int i = 0; i < S.size(); i++) {
+//			if (64 < S[i] && S[i] < 91) std::cout << (char)(S[i] + 32);
+//			else std::cout << S[i];
+//		}
+//		//std::cout << "\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll L, A, B, C, D, X, Y;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> L >> A >> B >> C >> D;
+//	X = A / C + (A % C != 0);
+//	Y = B / D + (B % D != 0);
+//	X = std::max(X, Y);
+//	//std::cout << L - X << '\n';
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll A, B, C, D, E, X, Y;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> A >> B >> C >> D >> E;
+//	X = std::min({ A, B, C });
+//	Y = std::min({ D, E });
+//	//std::cout << X + Y - 50 << "\n";
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-ll N;
+ll A, B, C, D, T;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cin >> N;
-	while (N--) {
-		std::string S;
-		std::cin >> S;
-		for (int i = 0; i < S.size(); i++) {
-			if (64 < S[i] && S[i] < 91) std::cout << (char)(S[i] + 32);
-			else std::cout << S[i];
-		}
-		//std::cout << "\n";
-	}
+	std::cin >> A >> B >> C >> D;
+	T = A + B + C + D;
+	//std::cout << T / 60 << "\n" << T % 60 << "\n";
 	return 0;
 }

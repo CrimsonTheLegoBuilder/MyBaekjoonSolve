@@ -423,9 +423,6 @@
     <ClCompile Include="boj25783.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj27957_half_plane.cpp">
-      <Filter>소스 파일\graph_search</Filter>
-    </ClCompile>
     <ClCompile Include="boj1288_voronoi_ON_2.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -552,7 +549,10 @@
     <ClCompile Include="boj14428.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj10746_cnvxhull_ter_search.cpp">
+    <ClCompile Include="boj10746_cnvx_bi.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj10746_cnvx_bi_sep.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
