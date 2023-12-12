@@ -1,0 +1,72 @@
+<title>Problem F: Marbles in Three Baskets</title>
+<h1>Problem F: Marbles in Three Baskets</h1>
+
+<p>
+<b>Input:</b> <tt>marbles.in</tt><br>
+<b>Output:</b> <tt>marbles.out</tt>
+</p>
+
+
+<p>
+Each of three baskets contains a certain number of marbles. You may
+move from one basket into another basket as many marbles as are
+already there, thus doubling the quantity in the basket that received
+the marbles. You must find a sequence of moves that will yield the
+same number of marbles in the three baskets. Moreover, you must
+achieve the goal in the smallest possible number of moves. Your
+program must also recognize the case in which there is no such
+sequence of moves.
+</p>
+
+
+<h2>Input</h2>
+
+<p>
+Each line of the input file will contain data for one instance of the
+problem: three positive integers, with one blank space separating adjacent
+integers. The three integers represent the initial numbers of marbles
+in the three baskets. The sum of the three integers will be at most
+60.
+</p>
+
+<h2>Output</h2>
+
+<p>
+The output will begin with the initial configuration from the
+input. Thereafter, on successive lines, the number of marbles in the
+respective baskets will be printed after each move, concluding with
+the line in which the three numbers are identical. As stated above,
+the goal must be achieved in the smallest possible number of
+moves. (The correct output is not unique, however.  There
+may be different sequences of moves which achieve the goal correctly
+in the smallest possible number of steps.)  
+If there is no sequence of
+moves to achieve the goal, only the initial configuration will be
+printed. Each integer in the output will be right-justified in a field
+of width 4.  Each instance of the problem will be concluded by a line
+of 12 equal signs.
+</p>
+
+<h2>Sample input</h2>
+
+<pre>
+6 7 11
+15 18 3
+5 6 7
+</pre>
+
+<h2>Output for sample input</h2>
+<pre>
+   6   7  11
+   6  14   4
+  12   8   4
+   8   8   8
+============
+  15  18   3
+  12  18   6
+  12  12  12
+============
+   5   6   7
+============
+</pre>
+

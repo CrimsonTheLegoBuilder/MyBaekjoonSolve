@@ -1,0 +1,149 @@
+<title>Problem A: Bridge Bidding</title>
+
+<h1>Problem A: Bridge Bidding</h1>
+
+<p>
+<b>Input:</b> <tt>bidding.in</tt><br>
+<b>Output:</b> <tt>bidding.out</tt>
+</p>
+
+<p>
+Bridge is a very complicated card game, and the bidding part is
+particularly difficult to master.  The bidding is made even more
+difficult because players use different bidding conventions
+(meanings assigned to bids).  In this problem, you are asked to write
+a program that suggests the first bid that should be made.  The
+bidding conventions described below are simplified from those used
+by a certain person who shall remain nameless.
+</p>
+
+<p>
+A bridge hand consists of 13 cards.  Each card has a suit (spades,
+hearts, diamonds, or clubs) and a rank (A, K, Q, J, T, 9, 8, 7, 6, 5,
+4, 3, 2).  Here, the letter T denotes the card whose rank is 10.
+Before making a bid, an experienced bridge player studies the number
+of high card points (hcp) in the hand, as well as the distribution
+(the number of cards in each suit).  The hcp contributed by each card
+is completely determined by its rank as follows:
+</p>
+<center>
+<table border=1>
+<tr><th align=center>Rank</th> <th>hcp</th></tr>
+<tr><td align=center>A</td><td align=center>4</td></tr>
+<tr><td align=center>K</td><td align=center>3</td></tr>
+<tr><td align=center>Q</td><td align=center>2</td></tr>
+<tr><td align=center>J</td><td align=center>1</td></tr>
+<tr><td align=center>others</td><td align=center>0</td></tr>
+</table>
+</center>
+
+<p>
+For example, if the hand is:
+</p>
+<center>
+<table border=0>
+<tr><td align=right>Spades:</td><td>A, 2</td></tr>
+<tr><td align=right>Hearts:</td><td>K, J, T, 9, 2</td></tr>
+<tr><td align=right>Diamonds:</td><td>3</td></tr>
+<tr><td align=right>Clubs:</td><td>K, Q, 7, 4, 3</td></tr>
+</table>
+</center>
+<p>
+Then this hand has 13 hcp and a distribution of 5-5-2-1 (the
+distribution is usually listed in non-increasing order).  A
+balanced distribution is any one of 4-3-3-3, 4-4-3-2, and 5-3-3-2.
+</p>
+
+<p>
+In bridge, an opening bid is either "pass" or consists of a level
+(1-7) and a trump suit.  The trump suits are no trump, spades, hearts,
+diamonds, clubs ranked in decreasing order.  Once a hand has been evaluated,
+the player applies the following list of (simplified) rules to
+determine the appropriate opening bid.  In cases where multiple rules
+apply, the first one that applies should be used.  An "x" in a
+distribution can be substituted with any non-negative number.  Multiple
+"x"s in a distribution are not necessarily the same.
+</p>
+
+<ol>
+<li>With at least 10 hcp and a y-x-x-x distribution (y &gt;= 8), bid 
+    the suit with y cards at the 4 level.  This is known as a preemptive 
+    bid.</li> 
+<li>With 10-13 hcp and a 7-x-x-x distribution, bid the suit with 7 cards 
+    at the 3-level.  This is known as a preemptive bid.</li>
+<li>With 8-9 hcp and a y-x-x-x distribution (y &gt;= 7), bid the suit with 
+    y cards at the 2-level if the y-card suit is Spades or Hearts.  This is
+    known as a "weak-two" bid.</li>
+<li>With 8-11 hcp and a 6-x-x-x distribution, in which Spades or
+    Hearts is one of the 6-card suits, bid the higher rank suit at the
+    2 level.  This is known as a "weak-two" bid.</li>
+<li>With 11-15 hcp, a distribution of 4-4-4-1 or 5-4-4-0, and at least
+    4 spades, bid Diamonds at the 2 level.  This is called the "Mini Roman
+    Convention".</li>
+<li>With 15-17 hcp and a balanced distribution, bid No Trump at the 1
+    level provided that at least 3 suits are "stopped."  A suit is
+    considered stopped if the suit contains at least one of the following:
+    <ul>
+    <li>an A;</li>
+    <li>a K and one other;</li>
+    <li>a Q and two others; or</li>
+    <li>a J and three others;</li>
+    </ul></li>
+<li>With 20-22 hcp and a balanced distribution, bid No Trump at the 2
+    level.</li>
+<li>With at least 22 hcp, bid Clubs at the 2 level.</li>
+<li>With 13-16 hcp:
+    <ol type="a">
+    <li>If there is a 5-card or longer suit in Spades or Hearts, 
+        bid it at the 1 level.  If both bids are possible, bid the longer
+        suit.  If both suits have the same length, bid the higher ranking
+        suit.</li>
+    <li>Without a 5-card suit in Spades or Hearts, bid the longer of
+        Diamonds or Clubs at the 1 level (whichever one has the most 
+        number of cards) .  If there is a tie, bid the higher
+        ranking suit.</li>
+    </ol>
+    </li>
+<li>With at least 17 hcp, bid the longest suit at the 1 level.  If
+    there is a tie, bid the lowest ranking suit.  This is known as
+    a "reverse".</li>
+<li>If none of the rules above is applicable, bid Pass.</li>
+</ol>
+
+<p>In the example above, rule 9a applies and a bid of 1 Hearts 
+should be made.</p>
+
+<h2>Input</h2>
+
+<p>The input consists of a number of cases.  The bridge hand for each
+case is specified on one line, with a single space separating each of
+the 13 cards in the hand.  Each card is given as a two-character
+string.  The first letter is the suit (S, H, D, C) and the second
+character is the rank (A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, 2).
+The end of input is terminated by end-of-file.
+</p>
+
+<h2>Output</h2>
+
+<p>
+For each case, print the hand number (starting from 1), followed by a
+colon and a space, and then the suggested bid on a single line (see
+below for the exact format).  Each bid is either "Pass" or a level and
+a suit ("No Trump", "Spades", "Hearts", "Diamonds", "Clubs") separated
+by a single space.
+</p>
+
+<h2>Sample input</h2>
+<pre>
+SA S2 HK HJ HT H9 H2 D3 CK CQ C7 C4 C3
+SK SQ HT H8 H4 CA CQ CT C5 DK DQ DJ D8
+SA SK SQ S3 S2 HT D7 D9 CA CK CQ C7 C5
+</pre>
+
+
+<h2>Output for sample input</h2>
+<pre>
+Hand #1: 1 Hearts
+Hand #2: 1 No Trump
+Hand #3: 1 Clubs
+</pre>

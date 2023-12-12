@@ -1,0 +1,62 @@
+<title>Problem B: Baskets of Gold Coins</title>
+<h1>Problem B: Baskets of Gold Coins</h1>
+
+<p>
+<b>Input:</b> <tt>coins.in</tt><br>
+<b>Output:</b> <tt>coins.out</tt>
+</p>
+
+
+<p>
+You are given <VAR>N</VAR> baskets of gold coins. The baskets are
+numbered from 1 to <var>N</var>. In all except one of the baskets,
+each gold coin weighs <var>w</var> grams. In the one exceptional
+basket, each gold coin weighs <var>w-d</var> grams. A wizard appears
+on the scene and takes 1 coin from Basket 1, 2 coins from Basket 2,
+and so on, up to and including <var>N-1</var> coins from Basket
+<var>N-1</var>. He does not take any coins from Basket
+<var>N</var>. He weighs the selected coins and concludes which of the
+<var>N</var> baskets contains the lighter coins. Your mission is to
+emulate the wizard's computation.
+</p>
+
+<h2>Input</h2>
+
+<p>
+The input file will consist of one or more lines; each line will
+contain data for one instance of the problem. More specifically, each
+line will contain four positive integers, separated by one blank
+space. The first three integers are, respectively, the numbers <var>N, w</var>,
+and <var>d</var>, as described above. The fourth integer is the result of
+weighing the selected coins.
+</p>
+
+<p>
+<var>N</var> will be at least 2 and not more than 8000. The value of
+<var>w</var> will be at most 30. The value of <var>d</var> will be
+less than <var>w</var>.
+</p>
+
+<h2>Output</h2>
+
+<p>
+For each instance of the problem, your program will produce one line
+of output, consisting of one positive integer: the number of the
+basket that contains lighter coins than the other baskets.
+</p>
+
+<h2>Sample input</h2>
+
+<pre>
+10 25 8 1109
+10 25 8 1045
+8000 30 12 959879400
+</pre>
+
+<h2>Output for sample input</h2>
+<pre>
+2
+10
+50
+</pre>
+

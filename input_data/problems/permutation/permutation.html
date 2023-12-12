@@ -1,0 +1,80 @@
+<title>Problem E: Permutation Recovery</title>
+<h1>Problem E: Permutation Recovery</h1>
+
+<p>
+<b>Input:</b> <tt>permutation.in</tt><br>
+<b>Output:</b> <tt>permutation.out</tt>
+</p>
+
+
+<p>
+Professor Permula gave a number of permutations of the <em>n</em>
+integers 1, 2, ..., <em>n</em> to her students.  For each integer
+<em>i</em> (1 &lt;= <em>i</em> &lt;= <em>n</em>), she asks the
+students to write down the number of integers greater than <em>i</em>
+that appears before <em>i</em> in the given permutation.  This number
+is denoted <em>a<sub>i</sub></em>.  For example, if <var>n</var> = 8
+and the permutation is 2,7,3,5,4,1,8,6, then <var>a<sub>1</sub></var>
+= 5 because there are 5 numbers (2, 7, 3, 5, 4) greater than 1
+appearing before it.  Similarly, <var>a<sub>4</sub></var> = 2 because
+there are 2 numbers (7, 5) greater than 4 appearing before it.
+</p>
+
+<p>
+John, one of the students in the class, is studying for the final exams
+now.  He found out that he has lost the assignment questions.  He only
+has the answers (the <em>a<sub>i</sub></em>'s) but not the original
+permutation.  Can you help him determine the original permutation, so
+he can review how to obtain the answers?
+</p>
+
+<h2>Input</h2>
+
+<p>
+The input consists of a number of test cases.  Each test case starts
+with a line containing the integer <em>n</em> (<em>n</em> &lt;= 500).
+The next <em>n</em> lines give the values of <em>a<sub>1</sub></em>,
+..., <em>a<sub>n</sub></em>.  The input ends with <em>n</em> = 0.
+</p>
+
+<h2>Output</h2>
+
+<p>
+For each test case, print a line specifying the original permutation.
+Adjacent elements of a permutation should be separated by a comma.
+Note that some cases may require you to print lines containing more than
+80 characters.
+</p>
+
+<h2>Sample input</h2>
+
+<pre>
+8
+5
+0
+1
+2
+1
+2
+0
+0
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+0
+0
+</pre>
+
+<h2>Output for sample input</h2>
+<pre>
+2,7,3,5,4,1,8,6
+10,9,8,7,6,5,4,3,2,1
+</pre>
+

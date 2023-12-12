@@ -1,0 +1,110 @@
+<html><head><title>Problem D: Human Knot</title></head><body><h1>Problem D: Human Knot</h1>
+
+<p>
+<b>Input:</b> <tt>humanknot.in</tt><br>
+<b>Output:</b> <tt>humanknot.out</tt>
+</p>
+
+<p>
+A classic ice-breaking exercise is for a group of <em>n</em> people to
+form a circle and then arbitrarily join hands with one another.  This forms
+a "human knot" since the players' arms are most likely intertwined.  The
+goal is then to unwind the knot to form a circle of players with no arms
+crossed.
+</p><p>
+We now adapt this game to a more general and more abstract setting where
+the physical constraints of the problem are gone.  Suppose we represent the
+initial knot with a 
+2-regular graph inscribed in a circle (i.e., we have a graph with <em>n</em>
+vertices with exactly two edges incident on each vertex).
+Initially, some edges may cross other edges and this is undesirable.
+This is the "knot" we wish to unwind.
+</p><p>
+A "move" involves
+moving any vertex to a new position on the circle, keeping its edges intact.
+Our goal is to make the fewest possible moves such that we obtain one
+<em>n</em>-sided polygon with no edge-crossings remaining.
+</p><p>
+For example, here is a knot on 4 vertices inscribed in a circle, but two
+edges cross each other.  By moving vertex 4
+down to the position between 2 and 3, a graph without edge-crossings emerges.
+This was achieved in a
+single move, which is clearly optimal in this case.
+
+</p>
+<center>
+<img src="unfolded-4-1.gif">
+</center>
+
+<p>
+When <em>n</em> is larger, things may not be quite as clear.  Below we see a 
+knot on 6 vertices.
+We might consider moving vertex 4 between 5 and 6, then
+vertex 5 between 1 and 2, and finally vertex 6 between 3 and 4; this unwinds
+the knot in 3 moves.
+</p>
+<center>
+<img src="unfolded-6-3.gif">
+</center>
+
+<p>
+But clearly we can unwind the same knot in only two moves:
+</p>
+<center>
+<img src="unfolded-6-2.gif">
+</center>
+
+<p>
+
+
+</p><h2>Input</h2>
+
+<p>The input consists of a number of cases.  Each case starts with a
+line containing the integer <em>n</em> (3 &lt;= <em>n</em> &lt;= 500),
+giving the number of vertices of the graph.
+The vertices are labelled clockwise 
+from 1 to <em>n</em>.  Each of the next
+<em>n</em> lines gives a pair of neighbors, where line
+<em>i</em> (1 &lt;= <em>i</em> &lt;= <em>n</em>) specifies the two
+vertices adjacent to vertex <em>i</em>.  The input
+is terminated by <em>n</em> = 0.
+</p>
+
+<h2>Output</h2>
+
+<p>
+For each case, if there is no solution, print "Not solvable." on a line 
+by
+itself.  If there is
+a solution, print "Knot solvable." on a line by itself, followed by 
+the minimum number of moves required to solve the problem, on a line by itself.
+</p>
+
+<h2>Sample input</h2>
+<pre>6
+4 5
+3 5
+2 6
+1 6
+1 2
+3 4
+6
+2 6
+1 4
+5 6
+2 5
+3 4
+1 3
+0
+</pre>
+
+
+<h2>Output for sample input</h2>
+<pre>
+Knot solvable.
+2
+Knot solvable.
+1
+</pre>
+
+</body></html>
