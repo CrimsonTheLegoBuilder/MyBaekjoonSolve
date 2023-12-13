@@ -77,10 +77,26 @@ ld dist(const Pos& d1, const Pos& d2) {
 ld dist(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return std::abs(cross(d1, d2, d3) / dist(d1, d2));
 }
+ld norm(ld theta) {
+	while (theta >= PI) theta -= PI;
+	while (0 > theta) theta += PI;
+	return theta;
+}
+ld arc(ld theta) { return R * theta; }
+ld dist(int i, int j) {
+	Pos d1 = nodes[i], d2 = nodes[j];
+	if (!d1.i || d1.i != d2.i) return dist(d1, d2);
+	else if (d1.i == d2.i) {
+		Pos p1 = d1, p2 = d2, p = poles[d1.i];
+		ld theta1 = atan2(d1.y - p.y, d1.x - p.x);
+		ld theta2 = atan2(d2.y - p.y, d2.x - p.x);
+		ld theta = norm(theta1 - theta2);
+		if (theta > PI) theta = 2 * PI - theta;
+		return arc(theta);
+	}
+}
 bool close(const Pos& d1, const Pos& d2) {
 	ld distance = dist(d1, d2);
-	//if (distance > D) return 0;
-	//return 1;
 	return distance < D + TOL;
 }
 bool close(const Pos& d1, const Pos& d2, const Pos& d3) {
@@ -94,19 +110,13 @@ ld get_theta(ld c, ld b) { return asin(b / c); }
 ld get_theta(const Pos& d1, const Pos& d2) {
 	ld w = dist(d1, d2); return get_theta(R, w);
 }
-ld arc(ld theta) { return R * theta; }
-ld norm(ld theta) {
-	while (theta >= PI) theta -= PI;
-	while (0 > theta) theta += PI;
-	return theta;
-}
 Pos rotate(const Pos& p, const Pos& v, ld theta, int i) {
 	ld x = v.x * cos(theta) - v.y * sin(theta);
 	ld y = v.x * sin(theta) + v.y * cos(theta);
 	return p + Pos(x, y, i);
 }
-bool is_connected(const Pos& d1, const Pos& d2) {
-	bool f = 0;
+bool is_connected(int n1, int n2) {
+	Pos d1 = nodes[n1], d2 = nodes[n2];
 	if (!d1.i || d1.i != d2.i) {
 		for (int i = 1; i <= N; i++) {
 			if (close(d1, d2, poles[i])) return 0;
@@ -130,7 +140,6 @@ bool is_connected(const Pos& d1, const Pos& d2) {
 		return 1;
 	}
 }
-
 
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -164,24 +173,32 @@ void pos_init() {
 		for (int j = i + 1; j <= N; j++) {
 			if (i == j) continue;
 			Pos p1, p2, p3, p4;
-			Pos p5, p6, p7, p8;
 			Pos m = mid(poles[i], poles[j]);
 			ld theta = get_theta(m, poles[i]);
 			p1 = rotate(m, poles[i] - m, theta, i);
 			nodes[n++] = p1;
-			p2 = rotate(m, poles[j] - m, theta + PI, i);
+			p2 = rotate(m, poles[j] - m, theta + PI, j);
 			nodes[n++] = p2;
 			p3 = rotate(m, poles[i] - m, -theta, i);
 			nodes[n++] = p3;
-			p4 = rotate(m, poles[j] - m, -theta - PI, i);
+			p4 = rotate(m, poles[j] - m, -theta - PI, j);
 			nodes[n++] = p4;
+			Pos p5, p6, p7, p8;
 
 		}
 	}
 	return;
 }
 void graph_init() {
-
+	for (int i = 0; i < n; i++) {
+		for (int j = i + 1; j <= n; j++) {
+			if (is_connected(i, j)) {
+				G[i].push_back({ j, dist(i, j) });
+				G[j].push_back({ i, dist(i, j) });
+			}
+		}
+	}
+	return;
 }
 void solve() {
 	init();
