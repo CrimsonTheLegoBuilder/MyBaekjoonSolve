@@ -88,8 +88,8 @@ void query(int q) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("fencing_gold/13.in", "r", stdin);
-	freopen("fencing_gold/out.txt", "w", stdout);
+	//freopen("fencing_gold/13.in", "r", stdin);
+	//freopen("fencing_gold/out.txt", "w", stdout);
 	std::cin >> N >> Q;
 	T.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> T[i].x >> T[i].y;
