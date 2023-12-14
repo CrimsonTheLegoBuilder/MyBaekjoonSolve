@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -20,7 +21,7 @@ ld C[LEN];
 struct Info {
 	int i;
 	ld c;
-	std::vector<int> path;
+	//std::vector<int> path;
 	bool operator < (const Info& x) const {
 		return c > x.c;
 	}
@@ -29,26 +30,27 @@ std::priority_queue<Info> Q;
 std::vector<Info> G[LEN];
 ld dijkstra(int v, int e) {
 	for (int i = 0; i < LEN; i++) C[i] = MAX;
-	Q.push({ v, 0, {v} });
+	Q.push({ v, 0 });
+	//Q.push({ v, 0, {v} });
 	C[v] = 0;
 	while (!Q.empty()) {
 		Info p = Q.top(); Q.pop();
 		if (p.c > C[p.i]) continue;
-		if (p.i == e) {
-			for (const int& a : p.path) {
-				std::cout << a << " ";
-			}
-			std::cout << "\n";
-		}
+		//if (p.i == e) {
+		//	for (const int& a : p.path) {
+		//		std::cout << a << " ";
+		//	}
+		//	std::cout << "\n";
+		//}
 		for (const Info& w : G[p.i]) {
 			ld cost = p.c + w.c;
 			if (C[w.i] > cost) {
 				C[w.i] = cost;
-				Info tmp = { w.i, cost, };
-				for (const int& a : p.path) {
-					tmp.path.push_back(a);
-				}
-				tmp.path.push_back(w.i);
+				Info tmp = { w.i, cost };
+				//for (const int& a : p.path) {
+				//	tmp.path.push_back(a);
+				//}
+				//tmp.path.push_back(w.i);
 				Q.push(tmp);
 			}
 		}
@@ -251,17 +253,49 @@ void connect_seg() {
 	}
 	return;
 }
-void solve() {
+
+void clear() {
+	for (std::vector<Info>& v : G) v.clear();
+	for (std::vector<Pos>& v : rev) v.clear();
+	n = 0;
+}
+
+// void solve() {
+ld solve() {
+	clear();
 	init();
 	pos_init();
 	connect_seg();
 	connect_arc();
 	ld ans = dijkstra(0, 1);
-	if (ans > 1e16) std::cout << "0.0\n";
-	else std::cout << ans << '\n';
-	return;
+	// if (ans > 1e16) std::cout << "0.0\n";
+	// else std::cout << ans << '\n';
+	return ans > 1e16 ? 0 : ans;
 }
-int main() { solve(); return 0; }
+// int main() { solve(); return 0; }
+
+char inputs[100][100], outputs[100][100];
+
+int main(int argc, char* argv[]) {
+	std::cout << "run\n";
+	std::cout << argc << '\n';
+	std::cout << argv[1] << '\n';
+	freopen(argv[1], "r", stdin);
+	for (int i = 0; i < 100; ++i) std::cin >> inputs[i];
+	
+	freopen(argv[2], "r", stdin);
+	for (int i = 0; i < 100; ++i) std::cin >> outputs[i];
+
+	for (int i = 0; i < 100; ++i) {
+		freopen(inputs[i], "r", stdin);
+		ld ret = solve();
+		freopen(outputs[i], "r", stdin);
+		ld ans;
+		std::cin >> ans;
+		std::cout << ret << ' ' << ans << ' ';
+		std::cout << (z(ret - ans)) << '\n';
+	}
+}
 
 /*
 1 0 -300
