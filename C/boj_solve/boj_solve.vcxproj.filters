@@ -561,7 +561,7 @@
     <ClCompile Include="boj10337_circle_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10337_sort.cpp">
+    <ClCompile Include="boj10337_no_debug.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
