@@ -221,6 +221,7 @@ ld solve() {
 }
 int main() { solve(); return 0; }//boj10337
 
+
 ////Auto judge
 //void clear() {
 //	for (std::vector<Info>& v : G) v.clear();
