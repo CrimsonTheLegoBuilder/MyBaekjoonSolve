@@ -565,33 +565,95 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll H, M, S, T = 0;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	int N = 3;
+//	while (N--) {
+//		T = 0;
+//		std::cin >> H >> M >> S;
+//		T -= S;
+//		T -= M * 60;
+//		T -= H * 3600;
+//		std::cin >> H >> M >> S;
+//		T += S;
+//		T += M * 60;
+//		T += H * 3600;
+//		H = T / 3600;
+//		T %= 3600;
+//		M = T / 60;
+//		T %= 60;
+//		S = T;
+//		std::cout << H << " " << M << " " << S << "\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll s, T1{ 0 }, T2{ 0 };
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	int a{ 4 }, b{ 4 };
+//	while (a--) {
+//		std::cin >> s;
+//		T1 += s;
+//	}
+//	while (b--) {
+//		std::cin >> s;
+//		T2 += s;
+//	}
+//	//std::cout << (T1 == T2 ? T1 : T1 > T2 ? T1 : T2) << "\n";
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll g, b;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	while (1) {
+//		std::cin >> b >> g;
+//		if (!b && !g) return 0;
+//		//std::cout << b + g << "\n";
+//	}
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-ll H, M, S, T = 0;
+ll D, H, M, T{ 0 };
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	int N = 3;
-	while (N--) {
-		T = 0;
-		std::cin >> H >> M >> S;
-		T -= S;
-		T -= M * 60;
-		T -= H * 3600;
-		std::cin >> H >> M >> S;
-		T += S;
-		T += M * 60;
-		T += H * 3600;
-		H = T / 3600;
-		T %= 3600;
-		M = T / 60;
-		T %= 60;
-		S = T;
-		std::cout << H << " " << M << " " << S << "\n";
-	}
+	std::cin >> D >> H >> M;
+	D *= 1440; H *= 60;
+	ll D1 = 11ll * 1440;
+	ll H1 = 11ll * 60;
+	ll M1 = 11ll;
+	T -= D1 + H1 + M1;
+	T += D + H + M;
+	std::cout << (T > -1 ? T : -1) << "\n";
 	return 0;
 }
