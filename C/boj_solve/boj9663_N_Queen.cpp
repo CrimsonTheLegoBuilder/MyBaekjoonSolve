@@ -15,6 +15,6 @@ void dfs(ll u, ll l, ll r, ll d) {
 int main() {
 	std::cin >> N;
 	dfs(0, 0, 0, 0);
-	std::cout << total;
+	std::cout << total << "\n";
 	return 0;
 }
