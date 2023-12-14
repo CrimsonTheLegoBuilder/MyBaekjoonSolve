@@ -112,8 +112,8 @@ void connect_node(int n1, int n2) {
 		for (int i = 1; i < N + 1; i++) if (close(d1, d2, poles[i])) return;
 		G[n1].push_back({ n2, dist(d1, d2) });
 		G[n2].push_back({ n1, dist(d1, d2) });
-		return;
 	}
+	return;
 }
 void connect_seg() {
 	for (int i = 0; i < n; i++)
