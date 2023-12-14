@@ -9,11 +9,10 @@ typedef long long ll;
 typedef long double ld;
 const int LEN = 300;
 const ld MAX = 1e17;
-const ld TOL = 1e-6;     //tolerance
+const ld TOL = 1e-6;  //tolerance
+const ld R = 100.0;   //radius
+const ld D = 200.0;   //diameter
 const ld PI = acos(-1);  //pi = 3.14159265...
-const ld R = 100.0;      //radius
-const ld D = 200.0;      //diameter
-const ld para = D * PI;  //parameter
 int N;
 ld C[LEN];
 
