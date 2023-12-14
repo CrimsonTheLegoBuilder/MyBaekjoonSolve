@@ -1,0 +1,1 @@
+ ./boj_solve inputs.txt outputs.txt
