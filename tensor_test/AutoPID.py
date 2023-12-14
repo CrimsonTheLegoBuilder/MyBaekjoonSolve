@@ -66,7 +66,7 @@ class Train:
             plt.plot(error)
             plt.title("step={}, p={:.3}, i={:.3}, d={:.3}, train_loss={:.3}".format(self.step, self.kp, self.ki, self.kd, self.abs_mean(error)))
             plt.ylim(-10, 10)
-            plt.savefig("graph\\{}.png".format(self.step))
+            # plt.savefig("graph\\{}.png".format(self.step))
 
         return self.abs_mean(error)
 
