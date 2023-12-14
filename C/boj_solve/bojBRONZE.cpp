@@ -549,18 +549,49 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll A, B, C, D, T;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> A >> B >> C >> D;
+//	T = A + B + C + D;
+//	//std::cout << T / 60 << "\n" << T % 60 << "\n";
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-ll A, B, C, D, T;
+ll H, M, S, T = 0;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cin >> A >> B >> C >> D;
-	T = A + B + C + D;
-	//std::cout << T / 60 << "\n" << T % 60 << "\n";
+	int N = 3;
+	while (N--) {
+		T = 0;
+		std::cin >> H >> M >> S;
+		T -= S;
+		T -= M * 60;
+		T -= H * 3600;
+		std::cin >> H >> M >> S;
+		T += S;
+		T += M * 60;
+		T += H * 3600;
+		H = T / 3600;
+		T %= 3600;
+		M = T / 60;
+		T %= 60;
+		S = T;
+		std::cout << H << " " << M << " " << S << "\n";
+	}
 	return 0;
 }
