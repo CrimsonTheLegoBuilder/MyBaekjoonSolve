@@ -15,6 +15,7 @@ const ld D = 200.0;//diameter
 const ld PI = acos(-1);//pi = 3.14159265...
 int N;
 
+
 //Graph
 struct Info {
 	int i;
@@ -43,6 +44,7 @@ ld dijkstra(int v, int e) {
 	return C[e];
 }
 
+
 //Geometry
 bool z(const ld& x) { return std::abs(x) < TOL; }
 struct Pos {
@@ -58,7 +60,7 @@ struct Pos {
 	bool operator < (const Pos& p) const {//sort CCW
 		bool f1 = z(x) ? y > 0 : x > 0;
 		bool f2 = z(p.x) ? p.y > 0 : p.x > 0;
-		if (f1 != f2) return f1 > f2;
+		if (f1 != f2) return f1;
 		ld ccw = *this / p;
 		return ccw > 0;
 	}
@@ -76,26 +78,22 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
 }
-bool between(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld dot1 = dot(d1, d2, d3), dot2 = dot(d2, d1, d3);
-	if ((z(dot1) || dot1 < 0) && (z(dot2) || dot2 < 0)) return 1;
-	return 0;
-}
-ld dist(const Pos& d1) {
-	return hypot(d1.x, d1.y);
+bool between(const Pos& d1, const Pos& d2, const Pos& target) {
+	ld dot1 = dot(d1, d2, target), dot2 = dot(d2, d1, target);
+	return ((z(dot1) || dot1 < 0) && (z(dot2) || dot2 < 0));
 }
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d1.x - d2.x), (d1.y - d2.y));
 }
-ld dist(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return std::abs(cross(d1, d2, d3) / dist(d1, d2));
+ld dist(const Pos& d1, const Pos& d2, const Pos& target) {
+	return std::abs(cross(d1, d2, target) / dist(d1, d2));
 }
-bool close(const Pos& d1, const Pos& d2) {
-	return dist(d1, d2) < R - TOL;
+bool close(const Pos& d, const Pos& target) {
+	return dist(d, target) < R - TOL;
 }
-bool close(const Pos& d1, const Pos& d2, const Pos& pole) {
-	if (between(d1, d2, pole)) return dist(d1, d2, pole) < R - TOL;
-	else return close(d1, pole) || close(d2, pole);
+bool close(const Pos& d1, const Pos& d2, const Pos& target) {
+	if (between(d1, d2, target)) return dist(d1, d2, target) < R - TOL;
+	else return close(d1, target) || close(d2, target);
 }
 ld get_theta(const Pos& d1, const Pos& d2) {
 	ld w = dist(d1, d2);
@@ -156,6 +154,7 @@ void connect_arc() {
 			}
 		}
 	}
+	return;
 }
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -173,7 +172,7 @@ void init() {
 void pos_init() {
 	nodes[n++] = S;
 	nodes[n++] = E;
-	for (int i = 1; i <= N; i++) {
+	for (int i = 1; i <= N; i++) {//tangent from S || E
 		ld theta1 = get_theta(S, poles[i]);
 		ld theta2 = get_theta(E, poles[i]);
 		nodes[n++] = rotate(S, poles[i], theta1, i);
@@ -191,7 +190,7 @@ void pos_init() {
 			nodes[n++] = poles[j] + v * scale;
 			nodes[n++] = poles[i] - v * scale;
 			nodes[n++] = poles[j] - v * scale;
-			if (distance > D) {
+			if (distance > D) {//tangent from m
 				Pos m = mid(poles[i], poles[j]);
 				ld theta = get_theta(m, poles[i]);
 				nodes[n++] = rotate(m, poles[i], theta, i);
@@ -207,6 +206,7 @@ void pos_init() {
 	}
 	return;
 }
+
 
 //Solve
 ld solve() {
@@ -255,6 +255,6 @@ int main() { solve(); return 0; }//boj10337
 //		ld ans;
 //		std::cin >> ans;
 //		std::cout << (z(ret - ans) ? "AC " : "WC          ");
-//		std::cout << i + 1 << "  " << ret << " " << ans << "\n";
+//		std::cout << i + 1 << "   " << ret << " " << ans << "\n";
 //	}
 //}
