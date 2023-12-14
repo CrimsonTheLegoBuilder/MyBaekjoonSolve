@@ -61,13 +61,7 @@ void solve() {
 	std::cout << total / 50;
 	return;
 }
-
-
-
-int main() {
-	solve();
-	return 0;
-}
+int main() { solve(); return 0; }
 
 
 //for (const Pos& i : H) { std::cout << i.x << " " << i.y << " " << cnt << "\n"; }

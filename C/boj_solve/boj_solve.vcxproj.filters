@@ -558,10 +558,10 @@
     <ClCompile Include="boj9663_N_Queen.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj10337_circle_dijkstra.cpp">
+    <ClCompile Include="boj10337_proto.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10337_no_debug.cpp">
+    <ClCompile Include="boj10337_circle_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
