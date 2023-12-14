@@ -9,13 +9,15 @@ typedef long long ll;
 typedef long double ld;
 const int LEN = 300;
 const ld MAX = 1e17;
-const ld TOL = 1e-6;  //tolerance
-const ld R = 100.0;   //radius
-const ld D = 200.0;   //diameter
-const ld PI = acos(-1);  //pi = 3.14159265...
+const ld TOL = 1e-6;//tolerance
+const ld R = 100.0;//radius
+const ld D = 200.0;//diameter
+const ld PI = acos(-1);//pi = 3.14159265...
 int N;
 ld C[LEN];
+//boj10337
 
+//Graph + Dijkstra
 struct Info {
 	int i;
 	ld c;
@@ -42,28 +44,28 @@ ld dijkstra(int v, int e) {
 	return C[e];
 }
 
+//Geometry
 bool z(const ld& x) { return std::abs(x) < TOL; }
 struct Pos {
 	ld x, y;
-	int pole_i, node_idx;
-	Pos(ld X, ld Y, int I, int n_i = 0) : x(X), y(Y), pole_i(I), node_idx(n_i) {}
-	Pos() : x(0), y(0), pole_i(0), node_idx(0) {}
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y, pole_i, node_idx }; }
-	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y, pole_i, node_idx }; }
-	Pos operator * (const ld& n) const { return { x * n, y * n, pole_i, node_idx }; }
-	Pos operator ~ () const { return { -y, x, pole_i, node_idx }; }  //rotate 90;
-	ld operator / (const Pos& p) const { return x * p.y - y * p.x; } //cross
+	int pole_i, node_i;
+	Pos(ld X, ld Y, int p_i, int n_i = 0) : x(X), y(Y), pole_i(p_i), node_i(n_i) {}
+	Pos() : x(0), y(0), pole_i(0), node_i(0) {}
+	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y, pole_i, node_i }; }
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y, pole_i, node_i }; }
+	Pos operator * (const ld& n) const { return { x * n, y * n, pole_i, node_i }; }
+	Pos operator ~ () const { return { -y, x, pole_i, node_i }; }//rotate PI/2;
+	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }//cross
 	bool operator < (const Pos& p) const {
 		bool f1 = z(x) ? y > 0 : x > 0;
-		bool f2 = z(p.x) ? p.y > 0 : p.x > 0;  // sort CCW
+		bool f2 = z(p.x) ? p.y > 0 : p.x > 0;//sort CCW
 		if (f1 != f2) return f1 > f2;
-		//ld ccw = x * p.y - y * p.x;  // ccw == 0 : parallel
-		ld ccw = *this / p;  // ccw == 0 : parallel
+		ld ccw = *this / p;
 		return ccw > 0;
 	}
 } S = { 0, 0, 0 }, E, poles[10], nodes[LEN];
 std::vector<Pos> rev[10];
-int n = 0;  //pointer of nodes
+int n = 0;//pointer of nodes
 Pos mid(const Pos& d1, const Pos& d2) { return (d1 + d2) * .5; }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
@@ -93,12 +95,8 @@ bool close(const Pos& d1, const Pos& d2) {
 	return dist(d1, d2) < R - TOL;
 }
 bool close(const Pos& d1, const Pos& d2, const Pos& pole) {
-	if (between(d1, d2, pole)) {
-		return dist(d1, d2, pole) < R - TOL;
-	}
-	else {
-		return close(d1, pole) || close(d2, pole);
-	}
+	if (between(d1, d2, pole)) return dist(d1, d2, pole) < R - TOL;
+	else return close(d1, pole) || close(d2, pole);
 }
 ld get_theta(const Pos& d1, const Pos& d2) {
 	ld w = dist(d1, d2);
@@ -114,9 +112,7 @@ Pos rotate(const Pos& pivot, const Pos& p, ld theta, int i) {
 void connect_node(int n1, int n2) {
 	Pos d1 = nodes[n1], d2 = nodes[n2];
 	if (!d1.pole_i || d1.pole_i != d2.pole_i) {
-		bool f = 1;
-		for (int i = 1; i < N + 1; i++)
-			if (close(d1, d2, poles[i])) return;
+		for (int i = 1; i < N + 1; i++) if (close(d1, d2, poles[i])) return;
 		G[n1].push_back({ n2, dist(d1, d2) });
 		G[n2].push_back({ n1, dist(d1, d2) });
 		return;
@@ -155,8 +151,8 @@ void connect_arc() {
 				ld theta2 = norm(atan2(nxt.y - p.y, nxt.x - p.x));
 				ld theta = norm(theta2 - theta1);
 				ld arc = R * theta;
-				G[cur.node_idx].push_back({ nxt.node_idx, arc });
-				G[nxt.node_idx].push_back({ cur.node_idx, arc });
+				G[cur.node_i].push_back({ nxt.node_i, arc });
+				G[nxt.node_i].push_back({ cur.node_i, arc });
 			}
 		}
 	}
@@ -168,8 +164,6 @@ void init() {
 	std::cout.precision(6);
 	std::cin >> N >> E.x >> E.y;
 	E.pole_i = 0;
-	nodes[n++] = S; //start
-	nodes[n++] = E; //goal
 	for (int i = 1; i <= N; i++) {
 		std::cin >> poles[i].x >> poles[i].y;
 		poles[i].pole_i = i;
@@ -177,6 +171,8 @@ void init() {
 	return;
 }
 void pos_init() {
+	nodes[n++] = S;
+	nodes[n++] = E;
 	for (int i = 1; i <= N; i++) {
 		ld theta1 = get_theta(S, poles[i]);
 		ld theta2 = get_theta(E, poles[i]);
@@ -189,6 +185,12 @@ void pos_init() {
 		for (int j = i + 1; j <= N; j++) {
 			if (i == j) continue;
 			ld distance = dist(poles[j], poles[i]);
+			Pos v = ~(poles[j] - poles[i]);
+			ld scale = R / distance;
+			nodes[n++] = poles[i] + v * scale;
+			nodes[n++] = poles[j] + v * scale;
+			nodes[n++] = poles[i] - v * scale;
+			nodes[n++] = poles[j] - v * scale;
 			if (distance > D) {
 				Pos m = mid(poles[i], poles[j]);
 				ld theta = get_theta(m, poles[i]);
@@ -197,29 +199,62 @@ void pos_init() {
 				nodes[n++] = rotate(m, poles[i], -theta, i);
 				nodes[n++] = rotate(m, poles[j], -theta - PI, j);
 			}
-			Pos v = ~(poles[j] - poles[i]);
-			ld scale = R / distance;
-			nodes[n++] = poles[i] + v * scale;
-			nodes[n++] = poles[j] + v * scale;
-			nodes[n++] = poles[i] - v * scale;
-			nodes[n++] = poles[j] - v * scale;
 		}
 	}
-	for (int i = 0; i < n; i++) nodes[i].node_idx = i;
-	for (int i = 0; i < n; i++) rev[nodes[i].pole_i].push_back(nodes[i]);
+	for (int i = 0; i < n; i++) {
+		nodes[i].node_i = i;
+		rev[nodes[i].pole_i].push_back(nodes[i]);
+	}
 	return;
 }
-void solve() {
+
+//Solve
+ld solve() {
 	init();
 	pos_init();
 	connect_seg();
 	connect_arc();
 	ld ans = dijkstra(0, 1);
 	if (ans > 1e16) std::cout << "0.0\n";
-	else std::cout << ans << '\n';
-	return;
+	else std::cout << ans << "\n";
+	return ans > 1e16 ? 0 : ans;
 }
 int main() { solve(); return 0; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//for (int i = 0; i < n; i++) rev[nodes[i].pole_i].push_back(nodes[i]);
+		//ld ccw = x * p.y - y * p.x;  // ccw == 0 : parallel
+
+/*
+1 0 - 300
+0 - 150
+
+1 0 - 200
+0 - 100
+*/
 
 
 //void clear() {
@@ -253,21 +288,13 @@ int main() { solve(); return 0; }
 //		freopen(outputs[i], "r", stdin);
 //		ld ans;
 //		std::cin >> ans;
-//		std::cout << ret << ' ' << ans << ' ';
-//		std::cout << (z(ret - ans)) << '\n';
+//		//std::cout << ret << ' ' << ans << ' ';
+//		std::cout << (z(ret - ans) ? "AC\n" : "WC\n");
 //	}
 //}
 
 
 
-
-/*
-1 0 -300
-0 -150
-
-1 0 -200
-0 -100
-*/
 
 
 
