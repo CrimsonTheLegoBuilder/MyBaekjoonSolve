@@ -637,23 +637,61 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll D, H, M, T{ 0 };
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> D >> H >> M;
+//	D *= 1440; H *= 60;
+//	ll D1 = 11ll * 1440;
+//	ll H1 = 11ll * 60;
+//	ll M1 = 11ll;
+//	T -= D1 + H1 + M1;
+//	T += D + H + M;
+//	//std::cout << (T > -1 ? T : -1) << "\n";
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll A, B, C;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> A >> B;
+//	C = B - A;
+//	//std::cout << B + C;
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-ll D, H, M, T{ 0 };
+ll A, B, C, F;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cin >> D >> H >> M;
-	D *= 1440; H *= 60;
-	ll D1 = 11ll * 1440;
-	ll H1 = 11ll * 60;
-	ll M1 = 11ll;
-	T -= D1 + H1 + M1;
-	T += D + H + M;
-	std::cout << (T > -1 ? T : -1) << "\n";
+	std::cin >> A >> B;
+	C = B - A;
+	if (C < 1) std::cout << "Congratulations, you are within the speed limit!\n";
+	else {
+		if (1 <= C && C <= 20) F = 100;
+		if (21 <= C && C <= 30) F = 270;
+		if (31 <= C) F = 500;
+		//std::cout << "You are speeding and your fine is $" << F << ".\n";
+	}
 	return 0;
 }
