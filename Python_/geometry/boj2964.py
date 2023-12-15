@@ -9,8 +9,8 @@ class Pos:
         self.cw = cw_
 
     def cross(self, pos1, pos2):
-        ccw = (pos1.x - self.x) * (pos2.y - pos1.y) - (pos1.y - self.y) * (pos2.x - pos1.x)
-        return ccw
+        ret = (pos1.x - self.x) * (pos2.y - pos1.y) - (pos1.y - self.y) * (pos2.x - pos1.x)
+        return ret
 
 
 class Order:
@@ -97,10 +97,12 @@ for i in range(N - 3, -1, -1):
     k = order[i]
     pos[k].ccw = pos[k].cw = j
 
-    while area := pos[k].cross(pos[pos[k].ccw], pos[pos[pos[k].ccw].ccw]) > 0:
+    while (area := pos[k].cross(pos[pos[k].ccw], pos[pos[pos[k].ccw].ccw])) > 0:
+        # print(area)
         ans[i] += area
         pos[k].ccw = pos[pos[k].ccw].ccw
-    while area := pos[k].cross(pos[pos[k].cw], pos[pos[pos[k].cw].cw]) < 0:
+    while (area := pos[k].cross(pos[pos[k].cw], pos[pos[pos[k].cw].cw])) < 0:
+        # print(area)
         ans[i] -= area
         pos[k].cw = pos[pos[k].cw].cw
 
