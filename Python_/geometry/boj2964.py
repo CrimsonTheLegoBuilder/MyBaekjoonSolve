@@ -98,11 +98,9 @@ for i in range(N - 3, -1, -1):
     pos[k].ccw = pos[k].cw = j
 
     while (area := pos[k].cross(pos[pos[k].ccw], pos[pos[pos[k].ccw].ccw])) > 0:
-        # print(area)
         ans[i] += area
         pos[k].ccw = pos[pos[k].ccw].ccw
     while (area := pos[k].cross(pos[pos[k].cw], pos[pos[pos[k].cw].cw])) < 0:
-        # print(area)
         ans[i] -= area
         pos[k].cw = pos[pos[k].cw].cw
 
@@ -121,10 +119,64 @@ for i in range(N - 3, -1, -1):
     ans[i] += ans[i + 1]
 
 for i in range(N - 2):
-    print(ans[i] / 2)
+    print(f"{ans[i] / 2:.1f}")
+
+'''
+import sys
 
 
+def cross(d1, d2, d3, d4):  # cross product / get CCW / get Torque / get area
+    return (d2[0] - d1[0]) * (d4[1] - d3[1]) - (d2[1] - d1[1]) * (d4[0] - d3[0])
 
 
+def get_polygon_area(hull):  # get area
+    pivot = (0, 0)
+    a = len(hull)
+    area = 0
+    for d in range(a):
+        area += cross(pivot, hull[d - 1], hull[d - 1], hull[d])
+    return abs(area/2)
 
 
+def monotone_chain(arr):  # get hull / sorting hull CCW
+    arr.sort(key=lambda x: (x[0], x[1]))
+    if len(arr) <= 2:
+        return arr
+    lower = []
+    for dl in arr:
+        while len(lower) > 1 and cross(lower[-2], lower[-1], lower[-1], dl) <= 0:
+            lower.pop()
+        lower.append(dl)
+    upper = []
+    for du in reversed(arr):
+        while len(upper) > 1 and cross(upper[-2], upper[-1], upper[-1], du) <= 0:
+            upper.pop()
+        upper.append(du)
+    return lower[:-1] + upper[:-1]
+
+
+def get_new_arr(arr, o):
+    if o == 'L':
+        arr.sort(key=lambda x: -x[0])
+    elif o == 'R':
+        arr.sort(key=lambda x: x[0])
+    elif o == 'U':
+        arr.sort(key=lambda y: y[1])
+    elif o == 'D':
+        arr.sort(key=lambda y: -y[1])
+    arr.pop()
+
+
+N = int(sys.stdin.readline().strip())
+nails = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
+order = str(sys.stdin.readline().strip())
+hull_nail = monotone_chain(nails)
+ans = get_polygon_area(hull_nail)
+print(ans)
+for i in order[:-1]:
+    get_new_arr(nails, i)
+    # print(nails)
+    hull_nail = monotone_chain(nails)
+    ans = get_polygon_area(hull_nail)
+    print(ans)
+'''
