@@ -1,4 +1,4 @@
-import sys  # boj2964
+import sys
 
 
 class Pos:
@@ -116,5 +116,5 @@ for i in range(N - 3, -1, -1):
 
     ans[i] += ans[i + 1]
 
-for i in range(N - 2):
-    print(f"{ans[i] / 2:.1f}")
+for i in range(N - 2):  # boj2964
+    print(f"{ans[i] // 2}.{(ans[i] & 1) * 5}")
