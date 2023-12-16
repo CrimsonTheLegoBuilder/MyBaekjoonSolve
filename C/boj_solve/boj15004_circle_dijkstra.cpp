@@ -7,7 +7,7 @@
 typedef long double ld;
 const int LEN = 700;
 const ld MAX = 1e19;
-const ld TOL = 1e-9;
+const ld TOL = 1e-6;
 const ld PI = acos(-1);
 int N;
 
@@ -69,7 +69,7 @@ struct Pos {
 		return (*this < p) || (*this == p);
 	}
 	ld meg() { return hypot(x, y); }
-} S, E, nodes[LEN]; int n = 0;//pointer of nodes
+} S, E, nodes[LEN], zero = { 0 ,0 }; int n = 0;//pointer of nodes
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 }
@@ -136,43 +136,54 @@ bool on_seg(const Circle& c, const Seg& s) {
 }
 Pos get_grediant(const Circle& c, const Seg& s) {
 	Pos d1 = s.L, d2 = s.R;
-	Pos vec = ~(d2 - d1);
+	Pos vec = ~(d1 - d2);
 	ld theta = atan2(vec.y, vec.x);
 	ld distance = cross(d1, d2, c.C) / dist(d1, d2);
 	//if (distance < 0) theta += PI;
-	return { -distance * cos(theta), -distance * sin(theta) };
+	return { distance * cos(theta), distance * sin(theta) };
 }
 bool line_sweeping(const std::vector<Seg>& tmp) {
 	int sz = tmp.size();
 	for (int i = 0; i < sz - 1; i++) {
 		Seg cur = tmp[i], nxt = tmp[i + 1];
-		if (cur.R < nxt.L) return 0;
+		//std::cout << cur.R.x << " " << cur.R.y << " " << nxt.L.x << " " << nxt.L.y << "\n";
+		//std::cout << (nxt.L <= cur.R ? "cur.R >= nxt.L\n" : "cur.R < nxt.L\n");
+		//if ((cur.R < nxt.L)) return 0;
+		if (!(nxt.L <= cur.R)) return 0;
 	}
 	return 1;
 }
-void connect_node(int i, int j) {
+bool connect_node(int i, int j) {
 	Pos v = nodes[i], w = nodes[j];
 	if (z(dist(v, w))) {
 		G[i].push_back({ j, 0 });
 		G[j].push_back({ i, 0 });
-		return;
+		return 1;
 	}
 	else {
 		std::vector<Seg> tmp;
+		if (w < v) std::swap(v, w);
 		Seg bridge = Seg(v, w);
-		Pos d1 = bridge.L, d2 = bridge.R;
-		Pos vec = ~(d2 - d1);
-		ld theta = atan2(vec.y, vec.x);
 		norm(bridge);
+		Pos vec = w - v;
+		//std::cout << v.x << " " << v.y << " " << w.x << " " << w.y << " bridge\n";
+		ld theta = norm(atan2(vec.y, vec.x));
 		for (int i = 0; i < N; i++) {
 			Circle C = shelves[i];
 			if (!on_seg(C, bridge)) continue;
+			ld alpha, beta;
 			Pos grediant = get_grediant(C, bridge);
-			ld width = grediant.meg();
-			ld delta = acos(width / C.R);
-			ld alpha = norm(theta + delta);
-			ld beta = norm(theta - delta);
-
+			if (grediant == zero) {
+				alpha = atan2(vec.y, vec.x);
+				beta = alpha + PI;
+			}
+			else {
+				ld width = grediant.meg();
+				ld delta = acos(width / C.R);
+				ld gamma = atan2(grediant.y, grediant.x);
+				alpha = norm(gamma + delta);
+				beta = norm(gamma - delta);
+			}
 			Pos d1, d2;
 			d1 = { C.C.x + C.R * cos(alpha), C.C.y + C.R * sin(alpha) };
 			d2 = { C.C.x + C.R * cos(beta), C.C.y + C.R * sin(beta) };
@@ -180,14 +191,42 @@ void connect_node(int i, int j) {
 			if (d1 < bridge.L) d1 = bridge.L;
 			if (bridge.R < d2) d2 = bridge.R;
 			tmp.push_back({ d1, d2 });
+
+			//Circle C = shelves[i];
+			//std::cout << on_seg(C, bridge) << " on_seg\n";
+			//if (!on_seg(C, bridge)) continue;
+			//Pos grediant = get_grediant(C, bridge);
+			//std::cout << grediant.x << " " << grediant.y << " grediant\n";
+			//ld width = grediant.meg();
+			//ld delta = acos(width / C.R);
+			//ld gamma = atan2(grediant.y, grediant.x);
+			//std::cout << "delta : " << delta << " , gamma : " << gamma << "\n";
+			//ld alpha = norm(theta + delta);
+			//ld alpha2 = norm(gamma + delta);
+			//ld beta = norm(theta - delta);
+			//ld beta2 = norm(gamma - delta);
+			//std::cout << "alpha : " << alpha << " beta : " << beta << " alpha beta\n";
+			//std::cout << "alpha2 : " << alpha2 << " beta2 : " << beta2 << " alpha2 beta2\n";
+
+			//Pos d1, d2;
+			//d1 = { C.C.x + C.R * cos(alpha2), C.C.y + C.R * sin(alpha2) };
+			//d2 = { C.C.x + C.R * cos(beta2), C.C.y + C.R * sin(beta2) };
+			//if (d2 < d1) std::swap(d1, d2);
+			//std::cout << "bridge : " << bridge.L.x << " " << bridge.L.y << " " << bridge.R.x << " " << bridge.R.y << " bridge\n";
+			//std::cout << "d1, d2 : " << d1.x << " " << d1.y << " " << d2.x << " " << d2.y << " d1, d2\n";
+			//if (d1 < bridge.L) d1 = bridge.L;
+			//if (bridge.R < d2) d2 = bridge.R;
+			//std::cout << "d1, d2 : " << d1.x << " " << d1.y << " " << d2.x << " " << d2.y << " d1, d2\n";
+			//tmp.push_back({ d1, d2 });
 		}
 		std::sort(tmp.begin(), tmp.end());
 		if (line_sweeping(tmp)) {
 			G[i].push_back({ j, dist(v, w) });
 			G[j].push_back({ i, dist(v, w) });
+			return 1;
 		}
-		return;
 	}
+	return 0;
 }
 void get_node(int i, int j) {
 	Circle a = shelves[i], b = shelves[j];
@@ -227,19 +266,16 @@ void init() {
 }
 void pos_init() {
 	nodes[n++] = S, nodes[n++] = E;
-	for (int i = 0; i < N; i++) {
-		for (int j = i + 1; j < N; j++) {
+	for (int i = 0; i < N; i++)
+		for (int j = i + 1; j < N; j++)
 			get_node(i, j);
-		}
-	}
 	return;
 }
 void graph_init() {
-	for (int i = 0; i < n; i++) {
-		for (int j = i + 1; j < n; j++) {
+	for (int i = 0; i < n; i++)
+		for (int j = i + 1; j < n; j++)
 			connect_node(i, j);
-		}
-	}
+			//std::cout << connect_node(i, j) << "\n";
 	return;
 }
 void solve() {
@@ -252,6 +288,26 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj15004
+
+
+/*
+0 0 1 1
+2
+0 0 2
+2 2 2
+
+0 0 2 0
+2
+0 0 1
+2 0 1
+
+0 0 0 2
+2
+0 2 1
+0 0 1
+
+*/
+
 
 
 //ld operator / (const Pos& p) const { return x * p.y - y * p.x; }//cross product
