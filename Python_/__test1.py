@@ -1,21 +1,19 @@
-# for i in range(int(input())):print(f"{i+1}.",input())
+import tensorflow as tf
 
-# while 1:
-#     try:
-#         name = input()
-#         for a in name:
-#             if a not in 'ieIE':
-#                 print(a, end='')
-#             elif a == 'i':
-#                 print('e', end='')
-#             elif a == 'e':
-#                 print('i', end='')
-#             elif a == 'I':
-#                 print('E', end='')
-#             # elif a == 'E':
-#                 # print('I', end='')
-#         print()
-#     except:
-#         break
+H = 170
+S = 260
 
-print(25**5)
+a = tf.Variable(0.1)
+b = tf.Variable(0.2)
+
+
+def loss_f():
+    pre = (H * a + b)
+    return tf.square(S - pre)
+
+
+opt = tf.keras.optimizers.Adam(learning_rate=0.1)
+for i in range(300):
+    opt.minimize(loss_f, var_list=[a, b])
+    print(a.numpy(), b.numpy())
+    print(H * a.numpy() + b.numpy(), S)

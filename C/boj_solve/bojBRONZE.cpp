@@ -674,24 +674,62 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//ll A, B, C, F;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> A >> B;
+//	C = B - A;
+//	if (C < 1) std::cout << "Congratulations, you are within the speed limit!\n";
+//	else {
+//		if (1 <= C && C <= 20) F = 100;
+//		if (21 <= C && C <= 30) F = 270;
+//		if (31 <= C) F = 500;
+//		//std::cout << "You are speeding and your fine is $" << F << ".\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//char N;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> N;
+//	std::cout << "Naver ";
+//	if (N == 'N' || N == 'n') std::cout << "D2\n";
+//	//else std::cout << "Whale\n";
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-ll A, B, C, F;
+int N, A, B, C, D, FU = 0, FD = 0;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cin >> A >> B;
-	C = B - A;
-	if (C < 1) std::cout << "Congratulations, you are within the speed limit!\n";
-	else {
-		if (1 <= C && C <= 20) F = 100;
-		if (21 <= C && C <= 30) F = 270;
-		if (31 <= C) F = 500;
-		//std::cout << "You are speeding and your fine is $" << F << ".\n";
-	}
+	std::cin >> A >> B >> C >> D;
+	if (A < B && B < C && C < D) FU = 1;
+	if (A > B && B > C && C > D) FD = 1;
+	if (!FU && !FD) std::cout << "No ";
+	std::cout << "Fish ";
+	if (FU) std::cout << "Rising\n";
+	//if (FD) std::cout << "Diving\n";
+	else std::cout << "\n";
 	return 0;
 }

@@ -55,6 +55,9 @@
     <Filter Include="소스 파일\2nd_BORAMAECUP">
       <UniqueIdentifier>{6d0d34bc-059e-4b3c-8116-43ae674e14ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\PadaengCup">
+      <UniqueIdentifier>{558c579a-b699-493a-acf4-d46ad2765947}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="boj28401_cnvxhull.cpp">
@@ -566,6 +569,18 @@
     </ClCompile>
     <ClCompile Include="boj15004_circle_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj15004_DEBUG.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj15004.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="PDCUP_A.cpp">
+      <Filter>소스 파일\PadaengCup</Filter>
+    </ClCompile>
+    <ClCompile Include="PDCUP_B.cpp">
+      <Filter>소스 파일\PadaengCup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
