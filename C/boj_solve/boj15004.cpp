@@ -50,6 +50,8 @@ struct Pos {
 	Pos() : x(0), y(0) {}
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
+	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
 	Pos operator * (const ld& n) const { return { x * n, y * n }; }
 	Pos operator ~ () const { return { -y, x }; }//rotate PI/2;
 	bool operator < (const Pos& p) const {
@@ -71,9 +73,6 @@ struct Circle {
 } shelves[30];
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d1.x - d2.x), (d1.y - d2.y));
-}
-ld func(const Pos& d1, const Pos& d2) {
-	return d1.x * d2.x + d1.y * d2.y;
 }
 bool get_node(int i, int j) {
 	Circle a = shelves[i], b = shelves[j];
@@ -107,9 +106,9 @@ bool connect(int i, int j) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
 	for (const Circle& C : shelves) {
 		Pos OM = s - C.C;
-		ld a = func(vec, vec);
-		ld b = 2 * func(vec, OM);
-		ld c = func(OM, OM) - C.R * C.R;
+		ld a = vec * vec;
+		ld b = 2 * (vec * OM);
+		ld c = OM * OM - C.R * C.R;
 
 		ld J = b * b - 4 * a * c;
 		if (J < 0 || z(J)) continue;
@@ -122,13 +121,13 @@ bool connect(int i, int j) {
 		}
 	}
 
-	ld depth = 0;
+	ld toggle = 0;
 	bool f = 0;
 	std::sort(tmp.begin(), tmp.end());
 	for (const Pos& d : tmp) {
-		depth -= d.y;
+		toggle -= d.y;
 		if (z(d.y)) f = !f;
-		if (f && (depth < 0 || z(depth))) return 0;
+		if (f && (toggle < 0 || z(toggle))) return 0;
 	}
 	ld cost = dist(nodes[i], nodes[j]);
 	G[i].push_back({ j, cost });
