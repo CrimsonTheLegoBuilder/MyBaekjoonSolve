@@ -89,13 +89,6 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return z(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
-}
-bool between(const Pos& d1, const Pos& d2, const Pos& target) {
-	ld dot1 = dot(d1, d2, target), dot2 = dot(d2, d1, target);
-	return ((z(dot1) || dot1 < 0) && (z(dot2) || dot2 < 0));
-}
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d1.x - d2.x), (d1.y - d2.y));
 }
@@ -149,6 +142,13 @@ int dist_check(const Circle& a, const Circle& b) {
 //bool close(const Pos& target, const Circle& c) {
 //	return dist(c.C, target) < c.R + TOL;
 //}
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3) {
+	return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
+}
+bool between(const Pos& d1, const Pos& d2, const Pos& target) {
+	ld dot1 = dot(d1, d2, target), dot2 = dot(d2, d1, target);
+	return ((z(dot1) || dot1 < 0) && (z(dot2) || dot2 < 0));
+}
 bool on_seg(const Circle& c, const Seg& s) {
 	if (between(s.L, s.R, c.C)) {
 		ld distance = dist(s.L, s.R, c.C);

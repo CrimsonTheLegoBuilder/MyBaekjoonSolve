@@ -74,6 +74,26 @@ struct Circle {
 ld dist(const Pos& d1, const Pos& d2) {
 	return hypot((d1.x - d2.x), (d1.y - d2.y));
 }
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3) {
+	return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
+}
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
+	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+}
+bool between(const Pos& d1, const Pos& d2, const Pos& target) {
+	ld dot1 = dot(d1, d2, target), dot2 = dot(d2, d1, target);
+	return ((z(dot1) || dot1 < 0) && (z(dot2) || dot2 < 0));
+}
+ld dist(const Pos& d1, const Pos& d2, const Pos& target) {
+	return std::abs(cross(d1, d2, target) / dist(d1, d2));
+}
+bool on_seg(const Circle& c, const Pos& s, const Pos& e) {
+	if (between(s, e, c.C)) {
+		ld distance = dist(s, e, c.C);
+		return z(distance - c.R) || c.R > distance;
+	}
+	else return (dist(e, c.C) < c.R + TOL || dist(e, c.C) < c.R + TOL);
+}
 bool get_node(int i, int j) {
 	Circle a = shelves[i], b = shelves[j];
 	Pos ca = a.C, cb = b.C;
@@ -103,8 +123,10 @@ bool connect(int i, int j) {
 	std::vector<Pos> tmp;
 	tmp.push_back({ 0, 0 });
 	tmp.push_back({ 1, 0 });
+	//cki86201
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
 	for (const Circle& C : shelves) {
+		if (!on_seg(C, s, e)) continue;
 		Pos OM = s - C.C;
 		ld a = vec * vec;
 		ld b = 2 * (vec * OM);
