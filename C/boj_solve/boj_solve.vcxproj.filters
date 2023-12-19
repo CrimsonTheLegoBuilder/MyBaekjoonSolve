@@ -567,13 +567,10 @@
     <ClCompile Include="boj10337_circle_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj15004_fail.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
     <ClCompile Include="boj15004_circle_dijkstra.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj15004_DEBUG.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj15004.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="PDCUP_A.cpp">
