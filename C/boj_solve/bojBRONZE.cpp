@@ -713,23 +713,60 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//int N, A, B, C, D, FU = 0, FD = 0;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> A >> B >> C >> D;
+//	if (A < B && B < C && C < D) FU = 1;
+//	if (A > B && B > C && C > D) FD = 1;
+//	if (!FU && !FD) std::cout << "No ";
+//	std::cout << "Fish ";
+//	if (FU) std::cout << "Rising\n";
+//	//if (FD) std::cout << "Diving\n";
+//	else std::cout << "\n";
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//ld w, h, BMI;
+//const ld TOL = 1e-6;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> w >> h;
+//	BMI = w / (h * h);
+//	if (BMI > 25) std::cout << "Over";
+//	else if (18.5 - TOL < BMI && BMI < 25 + TOL) std::cout << "Normal ";
+//	else if (BMI < 18.5) std::cout << "Under";
+//	//std::cout << "weight\n";
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-int N, A, B, C, D, FU = 0, FD = 0;
+typedef long double ld;
+const ld TOL = 1e-6;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cin >> A >> B >> C >> D;
-	if (A < B && B < C && C < D) FU = 1;
-	if (A > B && B > C && C > D) FD = 1;
-	if (!FU && !FD) std::cout << "No ";
-	std::cout << "Fish ";
-	if (FU) std::cout << "Rising\n";
-	//if (FD) std::cout << "Diving\n";
-	else std::cout << "\n";
+	
+	
 	return 0;
 }

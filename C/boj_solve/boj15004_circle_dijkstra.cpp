@@ -148,7 +148,6 @@ void init() {
 	for (int i = 0; i < n; i++)
 		for (int j = i + 1; j < n; j++)
 			connect(i, j);
-	std::cout << n << "\n";
 	return;
 }
 void solve() {
@@ -161,6 +160,7 @@ void solve() {
 int main() { solve(); return 0; }//boj15004
 
 
+	//std::cout << n << "\n";
 //struct Pos {
 //	ld x, y;
 //	Pos(ld X, ld Y) : x(X), y(Y) {}
