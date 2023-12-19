@@ -158,33 +158,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj15004
-
-
-	//std::cout << n << "\n";
-//struct Pos {
-//	ld x, y;
-//	Pos(ld X, ld Y) : x(X), y(Y) {}
-//	Pos() : x(0), y(0) {}
-//	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
-//	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-//	Pos operator * (const ld& n) const { return { x * n, y * n }; }
-//	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }//dot
-//	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }//cross
-//	Pos operator ~ () const { return { -y, x }; }//rotate PI/2;
-//	bool operator < (const Pos& p) const {
-//		return z(x - p.x) ? y < p.y : x < p.x;
-//	}
-//	//Pos& operator *= (const int scale) {
-//	//	x *= scale; y *= scale;
-//	//	return *this;
-//	//}
-//	ld mag() { return hypot(x, y); }
-//} S, E, nodes[LEN]; int n = 0;//pointer of nodes
-//struct Circle {
-//	Pos C;
-//	ld R;
-//	//Circle& operator *= (const int scale) {
-//	//	C *= scale; R *= scale;
-//	//	return *this;
-//	//}
-//} shelves[30];
