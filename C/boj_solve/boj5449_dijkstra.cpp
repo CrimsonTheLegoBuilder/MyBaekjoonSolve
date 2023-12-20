@@ -11,7 +11,7 @@ const ld fMAX = 1e17;
 int T, N;
 
 struct Pos {
-	ll x, y;
+	int x, y;
 	Pos operator - (const Pos& p) { return { x - p.x, y - p.y }; }
 	ld mag() { return hypot(x, y); }
 } S, E, pos[LEN];
