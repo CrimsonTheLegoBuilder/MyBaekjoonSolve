@@ -82,7 +82,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(7);
+	std::cout.precision(6);
 	std::cin >> T;
 	while (T--) {
 		for (int i = 0; i < LEN; i++) G[i].clear();

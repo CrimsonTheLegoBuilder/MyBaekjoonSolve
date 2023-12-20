@@ -755,6 +755,58 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::string a;
+//	while (std::cin >> a) {
+//		if (a == "CU") { std::cout << "see you\n"; continue; }
+//		if (a == ":-)") { std::cout << "I¡¯m happy\n"; continue; }
+//		if (a == ":-(") { std::cout << "I¡¯m unhappy\n";continue; }
+//		if (a == ";-)") { std::cout << "wink\n"; continue; }
+//		if (a == ":-P") { std::cout << "stick out my tongue\n"; continue; }
+//		if (a == "(~.~)") { std::cout << "sleepy\n"; continue; }
+//		if (a == "TA") { std::cout << "totally awesome\n"; continue;} 
+//		if (a == "CCC") { std::cout << "Canadian Computing Competition\n"; continue; }
+//		if (a == "CUZ") { std::cout << "because\n"; continue; }
+//		if (a == "TY") { std::cout << "thank-you\n"; continue; }
+//		if (a == "YW") { std::cout << "you¡¯re welcome\n"; continue; }
+//		if (a == "TTYL") { std::cout << "talk to you later\n"; continue; }
+//		//else std::cout << a << "\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//int N;
+//
+//int main() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> N;
+//	int a = 1;
+//	while (1) {
+//		if (N < a * a) break;
+//		a++;
+//	}
+//	std::cout << "The largest square has side length " << a - 1 << ".\n";
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -762,11 +814,8 @@
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
+int N;
 
 int main() {
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-	
-	
-	return 0;
+
 }
