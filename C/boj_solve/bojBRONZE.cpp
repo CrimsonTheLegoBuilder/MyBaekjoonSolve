@@ -807,15 +807,36 @@
 //	return 0;
 //}
 
-#include <iostream>
-#include <algorithm>
-#include <cmath>
-#include <cstring>
-typedef long long ll;
-typedef long double ld;
-const ld TOL = 1e-6;
-int N;
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//int N, s, total;
+//
+//int main() {
+//	N = 5;
+//	while (N--) {
+//		std::cin >> s;
+//		total += (s < 40 ? 40 : s);
+//	}
+//	//std::cout << total / 5 << "\n";
+//	return 0;
+//}
 
-int main() {
-
-}
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//int S, T, D;
+//
+//int main() {
+//	std::cin >> S >> T >> D;
+//	//std::cout << D * T / (S << 1) << "\n";
+//	return 0;
+//}

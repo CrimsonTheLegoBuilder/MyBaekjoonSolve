@@ -579,9 +579,6 @@
     <ClCompile Include="PDCUP_B.cpp">
       <Filter>소스 파일\PadaengCup</Filter>
     </ClCompile>
-    <ClCompile Include="boj15004_bearly.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj5449_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
