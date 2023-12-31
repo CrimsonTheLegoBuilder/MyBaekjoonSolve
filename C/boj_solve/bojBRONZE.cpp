@@ -840,3 +840,86 @@
 //	//std::cout << D * T / (S << 1) << "\n";
 //	return 0;
 //}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//int X;
+//
+//int main() {
+//	std::cin >> X;
+//	if (X <= 1) std::cout << 1;
+//	if (X == 2) std::cout << 2;
+//	if (X == 3) std::cout << 6;
+//	if (X == 4) std::cout << 4;
+//	//else std::cout << 0;
+//	return 0;
+//}
+//	//else {
+//	//	int a = 0, b = 1;
+//	//	while (X--) {
+//	//		b *= ++a;
+//	//		b %= 10;
+//	//	}
+//	//	std::cout << b;
+//	//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll a, b;
+//
+//int main() {
+//	std::cin >> a >> b;
+//	if (a & 1 && b & 1) std::cout << std::min(a, b);
+//	//else std::cout << 0;
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll k, w, m, tmp;
+//
+//int main() {
+//	std::cin >> k >> w >> m;
+//	int cnt = 0;
+//	//while (k + m * cnt < w) {
+//	//	cnt++;
+//	//}
+//	//std::cout << cnt << "\n";
+//	tmp = w - k;
+//	cnt = tmp / m + (tmp % m ? 1 : 0);
+//	//std::cout << cnt;
+//	return 0;
+//}
+
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+typedef long long ll;
+typedef long double ld;
+const ld TOL = 1e-6;
+ll m, d;
+
+int main() {
+	std::cin >> m >> d;
+	if (m == 2 && d == 18) std::cout << "Special";
+	else if (m == 1) std::cout << "Before";
+	else if (m == 2 && d < 18) std::cout << "Before";
+	//else std::cout << "After";
+	return 0;
+}
