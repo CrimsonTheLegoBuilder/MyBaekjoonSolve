@@ -906,6 +906,75 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll m, d;
+//
+//int main() {
+//	std::cin >> m >> d;
+//	if (m == 2 && d == 18) std::cout << "Special";
+//	else if (m == 1) std::cout << "Before";
+//	else if (m == 2 && d < 18) std::cout << "Before";
+//	//else std::cout << "After";
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll a, b, c, ans;
+//
+//int main() {
+//	std::cin >> a >> b >> c;
+//	if (a == b && b == c) ans = 2;
+//	else if ((a * a == b * b + c * c) || (b * b == a * a + c * c) || (c * c == b * b + a * a)) ans = 1;
+//	else ans = 0;
+//	//std::cout << ans;
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll n, w, h;
+//
+//int main() {
+//	std::cin >> n;
+//	while (n--) {
+//		std::cin >> w >> h;
+//		//std::cout << ((w * h) >> 1) << "\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll n, t = 0;
+//
+//int main() {
+//	std::cin >> n;
+//	//while (n--) std::cout << "Hello World, Judge " << ++t << "!\n";
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -913,13 +982,26 @@
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
-ll m, d;
+ld x, y;
+int a;
 
+bool z(ld x) { return std::abs(x) < TOL; }
 int main() {
-	std::cin >> m >> d;
-	if (m == 2 && d == 18) std::cout << "Special";
-	else if (m == 1) std::cout << "Before";
-	else if (m == 2 && d < 18) std::cout << "Before";
-	//else std::cout << "After";
+	while (1) {
+		std::cin >> x >> y;
+		if (z(x) || z(y)) {
+			std::cout << "AXIS\n";
+			if (z(x) && z(y)) return 0;
+			continue;
+		}
+		else {
+			std::cout << "Q";
+			if (x > 0 && y > 0) a = 1;
+			else if (x < 0 && y > 0) a = 2;
+			else if (x < 0 && y < 0) a = 3;
+			else a = 4;
+			std::cout << a << "\n";
+		}
+	}
 	return 0;
 }

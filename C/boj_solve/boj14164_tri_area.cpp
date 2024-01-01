@@ -11,7 +11,7 @@ struct Pos {
 	ll x, y;
 	bool operator < (const Pos& p) { return x == p.x ? y < p.y : x < p.x; }
 
-}T[LEN];
+} T[LEN];
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 }
