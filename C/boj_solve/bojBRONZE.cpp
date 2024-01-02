@@ -975,6 +975,37 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ld x, y;
+//int a;
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//int main() {
+//	while (1) {
+//		std::cin >> x >> y;
+//		if (z(x) || z(y)) {
+//			std::cout << "AXIS\n";
+//			if (z(x) && z(y)) return 0;
+//			continue;
+//		}
+//		else {
+//			std::cout << "Q";
+//			if (x > 0 && y > 0) a = 1;
+//			else if (x < 0 && y > 0) a = 2;
+//			else if (x < 0 && y < 0) a = 3;
+//			else a = 4;
+//			//std::cout << a << "\n";
+//		}
+//	}
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -982,25 +1013,20 @@
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
-ld x, y;
-int a;
+ll nums[100];
+ll n, t = 0, x;
 
 bool z(ld x) { return std::abs(x) < TOL; }
 int main() {
 	while (1) {
-		std::cin >> x >> y;
-		if (z(x) || z(y)) {
-			std::cout << "AXIS\n";
-			if (z(x) && z(y)) return 0;
-			continue;
-		}
+		std::cin >> n;
+		if (!n) return 0;
+		for (int i = 0; i < n; i++) std::cin >> nums[i];
+		std::cout << "Case " << ++t << ": ";
+		if (n & 1) std::cout << nums[n >> 1] << ".0\n";
 		else {
-			std::cout << "Q";
-			if (x > 0 && y > 0) a = 1;
-			else if (x < 0 && y > 0) a = 2;
-			else if (x < 0 && y < 0) a = 3;
-			else a = 4;
-			std::cout << a << "\n";
+			x = nums[n >> 1] + nums[(n >> 1) - 1];
+			std::cout << (x >> 1) << "." << (x & 1 ? "5\n" : "0\n");
 		}
 	}
 	return 0;
