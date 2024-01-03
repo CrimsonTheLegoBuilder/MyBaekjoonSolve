@@ -1006,6 +1006,32 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll nums[100];
+//ll n, t = 0, x;
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//int main() {
+//	while (1) {
+//		std::cin >> n;
+//		if (!n) return 0;
+//		for (int i = 0; i < n; i++) std::cin >> nums[i];
+//		std::cout << "Case " << ++t << ": ";
+//		if (n & 1) std::cout << nums[n >> 1] << ".0\n";
+//		else {
+//			x = nums[n >> 1] + nums[(n >> 1) - 1];
+//			std::cout << (x >> 1) << "." << (x & 1 ? "5\n" : "0\n");
+//		}
+//	}
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -1013,21 +1039,12 @@
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
-ll nums[100];
-ll n, t = 0, x;
+ll k, n, m;
 
 bool z(ld x) { return std::abs(x) < TOL; }
 int main() {
-	while (1) {
-		std::cin >> n;
-		if (!n) return 0;
-		for (int i = 0; i < n; i++) std::cin >> nums[i];
-		std::cout << "Case " << ++t << ": ";
-		if (n & 1) std::cout << nums[n >> 1] << ".0\n";
-		else {
-			x = nums[n >> 1] + nums[(n >> 1) - 1];
-			std::cout << (x >> 1) << "." << (x & 1 ? "5\n" : "0\n");
-		}
-	}
+	std::cin >> k >> n >> m;
+	if (k * n <= m) std::cout << 0;
+	//else std::cout << k * n - m;
 	return 0;
 }
