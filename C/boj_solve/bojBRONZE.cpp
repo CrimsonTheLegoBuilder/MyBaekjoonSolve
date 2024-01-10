@@ -1032,6 +1032,69 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll k, n, m;
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//int main() {
+//	std::cin >> k >> n >> m;
+//	if (k * n <= m) std::cout << 0;
+//	//else std::cout << k * n - m;
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll n, r, c;
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//int main() {
+//	std::cin >> n;
+//	while (n--) {
+//		std::cin >> c >> r;
+//		while (r--) {
+//			for (int i = 0; i < c; i++) {
+//				std::cout << "X";
+//			}
+//			std::cout << "\n";
+//		}
+//		//std::cout << "\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//ll n, x, cnt = 0;
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//int main() {
+//	std::cin >> n;
+//	int t = 5;
+//	while (t--) {
+//		std::cin >> x;
+//		cnt += x == n;
+//	}
+//	//std::cout << cnt;
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -1039,12 +1102,18 @@
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
-ll k, n, m;
+const int LEN = 123;;
+ll n, x;
+char S[101];
+int cnt[26];
 
 bool z(ld x) { return std::abs(x) < TOL; }
 int main() {
-	std::cin >> k >> n >> m;
-	if (k * n <= m) std::cout << 0;
-	//else std::cout << k * n - m;
+	std::cin >> S;
+	int i = 0;
+	while (S[i] != '\0') {
+		cnt[S[i++] - 97]++;
+	}
+	for (int j = 0; j < 26; j++) std::cout << cnt[j] << " ";
 	return 0;
 }
