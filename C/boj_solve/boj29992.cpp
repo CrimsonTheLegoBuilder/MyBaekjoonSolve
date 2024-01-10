@@ -2,10 +2,12 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
+#include <set>
 typedef long long ll;
 const int LEN = 1e5;
 int N, cnt = 0;
-int num[LEN];
+//int num[LEN];
+std::set<int> nums;
 
 struct Pos {
 	ll x, y;
@@ -38,7 +40,8 @@ void monotone_chain(std::vector<Pos>& C) {
 		}
 		H.pop_back();
 	}
-	for (const Pos& i : H) num[cnt++] = i.i;
+	//for (const Pos& i : H) num[cnt++] = i.i;
+	for (const Pos& i : H) nums.insert(i.i);
 	//return H;
 	return;
 }
@@ -49,8 +52,9 @@ void solve() {
 	C.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i].x >> C[i].y, C[i].i = i + 1;
 	monotone_chain(C);
-	std::sort(num, num + cnt);
-	for (int i = 0; i < cnt; i++) std::cout << num[i] << " ";
+	//std::sort(num, num + cnt);
+	//for (int i = 0; i < cnt; i++) std::cout << num[i] << " ";
+	for (const int i: nums) std::cout << i << " ";
 	return;
 }
 int main() { solve(); return 0; }//boj29992
