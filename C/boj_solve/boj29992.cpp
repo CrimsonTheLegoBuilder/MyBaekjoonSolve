@@ -54,7 +54,7 @@ void solve() {
 	monotone_chain(C);
 	//std::sort(num, num + cnt);
 	//for (int i = 0; i < cnt; i++) std::cout << num[i] << " ";
-	for (const int i: nums) std::cout << i << " ";
+	//for (const int i: nums) std::cout << i << " ";
 	return;
 }
 int main() { solve(); return 0; }//boj29992
