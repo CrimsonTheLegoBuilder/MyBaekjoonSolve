@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -21,29 +22,6 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret =  (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
-//std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
-//	std::vector<Pos> H;
-//	std::sort(C.begin(), C.end());
-//	if (C.size() <= 2) {
-//		for (const Pos& pos : C) H.push_back(pos);
-//	}
-//	else {
-//		for (int i = 0; i < C.size(); i++) {
-//			while (H.size() > 1 && cross(H[H.size() - 2], H[H.size() - 1], C[i]) < 0)
-//				H.pop_back();
-//			H.push_back(C[i]);
-//		}
-//		H.pop_back();
-//		int s = H.size() + 1;
-//		for (int i = C.size() - 1; i >= 0; i--) {
-//			while (H.size() > s && cross(H[H.size() - 2], H[H.size() - 1], C[i]) < 0)
-//				H.pop_back();
-//			H.push_back(C[i]);
-//		}
-//		H.pop_back();
-//	}
-//	return H;
-//}
 std::vector<Pos> half_monotone_chain(std::vector<Pos>& C, bool r = 0) {
 	std::vector<Pos> H;
 	if (!r) std::sort(C.begin(), C.end());
@@ -92,6 +70,7 @@ bool cross(const Pos& cur, const Pos& nxt) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	//freopen("sir/sir.in.3f", "r", stdin);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> Pizza[i].x >> Pizza[i].y;
 	std::cin >> M;
@@ -101,20 +80,40 @@ void solve() {
 	UH = half_monotone_chain(C, 1);
 	for (int i = 0, j = 1; i < N; i++) {
 		while (i != j && ccw(Pizza[i], Pizza[j], LH[0]) > 0 && !cross(Pizza[i], Pizza[j])) {
-			//std::cout << cur_area << "\n";
 			area = std::max(area, cur_area);
 			j = (j + 1) % N;
 			Pos a = Pizza[i], b = Pizza[j], c = Pizza[(j + N - 1) % N];
 			cur_area += std::abs(cross(a, b, c));
-			//std::cout << cur_area << "\n";
 		}
-		//std::cout << "nxt\n";
 		Pos a = Pizza[i], b = Pizza[(i + 1) % N], c = Pizza[j];
 		cur_area -= std::abs(cross(a, b, c));
-		//std::cout << cur_area << "\n";
-		//area = std::max(area, cur_area);
 	}
 	std::cout << area << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj10756
+
+
+//std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
+//	std::vector<Pos> H;
+//	std::sort(C.begin(), C.end());
+//	if (C.size() <= 2) {
+//		for (const Pos& pos : C) H.push_back(pos);
+//	}
+//	else {
+//		for (int i = 0; i < C.size(); i++) {
+//			while (H.size() > 1 && cross(H[H.size() - 2], H[H.size() - 1], C[i]) < 0)
+//				H.pop_back();
+//			H.push_back(C[i]);
+//		}
+//		H.pop_back();
+//		int s = H.size() + 1;
+//		for (int i = C.size() - 1; i >= 0; i--) {
+//			while (H.size() > s && cross(H[H.size() - 2], H[H.size() - 1], C[i]) < 0)
+//				H.pop_back();
+//			H.push_back(C[i]);
+//		}
+//		H.pop_back();
+//	}
+//	return H;
+//}

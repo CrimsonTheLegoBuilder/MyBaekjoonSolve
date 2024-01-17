@@ -42,7 +42,6 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 		H.pop_back();
 	}
 	return H;
-
 }
 ld get_round(std::vector<Pos>& H) {
 	ld ret = 0;
