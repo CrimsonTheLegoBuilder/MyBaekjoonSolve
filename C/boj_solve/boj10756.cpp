@@ -70,7 +70,6 @@ bool cross(const Pos& cur, const Pos& nxt) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("sir/sir.in.3f", "r", stdin);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> Pizza[i].x >> Pizza[i].y;
 	std::cin >> M;
@@ -94,6 +93,7 @@ void solve() {
 int main() { solve(); return 0; }//boj10756
 
 
+	//freopen("sir/sir.in.3f", "r", stdin);
 //std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 //	std::vector<Pos> H;
 //	std::sort(C.begin(), C.end());

@@ -1095,6 +1095,29 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//const int LEN = 123;;
+//ll n, x;
+//char S[101];
+//int cnt[26];
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//int main() {
+//	std::cin >> S;
+//	int i = 0;
+//	while (S[i] != '\0') {
+//		cnt[S[i++] - 97]++;
+//	}
+//	for (int j = 0; j < 26; j++) std::cout << cnt[j] << " ";
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -1103,17 +1126,17 @@ typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
 const int LEN = 123;;
-ll n, x;
-char S[101];
-int cnt[26];
+ll N, L, S, M, T;
 
 bool z(ld x) { return std::abs(x) < TOL; }
 int main() {
-	std::cin >> S;
-	int i = 0;
-	while (S[i] != '\0') {
-		cnt[S[i++] - 97]++;
+	std::cin >> N;
+	while (N--) {
+		std::cin >> L >> S >> M >> T;
+		int ss = S + M + T;
+		std::cout << L << " " << ss;
+		if (S > 35 * .3 && M > 25 * .3 && T > 40 * .3 && ss >= 55) std::cout << " PASS\n";
+		//else std::cout << " FAIL\n";
 	}
-	for (int j = 0; j < 26; j++) std::cout << cnt[j] << " ";
 	return 0;
 }
