@@ -62,22 +62,23 @@ def cross_check(cur: Pos, nxt: Pos) -> bool:
     return intersect(cur, nxt, pl, pu)
 
 
-N = int(sys.stdin.readline().strip())
-pizza = [Pos(*map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
-M = int(sys.stdin.readline().strip())
-C = [Pos(*map(int, sys.stdin.readline().strip().split())) for _ in range(M)]
-LH, UH = monotone_chain()
-area, cur_area = 0, 0
-j = 1
-for i in range(N):  # two pointer
-    while i != j and cross(pizza[i], pizza[j], LH[0]) > 0 and cross_check(pizza[i], pizza[j]):
-        area = max(area, cur_area)
-        j = (j + 1) % N
-        a, b, c = pizza[i], pizza[j], pizza[j - 1]
-        cur_area += abs(cross(a, b, c))
-    a, b, c = pizza[i], pizza[(i + 1) % N], pizza[j]
-    cur_area -= abs(cross(a, b, c))
-print(area)
+if __name__ == "__main__":
+    N = int(sys.stdin.readline().strip())
+    pizza = [Pos(*map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
+    M = int(sys.stdin.readline().strip())
+    C = [Pos(*map(int, sys.stdin.readline().strip().split())) for _ in range(M)]
+    LH, UH = monotone_chain()
+    area, cur_area = 0, 0
+    j = 1
+    for i in range(N):  # two pointer
+        while i != j and cross(pizza[i], pizza[j], LH[0]) > 0 and cross_check(pizza[i], pizza[j]):
+            area = max(area, cur_area)
+            j = (j + 1) % N
+            a, b, c = pizza[i], pizza[j], pizza[j - 1]
+            cur_area += abs(cross(a, b, c))
+        a, b, c = pizza[i], pizza[(i + 1) % N], pizza[j]
+        cur_area -= abs(cross(a, b, c))
+    print(area)
 
 # def dist(self, d1) -> int:
 #     return (self.x - d1.x)**2 + (self.y - d1.y)**2
