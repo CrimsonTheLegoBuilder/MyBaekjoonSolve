@@ -21,7 +21,7 @@ ll ternaty_search(ll limit) {
 		l = (s + s + e) / 3;
 		r = (s + e + e) / 3;
 		L = f(l), R = f(r);
-		std::cout << l << " " << r << "\n";
+		//std::cout << l << " " << r << "\n";
 		if (L > R) s = l;
 		else e = r;
 	}
