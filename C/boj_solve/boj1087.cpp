@@ -61,4 +61,4 @@ void solve() {
 	std::cout << ternary_search() << "\n";
 	return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj1087

@@ -1126,17 +1126,15 @@ typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
 const int LEN = 123;;
-ll N, L, S, M, T;
+ll N, M, cnt = 0;
 
 bool z(ld x) { return std::abs(x) < TOL; }
 int main() {
 	std::cin >> N;
-	while (N--) {
-		std::cin >> L >> S >> M >> T;
-		int ss = S + M + T;
-		std::cout << L << " " << ss;
-		if (S > 35 * .3 && M > 25 * .3 && T > 40 * .3 && ss >= 55) std::cout << " PASS\n";
-		//else std::cout << " FAIL\n";
+	for (int i = 0; i < 5; i++) {
+		std::cin >> M;
+		cnt += (N == M);
 	}
+	//std::cout << cnt;
 	return 0;
 }
