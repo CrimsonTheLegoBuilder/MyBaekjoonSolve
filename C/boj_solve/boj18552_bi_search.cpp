@@ -16,11 +16,44 @@ struct Pos {
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (ld n) const { return { x * n, y * n }; }
-	Pos operator ~ () const { return { y, -x }; }
-} p, FR, FL, RR, RL;
+	Pos operator / (ld n) const { return { x / n, y / n }; }
+	Pos operator ~ () const { return { -y, x }; }
+	ld mag() { return hypot(x, y); }
+} p, FR, FL, RR, RL, direction;
 std::vector<Pos> potholes[LEN];
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+}
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+	return z(ret) ? 0 : ret > 0 ? 1 : -1;
+}
+bool intersect(const Pos& d1, const Pos& d2, const Pos& s1, const Pos& s2) {
+	bool f1 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	bool f2 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
+	return f1 && f2;
+}
+bool intersect(int i, const Pos& s1, const Pos& s2) {
+	int sz = potholes[i].size();
+	for (int j = 0; j < sz; j++) {
+		Pos cur = potholes[i][j], nxt = potholes[i][(j + 1) % sz];
+		if (intersect(cur, nxt, s1, s2)) return 1;
+	}
+	return 0;
+}
+int intersect(ld D) {
+	Pos FRd = FR + direction * D, FLd = FL + direction * D;
+	Pos RRd = RR + direction * D, RLd = RL + direction * D;
+	bool f1, f2, f3, f4;
+	int cnt{ 0 };
+	for (int i = 0; i < N; i++) {
+		f1 = intersect(i, FR, FRd);
+		f2 = intersect(i, FL, FLd);
+		f3 = intersect(i, RR, RRd);
+		f4 = intersect(i, RL, RLd);
+		cnt += (f1 || f2 || f3 || f4);
+	}
+	return cnt;
 }
 std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	std::vector<Pos> H;
@@ -46,16 +79,14 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	H.pop_back();
 	return H;
 }
-bool cross() {
-	return 1;
-}
 ld bi_search(int K) {
 	ld s = 0, e = MAX, m = 0;
 	int cnt = 100;
 	while (cnt--) {
 		m = (s + e) * .5;
-
-
+		std::cout << intersect(m) << "\n";
+		if (K <= intersect(m)) e = m;
+		else s = m;
 	}
 	return m;
 }
@@ -76,6 +107,10 @@ void solve() {
 		}
 		potholes[i] = monotone_chain(potholes[i]);
 	}
+	direction = ~(FR - FL);
+	std::cout << direction.x << " " << direction.y << "\n";
+	ld MAG = direction.mag();
+	direction = direction / MAG;
 	std::cout << bi_search(K);
 	return;
 }
