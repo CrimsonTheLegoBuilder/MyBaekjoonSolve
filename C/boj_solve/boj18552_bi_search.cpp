@@ -35,23 +35,34 @@ bool intersect(const Pos& d1, const Pos& d2, const Pos& s1, const Pos& s2) {
 }
 bool intersect(int i, const Pos& s1, const Pos& s2) {
 	int sz = potholes[i].size();
+	Pos U = potholes[i][0], D = potholes[i][0];
+	ld cu = -MAX, cd = MAX;
+	for (int j = 0; j < sz; j++) {
+		if (cross(s1, s2, potholes[i][j]) > cu) cu = cross(s1, s2, potholes[i][j]), U = potholes[i][j];
+		if (cross(s1, s2, potholes[i][j]) < cd) cd = cross(s1, s2, potholes[i][j]), D = potholes[i][j];
+	}
+	return intersect(U, D, s1, s2);
+}
+bool inner_check(int i, const Pos& s2) {
+	int sz = potholes[i].size();
 	for (int j = 0; j < sz; j++) {
 		Pos cur = potholes[i][j], nxt = potholes[i][(j + 1) % sz];
-		if (intersect(cur, nxt, s1, s2)) return 1;
+		if (cross(cur, nxt, s2) < TOL) return 0;
 	}
-	return 0;
+	return 1;
 }
 int intersect(ld D) {
-	Pos FRd = FR + direction * D, FLd = FL + direction * D;
-	Pos RRd = RR + direction * D, RLd = RL + direction * D;
-	bool f1, f2, f3, f4;
+	Pos FRd = FR + (direction * D), FLd = FL + (direction * D);
+	Pos RRd = RR + (direction * D), RLd = RL + (direction * D);
+	bool f1, f2, f3, f4, f5;
 	int cnt{ 0 };
 	for (int i = 0; i < N; i++) {
 		f1 = intersect(i, FR, FRd);
 		f2 = intersect(i, FL, FLd);
 		f3 = intersect(i, RR, RRd);
 		f4 = intersect(i, RL, RLd);
-		cnt += (f1 || f2 || f3 || f4);
+		f5 = inner_check(i, FRd) || inner_check(i, FLd) || inner_check(i, RRd) || inner_check(i, RLd);
+		cnt += (f1 || f2 || f3 || f4 || f5);
 	}
 	return cnt;
 }
@@ -85,7 +96,7 @@ ld bi_search(int K) {
 	while (cnt--) {
 		m = (s + e) * .5;
 		std::cout << intersect(m) << "\n";
-		if (K <= intersect(m)) e = m;
+		if (K < intersect(m)) e = m;
 		else s = m;
 	}
 	return m;
@@ -95,7 +106,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(6);
+	std::cout.precision(7);
 	std::cin >> K;
 	std::cin >> FR.x >> FR.y >> FL.x >> FL.y >> RL.x >> RL.y >> RR.x >> RR.y;
 	std::cin >> N;
