@@ -1118,23 +1118,58 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//const int LEN = 123;;
+//ll N, M, cnt = 0;
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//int main() {
+//	std::cin >> N;
+//	for (int i = 0; i < 5; i++) {
+//		std::cin >> M;
+//		cnt += (N == M);
+//	}
+//	//std::cout << cnt;
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cmath>
+//#include <cstring>
+//typedef long long ll;
+//typedef long double ld;
+//const ld TOL = 1e-6;
+//const int LEN = 123;;
+//ll a, b, c, d;
+//
+//bool z(ld x) { return std::abs(x) < TOL; }
+//int main() {
+//	std::cin >> a >> b >> c >> d;
+//	//std::cout << std::min({ a + d, b + c });
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
-#include <cmath>
 #include <cstring>
-typedef long long ll;
-typedef long double ld;
-const ld TOL = 1e-6;
-const int LEN = 123;;
-ll N, M, cnt = 0;
+#include <vector>
 
-bool z(ld x) { return std::abs(x) < TOL; }
+int N, M;
+char arr[11][11];
+
 int main() {
-	std::cin >> N;
-	for (int i = 0; i < 5; i++) {
-		std::cin >> M;
-		cnt += (N == M);
+	std::cin >> N >> M;
+	for (int i = 0; i < N; i++) std::cin >> arr[i];
+	for (int i = 0; i < N; i++) {
+		for (int j = M; j >= 0; j--) std::cout << arr[i][j];
+		std::cout << "\n";
 	}
-	//std::cout << cnt;
 	return 0;
 }

@@ -7,7 +7,7 @@ typedef long double ld;
 const ld TOL = 1e-8;
 const ld MAX = 2e8;
 const int LEN = 50;
-int K, N, M, Z;
+int K, N, M;
 
 bool z(const ld& x) { return std::abs(x) < TOL; }
 struct Pos {
@@ -19,7 +19,7 @@ struct Pos {
 	Pos operator / (ld n) const { return { x / n, y / n }; }
 	Pos operator ~ () const { return { -y, x }; }
 	ld mag() { return hypot(x, y); }
-} p, FR, FL, RR, RL, direction;
+} FR, FL, RR, RL, direction;
 std::vector<Pos> potholes[LEN], UH, LH;
 struct Exs {
 	Pos EXU, EXL;
@@ -150,7 +150,6 @@ ld bi_search(int K) {
 	int cnt = 100;
 	while (cnt--) {
 		m = (s + e) * .5;
-		//std::cout << intersect(m) << "\n";
 		if (K < intersect(m)) e = m;
 		else s = m;
 	}
@@ -170,6 +169,8 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		std::cin >> M;
 		for (int j = 0; j < M; j++) {
+			Pos p;
+			int Z;
 			std::cin >> p.x >> p.y >> Z;
 			if (!Z) potholes[i].push_back(p);
 		}
@@ -181,7 +182,6 @@ void solve() {
 	}
 	ld MAG = direction.mag();
 	direction = direction / MAG;
-	//std::cout << direction.x << " " << direction.y << "\n";
 	ld ans = bi_search(K);
 	if (ans > MAX - 0.0001) std::cout << "oo\n";
 	else std::cout << ans << "\n";
@@ -189,6 +189,8 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj18552
 
+		//std::cout << intersect(m) << "\n";
+	//std::cout << direction.x << " " << direction.y << "\n";
 /*
 1
 2 0
@@ -218,6 +220,41 @@ int main() { solve(); return 0; }//boj18552
 1 4 0
 3 2 0
 3 4 0
+
+1
+2 0
+0 0
+0 -2
+2 -2
+2
+4
+2 2 0
+3 2 0
+2 4 0
+3 2 0
+4
+0 5 0
+0 7 0
+-1 5 0
+-1 7 0
+
+1
+-9999 0
+-9999 1
+-10000 1
+-10000 0
+2
+4
+10000 -1 0
+10000 2 0
+9999 -1 0
+9999 2 0
+4
+9998 -1 0
+9998 2 0
+9997 -1 0
+9997 2 0
+
 */
 
 //#include <iostream>
