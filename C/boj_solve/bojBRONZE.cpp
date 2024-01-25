@@ -1169,7 +1169,7 @@ int main() {
 	for (int i = 0; i < N; i++) std::cin >> arr[i];
 	for (int i = 0; i < N; i++) {
 		for (int j = M; j >= 0; j--) std::cout << arr[i][j];
-		std::cout << "\n";
+		//std::cout << "\n";
 	}
 	return 0;
 }
