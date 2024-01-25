@@ -16,6 +16,7 @@ struct Pos {
 	ll operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ll operator / (const Pos& p) const { return x * p.y - y * p.x; }
 } Target[LEN], YM, HB, O = { 0, 0 };
+
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 }
