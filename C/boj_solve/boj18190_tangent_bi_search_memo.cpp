@@ -1,12 +1,14 @@
 #include <iostream>
 #include <algorithm>
+#include <cstring>
+#include <cmath>
+//#include <vector>
 typedef long long ll;
 typedef long double ld;
 const int LEN = 1e5;
-const ll MOD = 1'000'000'007;
-const ld TOL = 1e-9;
+const ld TOL = 1e-7;
 int N, M, Q;
-ll memo_n[LEN + 1]{ 0 }, memo_m[LEN + 1]{ 0 }, ym{ 0 }, hb{ 0 };
+ll memo_n[LEN + 1]{ 0 }, memo_m[LEN + 1]{ 0 };
 
 bool z(ld x) { return std::abs(x) < TOL; }
 struct Pos {
@@ -21,25 +23,25 @@ struct Pos {
 	Pos operator / (const ld& n) const { return { 0, 0, xf / n, yf / n }; }
 	Pos operator * (const Pos& p) const { return { x * p.x + y * p.y, 0, xf * p.xf + yf * p.yf, 0.0 }; }
 	Pos operator / (const Pos& p) const { return { x * p.y - y * p.x, 0, xf * p.yf - yf * p.xf, 0.0 }; }
-} NH[LEN], MH[LEN], O = {0, 0};
+} NH[LEN], MH[LEN], O = {0, 0};//O = origin
 struct Vec {
 	ld vy, vx;
 	bool operator < (const Vec& v) const { return z(vy - v.vy) ? vx < v.vx : vy < v.vy; }
 	bool operator == (const Vec& v) const { return (z(vy - v.vy) && z(vx - v.vx)); }
-	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
+	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }//cross
 };
 const Vec Zero = { 0, 0 };
 struct Line {
 	Vec s;
 	ld c;
-	bool operator < (const Line& l) const {
+	bool operator < (const Line& l) const {//sort ccw
 		bool f1 = Zero < s;
 		bool f2 = Zero < l.s;
 		if (f1 != f2) return f1;
 		ld ccw = s / l.s;
 		return z(ccw) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : ccw > 0;
 	}
-	ld operator / (const Line& l) const { return s / l.s; }
+	ld operator / (const Line& l) const { return s / l.s; }//cross
 };
 struct Info {
 	ll area;
