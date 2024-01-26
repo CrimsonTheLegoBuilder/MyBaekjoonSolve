@@ -175,8 +175,8 @@ Info get_inner_area(Pos H[], ll memo[], const int& sz, const Pos& p) {
 	//std::cout << memo[sz] << " " << memo[i2] << " " << memo[i1] << " " << cross(O, H[i1], H[i2]) << " " << area << "\n";
 	return { area, i1, i2 };
 }
-ld find_intersections_get_area_bi_search(Pos H_in[], const int& sz_in, Pos H_out[], const int& sz_out, ll memo[], const Pos& p) {//memo_n
-	Info info = get_inner_area(MH, memo_m, M, p);
+ld find_intersections_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H_out[], ll memo_out[], const int& sz_out, const Pos& p) {//memo_n
+	Info info = get_inner_area(H_in, memo_in, sz_in, p);
 	ld area = -(ld)info.area;
 	//std::cout << "area: " << area << "\n";
 	int ir, il;
@@ -253,8 +253,8 @@ ld find_intersections_get_area_bi_search(Pos H_in[], const int& sz_in, Pos H_out
 	ll tri = cross(O, H_out[il], H_out[ir]);
 	//std::cout << "tri " << tri << "\n";
 	//std::cout << "memo " << memo[il] - memo[ir] << " " << memo[sz_out] << "\n";
-	ll tmp = memo[il] - memo[ir] + tri;
-	if (!f) tmp = memo[sz_out] - tmp;
+	ll tmp = memo_out[il] - memo_out[ir] + tri;
+	if (!f) tmp = memo_out[sz_out] - tmp;
 	//std::cout << "tmp : " << tmp << "\n";
 	area += tmp;
 	area += std::abs(cross(p, H_out[il], H_out[ir]));
@@ -273,7 +273,7 @@ void query() {
 	f2 = inner_check_bi_search(candle, NH, N) < 1;
 	if (f1) std::cout << "IN\n";
 	else if (f2) std::cout << "OUT\n";
-	else std::cout << find_intersections_get_area_bi_search(MH, M, NH, N, memo_n, candle) << "\n";
+	else std::cout << find_intersections_get_area_bi_search(MH, memo_m, M, NH, memo_n, N, candle) << "\n";
 	return;
 }
 void init() {
