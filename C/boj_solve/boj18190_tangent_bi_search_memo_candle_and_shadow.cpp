@@ -5,48 +5,28 @@
 //#include <vector>
 typedef long long ll;
 typedef long double ld;
-const int LEN = 1e5;
+//typedef double ld;
+const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
 int N, M, Q;
-ll memo_n[LEN + 1]{ 0 }, memo_m[LEN + 1]{ 0 };
+ll memo_n[LEN]{ 0 }, memo_m[LEN]{ 0 };
 
 bool z(ld x) { return std::abs(x) < TOL; }
 struct Pos {
 	ll x, y;
 	ld xf, yf;
-	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y, xf + p.xf, yf + p.yf }; }
-	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y, xf - p.xf, yf - p.yf }; }
-	Pos operator * (const ll& n) const { return { x * n, y * n, xf * n, yf * n }; }
-	Pos operator * (const ld& n) const { return { 0, 0, xf * n, yf * n }; }
-	Pos operator / (const ll& n) const { return { x / n, y / n, xf / n, yf / n }; }
-	Pos operator / (const ld& n) const { return { 0, 0, xf / n, yf / n }; }
-	Pos operator * (const Pos& p) const { return { x * p.x + y * p.y, 0, xf * p.xf + yf * p.yf, 0.0 }; }
-	Pos operator / (const Pos& p) const { return { x * p.y - y * p.x, 0, xf * p.yf - yf * p.xf, 0.0 }; }
-} NH[LEN], MH[LEN], O = { 0, 0 };//O = origin
+} NH[LEN], MH[LEN];
+const Pos O = { 0, 0, .0, .0 };
 struct Vec {
 	ld vy, vx;
-	bool operator < (const Vec& v) const { return z(vy - v.vy) ? vx < v.vx : vy < v.vy; }
-	bool operator == (const Vec& v) const { return (z(vy - v.vy) && z(vx - v.vx)); }
 	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }//cross
 };
-const Vec Zero = { 0, 0 };
 struct Line {
 	Vec s;
 	ld c;
-	bool operator < (const Line& l) const {//sort ccw
-		bool f1 = Zero < s;
-		bool f2 = Zero < l.s;
-		if (f1 != f2) return f1;
-		ld ccw = s / l.s;
-		return z(ccw) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : ccw > 0;
-	}
 	ld operator / (const Line& l) const { return s / l.s; }//cross
 };
-struct Info {
-	ll area;
-	ll l, r;
-};
+struct Info { ll area, l, r; };
 Line L(const Pos& p1, const Pos& p2) {
 	ld dy, dx, c;
 	dy = p2.yf - p1.yf;
@@ -85,10 +65,9 @@ void get_area_memo(Pos H[], ll memo[], const int& sz) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
 		memo[i + 1] = cross(O, cur, nxt) + memo[i];
 	}
-	//for (int i = 0; i <= N; i++) std::cout << "memo[" << i << "] " << memo[i] << "\n";
 	return;
 }
-int inner_check_bi_search(const Pos& p, Pos H[], const int& sz) {
+int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {
 	if (sz < 3 || cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
 	if (on_seg(H[0], H[1], p) || on_seg(H[0], H[sz - 1], p)) return 0;
 	int s = 0, e = sz - 1, m;
@@ -101,13 +80,10 @@ int inner_check_bi_search(const Pos& p, Pos H[], const int& sz) {
 	else if (on_seg(H[s], H[e], p)) return 0;
 	else return -1;
 }
-Pos find_tangent_bi_search(const Pos& p, Pos H[], const int& sz) {
+Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 	int i1{ 0 }, i2{ 0 };
 	int ccw1 = ccw(p, H[0], H[1]), ccwN = ccw(p, H[0], H[sz - 1]);
-	//ll ccw_1 = cross(p, H[0], H[1]), ccw_N = cross(p, H[0], H[N - 1]);
-	//std::cout << "DEBUG p: " << p.x << " " << p.y << " H[0]: " << H[0].x << " " << H[0].y << " H[1]:" << H[1].x << " " << H[1].y << " H[N-1]:" << H[N - 1].x << " " << H[N - 1].y << "\n";
 	if (ccw1 * ccwN >= 0) {
-		//std::cout << "tangent!! " << ccw_1 << " " << ccw_N << "\n";
 		i1 = 0;
 		if (!ccw1 && dot(p, H[1], H[0]) > 0) i1 = 1;
 		if (!ccwN && dot(p, H[sz - 1], H[0]) > 0) i1 = sz - 1;
@@ -126,7 +102,6 @@ Pos find_tangent_bi_search(const Pos& p, Pos H[], const int& sz) {
 		if (!ccw(p, H[i2], H[(i2 + 1)]) && dot(p, H[(i2 + 1)], H[i2]) > 0) i2 = (i2 + 1) % sz;
 	}
 	else {
-		//std::cout << "tangent?? " << ccw_1 << " " << ccw_N << "\n";
 		int s = 0, e = sz - 1, k, m;
 		bool f = ccw1 > 0 && ccwN < 0;// if H[k] is between H[0] && p
 		while (s + 1 < e) {
@@ -157,31 +132,26 @@ Pos find_tangent_bi_search(const Pos& p, Pos H[], const int& sz) {
 		i2 = s2;
 		if (!ccw(p, H[i2], H[(i2 + 1) % N]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
 	}
-	if (i1 > i2) std::swap(i1, i2);
-	return { i1, i2, .0, .0 };
+	if (i2 < i1) std::swap(i2, i1);
+	return { 0, i2, i1 };
 }
 Info get_inner_area(Pos H[], ll memo[], const int& sz, const Pos& p) {
-	ll area{ 0 };
-	Pos tangent = find_tangent_bi_search(p, H, sz);
-	//std::cout << "OUT tangent.. " << tangent.x << " " << tangent.y << "\n";
-	ll i1 = tangent.x, i2 = tangent.y;
+	Info tangent = find_tangent_bi_search(H, sz, p);
+	ll i1 = tangent.r, i2 = tangent.l;
 	ll tri = cross(O, H[i1], H[i2]);
-	area = memo[i2] - memo[i1] - tri;
-	//std::cout << memo[sz] << " " << memo[i2] << " " << memo[i1] << " " << cross(O, H[i1], H[i2]) << " " << area << "\n";
+	ll area = memo[i2] - memo[i1] - tri;
 	if (cross(p, H[i1], H[i2]) < 0) area = memo[sz] - area;
 	area += std::abs(cross(p, H[i1], H[i2]));
 	bool f = cross(p, H[i1], H[i2]) > 0;
-	if (f) std::swap(i1, i2);
-	//std::cout << memo[sz] << " " << memo[i2] << " " << memo[i1] << " " << cross(O, H[i1], H[i2]) << " " << area << "\n";
-	return { area, i1, i2 };
+	if (!f) std::swap(i1, i2);
+	return { area, i2, i1 };
 }
-ld find_intersections_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H_out[], ll memo_out[], const int& sz_out, const Pos& p) {//memo_n
+ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H_out[], ll memo_out[], const int& sz_out, const Pos& p) {
 	Info info = get_inner_area(H_in, memo_in, sz_in, p);
 	ld area = -(ld)info.area;
-	//std::cout << "area: " << area << "\n";
-	int ir, il;
 	Pos vr = H_in[info.r], vl = H_in[info.l], ip;
-	int s = 0, e = sz_out - 1, k, m;
+	//find_crossing_point
+	int ir, il, s = 0, e = sz_out - 1, k, m;
 	while (s + 1 < e) {
 		k = s + e >> 1;
 		int CCW = ccw(H_out[0], H_out[k], p);
@@ -189,16 +159,13 @@ ld find_intersections_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz
 		else e = k;
 	}
 	Pos S = H_out[s], E = H_out[e];
-	//find_r_intersection
+	//find_r-intersection
 	int sr{ 0 }, er{ 0 };
-	if (ccw(p, S, vr) >= 0 && ccw(p, E, vr) <= 0) {
+	if (ccw(p, S, vr) >= 0 && ccw(p, E, vr) <= 0) {//if vr is in p-S-E tri.
 		ir = e;
 		sr = s, er = e;
 		ip = intersection(L(S, E), L(p, vr));
 		area += std::abs(cross_f(p, ip, E));
-		//std::cout << sr << " " << er << "\n";
-		//std::cout << std::abs(cross_f(p, ip, E)) << " area a\n";
-		//std::cout << ip.xf << " " << ip.yf << "\n";
 	}
 	else {
 		if (ccw(H_out[0], p, vr) > 0) sr = e, er = sz_out;
@@ -213,20 +180,14 @@ ld find_intersections_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz
 		ir = er % sz_out;
 		ip = intersection(L(SR, ER), L(p, vr));
 		area += std::abs(cross_f(p, ip, ER));
-		//std::cout << sr << " " << er << "\n";
-		//std::cout << std::abs(cross_f(p, ip, ER)) << " area b\n";
-		//std::cout << ip.xf << " " << ip.yf << "\n";
 	}
-	//find_l_intersection
+	//find_l-intersection
 	int sl{ 0 }, el{ 0 };
-	if (ccw(p, S, vl) >= 0 && ccw(p, E, vl) <= 0) {
+	if (ccw(p, S, vl) >= 0 && ccw(p, E, vl) <= 0) {//if vl is in p-S-E tri.
 		il = s;
 		sl = s, el = e;
 		ip = intersection(L(S, E), L(p, vl));
 		area += std::abs(cross_f(p, ip, S));
-		//std::cout << sl << " " << el << "\n";
-		//std::cout << std::abs(cross_f(p, ip, S)) << " area a\n";
-		//std::cout << ip.xf << " " << ip.yf << "\n";
 	}
 	else {
 		if (ccw(H_out[0], p, vl) > 0) sl = e, el = sz_out;
@@ -241,26 +202,19 @@ ld find_intersections_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz
 		il = sl % sz_out;
 		ip = intersection(L(SL, EL), L(p, vl));
 		area += std::abs(cross_f(p, ip, SL));
-		//std::cout << sl << " " << el << "\n";
-		//std::cout << std::abs(cross_f(p, ip, SL)) << " area b\n";
-		//std::cout << ip.xf << " " << ip.yf << "\n";
 	}
-	//total
-	//std::cout << "OUT_idx: ir - " << ir << " il - " << il << " "  << area << "\n";
-	bool f = ir <= il;
-	//std::cout << il << " " << ir << "\n";
-	if (il < ir) std::swap(ir, il);
-	ll tri = cross(O, H_out[il], H_out[ir]);
-	//std::cout << "tri " << tri << "\n";
-	//std::cout << "memo " << memo[il] - memo[ir] << " " << memo[sz_out] << "\n";
-	ll tmp = memo_out[il] - memo_out[ir] + tri;
-	if (!f) tmp = memo_out[sz_out] - tmp;
-	//std::cout << "tmp : " << tmp << "\n";
-	area += tmp;
-	area += std::abs(cross(p, H_out[il], H_out[ir]));
-	//std::cout << sr << " " << sl << " " << area << "\n";
-	if (sr == sl) area -= tmp + 2 * std::abs(cross(p, H_out[il], H_out[ir]));
-	//std::cout << area << "\n";
+	//get_area
+	if (sr == sl) {//if 2 intersections on the same segment
+		area -= (ld)std::abs(cross(p, H_out[ir], H_out[il]));
+	}
+	else {
+		bool f = ir > il;
+		if (ir > il) std::swap(ir, il);
+		ll tri = cross(O, H_out[ir], H_out[il]);
+		ll tmp = memo_out[il] - memo_out[ir] - tri;
+		if (f) tmp = memo_out[sz_out] - tmp;
+		area += (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il]));
+	}
 	return area * .5;
 }
 void query() {
@@ -269,11 +223,11 @@ void query() {
 	candle.xf = (ld)candle.x;
 	candle.yf = (ld)candle.y;
 	int f1, f2;
-	f1 = inner_check_bi_search(candle, MH, M) > -1;
-	f2 = inner_check_bi_search(candle, NH, N) < 1;
+	f1 = inner_check_bi_search(MH, M, candle) > -1;
+	f2 = inner_check_bi_search(NH, N, candle) < 1;
 	if (f1) std::cout << "IN\n";
 	else if (f2) std::cout << "OUT\n";
-	else std::cout << find_intersections_get_area_bi_search(MH, memo_m, M, NH, memo_n, N, candle) << "\n";
+	else std::cout << find_inx_get_area_bi_search(MH, memo_m, M, NH, memo_n, N, candle) << "\n";
 	return;
 }
 void init() {
@@ -379,3 +333,34 @@ int main() { solve(); return 0; }//boj18190
 
 */
 
+//struct Pos {
+//	ll x, y;
+//	ld xf, yf;
+//	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+//	//Pos operator + (const Pos& p) const { return { x + p.x, y + p.y, xf + p.xf, yf + p.yf }; }
+//	//Pos operator - (const Pos& p) const { return { x - p.x, y - p.y, xf - p.xf, yf - p.yf }; }
+//	//Pos operator * (const ll& n) const { return { x * n, y * n, xf * n, yf * n }; }
+//	//Pos operator * (const ld& n) const { return { 0, 0, xf * n, yf * n }; }
+//	//Pos operator / (const ll& n) const { return { x / n, y / n, xf / n, yf / n }; }
+//	//Pos operator / (const ld& n) const { return { 0, 0, xf / n, yf / n }; }
+//	//Pos operator * (const Pos& p) const { return { x * p.x + y * p.y, 0, xf * p.xf + yf * p.yf, 0.0 }; }
+//	//Pos operator / (const Pos& p) const { return { x * p.y - y * p.x, 0, xf * p.yf - yf * p.xf, 0.0 }; }
+//} NH[LEN], MH[LEN], O = { 0, 0 };//O = origin
+//struct Vec {
+//	ld vy, vx;
+//	//bool operator < (const Vec& v) const { return z(vy - v.vy) ? vx < v.vx : vy < v.vy; }
+//	//bool operator == (const Vec& v) const { return (z(vy - v.vy) && z(vx - v.vx)); }
+//	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }//cross
+//};
+//struct Line {
+//	Vec s;
+//	ld c;
+//	//bool operator < (const Line& l) const {//sort ccw
+//	//	bool f1 = Zero < s;
+//	//	bool f2 = Zero < l.s;
+//	//	if (f1 != f2) return f1;
+//	//	ld ccw = s / l.s;
+//	//	return z(ccw) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : ccw > 0;
+//	//}
+//	ld operator / (const Line& l) const { return s / l.s; }//cross
+//};
