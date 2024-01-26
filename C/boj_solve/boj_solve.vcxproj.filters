@@ -621,7 +621,10 @@
     <ClCompile Include="boj18552_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj24895.cpp">
+    <ClCompile Include="boj18190_tangent_bi_search_memo.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj24895_tangent_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
