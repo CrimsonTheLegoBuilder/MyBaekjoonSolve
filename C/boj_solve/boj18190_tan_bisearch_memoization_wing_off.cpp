@@ -151,7 +151,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = std::abs(cross(p, S, E));
 		ll a = std::abs(cross(p, vr, S)); 
 		ll b = std::abs(cross(p, vr, E));
-		wing_r = (ld)tri * (ld)b / (a + b);
+		wing_r = (ld)tri * ((ld)b / (a + b));
 	}
 	else {
 		if (ccw(H_out[0], p, vr) > 0) sr = e, er = sz_out;
@@ -167,7 +167,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = std::abs(cross(p, SR, ER));
 		ll a = std::abs(cross(p, vr, SR));
 		ll b = std::abs(cross(p, vr, ER));
-		wing_r = (ld)tri * (ld)b / (a + b);
+		wing_r = (ld)tri * ((ld)b / (a + b));
 	}
 	//find_l-intersection
 	int sl{ 0 }, el{ 0 };
@@ -177,7 +177,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = std::abs(cross(p, S, E));
 		ll a = std::abs(cross(p, vl, S)); 
 		ll b = std::abs(cross(p, vl, E));
-		wing_l = (ld)tri * (ld)a / (a + b);
+		wing_l = (ld)tri * ((ld)a / (a + b));
 	}
 	else {
 		if (ccw(H_out[0], p, vl) > 0) sl = e, el = sz_out;
@@ -193,7 +193,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = std::abs(cross(p, SL, EL));
 		ll a = std::abs(cross(p, vl, SL));
 		ll b = std::abs(cross(p, vl, EL));
-		wing_l = (ld)tri * (ld)a / (a + b);
+		wing_l = (ld)tri * ((ld)a / (a + b));
 	}
 	//std::cout << wing_r << " " << wing_l << "\n";
 	//get_area
