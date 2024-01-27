@@ -4,11 +4,11 @@
 //#include <cstring>
 //#include <vector>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
-const ll SCALE = 1e3;
+const ll SCALE = 100;
 int N, M, Q;
 ll memo_n[LEN]{ 0 }, memo_m[LEN]{ 0 };
 
@@ -27,7 +27,7 @@ struct Pos {
 		x /= scale; y /= scale;
 		return *this;
 	}
-} NH[LEN], MH[LEN];
+} NH[LEN], MH[LEN], q[LEN];
 const Pos O = { 0, 0 };
 struct Info { ll area, l, r; };
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
@@ -187,10 +187,12 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = std::abs(cross(p, SL, EL)), a = std::abs(cross(p, vl, SL)), b = std::abs(cross(p, vl, EL));
 		wing_l = tri * (ld)a / (a + b);
 	}
+	std::cout << wing_r / (SCALE * SCALE) << " " << wing_l / (SCALE * SCALE) << "\n";
 	//get_area
 	ld area{ 0 };
 	if (sr == sl) {//if 2 intersections on the same segment
-		area = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+		ll tmp = -info.area - std::abs(cross(p, H_out[ir], H_out[il]));
+		area = tmp + wing_r + wing_l;
 	}
 	else {
 		bool f = ir > il;
@@ -198,20 +200,20 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = cross(O, H_out[ir], H_out[il]);
 		ll tmp = memo_out[il] - memo_out[ir] - tri;
 		if (f) tmp = memo_out[sz_out] - tmp;
-		area = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+		tmp += std::abs(cross(p, H_out[ir], H_out[il])) - info.area;
+		area = tmp + wing_r + wing_l;
 	}
 	return area * .5;
 }
-void query() {
-	Pos candle;
-	std::cin >> candle.x >> candle.y;
-	candle *= SCALE;
+void query(const int& i) {
+	Pos candle = q[i];
 	int f1, f2;
 	f1 = inner_check_bi_search(MH, M, candle) > -1;
 	f2 = inner_check_bi_search(NH, N, candle) < 1;
 	if (f1) std::cout << "IN\n";
 	else if (f2) std::cout << "OUT\n";
 	else std::cout << find_inx_get_area_bi_search(MH, memo_m, M, NH, memo_n, N, candle) / (SCALE * SCALE) << "\n";
+	//else std::cout << find_inx_get_area_bi_search(MH, memo_m, M, NH, memo_n, N, candle) << "\n";
 	return;
 }
 void init() {
@@ -222,13 +224,16 @@ void init() {
 	std::cin >> N >> M >> Q;
 	for (int i = 0; i < N; i++) std::cin >> NH[i].x >> NH[i].y, NH[i] *= SCALE;
 	for (int j = 0; j < M; j++) std::cin >> MH[j].x >> MH[j].y, MH[j] *= SCALE;
+	for (int k = 0; k < Q; k++) std::cin >> q[k].x >> q[k].y, q[k] *= SCALE;
 	get_area_memo(NH, memo_n, N);
 	get_area_memo(MH, memo_m, M);
 	return;
 }
-void solve() { init(); while (Q--) query(); return; }
+void solve() { init(); for (int i = 0; i < Q; i++) query(i); return; }
 int main() { solve(); return 0; }//boj18190
-//std::cout << wing_r << " " << wing_l << "\n";
+
+
+
 
 /*
 
@@ -392,6 +397,54 @@ int main() { solve(); return 0; }//boj18190
 
 999999 999999
 
+
+4 4 5
+-1000000 -1000000
+-999996 -1000000
+1000000 1000000
+-1000000 -999996
+
+-999999 -999999
+-999998 -999999
+999994 999994
+-999999 -999998
+
+999999 999999
+999998 999998
+999997 999997
+999996 999996
+999995 999995
+
+4 4 21
+-1000000 1000000
+-1000000 -1000000
+1000000 -1000000
+1000000 1000000
+-999999 -999999
+-999998 -999999
+-999998 -999998
+-999999 -999998
+999999 999999
+999999 999998
+999998 999999
+999999 -999999
+-999999 999999
+999999 -999998
+-999998 999999
+999999 -999997
+-999997 999999
+999999 -999996
+-999996 999999
+999999 -999995
+-999995 999999
+999999 -999994
+-999994 999999
+999999 -999993
+-999993 999999
+0 999999
+999999 0
+-999999 0
+0 -999999
 
 
 */
