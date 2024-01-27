@@ -187,7 +187,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = std::abs(cross(p, SL, EL)), a = std::abs(cross(p, vl, SL)), b = std::abs(cross(p, vl, EL));
 		wing_l = tri * (ld)a / (a + b);
 	}
-	std::cout << wing_r / (SCALE * SCALE) << " " << wing_l / (SCALE * SCALE) << "\n";
+	//std::cout << wing_r / (SCALE * SCALE) << " " << wing_l / (SCALE * SCALE) << "\n";
 	//get_area
 	ld area{ 0 };
 	if (sr == sl) {//if 2 intersections on the same segment
