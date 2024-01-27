@@ -630,7 +630,7 @@
     <ClCompile Include="boj11686.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj18190_tangent_bi_search_memo_off_query.cpp">
+    <ClCompile Include="boj18190_WRONG.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj18190_tan_bisearch_memoization_wing.cpp">

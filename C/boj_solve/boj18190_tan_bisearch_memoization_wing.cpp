@@ -202,12 +202,8 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 	}
 	return area * .5;
 }
-//void query() {
 void query(const int& i) {
 	Pos candle = q[i];
-	//std::cin >> candle.x >> candle.y;
-	//candle.xf = (ld)candle.x;
-	//candle.yf = (ld)candle.y;
 	int f1, f2;
 	f1 = inner_check_bi_search(MH, M, candle) > -1;
 	f2 = inner_check_bi_search(NH, N, candle) < 1;
@@ -229,9 +225,11 @@ void init() {
 	get_area_memo(MH, memo_m, M);
 	return;
 }
-//void solve() { init(); while (Q--) query(); return; }
 void solve() { init(); for (int i = 0; i < Q; i++) query(i); return; }
 int main() { solve(); return 0; }//boj18190
+
+
+
 	//std::cout << wing_r << " " << wing_l << "\n";
 
 /*
@@ -395,6 +393,24 @@ int main() { solve(); return 0; }//boj18190
 -999999 -999998
 
 999999 999999
+
+
+4 4 5
+-1000000 -1000000
+-999996 -1000000
+1000000 1000000
+-1000000 -999996
+
+-999999 -999999
+-999998 -999999
+999994 999994
+-999999 -999998
+
+999999 999999
+999998 999998
+999997 999997
+999996 999996
+999995 999995
 
 
 
