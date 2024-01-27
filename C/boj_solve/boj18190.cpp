@@ -8,7 +8,7 @@ typedef long double ld;
 //typedef double ld;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
-const ll SCALE = 100;
+const ll SCALE = 10;
 int N, M, Q;
 ll memo_n[LEN]{ 0 }, memo_m[LEN]{ 0 };
 
@@ -17,6 +17,7 @@ struct Pos {
 	ll x, y;
 	Pos(ll X, ll Y) : x(X), y(Y) {}
 	Pos() : x(0), y(0) {}
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ll& n) const { return { x * n, y * n }; }
 	Pos operator / (const ll& n) const { return { x / n, y / n }; }
 	Pos& operator *= (const ll scale) {
@@ -27,6 +28,7 @@ struct Pos {
 		x /= scale; y /= scale;
 		return *this;
 	}
+	ld mag() { return hypot(x, y); }
 } NH[LEN], MH[LEN], q[LEN];
 const Pos O = { 0, 0 };
 struct Info { ll area, l, r; };
@@ -149,7 +151,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ir = e;
 		sr = s, er = e;
 		ll tri = std::abs(cross(p, S, E));
-		ll a = std::abs(cross(p, vr, S)); 
+		ll a = std::abs(cross(p, vr, S));
 		ll b = std::abs(cross(p, vr, E));
 		wing_r = tri * (ld)b / (a + b);
 	}
@@ -175,7 +177,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		il = s;
 		sl = s, el = e;
 		ll tri = std::abs(cross(p, S, E));
-		ll a = std::abs(cross(p, vl, S)); 
+		ll a = std::abs(cross(p, vl, S));
 		ll b = std::abs(cross(p, vl, E));
 		wing_l = tri * (ld)a / (a + b);
 	}
@@ -199,12 +201,9 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 	//get_area
 	//if (wing_l < wing_r) std::swap(wing_l, wing_r);
 	ld area{ 0 };
-	ld area1{ 0 };
-	ld area2{ 0 };
 	if (sr == sl) {//if 2 intersections on the same segment
-		area = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
-		area1 = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
-		area2 = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_l + wing_r;
+		//area = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + (wing_r + wing_l);
+		area = -(ld)(info.area + std::abs(cross(p, H_out[ir], H_out[il]))) + (wing_r + wing_l);
 	}
 	else {
 		bool f = ir > il;
@@ -212,9 +211,8 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = cross(O, H_out[ir], H_out[il]);
 		ll tmp = memo_out[il] - memo_out[ir] - tri;
 		if (f) tmp = memo_out[sz_out] - tmp;
-		area = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
-		area1 = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
-		area2 = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_l + wing_r;
+		//area = -(ld)info.area - (ld)tmp - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + (wing_r + wing_l);
+		area = -(ld)(info.area + tmp + std::abs(cross(p, H_out[ir], H_out[il]))) + (wing_r + wing_l);
 	}
 	return area * .5;
 	//return std::max(area1, area2) * .5;
@@ -234,7 +232,7 @@ void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(6);
+	std::cout.precision(7);
 	std::cin >> N >> M >> Q;
 	for (int i = 0; i < N; i++) std::cin >> NH[i].x >> NH[i].y, NH[i] *= SCALE;
 	for (int j = 0; j < M; j++) std::cin >> MH[j].x >> MH[j].y, MH[j] *= SCALE;
@@ -620,3 +618,96 @@ int main() { solve(); return 0; }//boj18190
 0 -999990
 
 */
+
+
+//ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H_out[], ll memo_out[], const int& sz_out, const Pos& p) {
+	//	Info info = get_inner_area(H_in, memo_in, sz_in, p);
+	//	Pos vr = H_in[info.r], vl = H_in[info.l], ip;
+	//	ld wing_r{ 0 }, wing_l{ 0 };
+	//	//find_crossing_point
+	//	int ir, il, s = 0, e = sz_out - 1, k, m;
+	//	while (s + 1 < e) {
+	//		k = s + e >> 1;
+	//		int CCW = ccw(H_out[0], H_out[k], p);
+	//		if (CCW > 0) s = k;
+	//		else e = k;
+	//	}
+	//	Pos S = H_out[s], E = H_out[e];
+	//	//find_r-intersection
+	//	int sr{ 0 }, er{ 0 };
+	//	if (ccw(p, S, vr) >= 0 && ccw(p, E, vr) <= 0) {//if vr is in p-S-E tri.
+	//		ir = e;
+	//		sr = s, er = e;
+	//		ld tri = std::abs(cross(p, S, E));
+	//		ld a = std::abs(cross(p, vr, S)) / (p - vr).mag();
+	//		ld b = std::abs(cross(p, vr, E)) / (p - vr).mag();
+	//		wing_r = tri * (ld)b / (a + b);
+	//	}
+	//	else {
+	//		if (ccw(H_out[0], p, vr) > 0) sr = e, er = sz_out;
+	//		if (ccw(H_out[0], p, vr) < 0) sr = 0, er = s;
+	//		while (sr + 1 < er) {
+	//			m = sr + er >> 1;
+	//			int CCW = ccw(p, H_out[m % sz_out], vr);
+	//			if (CCW > 0) sr = m;
+	//			else er = m;
+	//		}
+	//		Pos SR = H_out[sr % sz_out], ER = H_out[er % sz_out];
+	//		ir = er % sz_out;
+	//		ll tri = std::abs(cross(p, SR, ER));
+	//		ld a = std::abs(cross(p, vr, SR)) / (p - vr).mag();
+	//		ld b = std::abs(cross(p, vr, ER)) / (p - vr).mag();
+	//		wing_r = tri * (ld)b / (a + b);
+	//	}
+	//	//find_l-intersection
+	//	int sl{ 0 }, el{ 0 };
+	//	if (ccw(p, S, vl) >= 0 && ccw(p, E, vl) <= 0) {//if vl is in p-S-E tri.
+	//		il = s;
+	//		sl = s, el = e;
+	//		ld tri = std::abs(cross(p, S, E));
+	//		ld a = std::abs(cross(p, vl, S)) / (p - vl).mag();
+	//		ld b = std::abs(cross(p, vl, E)) / (p - vl).mag();
+	//		wing_l = tri * (ld)a / (a + b);
+	//	}
+	//	else {
+	//		if (ccw(H_out[0], p, vl) > 0) sl = e, el = sz_out;
+	//		if (ccw(H_out[0], p, vl) < 0) sl = 0, el = s;
+	//		while (sl + 1 < el) {
+	//			m = sl + el >> 1;
+	//			int CCW = ccw(p, H_out[m % sz_out], vl);
+	//			if (CCW > 0) sl = m;
+	//			else el = m;
+	//		}
+	//		Pos SL = H_out[sl % sz_out], EL = H_out[el % sz_out];
+	//		il = sl % sz_out;
+	//		ld tri = std::abs(cross(p, SL, EL));
+	//		ld a = std::abs(cross(p, vl, SL)) / (p - vl).mag();
+	//		ld b = std::abs(cross(p, vl, EL)) / (p - vl).mag();
+	//		wing_l = tri * (ld)a / (a + b);
+	//	}
+	//	//std::cout << wing_r << " " << wing_l << "\n";
+	//	//get_area
+	//	//if (wing_l < wing_r) std::swap(wing_l, wing_r);
+	//	ld area{ 0 };
+	//	ld area1{ 0 };
+	//	ld area2{ 0 };
+	//	if (sr == sl) {//if 2 intersections on the same segment
+	//		area = -(ld)info.area - std::abs(cross(p, H_out[ir], H_out[il])) + (wing_r + wing_l);
+	//		//area = -(ld)(info.area + std::abs(cross(p, H_out[ir], H_out[il]))) + (wing_r + wing_l);
+	//		area1 = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+	//		area2 = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_l + wing_r;
+	//	}
+	//	else {
+	//		bool f = ir > il;
+	//		if (ir > il) std::swap(ir, il);
+	//		ll tri = cross(O, H_out[ir], H_out[il]);
+	//		ll tmp = memo_out[il] - memo_out[ir] - tri;
+	//		if (f) tmp = memo_out[sz_out] - tmp;
+	//		area = -(ld)info.area - tmp - std::abs(cross(p, H_out[ir], H_out[il])) + (wing_r + wing_l);
+	//		//area = -(ld)(info.area + tmp + std::abs(cross(p, H_out[ir], H_out[il]))) + (wing_r + wing_l);
+	//		area1 = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+	//		area2 = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_l + wing_r;
+	//	}
+	//	return area * .5;
+	//	//return std::max(area1, area2) * .5;
+	//}
