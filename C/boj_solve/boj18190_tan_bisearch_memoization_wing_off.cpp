@@ -4,8 +4,8 @@
 //#include <cstring>
 //#include <vector>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
 const ll SCALE = 100;
@@ -187,12 +187,16 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = std::abs(cross(p, SL, EL)), a = std::abs(cross(p, vl, SL)), b = std::abs(cross(p, vl, EL));
 		wing_l = tri * (ld)a / (a + b);
 	}
-	//std::cout << wing_r / (SCALE * SCALE) << " " << wing_l / (SCALE * SCALE) << "\n";
+	//std::cout << wing_r << " " << wing_l << "\n";
 	//get_area
+	//if (wing_l < wing_r) std::swap(wing_l, wing_r);
 	ld area{ 0 };
+	ld area1{ 0 };
+	ld area2{ 0 };
 	if (sr == sl) {//if 2 intersections on the same segment
-		ll tmp = -info.area - std::abs(cross(p, H_out[ir], H_out[il]));
-		area = tmp + wing_r + wing_l;
+		area = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+		area1 = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+		area2 = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_l + wing_r;
 	}
 	else {
 		bool f = ir > il;
@@ -200,10 +204,12 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = cross(O, H_out[ir], H_out[il]);
 		ll tmp = memo_out[il] - memo_out[ir] - tri;
 		if (f) tmp = memo_out[sz_out] - tmp;
-		tmp += std::abs(cross(p, H_out[ir], H_out[il])) - info.area;
-		area = tmp + wing_r + wing_l;
+		area = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+		area1 = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+		area2 = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_l + wing_r;
 	}
-	return area * .5;
+	//return area * .5;
+	return std::max(area1, area2) * .5;
 }
 void query(const int& i) {
 	Pos candle = q[i];
@@ -220,7 +226,7 @@ void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(7);
+	std::cout.precision(6);
 	std::cin >> N >> M >> Q;
 	for (int i = 0; i < N; i++) std::cin >> NH[i].x >> NH[i].y, NH[i] *= SCALE;
 	for (int j = 0; j < M; j++) std::cin >> MH[j].x >> MH[j].y, MH[j] *= SCALE;
@@ -446,5 +452,163 @@ int main() { solve(); return 0; }//boj18190
 -999999 0
 0 -999999
 
+4 4 1
+-1000000 -1000000
+-999996 -1000000
+1000000 1000000
+-1000000 -999996
+
+-999999 -999999
+-999998 -999999
+999998 999998
+-999999 -999998
+
+999999 999999
+
+8 8 16
+1000000 500000
+500000 1000000
+-500000 1000000
+-1000000 500000
+-1000000 -500000
+-500000 -1000000
+500000 -1000000
+1000000 -500000
+-200000 -400000
+200000 -400000
+400000 -200000
+400000 200000
+200000 400000
+-200000 400000
+-400000 200000
+-400000 -200000
+
+999999 0
+0 999999
+-999999 0
+0 -999999
+999999 1
+1 999999
+-999999 1
+1 -999999
+999999 -1
+-1 999999
+-999999 -1
+-1 -999999
+400001 0
+0 400001
+-400001 0
+0 -400001
+
+4 4 56
+-1000000 1000000
+-1000000 -1000000
+1000000 -1000000
+1000000 1000000
+-999999 -999999
+-999998 -999999
+-999998 -999998
+-999999 -999998
+
+999999 999999
+
+999999 999998
+999998 999999
+999998 999998
+
+999999 999997
+999997 999999
+999997 999997
+
+999996 999999
+999999 999996
+999996 999996
+
+999995 999999
+999999 999995
+999995 999995
+
+-999997 -999997
+-999996 -999996
+-999995 -999995
+-999994 -999994
+
+0 999999
+999999 0
+0 999998
+999998 0
+0 999997
+999997 0
+0 999996
+999996 0
+
+0 0
+1 -1
+-1 1
+2 -2
+-2 2
+3 -3
+-3 3
+
+-999985 0
+0 -999985
+-999999 0
+-999999 -950000
+0 -999999
+-950000 -999999
+-999998 0
+0 -999998
+-999997 0
+0 -999997
+-999996 0
+0 -999996
+-999995 0
+0 -999995
+-999994 0
+0 -999994
+-999993 0
+0 -999993
+-999992 0
+0 -999992
+-999991 0
+0 -999991
+-999990 0
+0 -999990
+
+
+4 4 20
+-1000000 1000000
+-1000000 -1000000
+1000000 -1000000
+1000000 1000000
+-999999 -999999
+-999998 -999999
+-999998 -999998
+-999999 -999998
+
+-999985 0
+0 -999985
+-999999 -900000
+-900000 -999999
+-999999 0
+0 -999999
+-999998 0
+0 -999998
+-999997 0
+0 -999997
+-999996 0
+0 -999996
+-999995 0
+0 -999995
+-999994 0
+0 -999994
+-999993 0
+0 -999993
+-999992 0
+0 -999992
+-999991 0
+0 -999991
+-999990 0
+0 -999990
 
 */
