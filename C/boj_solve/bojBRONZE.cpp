@@ -1220,6 +1220,6 @@ int main() {
 	if (b == x) ans = 2;
 	if (c == x) ans = 3;
 	if (d == x) ans = 4;
-	std::cout << ans << "\n";
+	//std::cout << ans << "\n";
 	return 0;
 }
