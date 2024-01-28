@@ -1,14 +1,12 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-//#include <cstring>
-//#include <vector>
 typedef long long ll;
 typedef long double ld;
-//typedef double ld;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
-const ll SCALE = 100;
+const ll SCALE = 10;
 int N, M, Q;
 ll memo_n[LEN]{ 0 }, memo_m[LEN]{ 0 };
 
@@ -17,6 +15,7 @@ struct Pos {
 	ll x, y;
 	Pos(ll X, ll Y) : x(X), y(Y) {}
 	Pos() : x(0), y(0) {}
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ll& n) const { return { x * n, y * n }; }
 	Pos operator / (const ll& n) const { return { x / n, y / n }; }
 	Pos& operator *= (const ll scale) {
@@ -27,9 +26,10 @@ struct Pos {
 		x /= scale; y /= scale;
 		return *this;
 	}
-} NH[LEN], MH[LEN];
-const Pos O = { 0, 0 };
+	ld mag() { return hypot(x, y); }
+} NH[LEN], MH[LEN], seq[LEN]; const Pos O = { 0, 0 };
 struct Info { ll area, l, r; };
+struct Query { int x; ld area; } q[LEN];
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 }
@@ -47,7 +47,7 @@ void get_area_memo(Pos H[], ll memo[], const int& sz) {
 	memo[0] = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		memo[i + 1] = cross(O, cur, nxt) + memo[i];
+		memo[i + 1] = cross(O, cur, nxt) + memo[i];//memo[sz] == convex hull's area
 	}
 	return;
 }
@@ -83,9 +83,10 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 			else e = m;
 		}
 		i2 = s;
-		if (!ccw(p, H[i2], H[(i2 + 1)]) && dot(p, H[(i2 + 1)], H[i2]) > 0) i2 = (i2 + 1) % sz;
+		if (!ccw(p, H[i2], H[(i2 + 1) % sz]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
 	}
 	else {
+		//divide hull
 		int s = 0, e = sz - 1, k, m;
 		bool f = ccw1 > 0 && ccwN < 0;// if H[k] is between H[0] && p
 		while (s + 1 < e) {
@@ -95,6 +96,8 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 			if (CCW > 0) s = k;
 			else e = k;
 		}
+		
+		//search lower hull
 		int s1 = 0, e1 = s;
 		while (s1 < e1) {
 			m = s1 + e1 >> 1;
@@ -105,6 +108,8 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 		}
 		i1 = s1;
 		if (!ccw(p, H[i1], H[(i1 + 1) % sz]) && dot(p, H[(i1 + 1) % sz], H[i1]) > 0) i1 = (i1 + 1) % sz;
+		
+		//search upper hull
 		int s2 = e, e2 = sz - 1;
 		while (s2 < e2) {
 			m = s2 + e2 >> 1;
@@ -114,9 +119,10 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 			else e2 = m;
 		}
 		i2 = s2;
-		if (!ccw(p, H[i2], H[(i2 + 1) % N]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
+		if (!ccw(p, H[i2], H[(i2 + 1) % sz]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
 	}
-	if (i2 < i1) std::swap(i2, i1);
+
+	if (i2 < i1) std::swap(i2, i1);//normalize
 	return { 0, i2, i1 };
 }
 Info get_inner_area(Pos H[], ll memo[], const int& sz, const Pos& p) {
@@ -126,14 +132,15 @@ Info get_inner_area(Pos H[], ll memo[], const int& sz, const Pos& p) {
 	ll area = memo[i2] - memo[i1] - tri;
 	if (cross(p, H[i1], H[i2]) < 0) area = memo[sz] - area;
 	area += std::abs(cross(p, H[i1], H[i2]));
-	bool f = cross(p, H[i1], H[i2]) > 0;
-	if (!f) std::swap(i1, i2);
+	
+	if (cross(p, H[i1], H[i2]) < 0) std::swap(i1, i2);//normalize
 	return { area, i2, i1 };
 }
 ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H_out[], ll memo_out[], const int& sz_out, const Pos& p) {
 	Info info = get_inner_area(H_in, memo_in, sz_in, p);
 	Pos vr = H_in[info.r], vl = H_in[info.l], ip;
 	ld wing_r{ 0 }, wing_l{ 0 };
+
 	//find_crossing_point
 	int ir, il, s = 0, e = sz_out - 1, k, m;
 	while (s + 1 < e) {
@@ -143,14 +150,11 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		else e = k;
 	}
 	Pos S = H_out[s], E = H_out[e];
+
 	//find_r-intersection
 	int sr{ 0 }, er{ 0 };
-	if (ccw(p, S, vr) >= 0 && ccw(p, E, vr) <= 0) {//if vr is in p-S-E tri.
-		ir = e;
-		sr = s, er = e;
-		ll tri = std::abs(cross(p, S, E)), a = std::abs(cross(p, vr, S)), b = std::abs(cross(p, vr, E));
-		wing_r = tri * (ld)b / (a + b);
-	}
+	Pos SR, ER;
+	if (ccw(p, S, vr) >= 0 && ccw(p, E, vr) <= 0) sr = s, er = e;//if vr is in p-S-E tri.
 	else {
 		if (ccw(H_out[0], p, vr) > 0) sr = e, er = sz_out;
 		if (ccw(H_out[0], p, vr) < 0) sr = 0, er = s;
@@ -160,19 +164,19 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 			if (CCW > 0) sr = m;
 			else er = m;
 		}
-		Pos SR = H_out[sr % sz_out], ER = H_out[er % sz_out];
-		ir = er % sz_out;
-		ll tri = std::abs(cross(p, SR, ER)), a = std::abs(cross(p, vr, SR)), b = std::abs(cross(p, vr, ER));
-		wing_r = tri * (ld)b / (a + b);
 	}
+	SR = H_out[sr % sz_out], ER = H_out[er % sz_out];
+	ir = er % sz_out;
+	ll trir = std::abs(cross(p, SR, ER));
+	ll ar = std::abs(cross(p, vr, SR));
+	ll br = std::abs(cross(p, vr, ER));
+	wing_r = trir * (ld)br / (ar + br);
+	if (!cross(p, vr, H_out[er % sz_out])) wing_r = 0;
+
 	//find_l-intersection
 	int sl{ 0 }, el{ 0 };
-	if (ccw(p, S, vl) >= 0 && ccw(p, E, vl) <= 0) {//if vl is in p-S-E tri.
-		il = s;
-		sl = s, el = e;
-		ll tri = std::abs(cross(p, S, E)), a = std::abs(cross(p, vl, S)), b = std::abs(cross(p, vl, E));
-		wing_l = tri * (ld)a / (a + b);
-	}
+	Pos SL, EL;
+	if (ccw(p, S, vl) >= 0 && ccw(p, E, vl) <= 0) sl = s, el = e;//if vl is in p-S-E tri.
 	else {
 		if (ccw(H_out[0], p, vl) > 0) sl = e, el = sz_out;
 		if (ccw(H_out[0], p, vl) < 0) sl = 0, el = s;
@@ -182,17 +186,19 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 			if (CCW > 0) sl = m;
 			else el = m;
 		}
-		Pos SL = H_out[sl % sz_out], EL = H_out[el % sz_out];
-		il = sl % sz_out;
-		ll tri = std::abs(cross(p, SL, EL)), a = std::abs(cross(p, vl, SL)), b = std::abs(cross(p, vl, EL));
-		wing_l = tri * (ld)a / (a + b);
 	}
-	//std::cout << wing_r / (SCALE * SCALE) << " " << wing_l / (SCALE * SCALE) << "\n";
-	//get_area
-	if (wing_l < wing_r) std::swap(wing_l, wing_r);
+	SL = H_out[sl % sz_out], EL = H_out[el % sz_out];
+	il = sl % sz_out;
+	ll tril = std::abs(cross(p, SL, EL));
+	ll al = std::abs(cross(p, vl, SL));
+	ll bl = std::abs(cross(p, vl, EL));
+	wing_l = tril * (ld)al / (al + bl);
+	if (!cross(p, vl, H_out[sl % sz_out])) wing_l = 0;
+
+	//get_shadow
 	ld area{ 0 };
 	if (sr == sl) {//if 2 intersections on the same segment
-		area = -(ld)info.area - (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+		area = -(ld)(info.area + std::abs(cross(p, H_out[ir], H_out[il]))) + (wing_r + wing_l);
 	}
 	else {
 		bool f = ir > il;
@@ -200,152 +206,75 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 		ll tri = cross(O, H_out[ir], H_out[il]);
 		ll tmp = memo_out[il] - memo_out[ir] - tri;
 		if (f) tmp = memo_out[sz_out] - tmp;
-		area = -(ld)info.area + (ld)tmp + (ld)std::abs(cross(p, H_out[ir], H_out[il])) + wing_r + wing_l;
+		area = -(ld)(info.area - tmp - std::abs(cross(p, H_out[ir], H_out[il]))) + (wing_r + wing_l);
 	}
 	return area * .5;
 }
-void query() {
-	Pos candle;
-	std::cin >> candle.x >> candle.y;
-	candle *= SCALE;
-	int f1, f2;
-	f1 = inner_check_bi_search(MH, M, candle) > -1;
-	f2 = inner_check_bi_search(NH, N, candle) < 1;
-	if (f1) std::cout << "IN\n";
-	else if (f2) std::cout << "OUT\n";
-	else std::cout << find_inx_get_area_bi_search(MH, memo_m, M, NH, memo_n, N, candle) / (SCALE * SCALE) << "\n";
-	//else std::cout << find_inx_get_area_bi_search(MH, memo_m, M, NH, memo_n, N, candle) << "\n";
+void query(const int& i) {
+	Pos candle = seq[i];
+	if (inner_check_bi_search(MH, M, candle) > -1) q[i].x = 1;
+	else if (inner_check_bi_search(NH, N, candle) < 1) q[i].x = -1;
+	else q[i].x = 0, q[i].area = find_inx_get_area_bi_search(MH, memo_m, M, NH, memo_n, N, candle);
+	return;
+}
+void query_print() {
+	for (int i = 0; i < Q; i++) {
+		if (q[i].x == 0) std::cout << q[i].area << "\n";
+		else if (q[i].x == 1) std::cout << "IN\n";
+		else if (q[i].x == -1) std::cout << "OUT\n";
+	}
 	return;
 }
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(6);
+	std::cout.precision(7);
 	std::cin >> N >> M >> Q;
-	for (int i = 0; i < N; i++) std::cin >> NH[i].x >> NH[i].y, NH[i] *= SCALE;
-	for (int j = 0; j < M; j++) std::cin >> MH[j].x >> MH[j].y, MH[j] *= SCALE;
+	for (int i = 0; i < N; i++) std::cin >> NH[i].x >> NH[i].y;
+	for (int j = 0; j < M; j++) std::cin >> MH[j].x >> MH[j].y;
+	for (int k = 0; k < Q; k++) std::cin >> seq[k].x >> seq[k].y;
 	get_area_memo(NH, memo_n, N);
 	get_area_memo(MH, memo_m, M);
 	return;
 }
-void solve() { init(); while (Q--) query(); return; }
+void solve() { init(); for (int i = 0; i < Q; i++) query(i); query_print(); return; }
 int main() { solve(); return 0; }//boj18190
-//std::cout << wing_r << " " << wing_l << "\n";
+
+//void query_print() {
+//	for (int i = 0; i < Q; i++) {
+//		if (q[i].x == 0) printf("%.7Lf\n", q[i].area);
+//		else if (q[i].x == 1) printf("IN\n");
+//		else if (q[i].x == -1) printf("OUT\n");
+//	}
+//	return;
+//}
+//void init() {
+//	scanf("%d%d%d", &N, &M, &Q);
+//	for (int i = 0; i < N; i++) scanf("%lld%lld", &NH[i].x, &NH[i].y);
+//	for (int j = 0; j < M; j++) scanf("%lld%lld", &MH[j].x, &MH[j].y);
+//	for (int k = 0; k < Q; k++) scanf("%lld%lld", &seq[k].x, &seq[k].y);
+//	get_area_memo(NH, memo_n, N);
+//	get_area_memo(MH, memo_m, M);
+//	return;
+//}
+//void solve() { init(); for (int i = 0; i < Q; i++) { query(i); } query_print(); return; }
+//int main() { solve(); return 0; }//boj18190
 
 /*
 
-4 4 14
--4 -4
-4 -4
-4 4
--4 4
--1 -1
-1 -1
-1 1
--1 1
-0 0
-3 3
-3 -3
--3 3
--3 -3
-0 2
--2 0
-0 -2
-2 0
-0 3
--3 0
-0 -3
-3 0
-6 6
-
-4 4 3
--4 -4
-4 -4
-4 4
--4 4
--1 -1
-1 -1
-1 1
--1 1
-0 0
-3 3
-6 6
-
-4 4 3
--40 -40
-40 -40
-40 40
--40 40
--10 -10
-10 -10
-10 10
--10 10
-0 0
-30 30
-60 60
-
-4 4 3
--400 -400
-400 -400
-400 400
--400 400
--100 -100
-100 -100
-100 100
--100 100
-0 0
-399 399
-600 600
-
-4 4 3
--4000 -4000
-4000 -4000
-4000 4000
--4000 4000
--1000 -1000
-1000 -1000
-1000 1000
--1000 1000
-0 0000
-3999 3999
-6000 6000
-
-4 4 3
--40000 -40000
-40000 -40000
-40000 40000
--40000 40000
--10000 -10000
-10000 -10000
-10000 10000
--10000 10000
-0 0
-39999 39999
-60000 60000
-
-4 4 3
--400000 -400000
-400000 -400000
-400000 400000
--400000 400000
--100000 -100000
-100000 -100000
-100000 100000
--100000 100000
-0 0
-399999 399999
-600000 600000
-
 4 4 42
+
 -4 -4
 4 -4
 4 4
 -4 4
+
 -1 -1
 1 -1
 1 1
 -1 1
+
 0 0
 5 5
 0 2
@@ -389,7 +318,54 @@ int main() { solve(); return 0; }//boj18190
 -3 3
 -3 -3
 
+answer
+IN
+OUT
+27.0000000
+27.0000000
+27.0000000
+27.0000000
+18.5000000
+18.5000000
+18.5000000
+18.5000000
+18.7500000
+18.7500000
+18.7500000
+18.7500000
+18.7500000
+18.7500000
+18.7500000
+18.7500000
+18.0000000
+18.0000000
+18.0000000
+18.0000000
+16.5000000
+16.5000000
+16.5000000
+16.5000000
+16.5000000
+16.5000000
+16.5000000
+16.5000000
+16.8750000
+16.8750000
+16.8750000
+16.8750000
+16.8750000
+16.8750000
+16.8750000
+16.8750000
+16.5000000
+16.5000000
+16.5000000
+16.5000000
+
+===
+
 8 8 53
+
 10 5
 5 10
 -5 10
@@ -398,6 +374,7 @@ int main() { solve(); return 0; }//boj18190
 -5 -10
 5 -10
 10 -5
+
 -2 -4
 2 -4
 4 -2
@@ -406,6 +383,7 @@ int main() { solve(); return 0; }//boj18190
 -2 4
 -4 2
 -4 -2
+
 3 4
 4 3
 -3 -4
@@ -460,20 +438,96 @@ int main() { solve(); return 0; }//boj18190
 7 -7
 8 8
 
-4 4 1
+answer
+153.1666667
+153.1666667
+153.1666667
+153.1666667
+153.1666667
+153.1666667
+153.1666667
+153.1666667
+98.8333333
+98.8333333
+98.8333333
+98.8333333
+98.8333333
+98.8333333
+98.8333333
+98.8333333
+167.0000000
+167.0000000
+167.0000000
+167.0000000
+126.1111111
+126.1111111
+126.1111111
+126.1111111
+139.8809524
+139.8809524
+139.8809524
+139.8809524
+139.8809524
+139.8809524
+139.8809524
+139.8809524
+IN
+IN
+IN
+IN
+125.5000000
+125.5000000
+125.5000000
+125.5000000
+116.3571429
+116.3571429
+116.3571429
+116.3571429
+109.5000000
+109.5000000
+109.5000000
+109.5000000
+104.1666667
+104.1666667
+104.1666667
+104.1666667
+OUT
+
+===
+
+4 4 7
+
 -1000000 -1000000
--999996 -1000000
+-999994 -1000000
 1000000 1000000
--1000000 -999996
+-1000000 -999994
 
 -999999 -999999
 -999998 -999999
-999998 999998
+999994 999994
 -999999 -999998
 
+1000000 1000000
 999999 999999
+999998 999998
+999997 999997
+999996 999996
+999995 999995
+999994 999994
+
+answer
+OUT
+2.0000005
+2.0000005
+2.0000005
+2.0000005
+2.0000005
+IN
+
+===
 
 8 8 16
+
 1000000 500000
 500000 1000000
 -500000 1000000
@@ -482,6 +536,7 @@ int main() { solve(); return 0; }//boj18190
 -500000 -1000000
 500000 -1000000
 1000000 -500000
+
 -200000 -400000
 200000 -400000
 400000 -200000
@@ -508,6 +563,67 @@ int main() { solve(); return 0; }//boj18190
 -400001 0
 0 -400001
 
+answer
+1073333802778.1690674
+1073333802778.1690674
+1073333802778.1690674
+1073333802778.1690674
+1073333802777.3864746
+1073333802777.3864746
+1073333802777.3864746
+1073333802777.3864746
+1073333802777.3864746
+1073333802777.3864746
+1073333802777.3864746
+1073333802777.3864746
+1989996800000.0000000
+1989996800000.0000000
+1989996800000.0000000
+1989996800000.0000000
 
+===
+
+16 4 8
+
+-5 -6
+0 -7
+3 -7
+8 -6
+9 -5
+10 0
+10 3
+9 8
+8 9
+3 10
+0 10
+-5 9
+-6 8
+-7 3
+-7 0
+-6 -5
+
+3 0
+3 3
+0 3
+0 0
+
+0 -4
+3 -4
+7 0
+7 3
+3 7
+0 7
+-4 3
+-4 0
+
+answer
+53.0000000
+53.0000000
+53.0000000
+53.0000000
+53.0000000
+53.0000000
+53.0000000
+53.0000000
 
 */
