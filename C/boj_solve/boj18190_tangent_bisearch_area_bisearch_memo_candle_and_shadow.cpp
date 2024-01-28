@@ -22,8 +22,8 @@ struct Pos {
 	ll operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ll operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
 	Pos operator ~ () { return { -y, x }; }
-	Pos& operator *= (const ll scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ll scale) { x /= scale; y /= scale; return *this; }
+	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
+	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
 	ld mag() { return hypot(x, y); }
 } NH[LEN], MH[LEN], seq[LEN]; const Pos O = { 0, 0 };
 struct Info { ll area, l, r; };
@@ -103,6 +103,7 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 
 		i1 = s1;
 		if (!ccw(p, H[i1], H[(i1 + 1) % sz]) && dot(p, H[(i1 + 1) % sz], H[i1]) > 0) i1 = (i1 + 1) % sz;
+
 		//search upper hull
 		int s2 = e, e2 = sz - 1;
 		while (s2 < e2) {
