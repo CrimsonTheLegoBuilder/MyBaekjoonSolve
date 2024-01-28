@@ -5,12 +5,11 @@
 typedef long long ll;
 typedef long double ld;
 const int LEN = 1e5 + 1;
-const ld TOL = 1e-7;
-const ll SCALE = 10;
+//const ld TOL = 1e-7;
 int N, M, Q;
 ll memo_n[LEN]{ 0 }, memo_m[LEN]{ 0 };
 
-bool z(ld x) { return std::abs(x) < TOL; }
+//bool z(ld x) { return std::abs(x) < TOL; }
 struct Pos {
 	ll x, y;
 	Pos(ll X, ll Y) : x(X), y(Y) {}
