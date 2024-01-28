@@ -14,27 +14,22 @@ struct Pos {
 	ll x, y;
 	Pos(ll X, ll Y) : x(X), y(Y) {}
 	Pos() : x(0), y(0) {}
+	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ll& n) const { return { x * n, y * n }; }
 	Pos operator / (const ll& n) const { return { x / n, y / n }; }
-	Pos& operator *= (const ll scale) {
-		x *= scale; y *= scale;
-		return *this;
-	}
-	Pos& operator /= (const ll scale) {
-		x /= scale; y /= scale;
-		return *this;
-	}
+	ll operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
+	ll operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
+	Pos operator ~ () { return { -y, x }; }
+	Pos& operator *= (const ll scale) { x *= scale; y *= scale; return *this; }
+	Pos& operator /= (const ll scale) { x /= scale; y /= scale; return *this; }
 	ld mag() { return hypot(x, y); }
 } NH[LEN], MH[LEN], seq[LEN]; const Pos O = { 0, 0 };
 struct Info { ll area, l, r; };
 struct Query { int x; ld area; } q[LEN];
-ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
-}
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
-}
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
@@ -77,7 +72,7 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 		while (s < e) {
 			m = s + e >> 1;
 			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
-			if (!f) std::swap(p1, cur);
+			if (!f) std::swap(p1, cur);//normalize
 			if (ccw(p1, cur, nxt) > 0) s = m + 1;
 			else e = m;
 		}
@@ -87,33 +82,33 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 	else {
 		//divide hull
 		int s = 0, e = sz - 1, k, m;
-		bool f = ccw1 > 0 && ccwN < 0;// if H[k] is between H[0] && p
+		bool f = ccw1 > 0 && ccwN < 0;//if H[k] is between H[0] && p
 		while (s + 1 < e) {
 			k = s + e >> 1;
 			int CCW = ccw(H[0], H[k], p);
-			if (!f) CCW *= -1;
+			if (!f) CCW *= -1;//normailze
 			if (CCW > 0) s = k;
 			else e = k;
 		}
-		
+
 		//search lower hull
 		int s1 = 0, e1 = s;
 		while (s1 < e1) {
 			m = s1 + e1 >> 1;
 			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
-			if (!f) std::swap(p1, cur);
+			if (!f) std::swap(p1, cur);//normalize
 			if (ccw(p1, cur, nxt) > 0) s1 = m + 1;
 			else e1 = m;
 		}
+
 		i1 = s1;
 		if (!ccw(p, H[i1], H[(i1 + 1) % sz]) && dot(p, H[(i1 + 1) % sz], H[i1]) > 0) i1 = (i1 + 1) % sz;
-		
 		//search upper hull
 		int s2 = e, e2 = sz - 1;
 		while (s2 < e2) {
 			m = s2 + e2 >> 1;
 			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
-			if (!f) std::swap(p1, cur);
+			if (!f) std::swap(p1, cur);//normalize
 			if (ccw(p1, cur, nxt) < 0) s2 = m + 1;
 			else e2 = m;
 		}
@@ -129,19 +124,18 @@ Info get_inner_area(Pos H[], ll memo[], const int& sz, const Pos& p) {
 	ll i1 = tangent.r, i2 = tangent.l;
 	ll tri = cross(O, H[i1], H[i2]);
 	ll area = memo[i2] - memo[i1] - tri;
-	if (cross(p, H[i1], H[i2]) < 0) area = memo[sz] - area;
+	if (cross(p, H[i1], H[i2]) < 0) area = memo[sz] - area, std::swap(i1, i2);//normalize
 	area += std::abs(cross(p, H[i1], H[i2]));
-	
-	if (cross(p, H[i1], H[i2]) < 0) std::swap(i1, i2);//normalize
 	return { area, i2, i1 };
 }
 ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H_out[], ll memo_out[], const int& sz_out, const Pos& p) {
 	Info info = get_inner_area(H_in, memo_in, sz_in, p);
 	Pos vr = H_in[info.r], vl = H_in[info.l], ip;
+	int ir, il;
 	ld wing_r{ 0 }, wing_l{ 0 };
 
-	//find_crossing_point
-	int ir, il, s = 0, e = sz_out - 1, k, m;
+	//divide hull
+	int s = 0, e = sz_out - 1, k, m;
 	while (s + 1 < e) {
 		k = s + e >> 1;
 		int CCW = ccw(H_out[0], H_out[k], p);
@@ -150,7 +144,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 	}
 	Pos S = H_out[s], E = H_out[e];
 
-	//find_r-intersection
+	//find r-intersection
 	int sr{ 0 }, er{ 0 };
 	Pos SR, ER;
 	if (ccw(p, S, vr) >= 0 && ccw(p, E, vr) <= 0) sr = s, er = e;//if vr is in p-S-E tri.
@@ -172,7 +166,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 	wing_r = trir * (ld)br / (ar + br);
 	if (!cross(p, vr, H_out[er % sz_out])) wing_r = 0;
 
-	//find_l-intersection
+	//find l-intersection
 	int sl{ 0 }, el{ 0 };
 	Pos SL, EL;
 	if (ccw(p, S, vl) >= 0 && ccw(p, E, vl) <= 0) sl = s, el = e;//if vl is in p-S-E tri.
@@ -201,7 +195,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 	}
 	else {
 		bool f = ir > il;
-		if (ir > il) std::swap(ir, il);
+		if (ir > il) std::swap(ir, il);//normalize
 		ll tri = cross(O, H_out[ir], H_out[il]);
 		ll tmp = memo_out[il] - memo_out[ir] - tri;
 		if (f) tmp = memo_out[sz_out] - tmp;
@@ -239,6 +233,15 @@ void init() {
 }
 void solve() { init(); for (int i = 0; i < Q; i++) query(i); query_print(); return; }
 int main() { solve(); return 0; }//boj18190
+
+//ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
+//	//return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+//	return (d2 - d1) / (d3 - d2);
+//}
+//ll dot(const Pos& d1, const Pos& d2, const Pos& d3) {
+//	//return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
+//	return (d2 - d1) * (d3 - d2);
+//}
 
 //void query_print() {
 //	for (int i = 0; i < Q; i++) {

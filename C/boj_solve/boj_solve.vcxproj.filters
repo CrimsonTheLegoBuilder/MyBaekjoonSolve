@@ -624,16 +624,10 @@
     <ClCompile Include="boj24895_tangent_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj18190_tan_bisearch_memoization_wing.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj11686.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj18190_WRONG.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj18190_tan_bisearch_memoization_wing_off.cpp">
+    <ClCompile Include="boj18190_tangent_bisearch_area_bisearch_memo_candle_and_shadow.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
