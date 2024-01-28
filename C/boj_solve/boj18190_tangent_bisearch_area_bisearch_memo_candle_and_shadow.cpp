@@ -21,7 +21,7 @@ struct Pos {
 	Pos operator / (const ll& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ll operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
-	Pos operator ~ () { return { -y, x }; }
+	Pos operator ~ () const { return { -y, x }; }
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
 	ld mag() { return hypot(x, y); }
@@ -100,7 +100,6 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 			if (ccw(p1, cur, nxt) > 0) s1 = m + 1;
 			else e1 = m;
 		}
-
 		i1 = s1;
 		if (!ccw(p, H[i1], H[(i1 + 1) % sz]) && dot(p, H[(i1 + 1) % sz], H[i1]) > 0) i1 = (i1 + 1) % sz;
 

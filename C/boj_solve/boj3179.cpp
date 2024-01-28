@@ -57,8 +57,8 @@ void solve() {
 	std::cout << cnt << "\n" << a << " " << b << " " << c << "\n";
 	return;
 }
-
 int main() { solve(); return 0; }//boj3179
+
 
 //#include <iostream>
 //#include <algorithm>
