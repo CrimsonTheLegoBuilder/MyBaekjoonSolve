@@ -1156,20 +1156,70 @@
 //	return 0;
 //}
 
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//#include <vector>
+//
+//int N, M;
+//char arr[11][11];
+//
+//int main() {
+//	std::cin >> N >> M;
+//	for (int i = 0; i < N; i++) std::cin >> arr[i];
+//	for (int i = 0; i < N; i++) {
+//		for (int j = M; j >= 0; j--) std::cout << arr[i][j];
+//		//std::cout << "\n";
+//	}
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//#include <vector>
+//int N, M;
+//char arr[101];
+//
+//int main() {
+//	std::cin >> arr;
+//	int i = 0, cnt = 0;
+//	while (arr[i] != '\0') {
+//		if (arr[i] == 'a' || arr[i] == 'i' || arr[i] == 'u' || arr[i] == 'e' || arr[i] == 'o') cnt++;
+//		i++;
+//	}
+//	//std::cout << cnt << "\n";
+//	return 0;
+//}
+
+//#include <iostream>
+//#include <algorithm>
+//#include <cstring>
+//#include <vector>
+//#include <cmath>
+//int a, b, c, d, e, f;
+//
+//int main() {
+//	std::cin >> a >> b >> c >> d >> e >> f;
+//	int A = a + b + c + d, B = std::max(e, f), C = -std::min({a, b, c, d});
+//	//std::cout << A + B + C << "\n";
+//	return 0;
+//}
+
 #include <iostream>
 #include <algorithm>
 #include <cstring>
 #include <vector>
-
-int N, M;
-char arr[11][11];
+#include <cmath>
+int a, b, c, d, x, y, r;
 
 int main() {
-	std::cin >> N >> M;
-	for (int i = 0; i < N; i++) std::cin >> arr[i];
-	for (int i = 0; i < N; i++) {
-		for (int j = M; j >= 0; j--) std::cout << arr[i][j];
-		//std::cout << "\n";
-	}
+	std::cin >> a >> b >> c >> d >> x >> y >> r;
+	int ans = 0;
+	if (a == x) ans = 1;
+	if (b == x) ans = 2;
+	if (c == x) ans = 3;
+	if (d == x) ans = 4;
+	std::cout << ans << "\n";
 	return 0;
 }
