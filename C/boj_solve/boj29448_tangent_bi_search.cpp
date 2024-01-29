@@ -153,8 +153,6 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj29448
 
-
-
 //int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {
 //	if (sz < 3 || cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
 //	if (on_seg(H[0], H[1], p) || on_seg(H[0], H[sz - 1], p)) return 0;

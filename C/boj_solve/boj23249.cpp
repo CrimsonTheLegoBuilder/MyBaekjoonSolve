@@ -10,14 +10,10 @@ int N, DP[LEN][LEN], CNT[LEN], cnt{ 0 };
 struct Pos {
 	ll x, y;
 	bool operator < (const Pos& p) { return x == p.x ? y < p.y : x < p.x; }
-
 } T[LEN];
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 }
-
-
-
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
