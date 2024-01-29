@@ -145,8 +145,8 @@ ll Manhattan_MAX() { return Chebyshev_MAX(); }
 //	CMAX = Chebyshev_MAX();
 //	MMIN = Manhattan_MIN();
 //	rotate();
-//	CMIN = Chebyshev_MIN() >> 1;
 //	MMAX = Manhattan_MAX();
+//	CMIN = Chebyshev_MIN() >> 1;
 //	std::cout << EMAX << "\n" << EMIN << "\n" << MMAX << "\n" << MMIN << "\n" << CMAX << "\n" << CMIN << "\n";
 //	return;
 //}
