@@ -84,7 +84,7 @@ ll min_dist(bool flag, int s = 0, int e = N - 1) {
 	}
 	while (l <= m) tmp[idx++] = C[l++];
 	while (r <= e) tmp[idx++] = C[r++];
-	for (int i = s; i <= e; i++) C[i] = tmp[i];// ...?
+	for (int i = s; i <= e; i++) C[i] = tmp[i];
 
 	band.clear();
 	for (int i = s; i <= e; i++) {
