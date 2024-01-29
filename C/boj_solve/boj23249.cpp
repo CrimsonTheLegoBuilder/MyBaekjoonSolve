@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-const int LEN = 300;
+const int LEN = 500;
 int N, DP[LEN][LEN], CNT[LEN], cnt{ 0 };
 
 struct Pos {
@@ -39,11 +39,7 @@ int main() {
 			}
 		}
 	}
-	for (int i = 1; i < N - 2; i++) {
-		cnt += CNT[i];
-		//std::cout << CNT[i] << "\n";
-	}
+	for (int i = 1; i < N - 2; i++) cnt += CNT[i];
 	std::cout << cnt << "\n";
 	return 0;
-
 }
