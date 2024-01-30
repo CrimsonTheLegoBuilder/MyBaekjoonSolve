@@ -52,6 +52,9 @@ bool inner_check_bi_search(const int& i, const Pos& TC) {
 		else return 0;
 	}
 	Pos& L = H[i][0], R = H[i][sz - 1];
+	if (L == TC || R == TC) return 0;
+	else if (L.x <= TC.x && L.y < TC.y) return 1;
+	else if (R.x <= TC.x && R.x <= TC.y) return 1;
 	if (L.x > TC.x || R.y > TC.y) return 0;
 	int s = 0, e = sz - 1, m;
 	while (s + 1 < e) {
@@ -73,13 +76,17 @@ void update(const int& i, const Pos& TC) {
 	}
 	else {
 		int s = 0, e = sz - 1;
-		for (int j = 0; j < sz; j++) {
-			Pos& cur = H[i][j], nxt = H[i][j + 1];
-			ll ccw = cross(TC, cur, nxt);
-			if (ccw <= 0) {
-				s = j; break;
+		if (TC.x <= H[i][0].x || cross(H[i][0], H[i][1], TC) <= 0) s = 0;
+		else {
+			for (int j = 0; j < sz; j++) {
+				Pos& cur = H[i][j], nxt = H[i][j + 1];
+				ll ccw = cross(TC, cur, nxt);
+				if (ccw <= 0) {
+					s = j; break;
+				}
 			}
 		}
+		if (TC.y <= H[i][sz - 1].y || cross(H[i][sz - 1], H[i][sz - 2], TC) >= 0) e = 0;
 		for (int k = sz; k > 0; k--) {
 			Pos& cur = H[i][k], nxt = H[i][k - 1];
 			ll ccw = cross(TC, cur, nxt);
@@ -89,9 +96,9 @@ void update(const int& i, const Pos& TC) {
 		}
 		if (H[i][s] == TC || H[i][e] == TC) return;
 		std::vector<Pos> h;
-		for (int l = 0; l <= s; s++) if (H[i][l].x < TC.x) h.push_back(H[i][l]);
+		for (int l = 0; l <= s; l++) if (H[i][l].x < TC.x && H[i][l].y > TC.y) h.push_back(H[i][l]);
 		h.push_back(TC);
-		for (int l = e; l <= sz; s++) h.push_back(H[i][l]);
+		for (int l = e; l <= sz; l++) if (H[i][l].x > TC.x && H[i][l].y < TC.y) h.push_back(H[i][l]);
 		while (H[i].size() > 1 && H[i][H[i].size()].y >= H[i][H[i].size() - 1].y)
 			H[i].pop_back();
 		H[i] = h;
