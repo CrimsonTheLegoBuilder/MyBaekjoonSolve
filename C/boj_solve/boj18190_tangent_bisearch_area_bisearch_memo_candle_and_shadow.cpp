@@ -14,6 +14,7 @@ struct Pos {
 	ll x, y;
 	Pos(ll X, ll Y) : x(X), y(Y) {}
 	Pos() : x(0), y(0) {}
+	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -22,6 +23,7 @@ struct Pos {
 	ll operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ll operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
 	Pos operator ~ () const { return { -y, x }; }
+	ll operator ! () const { return x * y; }
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
 	ld mag() { return hypot(x, y); }
@@ -187,6 +189,12 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 	ll bl = std::abs(cross(p, vl, EL));
 	wing_l = tril * (ld)al / (al + bl);
 	if (!cross(p, vl, H_out[sl % sz_out])) wing_l = 0;
+
+	//DEBUG
+	//std::cout << "in R: " << info.r << " in L: " << info.l << " out R: " << ir << " out L: " << il << "\n";
+	//std::cout << "wing R: " << wing_r << " wing L : " << wing_l << "\n";
+	//std::cout << "wing R: " << trir * (ld)ar / (ar + br) << " wing L : " << tril * (ld)bl / (al + bl) << "\n";
+	//std::cout << "inner: " << info.area << "\n";
 
 	//get_shadow
 	ld area{ 0 };
@@ -627,5 +635,25 @@ answer
 53.0000000
 53.0000000
 53.0000000
+
+===
+
+4 4 5
+
+-1000000 -1000000
+1000000 -1000000
+1000000 1000000
+-1000000 1000000
+
+-2 -999998
+2 -999998
+2 -999994
+-2 -999994
+
+0 999999
+0 999998
+0 999997
+0 999996
+0 999995
 
 */
