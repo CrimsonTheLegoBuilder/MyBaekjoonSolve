@@ -15,20 +15,20 @@ ll C[LEN]{ 0 };
 //bool z(const ld& x) { return std::abs(x) < TOL; }
 struct Pos {
 	ll x, y;
-	Pos(ll X, ll Y) : x(X), y(Y) {}
-	Pos() : x(0), y(0) {}
+	//Pos(ll X, ll Y) : x(X), y(Y) {}
+	//Pos() : x(0), y(0) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
-	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ll& n) const { return { x * n, y * n }; }
-	Pos operator / (const ll& n) const { return { x / n, y / n }; }
+	//Pos operator * (const ll& n) const { return { x * n, y * n }; }
+	//Pos operator / (const ll& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ll operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
-	Pos operator ~ () const { return { -y, x }; }
+	//Pos operator ~ () const { return { -y, x }; }
 	ll operator ! () const { return x * y; }
-	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
+	//Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
+	//Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
 	//ld mag() const { return hypot(x, y); }
 };
 const Pos O = { 0, 0 }, MAXL = { 0, INF }, MAXR = { INF, 0 }, pivot = { -1, -1 };
