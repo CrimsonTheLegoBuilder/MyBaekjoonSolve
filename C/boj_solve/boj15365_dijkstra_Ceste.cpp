@@ -109,10 +109,10 @@ void update(const int& i, const Pos& TC) {
 }
 void dijkstra() {
 	for (int i = 1; i <= N; i++) H[i].push_back(MAX);
-	for (int i = 1; i <= N; i++) C[i] = INF;
+	for (int i = 2; i <= N; i++) C[i] = INF;
 	H[1] = { { 0, 0 } };
 	C[1] = 0;
-	Q.push({ 0, 0, 0, 0 });
+	Q.push({ 1, 0, 0, 0 });
 	while (Q.size()) {
 		Info v = Q.top(); Q.pop();
 		Pos cur = v.pos();
@@ -130,7 +130,7 @@ void dijkstra() {
 			}
 		}
 	}
-	for (int i = 1; i <= N; i++) if (C[i] == INF) C[i] = -1;
+	for (int i = 2; i <= N; i++) if (C[i] == INF) C[i] = -1;
 	return;
 }
 void answer() { for (int i = 2; i <= N; i++) std::cout << C[i] << "\n"; }
@@ -140,7 +140,7 @@ void init() {
 	//freopen(".in", "r", stdin);
 	//freopen(".out", "w", stdout);
 	std::cin >> N >> M;
-	for (int i = 1; i <= N; i++) {
+	for (int i = 0; i < M; i++) {
 		int s, e; ll t, c;
 		std::cin >> s >> e >> t >> c;
 		G[s].push_back({ e, t, c, 0 });
