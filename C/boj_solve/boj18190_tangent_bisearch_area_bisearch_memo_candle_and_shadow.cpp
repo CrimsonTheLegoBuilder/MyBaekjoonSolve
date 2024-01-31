@@ -26,7 +26,7 @@ struct Pos {
 	ll operator ! () const { return x * y; }
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
-	ld mag() { return hypot(x, y); }
+	ld mag() const { return hypot(x, y); }
 } NH[LEN], MH[LEN], seq[LEN]; const Pos O = { 0, 0 };
 struct Info { ll area, l, r; };
 struct Query { int x; ld area; } q[LEN];

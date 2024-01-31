@@ -53,7 +53,7 @@ bool inner_check_bi_search(const int& i, const Pos& TC) {
 	}
 	Pos& L = H[i][0], R = H[i][sz - 1];
 	if (L == TC || R == TC) return 0;
-	else if (L.x <= TC.x && L.y < TC.y) return 1;
+	else if (L.x <= TC.x && L.y <= TC.y) return 1;
 	else if (R.x <= TC.x && R.x <= TC.y) return 1;
 	if (L.x > TC.x || R.y > TC.y) return 0;
 	int s = 0, e = sz - 1, m;
@@ -78,7 +78,7 @@ void update(const int& i, const Pos& TC) {
 		int s = 0, e = sz - 1;
 		if (TC.x <= H[i][0].x || cross(H[i][0], H[i][1], TC) <= 0) s = 0;
 		else {
-			for (int j = 0; j < sz; j++) {
+			for (int j = 0; j < sz - 1; j++) {
 				Pos& cur = H[i][j], nxt = H[i][j + 1];
 				ll ccw = cross(TC, cur, nxt);
 				if (ccw <= 0) {
@@ -86,12 +86,14 @@ void update(const int& i, const Pos& TC) {
 				}
 			}
 		}
-		if (TC.y <= H[i][sz - 1].y || cross(H[i][sz - 1], H[i][sz - 2], TC) >= 0) e = 0;
-		for (int k = sz; k > 0; k--) {
-			Pos& cur = H[i][k], nxt = H[i][k - 1];
-			ll ccw = cross(TC, cur, nxt);
-			if (ccw >= 0) {
-				e = k; break;
+		if (TC.y <= H[i][sz - 1].y || cross(H[i][sz - 1], H[i][sz - 2], TC) >= 0) e = sz - 1;
+		else {
+			for (int k = sz - 1; k > 0; k--) {
+				Pos& cur = H[i][k], nxt = H[i][k - 1];
+				ll ccw = cross(TC, cur, nxt);
+				if (ccw >= 0) {
+					e = k; break;
+				}
 			}
 		}
 		if (H[i][s] == TC || H[i][e] == TC) return;
