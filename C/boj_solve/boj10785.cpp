@@ -129,11 +129,11 @@ ld cal_time(const std::vector<Pos>& H1, const std::vector<Pos>& H2, Pos& vel2, b
 		if (!f && inner_check_bi_search(H2, p1)) return 0;
 		for (int j = 0; j < sz2; j++) {
 			Pos cur = H2[j], nxt = H2[(j + 1) % sz2];
-			if (!ccw(cur, nxt, p1)) {
-				if (!f) d = std::min(d, dist(cur, nxt, p1));
-				if (f) d = std::max(d, dist(cur, nxt, p1));
+			if (!ccw(cur, nxt, p1) && !ccw(cur, nxt, p1, p1 + vel2) && !(dot(p1 + vel2, p1, cur) > 0)) {
+				if (!f) d = std::min({ d, (cur - p1).mag(), (nxt - p1).mag() });
+				if (f) d = std::max({ d, (cur - p1).mag(), (nxt - p1).mag() });
 			}
-			else {
+			else if (ccw(cur, nxt, p1, p1 + vel2)){
 				Pos inx = intersection(L(cur, nxt), L(p1, p1 + vel2));
 				if (on_seg(cur, nxt, inx) && !(dot(p1 + vel2, p1, inx) > 0)) {
 					if (!f) d = std::min(d, (p1 - inx).mag());
@@ -148,11 +148,11 @@ ld cal_time(const std::vector<Pos>& H1, const std::vector<Pos>& H2, Pos& vel2, b
 		if (!f && inner_check_bi_search(H1, p2)) return 0;
 		for (int i = 0; i < sz1; i++) {
 			Pos cur = H1[i], nxt = H1[(i + 1) % sz1];
-			if (!ccw(cur, nxt, p2)) {
+			if (!ccw(cur, nxt, p2) && !ccw(cur, nxt, p2, p2 + vel2) && !(dot(p2 + vel2, p2, cur) > 0)) {
 				if (!f) d = std::min(d, dist(cur, nxt, p2));
 				if (f) d = std::max(d, dist(cur, nxt, p2));
 			}
-			else {
+			else if (ccw(cur, nxt, p2, p2 + vel2)) {
 				Pos inx = intersection(L(cur, nxt), L(p2, p2 + vel2));
 				if (on_seg(cur, nxt, inx) && !(dot(p2 + vel2, p2, inx) > 0)) {
 					if (!f) d = std::min(d, (p2 - inx).mag());
@@ -198,7 +198,6 @@ ld overlapped_area(const std::vector<Pos>& H1, const std::vector<Pos>& H2, const
 			Pos cur = MH2[j], nxt = MH2[(j + 1) % sz2];
 			if (cross_check(h1, h2, cur, nxt)) {
 				if (on_seg(cur, nxt, h1)) B.push_back(h1);
-				if (on_seg(cur, nxt, h2)) B.push_back(h2);
 				if (ccw(h1, h2, cur, nxt)) B.push_back(intersection(L(h1, h2), L(cur, nxt)));
 			}
 		}
@@ -210,7 +209,6 @@ ld overlapped_area(const std::vector<Pos>& H1, const std::vector<Pos>& H2, const
 			Pos cur = H1[i], nxt = H1[(i + 1) % sz1];
 			if (cross_check(h1, h2, cur, nxt)) {
 				if (on_seg(cur, nxt, h1)) B.push_back(h1);
-				if (on_seg(cur, nxt, h2)) B.push_back(h2);
 				if (ccw(h1, h2, cur, nxt)) B.push_back(intersection(L(h1, h2), L(cur, nxt)));
 			}
 		}
@@ -255,7 +253,7 @@ void solve() {
 	std::cin >> velB.x >> velB.y;
 	
 	Pos rel = velB - velA;
-	if (!cross_check(HA, HB, rel)) std::cout << "never\n";
+	if (z(rel.mag()) || !cross_check(HA, HB, rel)) std::cout << "never\n";
 	else {
 		ld low_vel = std::min(std::abs(rel.x), std::abs(rel.y));
 		ld tmin = cal_time(HA, HB, rel);
