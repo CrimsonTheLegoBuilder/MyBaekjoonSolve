@@ -227,7 +227,7 @@ ld overlapped_area(const std::vector<Pos>& H1, const std::vector<Pos>& H2, const
 	return std::abs(area);
 }
 ld ternary_search(const ld& t1, const ld& t2, const Pos& vel) {
-	ld s = t1, e = t2, l, r, AL, AR;
+	ld s = t1, e = t2 + 1, l, r, AL, AR;
 	int cnt = 50;
 	while (cnt--) {
 		l = (s + s + e) / 3;
@@ -236,6 +236,7 @@ ld ternary_search(const ld& t1, const ld& t2, const Pos& vel) {
 		AR = overlapped_area(HA, HB, vel, r);
 		//std::cout << "AL: " << AL << " AR: " << AR << "\n";
 		if (z(AL) && z(AR)) e = r;
+		else if (z(AL - AR)) e = r;
 		else if (AL > AR) e = r;
 		else s = l;
 	}
@@ -260,15 +261,37 @@ void solve() {
 	std::cin >> velB.x >> velB.y;
 	
 	Pos rel = velB - velA;
-	if (z(rel.mag()) || !cross_check(HA, HB, rel)) std::cout << "never\n";
+	if (z(rel.mag()) || !cross_check(HA, HB, rel)) std::cout << "never";
 	else {
 		ld low_vel = std::min(std::abs(rel.x), std::abs(rel.y));
 		ld tmin = cal_time(HA, HB, rel);
 		ld tmax = cal_time(HA, HB, rel, 1);
 		//std::cout << "tmin: " << tmin << " tmax: " << tmax << "\n";
 		ld ans = ternary_search(tmin, tmax, rel);
-		std::cout << ans << "\n";
+		//std::cout << "4.193518";
+		std::cout << ans;
 	}
 	return;
 }
 int main() { solve(); return 0; }//boj10785
+
+/*
+
+4 0 0 0 10 10 10 10 0 0 0
+4 11 5 11 6 12 6 12 5 -1 0
+
+4 0 0 0 10 10 10 10 0 0 0
+4 11 10 11 11 12 11 12 10 -1 0
+
+4 0 0 0 10 10 10 10 0 0 0
+4 11 9 11 11 12 11 12 9 -1 0
+
+4 0 0 0 10 10 10 10 0 0 0
+4 12 9 11 10 12 11 13 10 -1 0
+
+4 0 0 0 10 10 10 10 0 -1 1
+4 12 0 12 10 22 10 22 0 -2 0
+
+
+
+*/
