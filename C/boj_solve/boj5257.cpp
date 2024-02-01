@@ -8,7 +8,7 @@ typedef long long ll;
 //typedef long double ld;
 //const ld TOL = 1e-7;
 const ll INF = 1e9;
-const int LEN = 2e3 + 1;
+const int LEN = 2e2 + 1;
 
 int N, M;
 ll C[LEN]{ 0 };
@@ -41,6 +41,7 @@ bool on_seg(const Pos& d1, const Pos& d2, const Pos& d3) {
 struct Info {
 	int i;
 	ll t, c, tc;
+	int cnt;
 	bool operator < (const Info& info) const { return tc > info.tc; }
 	Pos pos() const { return { t, c }; }
 };
@@ -77,32 +78,14 @@ void update(const int& i, const Pos& TC) {
 	H[i] = h;
 	return;
 }
-void dijkstra() {
-	for (int i = 2; i <= N; i++) H[i].push_back(MAXL), H[i].push_back(MAXR);
-	for (int i = 2; i <= N; i++) C[i] = INF * INF;
-	H[1] = { MAXL, O, MAXR };
-	C[1] = 0;
-	Q.push({ 1, 0, 0, 0 });
+void prim(const int& N) {
+	Q.push({ 0, 0 });
 	while (Q.size()) {
 		Info v = Q.top(); Q.pop();
-		Pos cur = v.pos();
-		int f = inner_check_bi_search(v.i, cur);
-		if (f) continue;
-		for (const Info& w : G[v.i]) {
-			Pos nxt = w.pos();
-			Pos cost = cur + nxt;
-			if (!inner_check_bi_search(w.i, cost)) {
-				update(w.i, cost);
-				ll weight = !cost;
-				Q.push({ w.i, cost.x, cost.y, weight });
-				C[w.i] = std::min(C[w.i], weight);
-			}
-		}
+		 
 	}
-	for (int i = 2; i <= N; i++) if (C[i] == INF * INF) C[i] = -1;
 	return;
 }
-void answer() { for (int i = 2; i <= N; i++) std::cout << C[i] << "\n"; }
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -111,28 +94,11 @@ void init() {
 	std::cin >> N >> M;
 	for (int i = 0; i < M; i++) {
 		std::cin >> s >> e >> t >> c;
-		G[s].push_back({ e, t, c, 0 });
-		G[e].push_back({ s, t, c, 0 });
+		G[s].push_back({ e, t, c, 0, 0 });
+		G[e].push_back({ s, t, c, 0, 0 });
 	}
+	for (int i = 0; i < N; i++)    H[i].push_back(MAXL), H[i].push_back(MAXR);
 	return;
 }
-void solve() { init(); dijkstra(); answer(); return; }
-int main() { solve(); return 0; }//boj15365
-
-//void init() {
-//	std::cin.tie(0)->sync_with_stdio(0);
-//	std::cout.tie(0);
-//	freopen("ceste/ceste.in.10a", "r", stdin);
-//	freopen("ceste/cesteMyCode.out", "w", stdout);
-//	int s, e;
-//	ll t, c;
-//	std::cin >> N >> M;
-//	for (int i = 0; i < M; i++) {
-//		std::cin >> s >> e >> t >> c;
-//		G[s].push_back({ e, t, c, 0 });
-//		G[e].push_back({ s, t, c, 0 });
-//	}
-//	return;
-//}
-//void solve() { init(); dijkstra(); answer(); return; }
-//int main() { solve(); return 0; }//boj15365
+void solve() { init(); return; }
+int main() { solve(); return 0; }//boj5257
