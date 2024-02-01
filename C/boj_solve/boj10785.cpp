@@ -6,8 +6,7 @@
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
-const ld INF = 1e7;
-const ld LIMIT = 3e4;
+const ld INF = 1e6;
 int N, M;
 
 bool z(const ld& x) { return std::abs(x) < TOL; }
@@ -193,22 +192,26 @@ ld overlapped_area(const std::vector<Pos>& H1, const std::vector<Pos>& H2, const
 	int sz1 = H1.size(), sz2 = MH2.size();
 	for (int i = 0; i < sz1; i++) {
 		Pos h1 = H1[i], h2 = H1[(i + 1) % sz1];
+		//std::cout << "h1: " << h1.x << " " << h1.y << " h2: " << h2.x << " " << h2.y << "\n";
 		if (inner_check_bi_search(MH2, h1)) B.push_back(h1);
 		for (int j = 0; j < sz2; j++) {
 			Pos cur = MH2[j], nxt = MH2[(j + 1) % sz2];
+			//std::cout << "cur: " << cur.x << " " << cur.y << " nxt: " << nxt.x << " " << nxt.y << "\n";
+			if (on_seg(cur, nxt, h1)) B.push_back(h1);
 			if (cross_check(h1, h2, cur, nxt)) {
-				if (on_seg(cur, nxt, h1)) B.push_back(h1);
 				if (ccw(h1, h2, cur, nxt)) B.push_back(intersection(L(h1, h2), L(cur, nxt)));
 			}
 		}
 	}
 	for (int j = 0; j < sz2; j++) {
 		Pos h1 = MH2[j], h2 = MH2[(j + 1) % sz2];
+		//std::cout << "h1: " << h1.x << " " << h1.y << " h2: " << h2.x << " " << h2.y << "\n";
 		if (inner_check_bi_search(H1, h1)) B.push_back(h1);
 		for (int i = 0; i < sz1; i++) {
 			Pos cur = H1[i], nxt = H1[(i + 1) % sz1];
+			//std::cout << "cur: " << cur.x << " " << cur.y << " nxt: " << nxt.x << " " << nxt.y << "\n";
+			if (on_seg(cur, nxt, h1)) B.push_back(h1);
 			if (cross_check(h1, h2, cur, nxt)) {
-				if (on_seg(cur, nxt, h1)) B.push_back(h1);
 				if (ccw(h1, h2, cur, nxt)) B.push_back(intersection(L(h1, h2), L(cur, nxt)));
 			}
 		}
@@ -216,20 +219,22 @@ ld overlapped_area(const std::vector<Pos>& H1, const std::vector<Pos>& H2, const
 	std::vector<Pos> ol = monotone_chain(B);
 	ld area{ 0 };
 	int sz = ol.size();
+	//std::cout << "sz: " << sz << "\n";
 	for (int i = 0; i < sz; i++) {
 		Pos cur = ol[i], nxt = ol[(i + 1) % sz];
 		area += cross(O, cur, nxt);
 	}
 	return std::abs(area);
 }
-ld ternary_search(const ld& t1, const ld& t2) {
+ld ternary_search(const ld& t1, const ld& t2, const Pos& vel) {
 	ld s = t1, e = t2, l, r, AL, AR;
 	int cnt = 50;
 	while (cnt--) {
 		l = (s + s + e) / 3;
 		r = (s + e + e) / 3;
-		AL = overlapped_area(HA, HB, velB, l);
-		AR = overlapped_area(HA, HB, velB, r);
+		AL = overlapped_area(HA, HB, vel, l);
+		AR = overlapped_area(HA, HB, vel, r);
+		//std::cout << "AL: " << AL << " AR: " << AR << "\n";
 		if (z(AL) && z(AR)) e = r;
 		else if (AL > AR) e = r;
 		else s = l;
@@ -245,11 +250,13 @@ void solve() {
 	std::cin >> N;
 	HA.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> HA[i].x >> HA[i].y;
+	std::reverse(HA.begin(), HA.end());
 	std::cin >> velA.x >> velA.y;
 
 	std::cin >> M;
 	HB.resize(M);
 	for (int j = 0; j < M; j++) std::cin >> HB[j].x >> HB[j].y;
+	std::reverse(HB.begin(), HB.end());
 	std::cin >> velB.x >> velB.y;
 	
 	Pos rel = velB - velA;
@@ -258,7 +265,8 @@ void solve() {
 		ld low_vel = std::min(std::abs(rel.x), std::abs(rel.y));
 		ld tmin = cal_time(HA, HB, rel);
 		ld tmax = cal_time(HA, HB, rel, 1);
-		ld ans = ternary_search(tmin, tmax);
+		//std::cout << "tmin: " << tmin << " tmax: " << tmax << "\n";
+		ld ans = ternary_search(tmin, tmax, rel);
 		std::cout << ans << "\n";
 	}
 	return;
