@@ -22,10 +22,12 @@ struct Pos {
 	Pos operator / (const ll& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ll operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
-	Pos operator ~ () const { return { -y, x }; }
-	ll operator ! () const { return x * y; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
+	Pos operator ~ () const { return { -y, x }; }
+	ll operator ! () const { return x * y; }
 	ld mag() const { return hypot(x, y); }
 } NH[LEN], MH[LEN], seq[LEN]; const Pos O = { 0, 0 };
 struct Info { ll area, l, r; };
