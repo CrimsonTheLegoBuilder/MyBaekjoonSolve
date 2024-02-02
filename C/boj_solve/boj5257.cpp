@@ -4,6 +4,7 @@
 #include <vector>
 #include <queue>
 #include <cmath>
+#include <cstring>
 typedef long long ll;
 //typedef long double ld;
 //const ld TOL = 1e-7;
@@ -41,11 +42,12 @@ bool on_seg(const Pos& d1, const Pos& d2, const Pos& d3) {
 struct Info {
 	int i;
 	ll t, c, tc;
-	int cnt;
+	int cnt, prev;
+	int MST[LEN];
 	bool operator < (const Info& info) const { return tc > info.tc; }
 	Pos pos() const { return { t, c }; }
 };
-std::priority_queue<Info> Q;
+std::priority_queue<Info> Q, complete;
 std::vector<Info> G[LEN];
 bool inner_check_bi_search(const int& i, const Pos& TC) {
 	int sz = H[i].size(), s = 0, e = sz - 1, m;
@@ -79,11 +81,43 @@ void update(const int& i, const Pos& TC) {
 	return;
 }
 void prim(const int& N) {
-	Q.push({ 0, 0 });
+	Info start = { 0, 0, 0, 0, 0, -1 };
+	memset(start.MST, -1, LEN);
+	start.MST[0] = 0;
+	Q.push(start);
 	while (Q.size()) {
 		Info v = Q.top(); Q.pop();
-		 
+		std::cout << v.i << " " << v.prev << "\n";
+		if (inner_check_bi_search(v.cnt, v.pos())) continue;
+		std::cout << v.i << " " << v.prev << " re\n";
+		v.MST[v.i] = v.prev;
+
+		for (const Info& w : G[v.i]) {
+			Pos nxt = v.pos() + w.pos();
+			if (!inner_check_bi_search(v.cnt + 1, nxt) && !~v.MST[w.i]) {
+				Info W = v;
+				//W.t = w.t, W.c = w.c;
+				W.t = nxt.x, W.c = nxt.y;
+				W.tc = !w.pos();
+				W.i = w.i;
+				W.prev = v.i;
+				W.cnt++;
+				update(W.cnt, nxt);
+				if (W.cnt == N) {
+					complete.push(W);
+					continue;
+				}
+				Q.push(W);
+			}
+		}
 	}
+
+	Info ans = complete.top();
+	std::cout << ans.t << " " << ans.c << "\n\n";
+	for (int i = 1; i < N; i++) {
+		std::cout << i << " " << ans.MST[i] << "\n";
+	}
+	
 	return;
 }
 void init() {
@@ -97,8 +131,8 @@ void init() {
 		G[s].push_back({ e, t, c, 0, 0 });
 		G[e].push_back({ s, t, c, 0, 0 });
 	}
-	for (int i = 0; i < N; i++)    H[i].push_back(MAXL), H[i].push_back(MAXR);
+	for (int i = 0; i < N; i++) H[i].push_back(MAXL), H[i].push_back(MAXR);
 	return;
 }
-void solve() { init(); return; }
+void solve() { init(); prim(N); return; }
 int main() { solve(); return 0; }//boj5257
