@@ -5,7 +5,7 @@
 #include <cmath>
 typedef long long ll;
 typedef long double ld;
-const ld TOL = 1e-6;
+const ld TOL = 1e-7;
 const ld INF = 1e6;
 int N, M;
 
@@ -228,7 +228,7 @@ ld overlapped_area(const std::vector<Pos>& H1, const std::vector<Pos>& H2, const
 }
 ld ternary_search(const ld& t1, const ld& t2, const Pos& vel) {
 	ld s = t1, e = t2 + 1, l, r, AL, AR;
-	int cnt = 50;
+	int cnt = 100;
 	while (cnt--) {
 		l = (s + s + e) / 3;
 		r = (s + e + e) / 3;
@@ -242,6 +242,33 @@ ld ternary_search(const ld& t1, const ld& t2, const Pos& vel) {
 	}
 	return s;
 }
+//ld ternary_search(const ld& t1, const ld& t2, const Pos& vel) {
+//	ll s = 0, e = 1e6, ll, rr, len = 1e6;
+//	ld l, r, AL, AR;
+//	ld diff = t2 - t1;
+//	int cnt = 50;
+//	while (e - s > 2) {
+//		ll = (s + s + e) / 3;
+//		l = diff * (ll / (ld)len) + t1;
+//		rr = (s + e + e) / 3;
+//		r = diff * (rr / (ld)len) + t1;
+//		AL = overlapped_area(HA, HB, vel, l);
+//		AR = overlapped_area(HA, HB, vel, r);
+//		std::cout << "AL: " << AL << " AR: " << AR << l << " " << r << "\n";
+//		if (z(AL) && z(AR)) e = r;
+//		else if (z(AL - AR)) e = rr;
+//		else if (AL > AR) e = rr;
+//		else s = ll;
+//	}
+//	ld t{ 0 }, area{ INF };
+//	for (int i = s; i <= e; i++) {
+//		if (overlapped_area(HA, HB, vel, diff * (i / 1e6) + t1) < area) {
+//			std::cout << s << " " << e << " " << diff * (i / 1e6) + t1 << "\n";
+//			t = diff * (i / 1e6) + t1;
+//		}
+//	}
+//	return t;
+//}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -263,7 +290,6 @@ void solve() {
 	Pos rel = velB - velA;
 	if (z(rel.mag()) || !cross_check(HA, HB, rel)) std::cout << "never";
 	else {
-		ld low_vel = std::min(std::abs(rel.x), std::abs(rel.y));
 		ld tmin = cal_time(HA, HB, rel);
 		ld tmax = cal_time(HA, HB, rel, 1);
 		//std::cout << "tmin: " << tmin << " tmax: " << tmax << "\n";
