@@ -111,7 +111,7 @@ ll min_dist(bool flag, int s = 0, int e = N - 1) {
 
 	int sz = band.size();
 	ll dist = D;
-	for (int i = 1; i < sz; i++) {
+	for (int i = 1; i < sz; i++) {//pigeonhole principle
 		for (int j = i - 1; j >= 0; j--) {
 			ll y = std::abs(band[i].y - band[j].y);
 			ll dist_y = flag ? y : y * y;
