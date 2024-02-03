@@ -639,9 +639,6 @@
     <ClCompile Include="boj15365_dijkstra_Ceste.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj10785_light.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="q15365_Jay.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
@@ -654,7 +651,7 @@
     <ClCompile Include="boj15310_CH_trick.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10785.cpp">
+    <ClCompile Include="boj10785_Asteroids.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

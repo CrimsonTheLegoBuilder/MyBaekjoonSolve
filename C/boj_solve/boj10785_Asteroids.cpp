@@ -144,7 +144,7 @@ ld overlapped_area(const Pos& rel, const ld& t) {
 	return area(HPI);
 }
 ld ternary_search(const ld& t1, const ld& t2, const Pos& rel) {
-	ld s = t1, e = t2, l, r, AL{ 0 }, AR{ 0 };
+	ld s = t1, e = t2, l, r, AL, AR;
 	int cnt = 50;
 	while (cnt--) {
 		l = (s + s + e) / 3;
