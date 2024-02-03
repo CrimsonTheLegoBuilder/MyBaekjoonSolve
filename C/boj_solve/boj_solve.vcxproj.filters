@@ -648,6 +648,12 @@
     <ClCompile Include="boj5257.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
+    <ClCompile Include="q5257_Jay.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj15310_CH_trick.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
