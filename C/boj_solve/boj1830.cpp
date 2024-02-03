@@ -4,30 +4,46 @@
 #include <vector>
 #include <cstring>
 typedef long long ll;
+const ll MAX = 1e17;
 const int LEN = 1e6;
 int N;
-ll MAX = 1e17;
 
 struct Pos {
 	ll x, y;
+	Pos(ll X, ll Y) : x(X), y(Y) {}
+	Pos() : x(0), y(0) {}
+	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	Pos operator * (const ll& n) const { return { x * n, y * n }; }
+	Pos operator / (const ll& n) const { return { x / n, y / n }; }
+	ll operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
+	ll operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
+	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
+	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
+	Pos operator ~ () const { return { -y, x }; }
+	ll operator ! () const { return x * y; }
+	ll Euc() const { return x * x + y * y; }
+	ll Man() const { return std::abs(x) + std::abs(y); }
+	//ld mag() const { return hypot(x, y); }
 } tmp[LEN];
 struct Vec {
 	ll vx, vy;
 	ll operator / (const Vec& v) const { return vx * v.vy - vy * v.vx; }
 };
 std::vector<Pos> C, H, band;
-ll Euclidean(const Pos& d1, const Pos& d2) {
-	ll x = d1.x - d2.x, y = d1.y - d2.y;
-	return  x * x + y * y ;
-}
-ll Manhattan(const Pos& d1, const Pos& d2) {
-	ll x = d1.x - d2.x, y = d1.y - d2.y;
-	return  std::abs(x) + std::abs(y) ;
-}
-ll cross(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
-}
+//ll Euclidean(const Pos& d1, const Pos& d2) {
+//	ll x = d1.x - d2.x, y = d1.y - d2.y;
+//	return  x * x + y * y ;
+//}
+//ll Manhattan(const Pos& d1, const Pos& d2) {
+//	ll x = d1.x - d2.x, y = d1.y - d2.y;
+//	return std::abs(x) + std::abs(y) ;
+//}
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	std::vector<Pos> H;
 	std::sort(C.begin(), C.end());
@@ -52,9 +68,7 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	}
 	return H;
 }
-ll cross(const Vec& v1, const Vec& v2) {
-	return v1.vx * v2.vy - v1.vy * v2.vx;
-}
+//ll cross(const Vec& v1, const Vec& v2) { return v1.vx * v2.vy - v1.vy * v2.vx; }
 Vec V(std::vector<Pos>& H, int i) {
 	int f = (i + 1) % H.size();
 	i %= H.size();
@@ -65,10 +79,12 @@ ll rotating_calipers(std::vector<Pos>& H) {
 	int f = 0, l = H.size();
 	for (int i = 0; i < l; i++) {
 		while (V(H, i) / V(H, f) > 0) {
-			MD = std::max(MD, Euclidean(H[i], H[f]));
+			//MD = std::max(MD, Euclidean(H[i], H[f]));
+			MD = std::max(MD, (H[i] - H[f]).Euc());
 			f = (f + 1) % l;
 		}
-		MD = std::max(MD, Euclidean(H[i], H[f]));
+		//MD = std::max(MD, Euclidean(H[i], H[f]));
+		MD = std::max(MD, (H[i] - H[f]).Euc());
 	}
 	return MD;
 }
@@ -100,7 +116,10 @@ ll min_dist(bool flag, int s = 0, int e = N - 1) {
 			ll y = std::abs(band[i].y - band[j].y);
 			ll dist_y = flag ? y : y * y;
 			if (dist_y >= D) break;
-			dist = flag ? std::min(dist, Manhattan(band[i], band[j])) : std::min(dist, Euclidean(band[i], band[j]));
+			//if (flag) dist = std::min(dist, Manhattan(band[i], band[j]));
+			if (flag) dist = std::min(dist, (band[i] - band[j]).Man());
+			//else if (!flag) dist = std::min(dist, Euclidean(band[i], band[j]));
+			else if (!flag) dist = std::min(dist, (band[i] - band[j]).Euc());
 		}
 	}
 	return dist;
@@ -135,26 +154,26 @@ void rotate() {
 	std::sort(C.begin(), C.end());
 	return;
 }
-ll Chebyshev_MIN() { return min_dist(1); }
 ll Manhattan_MAX() { return Chebyshev_MAX(); }
-//void solve() {
-//	ll EMAX, EMIN, MMAX, MMIN, CMAX, CMIN;
-//	init();
-//	EMAX = Euclidean_MAX();
-//	EMIN = Euclidean_MIN();
-//	CMAX = Chebyshev_MAX();
-//	MMIN = Manhattan_MIN();
-//	rotate();
-//	MMAX = Manhattan_MAX();
-//	CMIN = Chebyshev_MIN() >> 1;
-//	std::cout << EMAX << "\n" << EMIN << "\n" << MMAX << "\n" << MMIN << "\n" << CMAX << "\n" << CMIN << "\n";
-//	return;
-//}
+ll Chebyshev_MIN() { return min_dist(1); }
 void solve() {
 	ll EMAX, EMIN, MMAX, MMIN, CMAX, CMIN;
 	init();
+	EMAX = Euclidean_MAX();
 	EMIN = Euclidean_MIN();
-	std::cout << EMIN << "\n";
+	CMAX = Chebyshev_MAX();
+	MMIN = Manhattan_MIN();
+	rotate();
+	MMAX = Manhattan_MAX();
+	CMIN = Chebyshev_MIN() >> 1;
+	std::cout << EMAX << "\n" << EMIN << "\n" << MMAX << "\n" << MMIN << "\n" << CMAX << "\n" << CMIN << "\n";
 	return;
 }
+//void solve() {
+//	ll EMAX, EMIN, MMAX, MMIN, CMAX, CMIN;
+//	init();
+//	EMIN = Euclidean_MIN();
+//	std::cout << EMIN << "\n";
+//	return;
+//}//boj2261
 int main() { solve(); return 0; }//boj1830 algorithm from hui

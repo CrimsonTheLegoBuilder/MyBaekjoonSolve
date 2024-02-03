@@ -15,10 +15,8 @@ struct Pos {
 	ld x, y;
 	Pos(ld X, ld Y) : x(X), y(Y) {}
 	Pos() : x(0), y(0) {}
-	//bool operator == (const Pos& p) const { return x == p.x && y == p.y; }//ll
-	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }//ll
-	bool operator == (const Pos& p) const { return z(x - p.x) && z(y - p.y); }//ld
-	bool operator < (const Pos& p) const { return z(x - p.x) ? y < p.y : x < p.x; }//ld
+	bool operator == (const Pos& p) const { return z(x - p.x) && z(y - p.y); }
+	bool operator < (const Pos& p) const { return z(x - p.x) ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ld& n) const { return { x * n, y * n }; }
@@ -27,10 +25,10 @@ struct Pos {
 	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
 	Pos operator ~ () const { return { -y, x }; }
 	ld operator ! () const { return x * y; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	ld mag() const { return hypot(x, y); }
-} vel[2], rel; const Pos O = {0, 0};
+} vel[2], rel; const Pos O = { 0, 0 };
 std::vector<Pos> H[2];
 struct Vec {
 	ld vy, vx;
@@ -106,26 +104,12 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	}
 	return 1;
 }
-//int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {
-//	int sz = H.size();
-//	if (sz < 3 || cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return 0;
-//	if (on_seg(H[0], H[1], p) || on_seg(H[0], H[sz - 1], p)) return 1;
-//	int s = 0, e = sz - 1, m;
-//	while (s + 1 < e) {
-//		m = s + e >> 1;
-//		if (cross(H[0], H[m], p) > 0) s = m;
-//		else e = m;
-//	}
-//	if (cross(H[s], H[e], p) > 0 || on_seg(H[s], H[e], p)) return 1;
-//	else 0;
-//}
 ld cal_dist(Pos& rel, bool f = 0) {
 	ld d = !f ? INF : -INF;
 	for (int i = 0; i < 2; i++) {
 		rel *= -1;
 		for (int j = 0; j < N[i]; j++) {
 			Pos& p = H[i][j];
-			//if (!f && inner_check_bi_search(H[i ^ 1], p)) return 0;
 			for (int k = 0; k < N[i ^ 1]; k++) {
 				Pos& cur = H[i ^ 1][k], nxt = H[i ^ 1][(k + 1) % N[i ^ 1]];
 				if (!ccw(cur, nxt, p, p + rel) && !ccw(cur, nxt, p) && !(dot(p + rel, p, cur) > 0)) {
@@ -160,7 +144,7 @@ ld overlapped_area(const Pos& rel, const ld& t) {
 	if (!half_plane_intersection(HP, HPI)) return 0;
 	return area(HPI);
 }
-ld ternary_search(const ld& t1, const ld& t2, const Pos& vel) {
+ld ternary_search(const ld& t1, const ld& t2, const Pos& rel) {
 	ld s = t1, e = t2, l, r, AL{ 0 }, AR{ 0 };
 	int cnt = 50;
 	while (cnt--) {
@@ -168,9 +152,6 @@ ld ternary_search(const ld& t1, const ld& t2, const Pos& vel) {
 		r = (s + e + e) / 3;
 		AL = overlapped_area(rel, l);
 		AR = overlapped_area(rel, r);
-		//std::cout << "s: " << s << " e: " << e << "\n";
-		//std::cout << "l: " << l << " r: " << r << "\n";
-		//std::cout << "AL: " << AL << " AR: " << AR << "\n";
 		if (z(AL - AR)) e = r;
 		else if (AL > AR) e = r;
 		else s = l;
@@ -192,7 +173,6 @@ void solve() {
 	rel = vel[1] - vel[0];
 	ld MIN = cal_dist(rel);
 	ld MAX = cal_dist(rel, 1);
-	//std::cout << MIN << " " << MAX << "\n";
 	if (z(rel.mag()) || MIN > 1e6) { std::cout << "never\n"; return; }
 	ld s = MIN / rel.mag();
 	ld e = MAX / rel.mag();
@@ -200,36 +180,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj10785
-
-
-/*
-
-4 0 0 0 10 10 10 10 0 0 0
-4 11 5 11 6 12 6 12 5 -1 0
-2.000
-
-4 0 0 0 10 10 10 10 0 0 0
-4 11 10 11 11 12 11 12 10 -1 0
-1.000
-
-4 0 0 0 10 10 10 10 0 0 0
-4 11 9 11 11 12 11 12 9 -1 0
-2.000
-
-4 0 0 0 10 10 10 10 0 0 0
-4 12 9 11 10 12 11 13 10 -1 0
-3.000
-
-4 0 0 0 10 10 10 10 0 -1 1
-4 12 0 12 10 22 10 22 0 -2 0
-6.000
-
-4 0 0 0 10 10 10 10 0 -1 0
-4 12 0 12 10 22 10 22 0 -2 0
-12.000
-
-3 0 0 1 1 2 0 0 0
-3 2 1 0 2 2 2 -1 0
-1.000
-
-*/
