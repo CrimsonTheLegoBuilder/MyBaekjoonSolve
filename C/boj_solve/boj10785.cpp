@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <deque>
 #include <cmath>
 typedef long long ll;
 typedef long double ld;
@@ -94,6 +95,32 @@ std::vector<Pos> moved_hull(const std::vector<Pos>& H, const Pos& dir, const ld&
 	Pos disp = dir * t;
 	for (const Pos& h : H) nxt.push_back(h + disp);
 	return nxt;
+}
+bool CW(const Line& l1, const Line& l2, const Line& target) {
+	if (l1.s / l2.s < TOL) return 0;
+	Pos p = intersection(l1, l2);
+	return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
+}
+bool half_plane_intersection(std::vector<Line>& HP, int m, std::vector<Pos>& hull) {
+	std::deque<Line> dq;
+	//std::sort(HP.begin(), HP.end());
+	for (const Line& l : HP) {
+		if (!dq.empty() && z(dq.back() / l)) continue;
+		while (dq.size() >= 2 && CW(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
+		while (dq.size() >= 2 && CW(l, dq.front(), dq[1])) dq.pop_front();
+		dq.push_back(l);
+	}
+	while (dq.size() >= 3 && CW(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
+	while (dq.size() >= 3 && CW(dq.back(), dq.front(), dq[1])) dq.pop_front();
+	for (int i = 0; i < dq.size(); i++) {
+		Line cur = dq[i], nxt = dq[(i + 1) % dq.size()];
+		if (cur / nxt < TOL) {
+			hull.clear();
+			return 0;
+		}
+		hull.push_back(intersection(cur, nxt));
+	}
+	return 1;
 }
 int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {
 	int sz = H.size();
