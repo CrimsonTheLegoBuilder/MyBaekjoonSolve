@@ -1,6 +1,3 @@
-import sys
-
-
 def solve(n, i):
     if n == 3:
         print(f"{i + 1} to {i - 2}")
@@ -45,6 +42,6 @@ def solve(n, i):
     return
 
 
-if __name__ == "__main__":  # boj10050
-    N = sys.stdin.readline().strip()
-    solve(int(N), 1)
+if __name__ == "__main__":  # boj10050 from wnwoghd22
+    N = int(input())
+    solve(N, 1)

@@ -13,7 +13,7 @@ int main() {
 		(a + b) == c || 
 		(b + c) == a || 
 		(c + a) == b) std::cout << "S\n";
-	else std::cout << "N\n";
+	//else std::cout << "N\n";
 	return 0;
 }
 

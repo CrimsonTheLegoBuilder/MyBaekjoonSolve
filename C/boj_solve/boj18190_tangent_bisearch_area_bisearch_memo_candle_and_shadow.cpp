@@ -134,7 +134,7 @@ Info get_inner_area(Pos H[], ll memo[], const int& sz, const Pos& p) {
 }
 ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H_out[], ll memo_out[], const int& sz_out, const Pos& p) {
 	Info info = get_inner_area(H_in, memo_in, sz_in, p);
-	Pos vr = H_in[info.r], vl = H_in[info.l], ip;
+	Pos vr = H_in[info.r], vl = H_in[info.l];
 	int ir, il;
 	ld wing_r{ 0 }, wing_l{ 0 };
 
