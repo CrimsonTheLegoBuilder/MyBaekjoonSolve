@@ -1,6 +1,0 @@
-IF(MATCH("i"))
-	STRING("impossible") NEWLINE
-ELSE
-	FLOAT(-10^10, 10^10) NEWLINE
-END
-EOF

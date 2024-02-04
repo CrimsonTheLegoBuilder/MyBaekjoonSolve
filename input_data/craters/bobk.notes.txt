@@ -1,7 +1,0 @@
-Craters notes:
-- changed directory name to craters
-- added CTD validator
-- split LaTeX input to fit 80-column lines
-- fixed spacing error in sample input 1.in
-- removed duplicate secret file 01.*
-- fixed John's validator to return 42
