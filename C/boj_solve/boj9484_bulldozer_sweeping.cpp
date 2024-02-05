@@ -40,8 +40,8 @@ struct Slope {//segment's two point and slope
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("boj9484_triangle_in.txt", "r", stdin);
-	freopen("boj9484_triangle_out.txt", "w", stdout);
+	//freopen("boj9484_triangle_in.txt", "r", stdin);
+	//freopen("boj9484_triangle_out.txt", "w", stdout);
 	while (1) {
 		memset(order, 0, LEN);
 		memset(idx, 0, LEN);

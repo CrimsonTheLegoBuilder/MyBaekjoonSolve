@@ -177,7 +177,7 @@
     <ClCompile Include="boj4618_eccentricity.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj16783_buldozer.cpp">
+    <ClCompile Include="boj16783_bulldozer.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
     <ClCompile Include="bojBRONZE.cpp">
@@ -654,7 +654,7 @@
     <ClCompile Include="q5257_Jay.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj9484_sweeping.cpp">
+    <ClCompile Include="boj9484_bulldozer_sweeping.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
