@@ -1,7 +1,7 @@
 #include <iostream>
 #include <algorithm>
 typedef long long ll;
-const ll INF = 1e9;
+const ll INF = 1e18;
 const int LEN = 2'001;
 
 int N, M, pos[LEN];
@@ -9,7 +9,7 @@ ll ret;
 char c;
 
 struct Pos {
-	ll x, y, v;
+	ll x, y;
 	Pos(ll X, ll Y) : x(X), y(Y) {}
 	Pos() : x(0), y(0) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
@@ -25,7 +25,7 @@ struct Pos {
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
 	//ld mag() const { return hypot(x, y); }
-} spot[LEN];
+} P[LEN];
 const Pos O = { 0, 0 }, MAXL = { 0, INF }, MAXR = { INF, 0 }, pivot = { -1, -1 };
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 struct Slope {  //segment's two point and slope
@@ -72,13 +72,25 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> N;
-	for (int i = 0; i < N; i++) std::cin >> spot[i].x >> spot[i].y;
-	std::sort(spot, spot + N);
+	for (int i = 0; i < N; i++) std::cin >> P[i].x >> P[i].y;
+	std::sort(P, P + N);
+	ll MIN = INF, MAX = -INF;
 
 	for (int i = 0; i < N; i++) {
+		Pos p1 = P[i];
 		for (int j = i + 1; j < N; j++) {
-			ll dx = spot[j].x - spot[i].x;
-			ll dy = spot[j].y - spot[i].y;
+			ll dx = P[j].x - P[i].x;
+			ll dy = P[j].y - P[i].y;
+			if (P[j].x == P[i].x) {
+				if (i > 0) {
+					MIN = std::min({ MIN, std::abs(cross(p1, P[j], P[i - 1])) });
+					MAX = std::min({ MAX, std::abs(cross(p1, P[j], P[0])) });
+				}
+				else if (j < N - 1) {
+					MIN = std::min({ MIN, std::abs(cross(p1, P[j], P[j + 1])) });
+					MAX = std::min({ MAX, std::abs(cross(p1, P[j], P[N - 1])) });
+				}
+			}
 			if (!dx) continue;
 			if (dx * dy >= 0) {
 				dx = std::abs(dx); dy = std::abs(dy);
@@ -91,25 +103,36 @@ void solve() {
 	}
 	std::sort(slopes, slopes + M);
 
-	//for (int i = 0; i < N; i++) {
-	//	pos[i] = i;  //cur. idx
-	//	update(i, spot[i].v);
-	//}
+	for (int i = 0; i < N; i++) pos[i] = i;  //cur. idx
 	//ret = std::max(ret, seg_len[1].max);
-
 	for (int i = 0, j; i < M; i = j) {
 		j = i;
+		Pos S = P[slopes[i].u], E = P[slopes[i].u];
+		int s = slopes[i].u, e = slopes[i].u;
 		while (j < M && slopes[i] == slopes[j]) {
 			int u = slopes[j].u, v = slopes[j].v;
-			int x = pos[u], y = pos[v];
+			if (e < v) e = v;
+			if (E < P[pos[v]]) { E = P[pos[v]];}
+			if (u > 0) {
+				MIN = std::min({ MIN, std::abs(cross(P[pos[u]], P[pos[v]], P[pos[u - 1]]))});
+			}
+			if (v < N - 1) {
+				MIN = std::min({ MIN, std::abs(cross(P[pos[u]], P[pos[v]], P[pos[v + 1]]))});
+			}
 			//int vx = spot[u].v, vy = spot[v].v;
 			//update(x, vy); update(y, vx);
+			int x = pos[u], y = pos[v];
 			pos[u] = y; pos[v] = x;
 			j++;
 		}
+		if (s > 0) MAX = std::max({ MAX, std::abs(cross(S, E, P[pos[0]])) });
+		if (e < N - 1) MAX = std::max({ MAX, std::abs(cross(S, E, P[pos[N - 1]])) });
+		
 		//ret = std::max(ret, seg_len[1].max);
 	}
-	std::cout << ret;
+	std::cout << MIN << "\n" << MAX << "\n";
+	std::cout << (MIN >> 1) << '.' << (MIN & 1 ? "5\n" : "0\n");
+	std::cout << (MAX >> 1) << '.' << (MAX & 1 ? "5\n" : "0\n");
 	return;
 }
 int main() { solve(); return 0; }//boj9484

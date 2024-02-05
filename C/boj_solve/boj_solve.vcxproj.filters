@@ -648,11 +648,14 @@
     <ClCompile Include="boj15310_CH_trick.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10785_Asteroids.cpp">
+    <ClCompile Include="boj10785_HPI_ternary_search_Asteroids.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="q5257_Jay.cpp">
       <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj9484_sweeping.cpp">
+      <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
