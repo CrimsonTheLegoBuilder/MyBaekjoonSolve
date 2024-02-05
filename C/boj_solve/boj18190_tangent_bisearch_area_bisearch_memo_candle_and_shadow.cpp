@@ -194,8 +194,8 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 
 	//DEBUG
 	//std::cout << "in R: " << info.r << " in L: " << info.l << " out R: " << ir << " out L: " << il << "\n";
-	//std::cout << "wing R: " << wing_r << " wing L : " << wing_l << "\n";
-	//std::cout << "wing R: " << trir * (ld)ar / (ar + br) << " wing L : " << tril * (ld)bl / (al + bl) << "\n";
+	//std::cout << "wing R: " << wing_r << " wing L: " << wing_l << "\n";
+	//std::cout << "wing R: " << trir * (ld)ar / (ar + br) << " wing L: " << tril * (ld)bl / (al + bl) << "\n";
 	//std::cout << "inner: " << info.area << "\n";
 
 	//get_shadow
