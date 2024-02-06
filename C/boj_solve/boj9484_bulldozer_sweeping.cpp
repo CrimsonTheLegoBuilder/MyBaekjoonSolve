@@ -84,18 +84,15 @@ void solve() {
 				int u = slopes[j].u, v = slopes[j].v;
 				if (e < order[v]) e = order[v];
 				int ou = order[u], ov = order[v];
-				if (ou > 0)
-					MIN = std::min({ MIN, std::abs(cross(P[u], P[v], P[idx[ou - 1]])) });
-				if (ov < N - 1)
-					MIN = std::min({ MIN, std::abs(cross(P[u], P[v], P[idx[ov + 1]])) });
+				if (ou > 0) MIN = std::min(MIN, std::abs(cross(P[u], P[v], P[idx[ou - 1]])));
+				if (ov < N - 1) MIN = std::min(MIN, std::abs(cross(P[u], P[v], P[idx[ov + 1]])));
 				order[u] = ov; order[v] = ou;
 				idx[ou] = v; idx[ov] = u;
 				j++;
 			}
 			if (s == 0 && e == N - 1) MAX = 0;
-			if (s > 0) MAX = std::max({ MAX, std::abs(cross(P[idx[s]], P[idx[e]], P[idx[0]]))});
-			if (e < N - 1) MAX = std::max({ MAX, std::abs(cross(P[idx[s]], P[idx[e]], P[idx[N - 1]])) });
-			
+			if (s > 0) MAX = std::max(MAX, std::abs(cross(P[idx[s]], P[idx[e]], P[idx[0]])));
+			if (e < N - 1) MAX = std::max(MAX, std::abs(cross(P[idx[s]], P[idx[e]], P[idx[N - 1]])));
 		}
 		std::cout << (MIN >> 1) << '.' << (MIN & 1 ? "5 " : "0 ");
 		std::cout << (MAX >> 1) << '.' << (MAX & 1 ? "5\n" : "0\n");
