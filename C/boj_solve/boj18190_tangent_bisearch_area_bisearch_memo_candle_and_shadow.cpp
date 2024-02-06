@@ -119,7 +119,6 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 		i2 = s2;
 		if (!ccw(p, H[i2], H[(i2 + 1) % sz]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
 	}
-
 	if (i2 < i1) std::swap(i2, i1);//normalize
 	return { 0, i2, i1 };
 }

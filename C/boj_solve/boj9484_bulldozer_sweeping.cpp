@@ -94,6 +94,7 @@ void solve() {
 			if (s > 0) MAX = std::max(MAX, std::abs(cross(P[idx[s]], P[idx[e]], P[idx[0]])));
 			if (e < N - 1) MAX = std::max(MAX, std::abs(cross(P[idx[s]], P[idx[e]], P[idx[N - 1]])));
 		}
+		//std::cout << N << "\n";
 		std::cout << (MIN >> 1) << '.' << (MIN & 1 ? "5 " : "0 ");
 		std::cout << (MAX >> 1) << '.' << (MAX & 1 ? "5\n" : "0\n");
 	}
