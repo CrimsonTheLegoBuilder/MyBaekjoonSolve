@@ -657,6 +657,12 @@
     <ClCompile Include="boj9484_bulldozer_sweeping.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj19586_rotating_calipers.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj9276_rotating_calipers.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
