@@ -37,3 +37,10 @@ int main() {
 	std::cout << cnt << "\n";
 	return 0;
 }
+
+/*
+6
+-1 0 0 1 2 3
+3
+
+*/
