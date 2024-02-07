@@ -1,21 +1,10 @@
-import sys
-
-
-def find(name: str) -> str:
-    return name if "S" in name else 0
-
-
 if __name__ == '__main__':
-    N = int(sys.stdin.readline().strip())
-    while N:
-        suspect = str(sys.stdin.readline().strip())
-        ans = find(suspect)
-        if ans:
-            print(ans)
-        N -= 1
-
-
-for _ in range(int(input())):
-    a = str(input())
-    # a = a if "S" in a else ""
-    print(a, end="")
+    AB = input().strip()
+    if len(AB) == 2:
+        print(int(AB[0]) + int(AB[1]))
+    elif len(AB) == 3 and AB[2] == '0':
+        print(int(AB[0]) + int(AB[1]) * 10)
+    elif len(AB) == 3 and AB[1] == '0':
+        print(int(AB[2]) + int(AB[0]) * 10)
+    # elif len(AB) == 4:
+    #     print(20)
