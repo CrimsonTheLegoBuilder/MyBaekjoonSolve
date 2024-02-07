@@ -16,10 +16,10 @@ const ld PI = acos(-1);// pi = 3.14159265...
 
 struct circle {
 	ll x, y, r;// [x, y] - center, r - radius
-	constexpr circle operator+(circle c) const { return { x + c.x, y + c.y, r + c.r }; }
-	constexpr circle operator-(circle c) const { return { x - c.x, y - c.y, r - c.r }; }
+	constexpr circle operator+(const circle& c) const { return { x + c.x, y + c.y, r + c.r }; }
+	constexpr circle operator-(const circle& c) const { return { x - c.x, y - c.y, r - c.r }; }
 	bool operator!=(circle c) const { return std::abs(x - c.x) >= TOL || std::abs(y - c.y) >= TOL || std::abs(r - c.r) >= TOL; }
-	ld H(ld th) { return sin(th) * x + cos(th) * y + r; }//y-coord
+	ld H(const ld& th) const { return sin(th) * x + cos(th) * y + r; }// coord trans | check right
 };
 struct arc {
 	ld lo, hi;// [lo, hi] - radian range of arc
@@ -27,7 +27,7 @@ struct arc {
 };
 
 
-ld norm(ld th) {  // angle normalization
+ld norm(ld th) {// angle normalization
 	while (th < 0) th += 2 * PI;
 	while (th >= 2 * PI) th -= 2 * PI;
 	return th;
@@ -41,9 +41,9 @@ std::vector<arc> merge(circle p, circle q, ld cur, ld nxt) {// merge 2 disks
 		else return { { cur, nxt, q } };             // same center :: p.r < q.r
 	}
 
-	ld t = -ld(delta.r) / hypot(delta.x, delta.y);// angle between tangent and line segment between centers || size comparison
-	if (t <= -1) return { { cur, nxt, p } };      // p.r > q.r
-	if (t >= 1) return { { cur, nxt, q } };       // p.r < q.r
+	ld t = -ld(delta.r) / hypot(delta.x, delta.y);// angle between tangent and line segment between centers && size comparison
+	if (t <= -1) return { { cur, nxt, p } };      // p > q
+	if (t >= 1) return { { cur, nxt, q } };       // p < q
 
 	ld phi = atan2l(delta.y, delta.x);// angle between x-line and line segment between centers
 	ld x1 = asin(std::abs(t)) + (t < 0 ? PI : 0);// normalizated angle between tangent and line segment between centers
@@ -107,7 +107,7 @@ std::vector<arc> HullDisks(std::vector<circle>& C) {
 	for (auto& A : hull) std::swap(A.c.x, A.c.y);// set back
 	return hull;
 }
-ld getPerimeter(std::vector<arc>& H) {// hull = [[lo, hi, c], [lo, hi, c], [lo, hi, c]...]
+ld getRound(std::vector<arc>& H) {// hull = [[lo, hi, c], [lo, hi, c], [lo, hi, c]...]
 	ld  R = 0;
 	for (int i = 0; i < H.size(); i++) {
 		arc  p = H[i], q = H[(i + 1) % H.size()];
@@ -154,7 +154,7 @@ int main() {
 		Circles[i].r = r;
 	}
 	std::vector<arc> Hull = HullDisks(Circles);
-	R = getPerimeter(Hull);
+	R = getRound(Hull);
 	//A = getArea(Hull);
 	std::cout << R << "\n";
 	//std::cout << A << "\n";
