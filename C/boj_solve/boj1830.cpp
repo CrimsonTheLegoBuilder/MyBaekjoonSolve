@@ -5,7 +5,7 @@
 #include <cstring>
 typedef long long ll;
 const ll MAX = 1e17;
-const int LEN = 1e6;
+const int LEN = 1e5;
 int N;
 
 struct Pos {
@@ -164,8 +164,8 @@ void solve() {
 	CMAX = Chebyshev_MAX();
 	MMIN = Manhattan_MIN();
 	rotate();
-	MMAX = Manhattan_MAX();
 	CMIN = Chebyshev_MIN() >> 1;
+	MMAX = Manhattan_MAX();
 	std::cout << EMAX << "\n" << EMIN << "\n" << MMAX << "\n" << MMIN << "\n" << CMAX << "\n" << CMIN << "\n";
 	return;
 }
