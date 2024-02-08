@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -158,24 +159,29 @@ ld ternary_search(const ld& t1, const ld& t2, const Pos& rel) {
 	return s;
 }
 void solve() {
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-	std::cout << std::fixed;
-	std::cout.precision(6);
+	//std::cin.tie(0)->sync_with_stdio(0);
+	//std::cout.tie(0);
+	//std::cout << std::fixed;
+	//std::cout.precision(6);
 	for (int i = 0; i < 2; i++) {
-		std::cin >> N[i];
+		//std::cin >> N[i];
+		scanf("%d", &N[i]);
 		H[i].resize(N[i]);
-		for (int j = 0; j < N[i]; j++) std::cin >> H[i][j].x >> H[i][j].y;
+		//for (int j = 0; j < N[i]; j++) std::cin >> H[i][j].x >> H[i][j].y;
+		for (int j = 0; j < N[i]; j++) scanf("%lf%lf", &H[i][j].x, &H[i][j].y);
 		std::reverse(H[i].begin(), H[i].end());
-		std::cin >> vel[i].x >> vel[i].y;
+		//std::cin >> vel[i].x >> vel[i].y;
+		scanf("%lf%lf", &vel[i].x, &vel[i].y);
 	}
 	rel = vel[1] - vel[0];
 	ld MIN = cal_dist(rel);
 	ld MAX = cal_dist(rel, 1);
-	if (z(rel.mag()) || MIN > 1e6) { std::cout << "never\n"; return; }
+	//if (z(rel.mag()) || MIN > 1e6) { std::cout << "never\n"; return; }
+	if (z(rel.mag()) || MIN > 1e6) { printf("never\n"); return; }
 	ld s = MIN / rel.mag();
 	ld e = MAX / rel.mag();
-	std::cout << ternary_search(s, e, rel) << "\n";
+	//std::cout << ternary_search(s, e, rel) << "\n";
+	printf("%.7lf\n", ternary_search(s, e, rel));
 	return;
 }
 int main() { solve(); return 0; }//boj10785
