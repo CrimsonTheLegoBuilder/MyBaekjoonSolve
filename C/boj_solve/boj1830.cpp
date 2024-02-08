@@ -78,7 +78,7 @@ ll min_dist(bool flag, int s = 0, int e = N - 1) {
 	int m = s + e >> 1;
 	ll x_mid = C[m].x, D = std::min(min_dist(flag, s, m), min_dist(flag, m + 1, e));
 
-	int idx = s, l = s, r = m + 1;
+	int idx = s, l = s, r = m + 1;//merge sort
 	while (l <= m && r <= e) {
 		if (C[l].y < C[r].y) tmp[idx++] = C[l++];
 		else tmp[idx++] = C[r++];

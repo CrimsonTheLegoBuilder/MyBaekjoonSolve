@@ -1,14 +1,13 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-//#include <deque>
 #include <queue>
 #include <cmath>
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-7;
 const ld INF = 1e17;
-const int LEN = 2e4;
+const int LEN = 102;
 int N, t{ 0 };
 ld COST[LEN];
 
@@ -20,7 +19,7 @@ struct Info {
 std::vector<Info> G[LEN];
 std::priority_queue<Info> Q;
 ld dijkstra(int v, int g) {
-	for (int i = 0; i <= t; i++) COST[i] = INF;
+	for (int i = 0; i < LEN; i++) COST[i] = INF;
 	Q.push({ v, 0 });
 	COST[v] = 0;
 	while (Q.size()) {
@@ -55,12 +54,13 @@ struct Pos {
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	ld mag() const { return hypot(x, y); }
-} gallery[LEN], nodes[LEN], guard{ 0, 0, 0 }, sculpture{ 0, 0, 1 }; const Pos O = { 0, 0, -1 };
+} gallery[LEN], nodes[LEN], sculpture{ 0, 0, 0 }, guard{ 0, 0, 1 };// const Pos O = { 0, 0, -1 };
 struct Vec {
 	ld vy, vx;
 	bool operator < (const Vec& v) const { return z(vy - v.vy) ? vx < v.vx : vy < v.vy; }
 	bool operator == (const Vec& v) const { return (z(vy - v.vy) && z(vx - v.vx)); }
 	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
+	Vec operator ~ () const { return { -vx, vy }; }
 }; const Vec Zero = { 0, 0 };
 struct Line {
 	Vec s;
@@ -79,7 +79,12 @@ Line L(const Pos& s, const Pos& e) {
 	dy = e.y - s.y;
 	dx = s.x - e.x;
 	c = dy * s.x + dx * s.y;
-	return { {dy, dx} , c };
+	return { { dy, dx } , c };
+}
+Line rotate90(const Line& l, const Pos& p) {
+	Vec s = ~l.s;
+	ld c = s.vy * p.x + s.vx * p.y;
+	return { s, c };
 }
 Pos intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
@@ -91,7 +96,6 @@ Pos intersection(const Line& l1, const Line& l2) {
 	};
 }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return z(ret) ? 0 : ret > 0 ? 1 : -1;
@@ -105,14 +109,11 @@ bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld dot_ = dot(d1, d3, d2);
 	return z(cross(d1, d2, d3)) && dot_ > 0;
 }
-//bool inner_check(std::vector<Pos>& H, const Pos& p) {
 bool inner_check(Pos H[], const int& sz, const Pos& p) {
 	int cnt = 0;
-	//int sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
 		if (on_seg_strong(cur, nxt, p)) continue;
-		//if (on_seg_strong(cur, nxt, p)) return 1;
 		if (z(cur.y - nxt.y)) continue;
 		if (cur.x < p.x && nxt.x < p.x) continue;
 		if (nxt.y < cur.y) std::swap(cur, nxt);
@@ -121,12 +122,38 @@ bool inner_check(Pos H[], const int& sz, const Pos& p) {
 	}
 	return cnt & 1;
 }
-bool blocked(Pos H[], const int& sz, const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
+	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	return f1 && f2;
+}
+bool blocked(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
 	bool f3 = on_seg_weak(s1, s2, d1) || on_seg_weak(s1, s2, d2);
-	bool f4 = inner_check(H, sz, (s1 + s2) * .5);
-	return (f1 && f2) || f3 ? 1 : f4;
+	return (f1 && f2) || f3;
+}
+bool blocked(Pos H[], const int& sz, const Pos& s1, const Pos& s2) {
+	for (int i = 0; i < sz; i++) if (blocked(s1, s2, H[i], H[(i + 1) % sz])) return 1;
+	return 0;
+}
+bool invisible(Pos H[], const int& sz, const Pos& p, const Pos& target) {
+	bool l{ 0 }, r{ 0 };
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (!ccw(p, target, cur) && !ccw(p, target, nxt)) continue;
+		if (intersect(p, target, cur, nxt)) return 1;
+		if (on_seg_weak(p, target, cur) && ccw(p, target, nxt) > 0) l = 1;
+		if (on_seg_weak(p, target, nxt) && ccw(p, target, cur) > 0) l = 1;
+		if (on_seg_weak(p, target, cur) && ccw(p, target, nxt) < 0) r = 1;
+		if (on_seg_weak(p, target, nxt) && ccw(p, target, cur) < 0) r = 1;
+		if (l && r) return 1;
+	}
+	//return l && r;
+	return 0;
+}
+bool visible(Pos H[], const int& sz, const Pos& p,  const Pos& inx, const Pos& target) {
+	return inner_check(H, sz, inx) && !blocked(H, sz, p, inx) && inner_check(H, sz, (p + inx) * .5) && !invisible(H, sz, inx, target);
 }
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -136,29 +163,50 @@ void init() {
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> gallery[i].x >> gallery[i].y, gallery[i].i = i + 2;
 	std::cin >> guard.x >> guard.y >> sculpture.x >> sculpture.y;
-	return;
-}
-void pos_init() {
-	t = 0;
-	nodes[t++] = guard;
-	nodes[t++] = sculpture;
-	for (int i = 0; i < N; i++) nodes[t++] = gallery[i];
-	return;
-}
-void graph_init() {
+	sculpture.i = 0;
+	guard.i = 1;
 
+	if (!invisible(gallery, N, guard, sculpture)) { G[1].push_back({ 0, 0 }); return; }
+
+	t = 0;
+	nodes[t++] = sculpture;
+	nodes[t++] = guard;
+	Pos seg;
+	for (int i = 0; i < N; i++) nodes[t++] = gallery[i];
+	for (int i = 1; i < t; i++) {
+		if (!invisible(gallery, N, nodes[i], nodes[0])) G[i].push_back({ 0, 0 });
+		for (int j = i + 1; j < t; j++) {
+			if (!blocked(gallery, N, nodes[i], nodes[j])
+				&& inner_check(gallery, N, (nodes[i] + nodes[j]) * .5)) {
+				seg = nodes[i] - nodes[j];
+				G[i].push_back({ j, seg.mag() });
+				G[j].push_back({ i, seg.mag() });
+			}
+		}
+	}
+	Line view_line, last;
+	Pos inx;
+	for (int i = 0; i < N; i++) {
+		view_line = L(sculpture, gallery[i]);
+		last = rotate90(view_line, guard);
+		inx = intersection(view_line, last);
+		if (visible(gallery, N, guard, inx, sculpture))
+				G[guard.i].push_back({ 0, (guard - inx).mag() });
+		for (int j = 0; j < N; j++) {
+			if (i == j) continue;
+			last = rotate90(view_line, gallery[j]);
+			inx = intersection(view_line, last);
+			if (visible(gallery, N, gallery[j], inx, sculpture))
+					G[gallery[j].i].push_back({ 0, (gallery[j] - inx).mag() });
+		}
+	}
 	return;
 }
-void solve() {
-	init();
-	pos_init();
-	graph_init();
-	std::cout << dijkstra(0, 1) << "\n";
-	return;
-}
+void solve() { init(); std::cout << dijkstra(1, 0) << "\n"; return; }
 int main() { solve(); return 0; }//boj26133
 
 
+//ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 //int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 //	ld ret = cross(d1, d2, d3, d4);
 //	return z(ret) ? 0 : ret > 0 ? 1 : -1;
@@ -188,4 +236,75 @@ int main() { solve(); return 0; }//boj26133
 //		hull.push_back(intersection(cur, nxt));
 //	}
 //	return 1;
+//}
+//void init() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cout << std::fixed;
+//	std::cout.precision(7);
+//	std::cin >> N;
+//	for (int i = 0; i < N; i++) std::cin >> gallery[i].x >> gallery[i].y, gallery[i].i = i + 2;
+//	std::cin >> guard.x >> guard.y >> sculpture.x >> sculpture.y;
+//	sculpture.i = 0;
+//	guard.i = 1;
+//
+//	t = 0;
+//	nodes[t++] = sculpture;
+//	nodes[t++] = guard;
+//
+//	Pos cost;
+//	for (int i = 0; i < N; i++) nodes[t++] = gallery[i];
+//	for (int i = 1; i < t; i++) {//O(N^3)
+//		if (!invisible(gallery, N, nodes[i], nodes[0])) G[i].push_back({ 0, 0 });
+//		for (int j = i + 1; j < t; j++) {
+//			if (!blocked(gallery, N, nodes[i], nodes[j])
+//				&& inner_check(gallery, N, (nodes[i] + nodes[j]) * .5)) {
+//				cost = nodes[i] - nodes[j];
+//				G[i].push_back({ j, cost.mag() });
+//				G[j].push_back({ i, cost.mag() });
+//			}
+//		}
+//	}
+//	Line view_line, last;
+//	Pos inx;
+//	for (int i = 0; i < N; i++) {//O(N^3)
+//		view_line = L(sculpture, gallery[i]);
+//		last = rotate90(view_line, guard);
+//		inx = intersection(view_line, last);
+//		//if (inner_check(gallery, N, inx) 
+//		//	&& !blocked(gallery, N, guard, inx) 
+//		//	&& inner_check(gallery, N, (guard + inx) * .5) 
+//		//	&& !invisible(gallery, N, inx, sculpture)) 
+//		//		G[guard.i].push_back({ 0, (guard - inx).mag() });
+//		if (visible(gallery, N, guard, inx, sculpture))
+//				G[guard.i].push_back({ 0, (guard - inx).mag() });
+//		for (int j = 0; j < N; j++) {
+//			if (i == j) continue;
+//			last = rotate90(view_line, gallery[j]);
+//			inx = intersection(view_line, last);
+//			//if (inner_check(gallery, N, inx) 
+//			//	&& !blocked(gallery, N, gallery[j], inx) 
+//			//	&& inner_check(gallery, N, (gallery[j] + inx) * .5) 
+//			//	&& !invisible(gallery, N, inx, sculpture)) 
+//			//		G[gallery[j].i].push_back({ 0, (gallery[j] - inx).mag() });
+//			if (visible(gallery, N, gallery[j], inx, sculpture))
+//					G[gallery[j].i].push_back({ 0, (gallery[j] - inx).mag() });
+//		}
+//	}
+//	return;
+//}
+//bool inner_check(std::vector<Pos>& H, const Pos& p) {
+//	int cnt = 0;
+//	int sz = H.size();
+//	for (int i = 0; i < sz; i++) {
+//		Pos cur = H[i], nxt = H[(i + 1) % sz];
+//		if (on_seg_strong(cur, nxt, p)) continue;
+//		//if (on_seg_strong(cur, nxt, p)) return 1;
+//		if (z(cur.y - nxt.y)) continue;
+//		if (cur.x < p.x && nxt.x < p.x) continue;
+//		if (nxt.y < cur.y) std::swap(cur, nxt);
+//		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+//		cnt += ccw(cur, nxt, p) > 0;
+//	}
+//	return cnt & 1;
 //}
