@@ -143,7 +143,6 @@ void pos_init() {
 	nodes[t++] = guard;
 	nodes[t++] = sculpture;
 	for (int i = 0; i < N; i++) nodes[t++] = gallery[i];
-
 	return;
 }
 void graph_init() {
