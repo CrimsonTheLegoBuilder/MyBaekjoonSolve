@@ -41,20 +41,12 @@ bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld dot_ = dot(d1, d3, d2);
 	return z(cross(d1, d2, d3)) && (dot_ > 0 || z(dot_));
 }
-//bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-//	ld dot_ = dot(d1, d3, d2);
-//	return z(cross(d1, d2, d3)) && dot_ > 0;
-//}
-//bool inner_check(std::vector<Pos>& H, const Pos& p) {
 bool inner_check(Pos H[], const int& sz, const Pos& p) {
 	int cnt = 0;
-	//int sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
 		if (on_seg_strong(cur, nxt, p)) return 1;
-		//if (on_seg_strong(cur, nxt, p)) continue;
 		if (z(cur.y - nxt.y)) continue;
-		if (cur.x < p.x&& nxt.x < p.x) continue;
 		if (nxt.y < cur.y) std::swap(cur, nxt);
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;

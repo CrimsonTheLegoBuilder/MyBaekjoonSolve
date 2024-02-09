@@ -61,8 +61,8 @@ void solve() {
 	if (N == 2) { std::cout << (H[0] - H[1]).mag() << "\n"; return; }
 
 	int R{ 0 }, U{ 0 }, L{ 0 };
-	for (int j = 0; j < N; j++) if (dot(H[0], H[1], H[j % N], H[(j + 1) % N]) <= 0) { R = j; break; }
-	for (int k = R; k < N; k++) if (cross(H[0], H[1], H[k % N], H[(k + 1) % N]) <= 0) { U = k; break; }
+	for (int j = 0; j < N; j++) if (dot(H[0], H[1], H[j], H[(j + 1) % N]) <= 0) { R = j; break; }
+	for (int k = R; k < N; k++) if (cross(H[0], H[1], H[k], H[(k + 1) % N]) <= 0) { U = k; break; }
 	for (int l = U; l <= N; l++) if (dot(H[0], H[1], H[l % N], H[(l + 1) % N]) >= 0) { L = l; break; }
 	R %= N, U %= N, L %= N;
 
@@ -71,7 +71,7 @@ void solve() {
 		while (dot(H[i % N], H[(i + 1) % N], H[R % N], H[(R + 1) % N]) > 0) R++;
 		while (cross(H[i % N], H[(i + 1) % N], H[U % N], H[(U + 1) % N]) > 0) U++;
 		while (dot(H[i % N], H[(i + 1) % N], H[L % N], H[(L + 1) % N]) < 0) L++;
-		R %= N, U %= N, L %= N;
+		//R %= N, U %= N, L %= N;
 		ld h = cross(H[i % N], H[(i + 1) % N], H[U % N]) / (H[i % N] - H[(i + 1) % N]).mag();
 		ld w = dot(H[i % N], H[(i + 1) % N], H[L % N], H[R % N]) / (H[i % N] - H[(i + 1) % N]).mag();
 		MIN = std::min(MIN, h + w);

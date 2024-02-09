@@ -5,7 +5,7 @@
 #include <cmath>
 typedef long long ll;
 typedef long double ld;
-const ld TOL = 1e-7;
+const ld TOL = 1e-8;
 const ld INF = 1e17;
 const int LEN = 102;
 int N, t{ 0 };
@@ -113,9 +113,10 @@ bool inner_check(Pos H[], const int& sz, const Pos& p) {
 	int cnt = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) continue;
+		//if (on_seg_strong(cur, nxt, p)) continue;
+		if (on_seg_strong(cur, nxt, p)) return 1;
 		if (z(cur.y - nxt.y)) continue;
-		if (cur.x < p.x && nxt.x < p.x) continue;
+		//if (cur.x < p.x && nxt.x < p.x) continue;
 		if (nxt.y < cur.y) std::swap(cur, nxt);
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
@@ -194,10 +195,35 @@ void init() {
 				G[guard.i].push_back({ 0, (guard - inx).mag() });
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
-			last = rotate90(view_line, gallery[j]);
+			Pos cur = gallery[j], pre = gallery[(j + N - 1) % N], nxt = gallery[(j + 1) % N];
+			last = rotate90(view_line, cur);
 			inx = intersection(view_line, last);
-			if (visible(gallery, N, gallery[j], inx, sculpture))
-					G[gallery[j].i].push_back({ 0, (gallery[j] - inx).mag() });
+			if (visible(gallery, N, cur, inx, sculpture))
+				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+			last = L(cur, pre);
+			inx = intersection(view_line, last);
+			//if (on_seg_strong(cur, pre, inx) && !invisible(gallery, N, inx, sculpture))
+			//	G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+			//if (!blocked(gallery, N, guard, inx) && on_seg_strong(cur, pre, inx) && !invisible(gallery, N, inx, sculpture))
+			//	G[guard.i].push_back({ 0, (guard - inx).mag() });
+			if (on_seg_weak(cur, pre, inx) && !invisible(gallery, N, inx, sculpture)) {
+				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+				for (int k = 1; k < t; k++) 
+					if (!blocked(gallery, N, nodes[k], inx)) 
+						G[nodes[k].i].push_back({ 0, (nodes[k] - inx).mag() });
+			}
+			last = L(cur, nxt);
+			inx = intersection(view_line, last);
+			//if (on_seg_strong(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture))
+			//	G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+			//if (!blocked(gallery, N, guard, inx) && on_seg_strong(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture))
+			//	G[guard.i].push_back({ 0, (guard - inx).mag() });
+			if (on_seg_weak(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture)) {
+				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+				for (int k = 1; k < t; k++)
+					if (!blocked(gallery, N, nodes[k], inx))
+						G[nodes[k].i].push_back({ 0, (nodes[k] - inx).mag() });
+			}
 		}
 	}
 	return;
@@ -205,6 +231,47 @@ void init() {
 void solve() { init(); std::cout << dijkstra(1, 0) << "\n"; return; }
 int main() { solve(); return 0; }//boj26133
 
+
+/*
+
+16
+13 33
+20 60
+23 66
+39 97
+49 105
+73 166
+100 205
+117 272
+98 216
+80 180
+66 172
+68 156
+51 122
+41 121
+22 92
+2 44
+10 40
+104 228
+
+140.8722826
+
+
+8
+10 10
+40 25
+20 25
+20 35
+12 23
+30 23
+10 20
+5 40
+15 15
+19 26
+
+25.0000000
+
+*/
 
 //ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 //int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
