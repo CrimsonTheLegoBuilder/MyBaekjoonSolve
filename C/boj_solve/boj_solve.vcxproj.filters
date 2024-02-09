@@ -663,10 +663,10 @@
     <ClCompile Include="boj19586_rotating_calipers.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj26133.cpp">
+    <ClCompile Include="boj1688.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj1688.cpp">
+    <ClCompile Include="boj26133_Noncnvxhul_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

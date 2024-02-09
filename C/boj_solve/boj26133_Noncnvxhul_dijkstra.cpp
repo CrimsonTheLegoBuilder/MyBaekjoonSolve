@@ -9,7 +9,7 @@ typedef double ld;
 const ld TOL = 1e-8;
 const ld INF = 1e17;
 const int LEN = 102;
-int N, t{ 0 };
+int N, t;
 ld COST[LEN];
 
 struct Info {
@@ -103,15 +103,15 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld dot_ = dot(d1, d3, d2);
-	return z(cross(d1, d2, d3)) && (dot_ > 0 || z(dot_));
+	ld ret = dot(d1, d3, d2);
+	return z(cross(d1, d2, d3)) && (ret > 0 || z(ret));
 }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld dot_ = dot(d1, d3, d2);
-	return z(cross(d1, d2, d3)) && dot_ > 0;
+	ld ret = dot(d1, d3, d2);
+	return z(cross(d1, d2, d3)) && ret > 0;
 }
 bool inner_check(Pos H[], const int& sz, const Pos& p) {
-	int cnt = 0;
+	int cnt{ 0 };
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
 		if (on_seg_strong(cur, nxt, p)) return 1;
@@ -296,78 +296,6 @@ int main() { solve(); return 0; }//boj26133
 //		hull.push_back(intersection(cur, nxt));
 //	}
 //	return 1;
-//}
-//void init() {
-//	std::cin.tie(0)->sync_with_stdio(0);
-//	std::cout.tie(0);
-//	std::cout << std::fixed;
-//	std::cout.precision(7);
-//	std::cin >> N;
-//	for (int i = 0; i < N; i++) std::cin >> gallery[i].x >> gallery[i].y, gallery[i].i = i + 2;
-//	std::cin >> guard.x >> guard.y >> sculpture.x >> sculpture.y;
-//	sculpture.i = 0;
-//	guard.i = 1;
-//
-//	if (!invisible(gallery, N, guard, sculpture)) { G[1].push_back({ 0, 0 }); return; }
-//
-//	t = 0;
-//	nodes[t++] = sculpture;
-//	nodes[t++] = guard;
-//	Pos seg;
-//	for (int i = 0; i < N; i++) nodes[t++] = gallery[i];
-//	for (int i = 1; i < t; i++) {
-//		if (!invisible(gallery, N, nodes[i], nodes[0])) G[i].push_back({ 0, 0 });
-//		for (int j = i + 1; j < t; j++) {
-//			if (!blocked(gallery, N, nodes[i], nodes[j])
-//				&& inner_check(gallery, N, (nodes[i] + nodes[j]) * .5)) {
-//				seg = nodes[i] - nodes[j];
-//				G[i].push_back({ j, seg.mag() });
-//				G[j].push_back({ i, seg.mag() });
-//			}
-//		}
-//	}
-//	Line view_line, last;
-//	Pos inx;
-//	for (int i = 0; i < N; i++) {
-//		view_line = L(sculpture, gallery[i]);
-//		last = rotate90(view_line, guard);
-//		inx = intersection(view_line, last);
-//		if (visible(gallery, N, guard, inx, sculpture))
-//			G[guard.i].push_back({ 0, (guard - inx).mag() });
-//		for (int j = 0; j < N; j++) {
-//			if (i == j) continue;
-//			Pos cur = gallery[j], pre = gallery[(j + N - 1) % N], nxt = gallery[(j + 1) % N];
-//			last = rotate90(view_line, cur);
-//			inx = intersection(view_line, last);
-//			if (visible(gallery, N, cur, inx, sculpture))
-//				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
-//			last = L(cur, pre);
-//			inx = intersection(view_line, last);
-//			//if (on_seg_strong(cur, pre, inx) && !invisible(gallery, N, inx, sculpture))
-//			//	G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
-//			//if (!blocked(gallery, N, guard, inx) && on_seg_strong(cur, pre, inx) && !invisible(gallery, N, inx, sculpture))
-//			//	G[guard.i].push_back({ 0, (guard - inx).mag() });
-//			if (on_seg_weak(cur, pre, inx) && !invisible(gallery, N, inx, sculpture)) {
-//				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
-//				for (int k = 1; k < t; k++) 
-//					if (!blocked(gallery, N, nodes[k], inx) && inner_check(gallery, N, (nodes[k] + inx) * .5))
-//						G[nodes[k].i].push_back({ 0, (nodes[k] - inx).mag() });
-//			}
-//			last = L(cur, nxt);
-//			inx = intersection(view_line, last);
-//			//if (on_seg_strong(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture))
-//			//	G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
-//			//if (!blocked(gallery, N, guard, inx) && on_seg_strong(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture))
-//			//	G[guard.i].push_back({ 0, (guard - inx).mag() });
-//			if (on_seg_weak(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture)) {
-//				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
-//				for (int k = 1; k < t; k++)
-//					if (!blocked(gallery, N, nodes[k], inx) && inner_check(gallery, N, (nodes[k] + inx) * .5))
-//						G[nodes[k].i].push_back({ 0, (nodes[k] - inx).mag() });
-//			}
-//		}
-//	}
-//	return;
 //}
 //bool inner_check(std::vector<Pos>& H, const Pos& p) {
 //	int cnt = 0;
