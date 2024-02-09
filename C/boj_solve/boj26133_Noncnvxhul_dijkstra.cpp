@@ -302,10 +302,8 @@ int main() { solve(); return 0; }//boj26133
 //	int sz = H.size();
 //	for (int i = 0; i < sz; i++) {
 //		Pos cur = H[i], nxt = H[(i + 1) % sz];
-//		if (on_seg_strong(cur, nxt, p)) continue;
-//		//if (on_seg_strong(cur, nxt, p)) return 1;
+//		if (on_seg_strong(cur, nxt, p)) return 1;
 //		if (z(cur.y - nxt.y)) continue;
-//		if (cur.x < p.x && nxt.x < p.x) continue;
 //		if (nxt.y < cur.y) std::swap(cur, nxt);
 //		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 //		cnt += ccw(cur, nxt, p) > 0;
