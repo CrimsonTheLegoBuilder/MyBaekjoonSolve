@@ -209,7 +209,7 @@ void init() {
 			if (on_seg_weak(cur, pre, inx) && !invisible(gallery, N, inx, sculpture)) {
 				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
 				for (int k = 1; k < t; k++) 
-					if (!blocked(gallery, N, nodes[k], inx)) 
+					if (!blocked(gallery, N, nodes[k], inx) && inner_check(gallery, N, (nodes[k] + inx) * .5))
 						G[nodes[k].i].push_back({ 0, (nodes[k] - inx).mag() });
 			}
 			last = L(cur, nxt);
@@ -221,7 +221,7 @@ void init() {
 			if (on_seg_weak(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture)) {
 				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
 				for (int k = 1; k < t; k++)
-					if (!blocked(gallery, N, nodes[k], inx))
+					if (!blocked(gallery, N, nodes[k], inx) && inner_check(gallery, N, (nodes[k] + inx) * .5))
 						G[nodes[k].i].push_back({ 0, (nodes[k] - inx).mag() });
 			}
 		}
