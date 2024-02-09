@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="39b4c90e-1449-48a0-952c-5acd0dfd5888" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boj10756.py" beforeDir="false" afterPath="$PROJECT_DIR$/boj10756_geo_two_pointer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boj1218_robot_sweeping.py" beforeDir="false" afterPath="$PROJECT_DIR$/boj1218_robot_sweeping.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

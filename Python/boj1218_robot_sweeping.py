@@ -127,7 +127,7 @@ def check(p: Pos) -> bool:
     return True
 
 
-if __name__ == '__main__':  # algorithm from Jay22
+if __name__ == '__main__':  # boj1218 algorithm from Jay22
     N = int(sys.stdin.readline().strip())
     pos = [Pos(*map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
     for j in range(N):
