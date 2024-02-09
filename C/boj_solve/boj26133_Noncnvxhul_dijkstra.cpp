@@ -4,7 +4,8 @@
 #include <queue>
 #include <cmath>
 typedef long long ll;
-typedef long double ld;
+//typedef long double ld;
+typedef double ld;
 const ld TOL = 1e-8;
 const ld INF = 1e17;
 const int LEN = 102;
