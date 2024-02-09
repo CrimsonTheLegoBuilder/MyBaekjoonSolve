@@ -113,10 +113,8 @@ bool inner_check(Pos H[], const int& sz, const Pos& p) {
 	int cnt = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		//if (on_seg_strong(cur, nxt, p)) continue;
 		if (on_seg_strong(cur, nxt, p)) return 1;
 		if (z(cur.y - nxt.y)) continue;
-		//if (cur.x < p.x && nxt.x < p.x) continue;
 		if (nxt.y < cur.y) std::swap(cur, nxt);
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
@@ -150,13 +148,15 @@ bool invisible(Pos H[], const int& sz, const Pos& p, const Pos& target) {
 		if (on_seg_weak(p, target, nxt) && ccw(p, target, cur) < 0) r = 1;
 		if (l && r) return 1;
 	}
-	//return l && r;
 	return 0;
 }
 bool visible(Pos H[], const int& sz, const Pos& p,  const Pos& inx, const Pos& target) {
-	return inner_check(H, sz, inx) && !blocked(H, sz, p, inx) && inner_check(H, sz, (p + inx) * .5) && !invisible(H, sz, inx, target);
+	return inner_check(H, sz, inx)
+		&& !blocked(H, sz, p, inx) 
+		&& inner_check(H, sz, (p + inx) * .5) 
+		&& !invisible(H, sz, inx, target);
 }
-void init() {
+void init() {//O(N^4)
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
@@ -192,7 +192,7 @@ void init() {
 		last = rotate90(view_line, guard);
 		inx = intersection(view_line, last);
 		if (visible(gallery, N, guard, inx, sculpture))
-				G[guard.i].push_back({ 0, (guard - inx).mag() });
+			G[guard.i].push_back({ 0, (guard - inx).mag() });
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
 			Pos cur = gallery[j], pre = gallery[(j + N - 1) % N], nxt = gallery[(j + 1) % N];
@@ -202,10 +202,6 @@ void init() {
 				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
 			last = L(cur, pre);
 			inx = intersection(view_line, last);
-			//if (on_seg_strong(cur, pre, inx) && !invisible(gallery, N, inx, sculpture))
-			//	G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
-			//if (!blocked(gallery, N, guard, inx) && on_seg_strong(cur, pre, inx) && !invisible(gallery, N, inx, sculpture))
-			//	G[guard.i].push_back({ 0, (guard - inx).mag() });
 			if (on_seg_weak(cur, pre, inx) && !invisible(gallery, N, inx, sculpture)) {
 				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
 				for (int k = 1; k < t; k++) 
@@ -214,10 +210,6 @@ void init() {
 			}
 			last = L(cur, nxt);
 			inx = intersection(view_line, last);
-			//if (on_seg_strong(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture))
-			//	G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
-			//if (!blocked(gallery, N, guard, inx) && on_seg_strong(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture))
-			//	G[guard.i].push_back({ 0, (guard - inx).mag() });
 			if (on_seg_weak(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture)) {
 				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
 				for (int k = 1; k < t; k++)
@@ -315,47 +307,63 @@ int main() { solve(); return 0; }//boj26133
 //	sculpture.i = 0;
 //	guard.i = 1;
 //
+//	if (!invisible(gallery, N, guard, sculpture)) { G[1].push_back({ 0, 0 }); return; }
+//
 //	t = 0;
 //	nodes[t++] = sculpture;
 //	nodes[t++] = guard;
-//
-//	Pos cost;
+//	Pos seg;
 //	for (int i = 0; i < N; i++) nodes[t++] = gallery[i];
-//	for (int i = 1; i < t; i++) {//O(N^3)
+//	for (int i = 1; i < t; i++) {
 //		if (!invisible(gallery, N, nodes[i], nodes[0])) G[i].push_back({ 0, 0 });
 //		for (int j = i + 1; j < t; j++) {
 //			if (!blocked(gallery, N, nodes[i], nodes[j])
 //				&& inner_check(gallery, N, (nodes[i] + nodes[j]) * .5)) {
-//				cost = nodes[i] - nodes[j];
-//				G[i].push_back({ j, cost.mag() });
-//				G[j].push_back({ i, cost.mag() });
+//				seg = nodes[i] - nodes[j];
+//				G[i].push_back({ j, seg.mag() });
+//				G[j].push_back({ i, seg.mag() });
 //			}
 //		}
 //	}
 //	Line view_line, last;
 //	Pos inx;
-//	for (int i = 0; i < N; i++) {//O(N^3)
+//	for (int i = 0; i < N; i++) {
 //		view_line = L(sculpture, gallery[i]);
 //		last = rotate90(view_line, guard);
 //		inx = intersection(view_line, last);
-//		//if (inner_check(gallery, N, inx) 
-//		//	&& !blocked(gallery, N, guard, inx) 
-//		//	&& inner_check(gallery, N, (guard + inx) * .5) 
-//		//	&& !invisible(gallery, N, inx, sculpture)) 
-//		//		G[guard.i].push_back({ 0, (guard - inx).mag() });
 //		if (visible(gallery, N, guard, inx, sculpture))
-//				G[guard.i].push_back({ 0, (guard - inx).mag() });
+//			G[guard.i].push_back({ 0, (guard - inx).mag() });
 //		for (int j = 0; j < N; j++) {
 //			if (i == j) continue;
-//			last = rotate90(view_line, gallery[j]);
+//			Pos cur = gallery[j], pre = gallery[(j + N - 1) % N], nxt = gallery[(j + 1) % N];
+//			last = rotate90(view_line, cur);
 //			inx = intersection(view_line, last);
-//			//if (inner_check(gallery, N, inx) 
-//			//	&& !blocked(gallery, N, gallery[j], inx) 
-//			//	&& inner_check(gallery, N, (gallery[j] + inx) * .5) 
-//			//	&& !invisible(gallery, N, inx, sculpture)) 
-//			//		G[gallery[j].i].push_back({ 0, (gallery[j] - inx).mag() });
-//			if (visible(gallery, N, gallery[j], inx, sculpture))
-//					G[gallery[j].i].push_back({ 0, (gallery[j] - inx).mag() });
+//			if (visible(gallery, N, cur, inx, sculpture))
+//				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+//			last = L(cur, pre);
+//			inx = intersection(view_line, last);
+//			//if (on_seg_strong(cur, pre, inx) && !invisible(gallery, N, inx, sculpture))
+//			//	G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+//			//if (!blocked(gallery, N, guard, inx) && on_seg_strong(cur, pre, inx) && !invisible(gallery, N, inx, sculpture))
+//			//	G[guard.i].push_back({ 0, (guard - inx).mag() });
+//			if (on_seg_weak(cur, pre, inx) && !invisible(gallery, N, inx, sculpture)) {
+//				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+//				for (int k = 1; k < t; k++) 
+//					if (!blocked(gallery, N, nodes[k], inx) && inner_check(gallery, N, (nodes[k] + inx) * .5))
+//						G[nodes[k].i].push_back({ 0, (nodes[k] - inx).mag() });
+//			}
+//			last = L(cur, nxt);
+//			inx = intersection(view_line, last);
+//			//if (on_seg_strong(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture))
+//			//	G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+//			//if (!blocked(gallery, N, guard, inx) && on_seg_strong(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture))
+//			//	G[guard.i].push_back({ 0, (guard - inx).mag() });
+//			if (on_seg_weak(cur, nxt, inx) && !invisible(gallery, N, inx, sculpture)) {
+//				G[gallery[j].i].push_back({ 0, (cur - inx).mag() });
+//				for (int k = 1; k < t; k++)
+//					if (!blocked(gallery, N, nodes[k], inx) && inner_check(gallery, N, (nodes[k] + inx) * .5))
+//						G[nodes[k].i].push_back({ 0, (nodes[k] - inx).mag() });
+//			}
 //		}
 //	}
 //	return;
