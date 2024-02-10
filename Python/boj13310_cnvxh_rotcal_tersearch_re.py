@@ -4,20 +4,29 @@ TOL = 1e-7
 
 
 class Pos:
-    def __init__(self, x_, y_, vx_, vy_):
+    def __init__(self, x_: int, y_: int, vx_: int, vy_: int):
         self.x = x_
         self.y = y_
         self.vx = vx_
         self.vy = vy_
 
-    def __sub__(self, p):
+    def __sub__(self, p: 'Pos') -> 'Pos':
         return Pos(self.x - p.x, self.y - p.y, 0, 0)
 
-    def __floordiv__(self, p) -> int or float:
+    def __floordiv__(self, p: 'Pos') -> int or float:
         return self.x * p.y - self.y * p.x
 
-    def __pow__(self, p) -> int or float:
+    def __pow__(self, p: 'Pos') -> int or float:
         return self.x * p.x + self.y * p.y
+
+    def mag(self) -> float:
+        return hypot(self.x, self.y)
+
+    def euc(self) -> int or float:
+        return self.x * self.x + self.y * self.y
+
+    def move(self, d: int) -> 'Pos':
+        return Pos(self.x + d * self.vx, self.y + d * self.vy, 0, 0)
 
     # def __lt__(self, p):
     #     if self.x == p.x:
@@ -29,21 +38,12 @@ class Pos:
     #         return self.y <= p.y
     #     return self.x <= p.x
 
-    def mag(self) -> float:
-        return hypot(self.x, self.y)
-
-    def euc(self) -> int or float:
-        return self.x * self.x + self.y * self.y
-
-    def move(self, d: int):
-        return Pos(self.x + d * self.vx, self.y + d * self.vy, 0, 0)
-
 
 def cross(d1: Pos, d2: Pos, d3: Pos) -> int or float:
     return (d2 - d1) // (d3 - d2)
 
 
-def monotone_chain(candi: list) -> list:
+def monotone_chain(candi: list[Pos]) -> list[Pos]:
     candi.sort(key=lambda p: (p.x, p.y))
     if len(candi) <= 2:
         return candi
@@ -60,14 +60,14 @@ def monotone_chain(candi: list) -> list:
     return lower[:-1] + upper[:-1]
 
 
-def ccw(hull: list, i: int, f: int) -> int or float:
+def ccw(hull: list[Pos], i: int, f: int) -> int or float:
     sz = len(hull)
     i1, i2 = hull[i], hull[(i + 1) % sz]
     f1, f2 = hull[f % sz], hull[(f + 1) % sz]
     return (i2 - i1) // (f2 - f1)
 
 
-def rotating_calipers(hull: list) -> int or float:
+def rotating_calipers(hull: list[Pos]) -> int or float:
     f = 1
     sz = len(hull)
     max_dist = 0
@@ -79,11 +79,11 @@ def rotating_calipers(hull: list) -> int or float:
     return max_dist
 
 
-def move(candi: list, d: int) -> list:
+def move(candi: list[Pos], d: int) -> list[Pos]:
     return [p.move(d) for p in candi]
 
 
-def ternary_search(candi: list, d: int) -> tuple:
+def ternary_search(candi: list[Pos], d: int) -> tuple[int, int]:
     s, e = 0, d
     while e - s >= 3:
         mid_l = (s + s + e) // 3
@@ -94,14 +94,12 @@ def ternary_search(candi: list, d: int) -> tuple:
             e = mid_r
         else:
             s = mid_l
-    min_length = int(1e17)
-    min_day = 0
+    min_len, min_day = int(1e17), 0
     for i in range(s, e + 1):
-        max_l = rotating_calipers(monotone_chain(move(candi, i)))
-        if min_length > max_l:
-            min_length = max_l
-            min_day = i
-    return min_day, min_length
+        max_len = rotating_calipers(monotone_chain(move(candi, i)))
+        if min_len > max_len:
+            min_len, min_day = max_len, i
+    return min_day, min_len
 
 
 if __name__ == '__main__':
