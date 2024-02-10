@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="39b4c90e-1449-48a0-952c-5acd0dfd5888" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj.filters" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boj2650_cross_point.py" beforeDir="false" afterPath="$PROJECT_DIR$/boj2650_cross_point.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boj13310_cnvxh_rotcal_tersearch.py" beforeDir="false" afterPath="$PROJECT_DIR$/boj13310_cnvxh_rotcal_tersearch.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +47,7 @@
       <recent name="D:\programming\BOJ\MyBaekjoonSolve\Python" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.boj2650_cross_point">
+  <component name="RunManager" selected="Python.boj13310_cnvxh_rotcal_tersearch_re">
     <configuration name="GNYP2004A_bullseye" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Python" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -67,7 +69,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="boj10050_block" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="boj13310_cnvxh_rotcal_tersearch" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Python" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -79,7 +81,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/boj10050_block.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/boj13310_cnvxh_rotcal_tersearch.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -88,7 +90,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="boj1218_robot_sweeping" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="boj13310_cnvxh_rotcal_tersearch_re" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Python" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -100,7 +102,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/boj1218_robot_sweeping.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/boj13310_cnvxh_rotcal_tersearch_re.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -153,11 +155,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.boj13310_cnvxh_rotcal_tersearch_re" />
+        <item itemvalue="Python.boj13310_cnvxh_rotcal_tersearch" />
         <item itemvalue="Python.boj2650_cross_point" />
         <item itemvalue="Python.GNYP2004A_bullseye" />
         <item itemvalue="Python.boj2756_bullseye" />
-        <item itemvalue="Python.boj1218_robot_sweeping" />
-        <item itemvalue="Python.boj10050_block" />
       </list>
     </recent_temporary>
   </component>

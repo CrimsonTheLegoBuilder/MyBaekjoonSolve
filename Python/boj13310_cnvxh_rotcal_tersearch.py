@@ -51,7 +51,7 @@ def pos_at_day_x(tup, x):  # compose list of positions at day x
     return pos_at_x_th
 
 
-def get_days_ternary_search(dots, x):  # get range of days during which the maximum length of the hull becomes smaller
+def ternary_search(dots, x):  # get range of days during which the maximum length of the hull becomes smaller
     start, end = 0, x
     while end - start >= 3:
         mid_l = (start*2 + end) // 3  # 1/3
@@ -71,13 +71,9 @@ def get_days_ternary_search(dots, x):  # get range of days during which the maxi
             start = mid_l
         # print(start, end)
         # print(max_l, max_r)
-    return (i for i in range(start, end + 1, 1))
-
-
-def get_min(dots, x):  # find min length of hulls and min day after ternary search
     min_length = int(32e15)
     min_day = 0
-    for i in x:
+    for i in range(start, end + 1):
         pos_at_i = pos_at_day_x(dots, i)
         hull_i = monotone_chain(pos_at_i)
         max_i = rotating_calipers(hull_i)
@@ -87,19 +83,33 @@ def get_min(dots, x):  # find min length of hulls and min day after ternary sear
     return min_day, min_length
 
 
-n, t = map(int, sys.stdin.readline().strip().split())
-stars = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
-if t > 6:
-    range_of_days = get_days_ternary_search(stars, t)
-else:  # the ternary search is inefficient if it does not exceed 7 days
-    range_of_days = [i for i in range(t + 1)]
-# print(range_of_days)
-ans = get_min(stars, range_of_days)
-print(ans[0])
-print(ans[1])
+if __name__ == '__main__':
+    n, t = map(int, sys.stdin.readline().strip().split())
+    stars = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
+    ans = ternary_search(stars, t)
+    print(ans[0])
+    print(ans[1])
+
 
 '''
 example
+
+3 3
+0 0 2 0
+5 0 -1 0
+3 -3 1 1
+
+2
+5
+
+
+2 1
+-4 -2 2 1
+4 2 -2 -1
+
+1
+10
+
 
 10 1000000
 1 1 5 5
@@ -113,6 +123,10 @@ example
 0 0 10 0
 -2 -3 -4 5
 
+0
+208
+
+
 8 100
 1 1 0 0
 2 2 -1 0
@@ -122,6 +136,10 @@ example
 0 3 3 3
 2 0 -3 -3
 1 0 2 1
+
+0
+74
+
 
 10 100
 50 60 -5 -5
@@ -134,4 +152,9 @@ example
 70 80 -2 -4
 0 0 7 0
 -20 -30 4 5
+
+10
+8500
+
+
 '''
