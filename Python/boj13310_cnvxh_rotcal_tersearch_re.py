@@ -4,12 +4,14 @@ TOL = 1e-7
 
 
 class Pos:
-    def __init__(self, x_, y_):
+    def __init__(self, x_, y_, vx_, vy_):
         self.x = x_
         self.y = y_
+        self.vx = vx_
+        self.vy = vy_
 
     def __sub__(self, p):
-        return Pos(self.x - p.x, self.y - p.y)
+        return Pos(self.x - p.x, self.y - p.y, 0, 0)
 
     def __floordiv__(self, p) -> int or float:
         return self.x * p.y - self.y * p.x
@@ -17,10 +19,15 @@ class Pos:
     def __pow__(self, p) -> int or float:
         return self.x * p.x + self.y * p.y
 
-    def __lt__(self, p):
-        if self.x == p.x:
-            return self.y < p.y
-        return self.x < p.x
+    # def __lt__(self, p):
+    #     if self.x == p.x:
+    #         return self.y < p.y
+    #     return self.x < p.x
+    #
+    # def __le__(self, p):
+    #     if self.x == p.x:
+    #         return self.y <= p.y
+    #     return self.x <= p.x
 
     def mag(self) -> float:
         return hypot(self.x, self.y)
@@ -28,20 +35,16 @@ class Pos:
     def euc(self) -> int or float:
         return self.x * self.x + self.y * self.y
 
-    def move(self, v, d: int):
-        return Pos(self.x + d * v.x, self.y + d * v.y)
+    def move(self, d: int):
+        return Pos(self.x + d * self.vx, self.y + d * self.vy, 0, 0)
 
 
 def cross(d1: Pos, d2: Pos, d3: Pos) -> int or float:
     return (d2 - d1) // (d3 - d2)
 
 
-def cross4(d1: Pos, d2: Pos, d3: Pos, d4: Pos) -> int or float:
-    return (d2 - d1) // (d4 - d3)
-
-
 def monotone_chain(candi: list) -> list:
-    candi.sort()
+    candi.sort(key=lambda p: (p.x, p.y))
     if len(candi) <= 2:
         return candi
     lower = []
@@ -59,7 +62,7 @@ def monotone_chain(candi: list) -> list:
 
 def ccw(hull: list, i: int, f: int) -> int or float:
     sz = len(hull)
-    i1, i2 = hull[i % sz], hull[(i + 1) % sz]
+    i1, i2 = hull[i], hull[(i + 1) % sz]
     f1, f2 = hull[f % sz], hull[(f + 1) % sz]
     return (i2 - i1) // (f2 - f1)
 
@@ -68,25 +71,25 @@ def rotating_calipers(hull: list) -> int or float:
     f = 1
     sz = len(hull)
     max_dist = 0
-    for i in range(sz + 1):
+    for i in range(sz):
         while ccw(hull, i, f) > 0:
-            max_dist = max(max_dist, (hull[i % sz] - hull[f]).euc())
+            max_dist = max(max_dist, (hull[i] - hull[f]).euc())
             f = (f + 1) % sz
-        max_dist = max(max_dist, (hull[i % sz] - hull[f]).euc())
+        max_dist = max(max_dist, (hull[i] - hull[f]).euc())
     return max_dist
 
 
-def move(candi: list, velo: list, d: int) -> list:
-    return [p.move(velo[j], d) for j, p in enumerate(candi)]
+def move(candi: list, d: int) -> list:
+    return [p.move(d) for p in candi]
 
 
-def ternary_search(candi: list, velo: list, d: int) -> tuple:
+def ternary_search(candi: list, d: int) -> tuple:
     s, e = 0, d
     while e - s >= 3:
         mid_l = (s + s + e) // 3
         mid_r = (s + e + e) // 3
-        ll = rotating_calipers(monotone_chain(move(candi, velo, mid_l)))
-        rr = rotating_calipers(monotone_chain(move(candi, velo, mid_r)))
+        ll = rotating_calipers(monotone_chain(move(candi, mid_l)))
+        rr = rotating_calipers(monotone_chain(move(candi, mid_r)))
         if ll <= rr:
             e = mid_r
         else:
@@ -94,7 +97,7 @@ def ternary_search(candi: list, velo: list, d: int) -> tuple:
     min_length = int(1e17)
     min_day = 0
     for i in range(s, e + 1):
-        max_l = rotating_calipers(monotone_chain(move(candi, velo, i)))
+        max_l = rotating_calipers(monotone_chain(move(candi, i)))
         if min_length > max_l:
             min_length = max_l
             min_day = i
@@ -103,13 +106,8 @@ def ternary_search(candi: list, velo: list, d: int) -> tuple:
 
 if __name__ == '__main__':
     N, T = map(int, sys.stdin.readline().strip().split())
-    candidate = []
-    velocity = []
-    for _ in range(N):
-        x, y, vx, vy = map(int, sys.stdin.readline().strip().split())
-        candidate.append(Pos(x, y))
-        velocity.append(Pos(vx, vy))
-    D, L = ternary_search(candidate, velocity, T)
+    candidate = [Pos(*map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
+    D, L = ternary_search(candidate, T)
     print(f'{D}\n{L}')
 
 
