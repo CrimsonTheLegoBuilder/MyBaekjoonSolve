@@ -5,11 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="39b4c90e-1449-48a0-952c-5acd0dfd5888" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../C/boj_solve/boj18190_tangent_bisearch_area_bisearch_memo_candle_and_shadow.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../C/boj_solve/boj18190_tangent_bisearch_area_bisearch_memo_candle_and_shadow.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../C/boj_solve/boj26133_Noncnvxhul_dijkstra.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../C/boj_solve/boj26133_Noncnvxhul_dijkstra.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../C/boj_solve/boj9276_rotating_calipers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../C/boj_solve/boj9276_rotating_calipers.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/../C/boj_solve/boj_solve.vcxproj.filters" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,14 +31,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/programming/BOJ/MyBaekjoonSolve/Python"
   }
-}</component>
-  <component name="RunManager" selected="Python.boj2756_bullseye">
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\programming\BOJ\MyBaekjoonSolve\Python" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.GNYP2004A_bullseye">
+    <configuration name="GNYP2004A_bullseye" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Python" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GNYP2004A_bullseye.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="boj10050_block" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Python" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -86,6 +108,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="boj2650_cross_point" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Python" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/boj2650_cross_point.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="boj2756_bullseye" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Python" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -109,7 +152,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.GNYP2004A_bullseye" />
         <item itemvalue="Python.boj2756_bullseye" />
+        <item itemvalue="Python.boj2650_cross_point" />
         <item itemvalue="Python.boj1218_robot_sweeping" />
         <item itemvalue="Python.boj10050_block" />
       </list>
