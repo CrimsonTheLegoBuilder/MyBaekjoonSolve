@@ -12,8 +12,7 @@ ll memo_n[LEN]{ 0 }, memo_m[LEN]{ 0 };
 //bool z(ld x) { return std::abs(x) < TOL; }
 struct Pos {
 	ll x, y;
-	Pos(ll X, ll Y) : x(X), y(Y) {}
-	Pos() : x(0), y(0) {}
+	Pos(ll X = 0, ll Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }

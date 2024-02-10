@@ -40,8 +40,7 @@ bool z(const ld& x) { return std::abs(x) < TOL; }
 struct Pos {
 	ld x, y;
 	int i;
-	Pos(ld X, ld Y, int I) : x(X), y(Y), i(I) {}
-	Pos() : x(0), y(0), i(0) {}
+	Pos(ld X = 0, ld Y = 0, int I = 0) : x(X), y(Y), i(I) {}
 	bool operator == (const Pos& p) const { return z(x - p.x) && z(y - p.y); }
 	bool operator < (const Pos& p) const { return z(x - p.x) ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y, 0 }; }
@@ -70,8 +69,8 @@ struct Line {
 		bool f1 = Zero < s;
 		bool f2 = Zero < l.s;
 		if (f1 != f2) return f1;
-		ld ccw = s / l.s;
-		return z(ccw) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : ccw > 0;
+		ld CCW = s / l.s;
+		return z(CCW) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : CCW > 0;
 	}
 	ld operator / (const Line& l) const { return s / l.s; }
 };

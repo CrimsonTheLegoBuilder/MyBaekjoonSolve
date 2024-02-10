@@ -12,8 +12,7 @@ int N;
 
 struct Pos {
 	ll x, y;
-	Pos(ll X, ll Y) : x(X), y(Y) {}
-	Pos() : x(0), y(0) {}
+	Pos(ll X = 0, ll Y = 0) : x(X), y(Y) {}
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	ll operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
@@ -53,12 +52,14 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(6);
+	//freopen("boj9276_fo.in", "r", stdin);
+	//freopen("boj9276_ans_txt", "w", stdout);
 	while (std::cin >> N) {
 		C.resize(N);
 		for (int i = 0; i < N; i++) std::cin >> C[i].x >> C[i].y, C[i] *= 2;
 		H = monotone_chain(C);
 		N = H.size();
-		if (N == 2) { std::cout << (H[0] - H[1]).mag() << "\n"; return; }
+		if (N == 2) { std::cout << (H[0] - H[1]).mag() << "\n"; continue; }
 
 		int R{ 0 }, U{ 0 }, L{ 0 };
 		for (int j = 0; j < N; j++) if (dot(H[0], H[1], H[j], H[(j + 1) % N]) <= 0) { R = j; break; }
@@ -80,8 +81,6 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj9276
 
-	//freopen("boj9276_fo.in", "r", stdin);
-	//freopen("boj9276_ans_txt", "w", stdout);
 /*
 
 3
