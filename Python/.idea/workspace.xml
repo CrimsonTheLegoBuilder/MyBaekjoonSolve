@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="39b4c90e-1449-48a0-952c-5acd0dfd5888" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boj2650_cross_point.py" beforeDir="false" afterPath="$PROJECT_DIR$/boj2650_cross_point.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +45,7 @@
       <recent name="D:\programming\BOJ\MyBaekjoonSolve\Python" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.GNYP2004A_bullseye">
+  <component name="RunManager" selected="Python.boj2650_cross_point">
     <configuration name="GNYP2004A_bullseye" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Python" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -152,9 +153,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.boj2650_cross_point" />
         <item itemvalue="Python.GNYP2004A_bullseye" />
         <item itemvalue="Python.boj2756_bullseye" />
-        <item itemvalue="Python.boj2650_cross_point" />
         <item itemvalue="Python.boj1218_robot_sweeping" />
         <item itemvalue="Python.boj10050_block" />
       </list>
