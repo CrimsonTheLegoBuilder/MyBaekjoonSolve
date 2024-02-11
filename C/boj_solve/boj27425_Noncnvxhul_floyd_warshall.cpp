@@ -101,10 +101,20 @@ void port_sort(Pos H[], const int& sz_h, Pos P[], const int& sz_p, bool V[], int
 	return;
 }
 void floyd_warshall() {
+	//for (int k = 0; k < t; k++) {
+	//	for (int i = 0; i < t; i++) {
+	//		for (int j = 0; j < t; j++) {
+	//			G[i][j] = std::min(G[i][k] + G[k][j], G[i][j]);
+	//		}
+	//	}
+	//}
 	for (int k = 0; k < t; k++) {
 		for (int i = 0; i < t; i++) {
-			for (int j = 0; j < t; j++) {
-				G[i][j] = std::min(G[i][k] + G[k][j], G[i][j]);
+			for (int j = i + 1; j < t; j++) {
+				if (k != i && k != j) {
+					G[i][j] = std::min(G[i][k] + G[k][j], G[i][j]);
+					G[j][i] = std::min(G[j][k] + G[k][i], G[j][i]);
+				}
 			}
 		}
 	}
@@ -137,9 +147,9 @@ void solve() {
 		}
 	}
 	floyd_warshall();
-	ld cost = 0;
-	for (int j = 0; j < M; j++) cost += G[order[j] + N][order[(j + 1) % M] + N];
-	std::cout << cost << "\n";
+	ld length = 0;
+	for (int j = 0; j < M; j++) length += G[order[j] + N][order[(j + 1) % M] + N];
+	std::cout << length << "\n";
 	return;
 }
 int main() { init(); solve(); return 0; }//boj27425
