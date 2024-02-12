@@ -202,7 +202,7 @@ void solve() {
 	ld length = 0;
 	int sz = H.size();
 
-	//int s = H[0].i, e = H[sz - 1].i;
+	//int s = H[0].i, e = H[1 % sz].i;
 	//ld a = dijkstra(s, e), b = dijkstra(e, s);
 	//length = a + b;
 
