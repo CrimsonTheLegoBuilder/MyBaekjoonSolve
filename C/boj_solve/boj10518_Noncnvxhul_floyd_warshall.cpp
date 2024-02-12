@@ -178,10 +178,7 @@ void init() {
 	return;
 }
 void solve() {
-	Pos seg;
-	for (int i = 0; i < t; i++)
-		for (int j = 0; j < t; j++)
-			G[i][j] = INF;
+	for (int i = 0; i < t; i++) for (int j = 0; j < t; j++) G[i][j] = INF;
 	for (int i = 0; i < N; i++) {
 		G[i][(i + 1) % N] = (inner[i] - inner[(i + 1) % N]).mag();
 		for (int k = 0; k < t; k++) {
@@ -275,7 +272,6 @@ int main() { init(); solve(); return 0; }//boj10518
 0 0
 1000 -1000
 0 2000
-
 8
 1500 -1500
 0 2500
