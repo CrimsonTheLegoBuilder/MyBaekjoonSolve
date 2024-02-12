@@ -18,47 +18,47 @@ struct Info {
 	ld c;
 	bool operator < (const Info& x) const { return c > x.c; }
 };
-//std::priority_queue<Info> Q;
-//ld COST[LEN << 1];
-//ld dijkstra(int v, int g) {
-//	for (int i = 0; i < LEN << 1; i++) COST[i] = INF;
-//	Q.push({ v, 0 });
-//	COST[v] = 0;
-//	while (Q.size()) {
-//		Info p = Q.top(); Q.pop();
-//		if (p.c > COST[p.i]) continue;
-//		for (int j = 0; j < t; j++) {
-//			ld w = G[p.i][j];
-//			if (w > 1e16) continue;
-//			ld cost = p.c + w;
-//			if (COST[j] > cost) {
-//				COST[j] = cost;
-//				Q.push({ j, cost });
-//			}
-//		}
-//	}
-//	return COST[g];
-//}
-void floyd_warshall() {
-	//for (int k = 0; k < t; k++) {
-	//	for (int i = 0; i < t; i++) {
-	//		for (int j = 0; j < t; j++) {
-	//			G[i][j] = std::min(G[i][k] + G[k][j], G[i][j]);
-	//		}
-	//	}
-	//}
-	for (int k = 0; k < t; k++) {
-		for (int i = 0; i < t; i++) {
-			for (int j = i + 1; j < t; j++) {
-				if (k != i && k != j) {
-					G[i][j] = std::min(G[i][k] + G[k][j], G[i][j]);
-					G[j][i] = std::min(G[j][k] + G[k][i], G[j][i]);
-				}
+std::priority_queue<Info> Q;
+ld COST[LEN << 1];
+ld dijkstra(int v, int g) {
+	for (int i = 0; i < LEN << 1; i++) COST[i] = INF;
+	Q.push({ v, 0 });
+	COST[v] = 0;
+	while (Q.size()) {
+		Info p = Q.top(); Q.pop();
+		if (p.c > COST[p.i]) continue;
+		for (int j = 0; j < t; j++) {
+			ld w = G[p.i][j];
+			if (w > 1e16) continue;
+			ld cost = p.c + w;
+			if (COST[j] > cost) {
+				COST[j] = cost;
+				Q.push({ j, cost });
 			}
 		}
 	}
-	return;
+	return COST[g];
 }
+//void floyd_warshall() {
+//	//for (int k = 0; k < t; k++) {
+//	//	for (int i = 0; i < t; i++) {
+//	//		for (int j = 0; j < t; j++) {
+//	//			G[i][j] = std::min(G[i][k] + G[k][j], G[i][j]);
+//	//		}
+//	//	}
+//	//}
+//	for (int k = 0; k < t; k++) {
+//		for (int i = 0; i < t; i++) {
+//			for (int j = i + 1; j < t; j++) {
+//				if (k != i && k != j) {
+//					G[i][j] = std::min(G[i][k] + G[k][j], G[i][j]);
+//					G[j][i] = std::min(G[j][k] + G[k][i], G[j][i]);
+//				}
+//			}
+//		}
+//	}
+//	return;
+//}
 bool z(const ld& x) { return std::abs(x) < TOL; }
 struct Pos {
 	ld x, y;
@@ -179,8 +179,8 @@ void init() {
 }
 void solve() {
 	Pos seg;
-	for (int i = 0; i < t; i++)
-		for (int j = 0; j < t; j++)
+	for (int i = 0; i < t; i++) 
+		for (int j = 0; j < t; j++) 
 			G[i][j] = INF;
 	for (int i = 0; i < N; i++) {
 		G[i][(i + 1) % N] = (inner[i] - inner[(i + 1) % N]).mag();
@@ -205,16 +205,16 @@ void solve() {
 	ld length = 0;
 	int sz = H.size();
 
-	//int s = H[0].i, e = H[sz - 1].i;
-	//ld a = dijkstra(s, e), b = dijkstra(e, s);
-	//length = a + b;
+	int s = H[0].i, e = H[1 % sz].i;
+	ld a = dijkstra(s, e), b = dijkstra(e, s);
+	length = a + b;
 
-	floyd_warshall();
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (!blocked(outer, M, cur, nxt)) length += (cur - nxt).mag();
-		else length += G[cur.i][nxt.i];
-	}
+	//floyd_warshall();
+	//for (int i = 0; i < sz; i++) {
+	//	Pos cur = H[i], nxt = H[(i + 1) % sz];
+	//	if (!blocked(outer, M, cur, nxt)) length += (cur - nxt).mag();
+	//	else length += G[cur.i][nxt.i];
+	//}
 
 	std::cout << length << "\n";
 	return;
