@@ -54,29 +54,28 @@ void solve() {
 	std::cout.precision(6);
 	//freopen(".in", "r", stdin);
 	//freopen("txt", "w", stdout);
-	while (std::cin >> N) {
-		C.resize(N);
-		for (int i = 0; i < N; i++) std::cin >> C[i].x >> C[i].y;
-		H = monotone_chain(C);
-		N = H.size();
-		if (N == 2) { std::cout << (H[0] - H[1]).mag() << "\n"; continue; }
+	std::cin >> N;
+	C.resize(N);
+	for (int i = 0; i < N; i++) std::cin >> C[i].x >> C[i].y;
+	H = monotone_chain(C);
+	N = H.size();
+	if (N == 2) { std::cout << "0.000000\n"; return; }
 
-		int R{ 0 }, U{ 0 }, L{ 0 };
-		for (int j = 0; j < N; j++) if (dot(H[0], H[1], H[j], H[(j + 1) % N]) <= 0) { R = j; break; }
-		for (int k = R; k < N; k++) if (cross(H[0], H[1], H[k], H[(k + 1) % N]) <= 0) { U = k; break; }
-		for (int l = U; l <= N; l++) if (dot(H[0], H[1], H[l % N], H[(l + 1) % N]) >= 0) { L = l; break; }
+	int R{ 0 }, U{ 0 }, L{ 0 };
+	for (int j = 0; j < N; j++) if (dot(H[0], H[1], H[j], H[(j + 1) % N]) <= 0) { R = j; break; }
+	for (int k = R; k < N; k++) if (cross(H[0], H[1], H[k], H[(k + 1) % N]) <= 0) { U = k; break; }
+	for (int l = U; l <= N; l++) if (dot(H[0], H[1], H[l % N], H[(l + 1) % N]) >= 0) { L = l; break; }
 
-		ld MIN{ INF };
-		for (int i = 0; i < N; i++) {
-			while (dot(H[i], H[(i + 1) % N], H[R % N], H[(R + 1) % N]) > 0) R++;
-			while (cross(H[i], H[(i + 1) % N], H[U % N], H[(U + 1) % N]) > 0) U++;
-			while (dot(H[i], H[(i + 1) % N], H[L % N], H[(L + 1) % N]) < 0) L++;
-			ld h = cross(H[i], H[(i + 1) % N], H[U % N]) / (H[i] - H[(i + 1) % N]).mag();
-			ld w = dot(H[i], H[(i + 1) % N], H[L % N], H[R % N]) / (H[i] - H[(i + 1) % N]).mag();
-			MIN = std::min(MIN, h * w);
-		}
-		std::cout << MIN << "\n";
+	ld MIN{ INF };
+	for (int i = 0; i < N; i++) {
+		while (dot(H[i], H[(i + 1) % N], H[R % N], H[(R + 1) % N]) > 0) R++;
+		while (cross(H[i], H[(i + 1) % N], H[U % N], H[(U + 1) % N]) > 0) U++;
+		while (dot(H[i], H[(i + 1) % N], H[L % N], H[(L + 1) % N]) < 0) L++;
+		ld h = cross(H[i], H[(i + 1) % N], H[U % N]) / (H[i] - H[(i + 1) % N]).mag();
+		ld w = dot(H[i], H[(i + 1) % N], H[L % N], H[R % N]) / (H[i] - H[(i + 1) % N]).mag();
+		MIN = std::min(MIN, h * w);
 	}
+	std::cout << MIN << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj10466

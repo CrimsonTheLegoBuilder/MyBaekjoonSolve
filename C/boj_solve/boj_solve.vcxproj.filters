@@ -66,9 +66,6 @@
     <ClCompile Include="boj2096.cpp">
       <Filter>소스 파일\sliding_window</Filter>
     </ClCompile>
-    <ClCompile Include="boj6632_grid_scan.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj26574.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
@@ -684,10 +681,10 @@
     <ClCompile Include="boj10518_Noncnvxhul_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj6632_arable.cpp">
+    <ClCompile Include="boj10466.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10466.cpp">
+    <ClCompile Include="boj6632_arable.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
