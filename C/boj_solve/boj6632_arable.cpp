@@ -12,7 +12,6 @@ const ll INF = 1e9;
 const int LEN = 100;
 int N;
 int board[205][205];
-int drc[4][2] = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
 ll MAXX, MAXY, MINX, MINY;
 
 bool z(const ld& x) { return std::abs(x) < TOL; }
@@ -37,25 +36,28 @@ struct Pos {
 	ll Man() const { return std::abs(x) + std::abs(y); }
 	//ld mag() const { return hypot(x, y); }
 }; const Pos O = { 0, 0 };
+Pos DRC[4] = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
 std::vector<Pos> H;
-struct Pdd {
-	ld x, y;
-	Pdd(ld X = 0, ld Y = 0) : x(X), y(Y) {}
-};
 std::queue<Pos> Q;
-void bfs(int x, int y, const int& f) {
+
+struct Pdd { ld x, y; Pdd(ld X = 0, ld Y = 0) : x(X), y(Y) {} };
+
+int bfs(int x, int y, const int& f) {
 	Q.push(Pos(x, y));
 	board[y][x] = f;
+	int cnt = 1;
 	while (Q.size()) {
 		Pos p = Q.front(); Q.pop();
 		for (int i = 0; i < 4; i++) {
-			Pos w = Pos(p.x + drc[i][0], p.y + drc[i][1]);
+			Pos w = p + DRC[i];
 			if ((MINX <= w.x) && (w.x <= MAXX) && (MINY <= w.y) && (w.y <= MAXY) && !board[w.y][w.x]) {
 				Q.push(w);
 				board[w.y][w.x] = f;
+				cnt++;
 			}
 		}
 	}
+	return cnt;
 }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
@@ -190,18 +192,19 @@ void solve() {
 		MINY--, MINX--, MAXX++, MAXY++;
 		if (area(H, N) < 0) std::reverse(H.begin(), H.end());
 		for (int i = 0; i < N; i++) sweep(H[i], H[(i + 1) % N]);
+		ll cnt = 0;
 		for (int i = MINY; i < MAXY; i++)
 			for (int j = MINX; j < MAXX; j++) {
 				if (!board[i][j]) {
-					if (inner_check(H, N, Pos(j, i)) && inner_check(H, N, Pdd(j + .5, i + .5))) bfs(j, i, 2);
+					if (inner_check(H, N, Pos(j, i)) && inner_check(H, N, Pdd(j + .5, i + .5))) cnt += bfs(j, i, 2);
 					else bfs(j, i, 1);
 				}
 			}
-		ll cnt = 0;
-		for (int i = MINY; i < MAXY; i++)
-			for (int j = MINX; j < MAXX; j++)
-				cnt += board[i][j] == 2;
 		std::cout << cnt << "\n";
+		//for (int i = MINY; i < MAXY; i++)
+		//	for (int j = MINX; j < MAXX; j++)
+		//		cnt += board[i][j] == 2;
+		//std::cout << cnt << "\n";
 	}
 }
 int main() { solve(); return 0; }//boj6632
