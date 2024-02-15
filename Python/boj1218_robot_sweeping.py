@@ -128,21 +128,25 @@ def check(p: Pos) -> bool:
 
 
 if __name__ == '__main__':  # boj1218 algorithm from Jay22
-    N = int(sys.stdin.readline().strip())
-    pos = [Pos(*map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
-    for j in range(N):
-        CUR, NXT = pos[j], pos[(j + 1) % N]
-        if CUR.x > NXT.x:
-            direction[j] = L
-        if CUR.x < NXT.x:
-            direction[j] = R
-        if CUR.y > NXT.y:
-            direction[j] = D
-        if CUR.y < NXT.y:
-            direction[j] = U
-    for _ in range(5):
-        x, y = map(int, sys.stdin.readline().strip().split())
-        if check(Pos(x, y)):
-            print("YES")
-        else:
-            print("NO")
+    while 1:
+        try:
+            N = int(sys.stdin.readline().strip())
+            pos = [Pos(*map(int, sys.stdin.readline().strip().split())) for _ in range(N)]
+            for j in range(N):
+                CUR, NXT = pos[j], pos[(j + 1) % N]
+                if CUR.x > NXT.x:
+                    direction[j] = L
+                if CUR.x < NXT.x:
+                    direction[j] = R
+                if CUR.y > NXT.y:
+                    direction[j] = D
+                if CUR.y < NXT.y:
+                    direction[j] = U
+            for _ in range(5):
+                x, y = map(int, sys.stdin.readline().strip().split())
+                if check(Pos(x, y)):
+                    print("YES")
+                else:
+                    print("NO")
+        except:
+            break
