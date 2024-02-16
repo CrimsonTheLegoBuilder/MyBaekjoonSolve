@@ -55,12 +55,25 @@ void init() {
 	std::cin >> N;
 	C.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i].x >> C[i].y;
-	H = monotone_chain(C);
-	N = H.size();
+	//H = monotone_chain(C);
+	//N = H.size();
 	return;
 }
 void rotating_calipers() {
 	init();
+	std::swap(C[0], *min_element(C.begin(), C.end()));
+	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) {
+		ll ret = cross(C[0], p, q);
+		if (ret != 0) return ret > 0;
+		return (C[0] - p).Euc() < (C[0] - q).Euc();
+	});
+	for (int i = 0; i < N; i++) {
+		while (H.size() >= 2 && cross(H[H.size() - 2], H.back(), C[i]) <= 0) {
+			H.pop_back();
+		}
+		H.push_back(C[i]);
+	}
+	N = H.size();
 	if (N == 2) { std::cout << "0\n"; return; }
 
 	int R{ 0 }, U{ 0 }, L{ 0 };
@@ -77,8 +90,9 @@ void rotating_calipers() {
 		ld w = dot(H[i], H[(i + 1) % N], H[L % N], H[R % N]) / (H[i] - H[(i + 1) % N]).mag();
 		MIN = std::min(MIN, h * w);
 	}
-	ll ans = MIN;
-	if (MIN - ans > .5) ans++;
+	//ll ans = MIN;
+	//if (MIN - ans > .5) ans++;
+	ll ans = MIN + .5;
 	std::cout << ans << "\n";
 	return;
 }
