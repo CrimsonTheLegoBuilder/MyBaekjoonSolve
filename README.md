@@ -1,10 +1,10 @@
 # MyBaekjoonSolve
 My Baekjoon Solve
 
-## Solved.ac Profile
+### Solved.ac Profile
 [![Solved.ac Profile](http://mazassumnida.wtf/api/v2/generate_badge?boj=redcube231)](https://solved.ac/redcube231/)
 
-## Language
+### Language
 
 C++ && Python && Rust
 
@@ -13,8 +13,8 @@ C++ && Python && Rust
 ![RUST](https://img.shields.io/badge/RUST-000000.svg?&style=for-the-badge&logo=RUST&logoColor=white)
 <!-- ![ROS](https://img.shields.io/badge/ROS-22314E.svg?&style=for-the-badge&logo=ros&logoColor=white) -->
 
-## to Be Diamond
+### to Be Diamond
 ~23.12.01 *achieve*;
 
-## to Be Ruby
+### to Be Ruby
 ~??.??.??;
