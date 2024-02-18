@@ -11,7 +11,7 @@ now studying
 </br>
 </br>
 ![RUST](https://img.shields.io/badge/RUST-000000.svg?&style=for-the-badge&logo=RUST&logoColor=white)
-![ROS](https://img.shields.io/badge/ROS-#22314E.svg?&style=for-the-badge&logo=ROS&logoColor=white)
+![ROS](https://img.shields.io/badge/ROS-#22314E.svg?&style=for-the-badge&logo=ros&logoColor=white)
 </br>
 </br>
 ## to Be Diamond
