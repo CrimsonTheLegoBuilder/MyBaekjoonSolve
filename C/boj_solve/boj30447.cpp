@@ -70,19 +70,9 @@ Pos intersection(const Line& l1, const Line& l2) {
 	};
 }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return z(ret) ? 0 : ret > 0 ? 1 : -1;
-}
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	ld ret = cross(d1, d2, d3, d4);
-	return z(ret) ? 0 : ret > 0 ? 1 : -1;
-}
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-bool on_seg(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld dot_ = dot(d1, d3, d2);
-	return z(cross(d1, d2, d3)) && (dot_ > 0 || z(dot_));
 }
 std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	std::vector<Pos> H;
@@ -146,7 +136,7 @@ void mirror(std::vector<Pos>& C, const Pos& s1, const Pos& s2) {
 	for (int i = 0; i < sz; i++) {
 		Pos inx = intersection(s, rotate90(s, C[i]));
 		Pos d = inx - C[i];
-		C[i] += d + d;
+		C[i] += d * 2;
 	}
 	return;
 }
@@ -155,7 +145,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cin >> w >> h >> P1.x >> P1.y >> P2.x >> P2.y;
 
-	ld A = w * h;
+	ll A = w * h;
 	box.resize(4);
 	box[0] = Pos(0, 0);
 	box[1] = Pos(w, 0);
@@ -182,11 +172,10 @@ void solve() {
 	ld overlap = 0;
 	for (int i = 0; i < szl; i++) HP.push_back(L(HL[i], HL[(i + 1) % szl]));
 	for (int i = 0; i < szr; i++) HP.push_back(L(HR[i], HR[(i + 1) % szr]));
-	
 	if (!half_plane_intersection(HP, HPI)) overlap = 0;
 	else overlap = area(HPI);
 
-	ll ans = A - overlap;
+	ll ans = A - overlap + TOL;
 	std::cout << ans << "\n";
 	return;
 }
