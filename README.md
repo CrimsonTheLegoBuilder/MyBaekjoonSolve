@@ -2,7 +2,7 @@
 My Baekjoon Solve
 C++ && Python (&& Rust)
 ![cpp](https://img.shields.io/badge/-00599C.svg?&style=for-the-badge&logo=Cplusplus&logoColor=white)
-![python](https://img.shields.io/badge/3776AB.svg?&style=for-the-badge&logo=Python&logoColor=white)
+![python](https://img.shields.io/badge/-3776AB.svg?&style=for-the-badge&logo=Python&logoColor=white)
 
 
 ![cpp](https://img.shields.io/badge/-00599C.svg?&style=for-the-badge&logo=C++&logoColor=white)
