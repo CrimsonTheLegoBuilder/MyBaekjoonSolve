@@ -48,10 +48,15 @@ class Line:
     def __floordiv__(self, s: 'Line') -> float:
         return self.vy * s.vx - self.vx * s.vy
 
-    def __lt__(self, s: 'Line'):
-        if z(self.theta - s.theta):
+    def __lt__(self, s: 'Line') -> bool:
+        ret = self // s
+        f1 = (0, 0) < (self.vy, self.vx)
+        f2 = (0, 0) < (s.vy, s.vx)
+        if f1 != f2:
+            return f1
+        if z(ret):
             return self.c * hypot(s.vy, s.vx) < s.c * hypot(self.vy, self.vx)
-        return self.theta < s.theta
+        return ret > 0
 
 
 def line(s: Pos, e: Pos) -> Line:

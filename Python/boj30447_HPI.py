@@ -29,7 +29,7 @@ class Pos:
     def mag(self) -> float:
         return hypot(self.x, self.y)
 
-    def __lt__(self, p):
+    def __lt__(self, p: 'Pos') -> bool:
         if self.x == p.x:
             return self.y < p.y
         return self.x < p.x
@@ -47,6 +47,16 @@ class Line:
 
     def __floordiv__(self, s: 'Line') -> float:
         return self.vy * s.vx - self.vx * s.vy
+
+    def __lt__(self, s: 'Line') -> bool:
+        ret = self // s
+        f1 = (0, 0) < (self.vy, self.vx)
+        f2 = (0, 0) < (s.vy, s.vx)
+        if f1 != f2:
+            return f1
+        if z(ret):
+            return self.c * hypot(s.vy, s.vx) < s.c * hypot(self.vy, self.vx)
+        return ret > 0
 
 
 def line(s: Pos, e: Pos) -> Line:
@@ -115,7 +125,8 @@ def bad(l1: Line, l2: Line, t: Line) -> bool:
 
 def half_plane_intersection(hp_: list[Line], hpi: list[Pos]) -> bool:
     dq = deque()
-    hp_.sort(key=lambda s: s.theta)
+    # hp_.sort(key=lambda s: s.theta)
+    hp_.sort()
     for hp in hp_:
         if dq and z(dq[-1] // hp):
             continue
@@ -130,7 +141,6 @@ def half_plane_intersection(hp_: list[Line], hpi: list[Pos]) -> bool:
         dq.popleft()
     for i in range(len(dq)):
         cur, nxt = dq[i - 1], dq[i]
-        print(i)
         if cur // nxt < TOL:
             hpi.clear()
             return False
@@ -173,4 +183,4 @@ if __name__ == '__main__':  # boj30447
         overlap = 0
     else:
         overlap = area(HPI)
-    print(int(w * h - overlap))
+    print(int(w * h - overlap + TOL))
