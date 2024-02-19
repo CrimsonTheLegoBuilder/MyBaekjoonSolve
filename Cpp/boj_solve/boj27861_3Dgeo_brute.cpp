@@ -62,8 +62,8 @@ Plane P(const Pos3D& p1, const Pos3D& p2, const Pos3D& p3) {
 	Pos3D norm = (p2 - p1) / (p3 - p2);
 	return Plane(norm, p1);
 }
-Plane P(std::vector<Pos3D> tri) {
-	Pos3D& p1 = tri[0], p2 = tri[1], p3 = tri[2];
+Plane P(std::vector<Pos3D>& tri) {
+	Pos3D p1 = tri[0], p2 = tri[1], p3 = tri[2];
 	Pos3D norm = (p2 - p1) / (p3 - p2);
 	return Plane(norm, p1);
 }
@@ -73,7 +73,7 @@ Pos3D intersection(const Plane& S, const Line3D& l) {
 	ld t = (S.norm * S.p0 - S.norm * l.p0) / det;
 	return l.p0 + (l.dir * t);
 }
-int inner_check(std::vector<Pos3D> H, const Pos3D& p) {
+int inner_check(std::vector<Pos3D>& H, const Pos3D& p) {
 	int sz = H.size();
 	if (sz <= 1) return -1;
 	if (sz == 2) {
@@ -230,8 +230,8 @@ int main() { solve(); return 0; }//boj27861 Linked Triangles
 //	Pos3D norm = (p2 - p1) / (p3 - p2);
 //	return Plane(norm, p1);
 //}
-//Plane P(std::vector<Pos3D> tri) {
-//	Pos3D& p1 = tri[0], p2 = tri[1], p3 = tri[2];
+//Plane P(std::vector<Pos3D>& tri) {
+//	Pos3D p1 = tri[0], p2 = tri[1], p3 = tri[2];
 //	Pos3D norm = (p2 - p1) / (p3 - p2);
 //	return Plane(norm, p1);
 //}
@@ -241,7 +241,7 @@ int main() { solve(); return 0; }//boj27861 Linked Triangles
 //	ld t = (S.norm * S.p0 - S.norm * l.p0) / det;
 //	return l.p0 + (l.dir * t);
 //}
-//int inner_check(std::vector<Pos3D> H, const Pos3D& p) {
+//int inner_check(std::vector<Pos3D>& H, const Pos3D& p) {
 //	int sz = H.size();
 //	if (sz <= 1) return -1;
 //	if (sz == 2) {
