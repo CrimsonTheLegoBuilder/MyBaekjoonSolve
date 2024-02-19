@@ -687,7 +687,7 @@
     <ClCompile Include="boj1218_sweep.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj27861_3D_brute.cpp">
+    <ClCompile Include="boj27861_3Dgeo_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
