@@ -558,13 +558,7 @@
     <ClCompile Include="boj9663_N_Queen.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj10337_proto.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj10337_circle_dijkstra.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj15004_fail.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj15004_circle_dijkstra.cpp">
@@ -691,6 +685,9 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj1218_sweep.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj27861_3D_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
