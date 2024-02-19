@@ -82,7 +82,7 @@ int inner_check(std::vector<Pos3D>& H, const Pos3D& p) {
 	}
 	Plane S = P(H);
 	Pos3D norm = S.norm;
-	Pos3D torque1 = cross(H[0], H[1], p);
+	Pos3D torque0 = cross(H[0], H[1], p);
 	for (int i = 1; i < sz; i++) {
  		Pos3D cur = H[i], nxt = H[(i + 1) % sz];
 		Pos3D torqueI = cross(cur, nxt, p);
@@ -90,7 +90,7 @@ int inner_check(std::vector<Pos3D>& H, const Pos3D& p) {
 			if (on_seg_strong(cur, nxt, p)) return 0;
 			else return -1;
 		}
-		if (torque1 * torqueI < 0) return -1;
+		if (torque0 * torqueI < 0) return -1;
 	}
 	return 1;
 }
@@ -250,7 +250,7 @@ int main() { solve(); return 0; }//boj27861 Linked Triangles
 //	}
 //	Plane S = P(H);
 //	Pos3D norm = S.norm;
-//	Pos3D torque1 = cross(H[0], H[1], p);
+//	Pos3D torque0 = cross(H[0], H[1], p);
 //	for (int i = 1; i < sz; i++) {
 // 		Pos3D cur = H[i], nxt = H[(i + 1) % sz];
 //		Pos3D torqueI = cross(cur, nxt, p);
@@ -258,7 +258,7 @@ int main() { solve(); return 0; }//boj27861 Linked Triangles
 //			if (on_seg_strong(cur, nxt, p)) return 0;
 //			else return -1;
 //		}
-//		if (torque1 * torqueI < 0) return -1;
+//		if (torque0 * torqueI < 0) return -1;
 //	}
 //	return 1;
 //}
