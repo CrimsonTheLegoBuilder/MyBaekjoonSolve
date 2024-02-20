@@ -8,9 +8,8 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
-int N, M, T, Q, tmp[2]{ 0 };
-bool V[6];
+const ld TOL = 1e-6;
+int T;
 
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 struct Pos3D {
@@ -31,7 +30,7 @@ struct Pos3D {
 	Pos3D& operator += (const Pos3D& p) { x + p.x; y + p.y; z + p.z; return *this; }
 	Pos3D& operator *= (const ld& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
 	ld mag() const { return sqrtl(x * x + y * y + z * z); }
-} candi[6], MAXP{ INF, INF, INF };
+} MAXP{ INF, INF, INF };
 std::vector<Pos3D> tri1, tri2;
 struct Line3D {
 	Pos3D dir, p0;
