@@ -8,9 +8,8 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
-int N, M, T, Q, tmp[2]{ 0 };
-bool V[6];
+const ld TOL = 1e-6;
+int T;
 
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 struct Pos3D {
