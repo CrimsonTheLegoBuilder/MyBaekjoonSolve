@@ -31,7 +31,7 @@ struct Pos3D {
 	Pos3D& operator += (const Pos3D& p) { x + p.x; y + p.y; z + p.z; return *this; }
 	Pos3D& operator *= (const ld& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
 	ld mag() const { return sqrtl(x * x + y * y + z * z); }
-} candi[6], MAXP{ INF, INF, INF };
+} MAXP{ INF, INF, INF };
 std::vector<Pos3D> tri1, tri2;
 struct Line3D {
 	Pos3D dir, p0;

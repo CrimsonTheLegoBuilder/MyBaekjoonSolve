@@ -161,7 +161,10 @@ vector<F> hull3dFast(vector<P3>& p) {
 //	cl_float z;
 //	cl_int prev;
 //	cl_int next;
-//};//////// CPU Algorithm list of points
+//};
+//
+//
+//// CPU Algorithm list of points
 //Point* P = new Point[n];
 //...
 //// Sorts points into a doubly
@@ -223,7 +226,9 @@ vector<F> hull3dFast(vector<P3>& p) {
 //// GPU Algorithm time [0] calculation
 //t[0] = time(P[B[i]].prev,
 //	B[i],
-//	P[B[i]].next);////dataOffsetValue = 2;
+//	P[B[i]].next);
+//
+//dataOffsetValue = 2;
 //totalMergesLeft = numberOfPoints / 2;
 //do {
 //	numberOfThreads = totalMergesLeft;
@@ -231,7 +236,9 @@ vector<F> hull3dFast(vector<P3>& p) {
 //	swap(A, B);
 //	dataOffsetValue = dataOffsetValue * 2;
 //	totalMergesLeft = totalMergesLeft / 2;
-//} while (totalMergesLeft > 1);////// the index of where the head of the
+//} while (totalMergesLeft > 1);
+//
+//// the index of where the head of the
 //// left group of the list can be found
 //// on the globally accessed array
 //leftGroupIndex
