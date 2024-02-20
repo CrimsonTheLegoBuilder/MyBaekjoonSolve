@@ -104,11 +104,11 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	//freopen("boj9212random.in", "r", stdin);
-	freopen("boj9212random.sol", "w", stdout);
+	//freopen("boj9212random.sol", "w", stdout);
 	std::cin >> T;
+	tri1.resize(3);
+	tri2.resize(3);
 	while (T--) {
-		tri1.resize(3);
-		tri2.resize(3);
 		for (int i = 0; i < 3; i++) std::cin >> tri1[i].x >> tri1[i].y >> tri1[i].z;
 		for (int i = 0; i < 3; i++) std::cin >> tri2[i].x >> tri2[i].y >> tri2[i].z;
 		std::cout << (brute() ? "YES\n" : "NO\n");
