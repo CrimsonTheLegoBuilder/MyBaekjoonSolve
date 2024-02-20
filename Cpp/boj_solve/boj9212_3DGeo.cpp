@@ -104,7 +104,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	//freopen("boj9212random.in", "r", stdin);
-	freopen("boj9212random.sol", "w", stdout);
+	//freopen("boj9212random.sol", "w", stdout);
 	std::cin >> T;
 	while (T--) {
 		tri1.resize(3);

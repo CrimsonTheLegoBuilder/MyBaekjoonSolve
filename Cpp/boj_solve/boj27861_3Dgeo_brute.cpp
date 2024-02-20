@@ -19,7 +19,7 @@ struct Seq {
 	void print() const { std::cout << x << " " << y << "\n"; return; }
 }; std::vector<Seq> seq;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
-struct Pos3D {
+struct Pos3D {// 3-dimensional point [x, y, z]
 	ld x, y, z;
 	Pos3D(ld X = 0, ld Y = 0, ld Z = 0): x(X), y(Y), z(Z) {}
 	bool operator == (const Pos3D& p) const { return zero(x - p.x) && zero(y - p.y) && zero(z - p.z); }
@@ -39,11 +39,11 @@ struct Pos3D {
 	ld mag() const { return sqrtl(x * x + y * y + z * z); }
 } candi[6], MAXP{ INF, INF, INF };
 std::vector<Pos3D> tri1, tri2;
-struct Line3D {
+struct Line3D {// 3-dimensional line [Vec, P0]
 	Pos3D dir, p0;
 	Line3D(Pos3D DIR = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)): dir(DIR), p0(P0) {}
 };
-struct Plane {
+struct Plane {// 3-dimensional plane [Norm, P0]
 	Pos3D norm, p0;
 	Plane(Pos3D NORM = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)): norm(NORM), p0(P0) {}
 };
