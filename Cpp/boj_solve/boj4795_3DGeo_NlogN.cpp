@@ -45,7 +45,7 @@ public:
 	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
 	Pos3D operator * (const ll& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
 	//Pos3D operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	Pos3D& operator *= (const ll& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
+	Pos3D& operator *= (const ll& scalar) { x * scalar; y * scalar; z * scalar; return *this; }
 	//Pos3D& operator *= (const ld& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
 	ll Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
@@ -137,7 +137,7 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	int sz = candi.size();
 	std::vector<Face> faces;
 	std::vector<int> active;//whether face is active - face faces outside 
-	std::vector<std::vector<int>> vis(N);//faces visible from each point
+	std::vector<std::vector<int>> vis(sz);//faces visible from each point
 	std::vector<std::vector<int>> rvis;//points visible from each face
 	std::vector<std::array<Edge, 3>> other;//other face adjacent to each edge of face
 	auto ad = [&](int a, int b, int c) -> void {//add face
@@ -145,10 +145,12 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 		active.push_back(1);
 		rvis.emplace_back();
 		other.emplace_back();
+		return;
 	};
 	auto visible = [&](int a, int b) -> void {
 		vis[b].push_back(a);
 		rvis[a].push_back(b);
+		return;
 	};
 	auto abv = [&](int a, int b) -> bool {//above
 		Face tri = faces[a];
@@ -161,6 +163,7 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 		pi x = edge(a); assert(edge(b) == pi(x.second, x.first));
 		other[a.face_num][a.edge_num] = b;
 		other[b.face_num][b.edge_num] = a;
+		return;
 	};//ensure face 0 is removed when i = 3
 
 	ad(0, 1, 2), ad(0, 2, 1);
@@ -168,8 +171,8 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	for (int i = 0; i < 3; i++) glue({ 0, i }, { 1, 2 - i });
 	for (int i = 3; i < N; i++) visible(abv(1, i), i);//coplanar points go in rvis[0]
 
-	std::vector<int> label(N, -1);
-	for (int i = 3; i < N; i++) {//incremental construction
+	std::vector<int> label(sz, -1);
+	for (int i = 3; i < sz; i++) {//incremental construction
 		std::vector<int> rem;
 		for (auto& v : vis[i]) if (active[v]) { active[v] = 0, rem.push_back(v); }
 		if (!rem.size()) continue;//hull unchanged
@@ -192,12 +195,14 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 
 					for (auto& x : tmp) if (abv(cur, x)) visible(cur, x);
 					//if no rounding errors then guaranteed that only x > i matters
+					
 					glue({ cur, 0 }, other[v][j]);//glue old, new face
 				}
 			}
 		}
 		for (int x = st, y; ; x = y) {//glue new faces together
-			int X = label[x]; glue({ X, 1 }, { label[y = faces[X][1]], 2 });
+			int X = label[x];
+			glue({ X, 1 }, { label[y = faces[X][1]], 2 });
 			if (y == st) break;
 		}
 	}
@@ -214,10 +219,6 @@ void solve() {
 	candi.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> candi[i];
 	Hull3D = convex_hull_3D(candi);
-	//for (const Face& face : Hull3D) {
-	//	for (int i = 0; i < 3; i++) std::cout << candi[face[i]];
-	//	std::cout << "\n";
-	//}
 	std::cin >> Q;
 	while (Q--) {
 		std::cin >> willy;
@@ -227,3 +228,8 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj4795 The Worm in the Apple
+
+	//for (const Face& face : Hull3D) {
+	//	for (int i = 0; i < 3; i++) std::cout << candi[face[i]];
+	//	std::cout << "\n";
+	//}
