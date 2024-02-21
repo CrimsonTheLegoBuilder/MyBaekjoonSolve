@@ -140,26 +140,26 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	std::vector<std::vector<int>> vis(sz);//faces visible from each point
 	std::vector<std::vector<int>> rvis;//points visible from each face
 	std::vector<std::array<Edge, 3>> other;//other face adjacent to each edge of face
-	auto ad = [&](int a, int b, int c) -> void {//add face
+	auto ad = [&](const int& a, const int& b, const int& c) -> void {//add face
 		faces.push_back({ a, b, c });
 		active.push_back(1);
 		rvis.emplace_back();
 		other.emplace_back();
 		return;
 	};
-	auto visible = [&](int a, int b) -> void {
+	auto visible = [&](const int& a, const int& b) -> void {
 		vis[b].push_back(a);
 		rvis[a].push_back(b);
 		return;
 	};
-	auto abv = [&](int a, int b) -> bool {//above
+	auto abv = [&](const int& a, const int& b) -> bool {//above
 		Face tri = faces[a];
 		return above(candi[tri[0]], candi[tri[1]], candi[tri[2]], candi[b]);
 	};
-	auto edge = [&](Edge e) -> pi {
+	auto edge = [&](const Edge& e) -> pi {
 		return { faces[e.face_num][e.edge_num], faces[e.face_num][(e.edge_num + 1) % 3] };
 	};
-	auto glue = [&](Edge a, Edge b) -> void {//link two faces by an edge
+	auto glue = [&](const Edge& a, const Edge& b) -> void {//link two faces by an edge
 		pi x = edge(a); assert(edge(b) == pi(x.second, x.first));
 		other[a.face_num][a.edge_num] = b;
 		other[b.face_num][b.edge_num] = a;
@@ -219,6 +219,10 @@ void solve() {
 	candi.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> candi[i];
 	Hull3D = convex_hull_3D(candi);
+	//for (const Face& face : Hull3D) {
+	//	for (int i = 0; i < 3; i++) std::cout << candi[face[i]];
+	//	std::cout << "\n";
+	//}
 	std::cin >> Q;
 	while (Q--) {
 		std::cin >> willy;
@@ -228,8 +232,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj4795 The Worm in the Apple
-
-	//for (const Face& face : Hull3D) {
-	//	for (int i = 0; i < 3; i++) std::cout << candi[face[i]];
-	//	std::cout << "\n";
-	//}
