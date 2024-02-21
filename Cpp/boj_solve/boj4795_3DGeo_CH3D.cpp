@@ -154,19 +154,19 @@ std::vector<Face> convex_hull_3d_Fast(std::vector<Pos3D>& p) {
 			for (int j = 0; j < 3; j++) {
 				int o = other[r][j].first;
 				if (active[o]) { // create new face!
-					int a, b; std::tie(a, b) = edge({ r,j }); ad(a, b, i); st = a;
+					int a, b; std::tie(a, b) = edge({ r, j }); ad(a, b, i); st = a;
 					int cur = rvis.size() - 1; label[a] = cur;
 					std::vector<int> tmp;
 					set_union(rvis[r].begin(), rvis[r].end(), rvis[o].begin(), rvis[o].end(), back_inserter(tmp));
 					// merge sorted vectors ignoring duplicates
 					for (auto& x : tmp) if (abv(cur, x)) ae(cur, x);
-					/// if no rounding errors then guaranteed that only x>i matters
+					// if no rounding errors then guaranteed that only x>i matters
 					glue({ cur, 0 }, other[r][j]); // glue old w/ new face
 				}
 			}
 		}
-		for (int x = st, y; ; x = y) { // glue new faces together
-			int X = label[x]; glue({ X,1 }, { label[y = hull[X][1]],2 });
+		for (int x = st, y;; x = y) { // glue new faces together
+			int X = label[x]; glue({ X, 1 }, { label[y = hull[X][1]], 2 });
 			if (y == st) break;
 		}
 	}
@@ -183,7 +183,10 @@ void solve() {
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> candi[i].x >> candi[i].y >> candi[i].z;
 	std::cin >> Q;
-	while (Q--) { willy.scan(); }
+	while (Q--) {
+		willy.scan();
+
+	}
 	std::cin >> T;
 	return;
 }
