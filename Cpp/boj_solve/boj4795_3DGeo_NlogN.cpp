@@ -49,8 +49,8 @@ public:
 	//Pos3D& operator *= (const ld& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
 	ll Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
-	friend std::ostream& operator<<(std::ostream& os, const Pos3D& p);
-	friend std::istream& operator>>(std::istream& is, Pos3D& p);
+	friend std::ostream& operator << (std::ostream& os, const Pos3D& p);
+	friend std::istream& operator >> (std::istream& is, Pos3D& p);
 } willy, MAXP{ INF, INF, INF };
 std::ostream& operator << (std::ostream& os, const Pos3D& p) {
 	os << p.x << " " << p.y << " " << p.z << "\n";
