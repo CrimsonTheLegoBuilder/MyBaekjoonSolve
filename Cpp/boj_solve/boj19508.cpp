@@ -78,6 +78,23 @@ struct Plane {
 	Pos3D norm, p0;
 	Plane(Pos3D NORM = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : norm(NORM), p0(P0) {}
 };
+struct Plane_formula {
+	ld a, b, c, d;
+	Plane_formula(ld A = 0, ld B = 0, ld C = 0, ld D = 0): a(A), b(B), c(C), d(D) {}
+	Pos3D norm() const { Pos3D(a, b, c); };
+};
+Pos3D intersection(const Plane& S, const Line3D& l) {
+	ld det = S.norm * l.dir;
+	if (zero(det)) return { INF, INF, INF };
+	ld t = (S.norm * S.p0 - S.norm * l.p0) / det;
+	return l.p0 + (l.dir * t);
+}
+Pos3D intersection(const Plane_formula& S, const Line3D& l) {
+	ld det = S.norm() * l.dir;
+	if (zero(det)) return { INF, INF, INF };
+	ld t = -((l.dir * S.norm() + S.d) / det);
+	return l.p0 + (l.dir * t);
+}
 Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
 ld dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
 int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
@@ -118,20 +135,20 @@ ld area(std::vector<Pos3D>& H, const Pos3D& norm) {
 }
 bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	ll ret = dot(d1, d3, d2);
-	return !cross(d1, d2, d3).mag() && ret >= 0;
+	return zero(cross(d1, d2, d3).mag()) && (ret > 0 || zero(ret));
 }
 bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	ll ret = dot(d1, d3, d2);
-	return !cross(d1, d2, d3).mag() && ret > 0;
+	return zero(cross(d1, d2, d3).mag()) && ret > 0;
 }
 bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) {
-	return ((b - a) / (c - b)).Euc() == 0;
+	return zero(((b - a) / (c - b)).Euc());
 }
 //int dot_cross(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
 //	return cross(a, b, c) * (p - a);
 //}
 bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
-	return cross(a, b, c) * (p - a) == 0;
+	return zero(cross(a, b, c) * (p - a));
 }
 bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {// is p strictly above plane
 	return cross(a, b, c) * (p - a) > 0;
@@ -263,8 +280,8 @@ void solve() {
 		std::cout << "\n";
 	}
 	while (Q--) {
-		std::cin >> willy;
-		std::cout << get_min_dist(candi, Hull3D, willy) << "\n";
+
+
 	}
 	return;
 }
