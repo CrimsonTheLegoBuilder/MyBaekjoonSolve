@@ -41,10 +41,10 @@ public:
 		return ret;
 	}
 	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
-	Pos3D& operator += (const Pos3D& p) { x + p.x; y + p.y; z + p.z; return *this; }
+	//Pos3D& operator += (const Pos3D& p) { x + p.x; y + p.y; z + p.z; return *this; }
 	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
 	Pos3D operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	Pos3D& operator *= (const ld& scalar) { x * scalar; y * scalar; z * scalar; return *this; }
+	//Pos3D& operator *= (const ld& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
 	ld Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos3D& p);
@@ -53,9 +53,10 @@ public:
 std::vector<Pos3D> poses;//3D
 std::vector<Pos3D> HPI;//2D
 std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
-std::ostream& operator << (std::ostream& os, const Pos3D& p) { 
-	os << p.x << " " << p.y << " " << p.z << "\n"; 
-	return os; }
+std::ostream& operator << (std::ostream& os, const Pos3D& p) {
+	os << p.x << " " << p.y << " " << p.z << "\n";
+	return os;
+}
 struct Line3D {
 	Pos3D dir, p0;
 	Line3D(Pos3D DIR = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : dir(DIR), p0(P0) {}
@@ -72,9 +73,10 @@ struct Plane {
 	friend std::ostream& operator << (std::ostream& os, const Plane& f);
 } knife;
 std::istream& operator >> (std::istream& is, Plane& f) { is >> f.a >> f.b >> f.c >> f.d; return is; }
-std::ostream& operator << (std::ostream& os, const Plane& f) { 
-	os << f.a << " " << f.b << " " << f.c << " " << f.d << "\n"; 
-	return os; }
+std::ostream& operator << (std::ostream& os, const Plane& f) {
+	os << f.a << " " << f.b << " " << f.c << " " << f.d << "\n";
+	return os;
+}
 using Mesh = std::array<int, 3>; std::vector<Mesh> Hull3D;
 struct Edge {
 	int mesh_num, edge_num;
@@ -108,12 +110,12 @@ bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	return zero(cross(d1, d2, d3).mag()) && ret > 0;
 }
 std::vector<Pos3D> graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
-	if (C.size() < 1) return {};
+	if (C.size() <= 1) return {};
 	std::vector<Pos3D> H;
 	std::swap(C[0], *min_element(C.begin(), C.end()));
 	std::sort(C.begin() + 1, C.end(), [&](const Pos3D& p, const Pos3D& q) -> bool {
 		ld ret = ccw(C[0], p, q, norm);
-		if (ret != 0) return ret > 0;
+		if (!zero(ret)) return ret > 0;
 		return (C[0] - p).Euc() < (C[0] - q).Euc();
 		}
 	);
@@ -151,7 +153,7 @@ Pos3D intersection(const Plane& S, const Pos3D& p1, const Pos3D& p2) {
 	else return { INF, INF, INF };
 }
 bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) {
-	return zero(((b - a) / (c - b)).Euc()); 
+	return zero(((b - a) / (c - b)).Euc());
 }
 bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
 	return zero(cross(a, b, c) * (p - a));
@@ -197,25 +199,25 @@ std::vector<Mesh> convex_hull_3D(std::vector<Pos3D>& candi) {
 		rvis.emplace_back();
 		other.emplace_back();
 		return;
-		};
+	};
 	auto visible = [&](const int& a, const int& b) -> void {
 		vis[b].push_back(a);
 		rvis[a].push_back(b);
 		return;
-		};
+	};
 	auto abv = [&](const int& a, const int& b) -> bool {//above
 		Mesh tri = faces[a];
 		return above(candi[tri[0]], candi[tri[1]], candi[tri[2]], candi[b]);
-		};
+	};
 	auto edge = [&](const Edge& e) -> pi {
 		return { faces[e.mesh_num][e.edge_num], faces[e.mesh_num][(e.edge_num + 1) % 3] };
-		};
+	};
 	auto glue = [&](const Edge& a, const Edge& b) -> void {//link two faces by an edge
 		pi x = edge(a); assert(edge(b) == pi(x.second, x.first));
 		other[a.mesh_num][a.edge_num] = b;
 		other[b.mesh_num][b.edge_num] = a;
 		return;
-		};//ensure face 0 is removed when i = 3
+	};//ensure face 0 is removed when i = 3
 
 	ad(0, 1, 2), ad(0, 2, 1);
 	if (abv(1, 3)) std::swap(candi[1], candi[2]);
@@ -262,7 +264,7 @@ std::vector<Mesh> convex_hull_3D(std::vector<Pos3D>& candi) {
 	return hull3D;
 }
 std::vector<Pos3D> cutting_hull(const std::vector<Pos3D>& pos, const std::vector<Mesh>& F, const Plane& S) {
-	std::vector<Pos3D> c, h;//2D
+	std::vector<Pos3D> c;//2D
 	for (const Mesh& face : F) {
 		for (int i = 0; i < 3; i++) {
 			Pos3D cur = pos[face[i]], nxt = pos[face[(i + 1) % 3]];
@@ -280,23 +282,27 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(4);
-	std::cin >> N >> Q;
-	poses.resize(N);
-	for (int i = 0; i < N; i++) std::cin >> poses[i];
-	Hull3D = convex_hull_3D(poses);
-	//std::cout << "DEBUG Mesh::\nlen:: " << Hull3D.size() << "\n";
-	//for (const Mesh& face : Hull3D) {
-	//	for (int i = 0; i < 3; i++) std::cout << poses[face[i]];
-	//	std::cout << "DEBUG Mesh::\n";
-	//}
-	while (Q--) {
-		std::cin >> knife;
-		HPI = cutting_hull(poses, Hull3D, knife);
-		//std::cout << "DEBUG HPI::\n";
-		//for (const Pos3D& p : HPI) std::cout << p;
-		//std::cout << "DEBUG HPI::\n";
-		std::cout << area(HPI, knife.norm());
+	std::cout.precision(3);
+	std::cin >> T;
+	for (int t = 1; t <= T; t++) {
+		std::cin >> N >> Q;
+		poses.resize(N);
+		for (int i = 0; i < N; i++) std::cin >> poses[i];
+		Hull3D = convex_hull_3D(poses);
+		//std::cout << "DEBUG Mesh::\nlen:: " << Hull3D.size() << "\n";
+		//for (const Mesh& face : Hull3D) {
+		//	for (int i = 0; i < 3; i++) std::cout << poses[face[i]];
+		//	std::cout << "DEBUG Mesh::\n";
+		//}
+		std::cout << "Case #" << t << ":\n";
+		while (Q--) {
+			std::cin >> knife;
+			HPI = cutting_hull(poses, Hull3D, knife);
+			//std::cout << "DEBUG HPI::\n";
+			//for (const Pos3D& p : HPI) std::cout << p;
+			//std::cout << "DEBUG HPI::\n";
+			std::cout << area(HPI, knife.norm()) << "\n";
+		}
 	}
 	return;
 }
@@ -305,6 +311,7 @@ int main() { solve(); return 0; }//boj19508 Convex Hull
 /*
 test
 
+1
 6 1
 0 0 1
 1 0 1
@@ -314,7 +321,22 @@ test
 0 1 -1
 0 0 1 0
 
-8 0
+1
+6 1
+0 0 1
+1 0 1
+0 1 1
+0 0 -1
+1 0 -1
+0 1 -1
+0 0 -1 0
+0 1 0 0
+0 -1 0 0
+1 0 0 0
+-1 0 0 0
+
+1
+8 12
 1 1 1
 1 -1 1
 -1 1 1
@@ -323,6 +345,18 @@ test
 1 -1 -1
 -1 1 -1
 -1 -1 -1
+0 0 1 0
+0 0 -1 0
+0 1 0 0
+0 -1 0 0
+1 0 0 0
+-1 0 0 0
+1 1 0 0
+1 0 1 0
+0 1 1 0
+-1 -1 0 0
+-1 0 -1 0
+0 -1 -1 0
 
 */
 
