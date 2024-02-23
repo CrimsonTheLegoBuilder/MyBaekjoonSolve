@@ -708,10 +708,16 @@
     <ClCompile Include="boj4795_3DGeo_NlogN.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj19508.cpp">
+    <ClCompile Include="boj7684_3DGeo_CH_surface.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj7684_3DGeo_CH_surface.cpp">
+    <ClCompile Include="__3D_convex_cutting.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj19508_3DGeo_CH_cut.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="__3DGeo_Ch.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

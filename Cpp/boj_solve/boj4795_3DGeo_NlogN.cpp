@@ -215,20 +215,22 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(4);
-	std::cin >> N;
-	candi.resize(N);
-	for (int i = 0; i < N; i++) std::cin >> candi[i];
-	Hull3D = convex_hull_3D(candi);
-	//for (const Face& face : Hull3D) {
-	//	for (int i = 0; i < 3; i++) std::cout << candi[face[i]];
-	//	std::cout << "\n";
-	//}
-	std::cin >> Q;
-	while (Q--) {
-		std::cin >> willy;
-		std::cout << get_min_dist(candi, Hull3D, willy) << "\n";
+	while (1) {
+		std::cin >> N;
+		if (!N) return;
+		candi.resize(N);
+		for (int i = 0; i < N; i++) std::cin >> candi[i];
+		Hull3D = convex_hull_3D(candi);
+		//for (const Face& face : Hull3D) {
+		//	for (int i = 0; i < 3; i++) std::cout << candi[face[i]];
+		//	std::cout << "\n";
+		//}
+		std::cin >> Q;
+		while (Q--) {
+			std::cin >> willy;
+			std::cout << get_min_dist(candi, Hull3D, willy) << "\n";
+		}
 	}
-	std::cin >> T;
 	return;
 }
 int main() { solve(); return 0; }//boj4795 The Worm in the Apple
