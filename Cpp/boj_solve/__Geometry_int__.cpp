@@ -16,6 +16,7 @@ const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
 int N, M, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
+struct Info { ll area, l, r; };
 
 //2D============================================================================//
 //2D============================================================================//
@@ -45,8 +46,6 @@ struct Pos {
 std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y << "\n"; return os; }
 std::vector<Pos> C, H;
-struct Info { ll area, l, r; };
-struct Query { int x; ld area; } q[LEN];
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -55,15 +54,20 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
-//int ccw(Pos& d1, const Pos& d2, const Pos& d3) {
-//	ll ret = cross(d1, d2, d3);
-//	return !ret ? 0 : ret > 0 ? 1 : -1;
-//}
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0;
 }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
+}
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
+	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	//bool f3 = on_seg_strong(s1, s2, p1) ||
+	//	on_seg_strong(s1, s2, p2) ||
+	//	on_seg_strong(p1, p2, s1) ||
+	//	on_seg_strong(p1, p2, s2);
+	return (f1 && f2);// || f3;
 }
 void get_area_memo(Pos H[], ll memo[], const int& sz) {
 	memo[0] = 0;
@@ -232,7 +236,7 @@ void rotating_calipers() {
 	std::cout << ans << "\n";
 	return;
 }
-Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
+Pos find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 	int i1{ 0 }, i2{ 0 };
 	int ccw1 = ccw(p, H[0], H[1]), ccwN = ccw(p, H[0], H[sz - 1]);
 	if (ccw1 * ccwN >= 0) {
@@ -290,7 +294,7 @@ Info find_tangent_bi_search(Pos H[], const int& sz, const Pos& p) {
 		if (!ccw(p, H[i2], H[(i2 + 1) % sz]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
 	}
 	if (i2 < i1) std::swap(i2, i1);//normalize
-	return { 0, i2, i1 };
+	return { i2, i1 };
 }
 Info get_inner_area(Pos H[], ll memo[], const int& sz, const Pos& p) {
 	Info tangent = find_tangent_bi_search(H, sz, p);

@@ -116,7 +116,11 @@ bool inner_check(Pos H[], const int& sz, const Pos& p) {
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	return f1 && f2;
+	//bool f3 = on_seg_strong(s1, s2, p1) ||
+	//	on_seg_strong(s1, s2, p2) ||
+	//	on_seg_strong(p1, p2, s1) ||
+	//	on_seg_strong(p1, p2, s2);
+	return (f1 && f2);// || f3;
 }
 std::vector<Pos> monotone_chain(std::vector<Pos>& C, std::vector<Pos>& H) {
 	std::sort(C.begin(), C.end());
