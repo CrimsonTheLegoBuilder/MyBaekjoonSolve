@@ -7,6 +7,7 @@
 #include <cassert>
 #include <random>
 #include <array>
+#include <tuple>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;

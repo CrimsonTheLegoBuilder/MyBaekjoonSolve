@@ -1,0 +1,372 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <cassert>
+#include <vector>
+#include <queue>
+#include <deque>
+#include <random>
+typedef long long ll;
+//typedef long double ld;
+typedef double ld;
+const ld INF = 1e17;
+const ld TOL = 1e-7;
+const int LEN = 1e3;
+int N, M, T, Q;
+bool V[LEN + 1][LEN + 1];
+struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
+std::vector<Seq> seq;
+
+//2D============================================================================//
+//2D============================================================================//
+//2D============================================================================//
+bool zero(const ld& x) { return std::abs(x) < TOL; }
+int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
+struct Pos {
+	ld x, y;
+	int i;
+	Pos(ld X = 0, ld Y = 0, int I = 0) : x(X), y(Y), i(I) {}
+	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
+	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y, 0 }; }
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y, 0 }; }
+	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar, 0 }; }
+	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar, 0 }; }
+	ld operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
+	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
+	Pos operator ~ () const { return { -y, x, 0 }; }
+	ld operator ! () const { return x * y; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
+	ld Euc() const { return x * x + y * y; }
+	ld mag() const { return hypot(x, y); }
+	friend std::istream& operator >> (std::istream& is, Pos& p);
+	friend std::ostream& operator << (std::ostream& os, const Pos& p);
+}; const Pos O = { 0, 0, -1 };
+std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y << "\n"; return os; }
+struct Vec {
+	ld vy, vx;
+	bool operator < (const Vec& v) const { return z(vy - v.vy) ? vx < v.vx : vy < v.vy; }
+	bool operator == (const Vec& v) const { return (z(vy - v.vy) && z(vx - v.vx)); }
+	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
+	Vec operator ~ () const { return { -vx, vy }; }
+}; const Vec Zero = { 0, 0 };
+struct Line {
+	Vec s;
+	ld c;
+	bool operator < (const Line& l) const {
+		bool f1 = Zero < s;
+		bool f2 = Zero < l.s;
+		if (f1 != f2) return f1;
+		ld CCW = s / l.s;
+		return zero(CCW) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : CCW > 0;
+	}
+	ld operator / (const Line& l) const { return s / l.s; }
+};
+Line L(const Pos& s, const Pos& e) {
+	ld dy, dx, c;
+	dy = e.y - s.y;
+	dx = s.x - e.x;
+	c = dy * s.x + dx * s.y;
+	return { { dy, dx } , c };
+}
+Line rotate90(const Line& l, const Pos& p) {
+	Vec s = ~l.s;
+	ld c = s.vy * p.x + s.vx * p.y;
+	return { s, c };
+}
+Pos intersection(const Line& l1, const Line& l2) {
+	Vec v1 = l1.s, v2 = l2.s;
+	ld det = v1 / v2;
+	return {
+		(l1.c * v2.vx - l2.c * v1.vx) / det,
+		(l2.c * v1.vy - l1.c * v2.vy) / det,
+		0
+	};
+}
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = cross(d1, d2, d3);
+	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
+}
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = dot(d1, d3, d2);
+	return zero(cross(d1, d2, d3)) && (ret > 0 || zero(ret));
+}
+bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = dot(d1, d3, d2);
+	return zero(cross(d1, d2, d3)) && ret > 0;
+}
+bool inner_check(Pos H[], const int& sz, const Pos& p) {
+	int cnt{ 0 };
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (zero(cur.y - nxt.y)) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return cnt & 1;
+}
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
+	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	return f1 && f2;
+}
+std::vector<Pos> monotone_chain(std::vector<Pos>& C, std::vector<Pos>& H) {
+	std::sort(C.begin(), C.end());
+	if (C.size() <= 2) { for (const Pos& p : C) H.push_back(p); }
+	else {
+		for (int i = 0; i < C.size(); i++) {
+			while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+				H.pop_back();
+			H.push_back(C[i]);
+		}
+		H.pop_back();
+		int s = H.size() + 1;
+		for (int i = C.size() - 1; i >= 0; i--) {
+			while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+				H.pop_back();
+			H.push_back(C[i]);
+		}
+		H.pop_back();
+	}
+	return H;
+}
+ld area(std::vector<Pos>& H) {
+	Pos P = { 0, 0 };
+	ld ret = 0;
+	int h = H.size();
+	for (int i = 0; i < h; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % h];
+		ret += cross(P, cur, nxt);
+	}
+	return ret / 2;
+}
+bool CW(const Line& l1, const Line& l2, const Line& target) {
+	if (l1.s / l2.s < TOL) return 0;
+	Pos p = intersection(l1, l2);
+	return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
+}
+bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
+	std::deque<Line> dq;
+	std::sort(HP.begin(), HP.end());
+	for (const Line& l : HP) {
+		if (!dq.empty() && zero(dq.back() / l)) continue;
+		while (dq.size() >= 2 && CW(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
+		while (dq.size() >= 2 && CW(l, dq.front(), dq[1])) dq.pop_front();
+		dq.push_back(l);
+	}
+	while (dq.size() >= 3 && CW(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
+	while (dq.size() >= 3 && CW(dq.back(), dq.front(), dq[1])) dq.pop_front();
+	for (int i = 0; i < dq.size(); i++) {
+		Line cur = dq[i], nxt = dq[(i + 1) % dq.size()];
+		if (cur / nxt < TOL) {
+			hull.clear();
+			return 0;
+		}
+		hull.push_back(intersection(cur, nxt));
+	}
+	return 1;
+}
+//3D============================================================================//
+//3D============================================================================//
+//3D============================================================================//
+struct Pos3D {
+	ld x, y, z;
+	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
+	bool operator == (const Pos3D& p) const { return zero(x - p.x) && zero(y - p.y) && zero(z - p.z); }
+	bool operator != (const Pos3D& p) const { return !zero(x - p.x) || !zero(y - p.y) || !zero(z - p.z); }
+	bool operator < (const Pos3D& p) const { return zero(x - p.x) ? zero(y - p.y) ? z < p.z : y < p.y : x < p.x; }
+	ld operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
+	Pos3D operator / (const Pos3D& p) const {
+		Pos3D ret;
+		ret.x = y * p.z - z * p.y;
+		ret.y = z * p.x - x * p.z;
+		ret.z = x * p.y - y * p.x;
+		return ret;
+	}
+	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
+	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
+	Pos3D operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
+	Pos3D operator / (const ld& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+	Pos3D& operator += (const Pos3D& p) { x + p.x; y + p.y; z + p.z; return *this; }
+	Pos3D& operator *= (const ld& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
+	ld Euc() const { return x * x + y * y + z * z; }
+	ld mag() const { return sqrtl(Euc()); }
+	friend std::istream& operator >> (std::istream& is, Pos3D& p);
+	friend std::ostream& operator << (std::ostream& os, const Pos3D& p);
+}; const Pos3D MAXP3D = { INF, INF, INF };
+std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
+std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z << "\n"; return os; }
+std::vector<Pos3D> poses, distorted;//3D
+std::vector<Pos3D> CANDI;//2D
+struct Line3D {
+	Pos3D dir, p0;
+	Line3D(Pos3D DIR = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : dir(DIR), p0(P0) {}
+};
+struct Plane {
+	ld a, b, c, d;
+	Plane(ld A = 0, ld B = 0, ld C = 0, ld D = 0) : a(A), b(B), c(C), d(D) {}
+	Pos3D norm() const { return Pos3D(a, b, c); };
+	friend std::istream& operator >> (std::istream& is, Plane& f);
+	friend std::ostream& operator << (std::ostream& os, const Plane& f);
+} knife;
+std::istream& operator >> (std::istream& is, Plane& f) { is >> f.a >> f.b >> f.c >> f.d; return is; }
+std::ostream& operator << (std::ostream& os, const Plane& f) { os << f.a << " " << f.b << " " << f.c << " " << f.d << "\n"; return os; }
+int above(const Plane& S, const Pos3D& p) {
+	ld ret = p * S.norm() + S.d;
+	return dcmp(ret);
+}
+ld randTOL() {
+	ld rand01 = rand() / (ld)RAND_MAX;
+	ld err = (rand01 - .5) * TOL;
+	return err;
+}
+Pos3D add_noise(const Pos3D& p) {//refer to BIGINTEGER
+	return p + Pos3D(randTOL(), randTOL(), randTOL());
+}
+Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
+ld dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
+int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
+	Pos3D CCW = cross(d1, d2, d3);
+	ld ret = CCW * norm;
+	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
+}
+ld area(const std::vector<Pos3D>& H, const Pos3D& norm) {
+	ld ret = 0;
+	if (H.size() < 3) return ret;
+	Pos3D O = H[0];
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos3D cur = H[i], nxt = H[(i + 1) % sz];
+		ret += cross(O, cur, nxt) * norm / norm.mag();
+	}
+	return std::abs(ret * .5);
+}
+bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
+	ld ret = dot(d1, d3, d2);
+	return zero(cross(d1, d2, d3).mag()) && (ret > 0 || zero(ret));
+}
+bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
+	ld ret = dot(d1, d3, d2);
+	return zero(cross(d1, d2, d3).mag()) && ret > 0;
+}
+//std::vector<Pos3D> graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
+ld graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
+	//if (C.size() < 3) {
+	//	std::sort(C.begin(), C.end());
+	//	return C;
+	// }
+	if (C.size() < 3) return 0;
+	std::vector<Pos3D> H;
+	std::swap(C[0], *min_element(C.begin(), C.end()));
+	std::sort(C.begin() + 1, C.end(), [&](const Pos3D& p, const Pos3D& q) -> bool {
+		ld ret = ccw(C[0], p, q, norm);
+		if (zero(ret)) return (C[0] - p).Euc() < (C[0] - q).Euc();
+		return ret > 0;
+		}
+	);
+	C.erase(unique(C.begin(), C.end()), C.end());
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i], norm) <= 0)
+			H.pop_back();
+		H.push_back(C[i]);
+	}
+	//return H;
+	return area(H, norm);
+}
+Line3D L(const Pos3D& p1, const Pos3D& p2) { return { p2 - p1, p1 }; }
+Pos3D intersection(const Plane& S, const Line3D& l) {
+	ld det = S.norm() * l.dir;
+	if (zero(det)) return { INF, INF, INF };
+	ld t = -((S.norm() * l.p0 + S.d) / det);
+	return l.p0 + (l.dir * t);
+}
+Pos3D intersection(const Plane& S, const Pos3D& p1, const Pos3D& p2) {
+	Line3D l = L(p1, p2);
+	Pos3D inx = intersection(S, l);
+	//if (!on_seg_strong(p1, p2, inx)) return { INF, INF, INF };
+	return inx;
+}
+int inner_check(std::vector<Pos3D>& H, const Pos3D& p) {//for convex hull
+	int sz = H.size();
+	if (sz <= 1) return -1;
+	if (sz == 2) {
+		if (on_seg_strong(H[0], H[1], p)) return 0;
+		else return -1;
+	}
+	Pos3D torque0 = cross(H[0], H[1], p);
+	for (int i = 1; i < sz; i++) {
+		Pos3D cur = H[i], nxt = H[(i + 1) % sz];
+		Pos3D torqueI = cross(cur, nxt, p);
+		if (zero(torqueI.mag())) {
+			if (on_seg_strong(cur, nxt, p)) return 0;
+			else return -1;
+		}
+		if (torque0 * torqueI < 0) return -1;
+	}
+	return 1;
+}
+struct Planar {
+	Pos3D norm, p0;
+	Planar(Pos3D NORM = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : norm(NORM), p0(P0) {}
+};
+Planar P(const Pos3D& p1, const Pos3D& p2, const Pos3D& p3) {
+	Pos3D norm = (p2 - p1) / (p3 - p2);
+	return Planar(norm, p1);
+}
+Planar P(std::vector<Pos3D>& tri) {
+	Pos3D p1 = tri[0], p2 = tri[1], p3 = tri[2];
+	Pos3D norm = (p2 - p1) / (p3 - p2);
+	return Planar(norm, p1);
+}
+Pos3D intersection(const Planar& S, const Line3D& l) {
+	ld det = S.norm * l.dir;
+	if (zero(det)) return { INF, INF, INF };
+	ld t = (S.norm * S.p0 - S.norm * l.p0) / det;
+	return l.p0 + (l.dir * t);
+}
+struct Face {//refer to BIGINTEGER
+	int v[3];
+	Face(int a, int b, int c) { v[0] = a; v[1] = b; v[2] = c; }
+	Pos3D norm(const std::vector<Pos3D>& P) const {
+		return cross(P[v[0]], P[v[1]], P[v[2]]);
+	}
+	bool visible(const std::vector<Pos3D>& P, int i) const {
+		return (P[i] - P[v[0]]) * norm(P) > 0;
+	}
+};
+std::vector<Face> H3D;
+std::vector<Face> ConvexHull3D(const std::vector<Pos3D>& P) {//refer to BIGINTEGER
+	int sz = P.size();
+	std::vector<std::vector<int>> vis(sz);
+	for (int i = 0; i < sz; i++) vis[i].resize(sz);
+	std::vector<Face> cur;
+	cur.push_back(Face(0, 1, 2));
+	cur.push_back(Face(2, 1, 0));
+	for (int i = 3; i < sz; i++) {
+		std::vector<Face> next;
+		for (int j = 0; j < cur.size(); j++) {
+			Face& f = cur[j];
+			int ret = f.visible(P, i);
+			if (!ret) next.push_back(f);
+			for (int k = 0; k < 3; k++) vis[f.v[k]][f.v[(k + 1) % 3]] = ret;
+		}
+		for (int j = 0; j < cur.size(); j++) {
+			for (int k = 0; k < 3; k++) {
+				int a = cur[j].v[k], b = cur[j].v[(k + 1) % 3];
+				if (vis[a][b] != vis[b][a] && vis[a][b])
+					next.push_back(Face(a, b, i));
+			}
+		}
+		cur = next;
+	}
+	return cur;
+}

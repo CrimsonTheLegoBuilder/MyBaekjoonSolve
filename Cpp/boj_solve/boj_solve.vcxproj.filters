@@ -711,13 +711,10 @@
     <ClCompile Include="boj7684_3DGeo_CH_surface.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="__3D_convex_cutting.cpp">
+    <ClCompile Include="boj19508_biginteger.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj19508_3DGeo_CH_cut.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="__3DGeo_Ch.cpp">
+    <ClCompile Include="boj19508_3D_Graham_scan.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

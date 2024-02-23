@@ -233,4 +233,4 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj4795 The Worm in the Apple
+int main() { solve(); return 0; }//boj4795 The Worm in the Apple - refer to koosaga
