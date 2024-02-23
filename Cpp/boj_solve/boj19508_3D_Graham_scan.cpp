@@ -181,10 +181,8 @@ ld query() {
 	for (const Seq& p : seq) {
 		Pos3D& cur = poses[p.x], nxt = poses[p.y];
 		int abv1 = above(knife, cur), abv2 = above(knife, nxt);
-		if (abv1 != abv2) {
-			Pos3D inx = intersection(knife, cur, nxt);
-			CANDI.push_back(inx);
-		}
+		if (abv1 != abv2)
+			CANDI.push_back(intersection(knife, cur, nxt));
 	}
 	return graham_scan(CANDI, knife.norm());
 }
