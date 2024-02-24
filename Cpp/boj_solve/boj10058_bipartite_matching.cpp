@@ -9,8 +9,8 @@ typedef std::pair<int, int> pi;
 const ll INF = 1e17;
 const int LEN = 110;
 const ld TOL = 1e-7;
-int N, M, R, U, V, CNT, MAT, match[LEN];
-bool done[LEN], connected[LEN];
+int N, M, R, U, V, CNT, MAT, match[LEN], arrow[LEN];
+bool done[LEN], connected[LEN], visited[LEN];
 
 struct Pos {
 	ll x, y;
@@ -35,15 +35,23 @@ std::vector<int> vtx_U, vtx_V;
 std::vector<int> G[LEN];
 void G_CLEAR() { for (int i = 1; i <= N; i++) G[i].clear(); return; }
 bool dfs(int i) {
-	if (done[i]) return 0;
 	done[i] = 1;
-	for (const int& w : G[i]) {
-		if (!~match[w] || dfs(match[w])) {
-			match[w] = i;
+	for (const int& j : G[i]) {
+		if (!~match[j] || (!done[match[j]] && dfs(match[j]))) {
+			match[j] = i;
 			return 1;
 		}
 	}
 	return 0;
+}
+void dfs_mask(int i) {
+	visited[i] = 1;
+	for (const int& j : G[i]) {
+		if (visited[j] || match[j] == i) continue;
+		visited[j] = 1;
+		dfs_mask(match[j]);
+	}
+	return;
 }
 int bi_matching(int u, int v, bool f = 0) {
 	int cnt = 2, r = (pos[u] - pos[v]).Euc();
@@ -61,23 +69,28 @@ int bi_matching(int u, int v, bool f = 0) {
 		for (const int& j : vtx_V) {
 			if ((pos[i] - pos[j]).Euc() > r) {
 				G[i].push_back(j);
-				//if (f) connected[i] = connected[j] = 0;
+				if (f) connected[i] = connected[j] = 0;
 			}
 		}
 	}
 	memset(match, -1, sizeof match);
 	int mat = 0;
-	for (int i = 1; i <= N; i++) {
+	for (const int& i : vtx_U) {
 		memset(done, 0, sizeof done);
 		mat += dfs(i);
 	}
 	if (f) {
+		for (int i = 1; i <= N; ++i)
+			if (~match[i]) arrow[match[i]] = i;
 		connected[u] = connected[v] = 1;
-		for (const int& i : vtx_U) 
-			if (match[i] != -1)
+		for (const int& i : vtx_U)
+			if (!arrow[i])
+				dfs_mask(i);
+		for (const int& i : vtx_U)
+			if (visited[i])
 				connected[i] = 1;
 		for (const int& j : vtx_V)
-			if (match[j] == -1)
+			if (!visited[j])
 				connected[j] = 1;
 		for (int i = 1; i <= N; i++)
 			if (connected[i])
@@ -110,6 +123,7 @@ void solve() {
 	if (!CNT) { std::cout << "1\n1\n"; return; }
 	std::cout << CNT << "\n";
 	memset(connected, 0, sizeof connected);
+	memset(arrow, 0, sizeof arrow);
 	bi_matching(U, V, 1);
 	return;
 }
