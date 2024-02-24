@@ -720,6 +720,9 @@
     <ClCompile Include="boj2188_bipartite_matching.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
+    <ClCompile Include="boj10058_bipartite_matching.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

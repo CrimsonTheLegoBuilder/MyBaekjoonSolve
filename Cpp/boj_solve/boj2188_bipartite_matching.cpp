@@ -1,8 +1,12 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
-#include <cstring>
+#include <vector>
 #include <cmath>
+#include <cstring>
+#include <cassert>
+#include <random>
+#include <array>
+#include <tuple>
 typedef long double ld;
 const int LEN = 201;
 const ld TOL = 1e-8;
@@ -32,12 +36,12 @@ void solve() {
 		while (S--) std::cin >> G[i][j++];
 	}
 	memset(match, -1, sizeof match);
-	int C = N;
+	int C = 0;
 	for (int i = 0; i < N; i++) {
 		memset(done, 0, sizeof done);
-		C -= bi_matching(i);
+		C += bi_matching(i);
 	}
-	std::cout << N - C << "\n";
-
+	std::cout << C << "\n";
+	return;
 }
 int main() { solve(); return 0; }//boj2188 bipartite maching
