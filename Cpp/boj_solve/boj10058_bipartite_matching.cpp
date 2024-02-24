@@ -4,13 +4,10 @@
 #include <cstring>
 #include <cmath>
 typedef long long ll;
-typedef long double ld;
-typedef std::pair<int, int> pi;
-const ll INF = 1e17;
+//typedef long double ld;
 const int LEN = 110;
-const ld TOL = 1e-7;
-int N, M, R, U, V, CNT, MAT, match[LEN], arrow[LEN];
-bool done[LEN], connected[LEN], visited[LEN];
+int N, M, CNT, match[LEN], arrow[LEN];
+bool done[LEN], connected[LEN];
 
 struct Pos {
 	ll x, y;
@@ -45,10 +42,10 @@ bool dfs(int i) {
 	return 0;
 }
 void dfs_mask(int i) {
-	visited[i] = 1;
+	done[i] = 1;
 	for (const int& j : G[i]) {
-		if (visited[j] || match[j] == i) continue;
-		visited[j] = 1;
+		if (done[j] || match[j] == i) continue;
+		done[j] = 1;
 		dfs_mask(match[j]);
 	}
 	return;
@@ -82,15 +79,16 @@ int bi_matching(int u, int v, bool f = 0) {
 	if (f) {
 		for (int i = 1; i <= N; ++i)
 			if (~match[i]) arrow[match[i]] = i;
+		memset(done, 0, sizeof done);
 		connected[u] = connected[v] = 1;
 		for (const int& i : vtx_U)
 			if (!arrow[i])
 				dfs_mask(i);
 		for (const int& i : vtx_U)
-			if (visited[i])
+			if (done[i])
 				connected[i] = 1;
 		for (const int& j : vtx_V)
-			if (!visited[j])
+			if (!done[j])
 				connected[j] = 1;
 		for (int i = 1; i <= N; i++)
 			if (connected[i])
@@ -104,17 +102,17 @@ void init() {
 	std::cin >> N >> M;
 	for (int i = 1; i <= N; i++) std::cin >> pos[i];
 	CNT = 0;
-	R = M * M;
 	return;
 }
 void solve() {
 	init();
+	int R = M * M, U = 0, V = 0;
 	for (int i = 1; i < N; i++) {
 		for (int j = i + 1; j <= N; j++) {
 			if (R < (pos[i] - pos[j]).Euc()) continue;
-			MAT = bi_matching(i, j);
-			if (CNT < MAT) {
-				CNT = MAT;
+			int ret = bi_matching(i, j);
+			if (CNT < ret) {
+				CNT = ret;
 				U = i;
 				V = j;
 			}
@@ -127,4 +125,5 @@ void solve() {
 	bi_matching(U, V, 1);
 	return;
 }
-int main() { solve(); return 0; }//boj10058 bipartite maching
+int main() { solve(); return 0; }//boj10058 bipartite matching
+//with help from Jay22
