@@ -224,8 +224,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(4);
-	freopen("boj7684_area.in", "r", stdin);
-	freopen("boj7684.ans", "w", stdout);
+	//freopen("boj7684_area.in", "r", stdin);
+	//freopen("boj7684.ans", "w", stdout);
 	while (1) {
 		std::cin >> N;
 		if (!N) return;

@@ -168,9 +168,6 @@
     <ClCompile Include="boj19970_ky6.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj24162_Wrong.cpp">
-      <Filter>소스 파일\graph_search</Filter>
-    </ClCompile>
     <ClCompile Include="boj4618_eccentricity.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
@@ -719,6 +716,9 @@
     </ClCompile>
     <ClCompile Include="__Geometry_float__.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj2188_bipartite_matching.cpp">
+      <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
