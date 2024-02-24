@@ -702,7 +702,7 @@
     <ClCompile Include="boj4795_3DGeo_CH3D.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="__Geometry_int.cpp">
+    <ClCompile Include="__Geometry_int__.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj4795_3DGeo_NlogN.cpp">
@@ -715,6 +715,9 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj19508_3D_Graham_scan.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="__Geometry_float__.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
