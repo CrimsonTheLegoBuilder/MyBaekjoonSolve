@@ -125,5 +125,5 @@ void solve() {
 	bi_matching(U, V, 1);
 	return;
 }
-int main() { solve(); return 0; }//boj10058 bipartite matching
+int main() { solve(); return 0; }//boj10058 Sensor Network
 //with help from Jay22

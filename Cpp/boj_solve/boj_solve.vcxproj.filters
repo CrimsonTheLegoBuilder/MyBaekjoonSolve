@@ -690,9 +690,6 @@
     <ClCompile Include="boj9212_3DGeo.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Geo_3D_convex_hull.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Geo_CH3D_koosaga.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -725,6 +722,9 @@
     </ClCompile>
     <ClCompile Include="boj19508_3Dcnvxhul_3Dgrahamscan_for_boj.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1298_bi_matching.cpp">
+      <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
