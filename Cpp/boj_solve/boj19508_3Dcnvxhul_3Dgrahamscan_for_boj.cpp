@@ -134,13 +134,10 @@ Pos3D intersection(const Plane& S, const Pos3D& p1, const Pos3D& p2) {
 	return inx;
 }
 bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) {
-	return ((b - a) / (c - b)).Euc() == 0;
-}
-int dot_cross(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
-	return cross(a, b, c) * (p - a);
+	return zero(((b - a) / (c - b)).Euc());
 }
 bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
-	return cross(a, b, c) * (p - a) == 0;
+	return zero(cross(a, b, c) * (p - a));
 }
 bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {// is p strictly above plane
 	return cross(a, b, c) * (p - a) > 0;
@@ -191,25 +188,25 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 		rvis.emplace_back();
 		other.emplace_back();
 		return;
-		};
+	};
 	auto visible = [&](const int& a, const int& b) -> void {
 		vis[b].push_back(a);
 		rvis[a].push_back(b);
 		return;
-		};
+	};
 	auto abv = [&](const int& a, const int& b) -> bool {//above
 		Face tri = faces[a];
 		return above(candi[tri[0]], candi[tri[1]], candi[tri[2]], candi[b]);
-		};
+	};
 	auto edge = [&](const Edge& e) -> pi {
 		return { faces[e.face_num][e.edge_num], faces[e.face_num][(e.edge_num + 1) % 3] };
-		};
+	};
 	auto glue = [&](const Edge& a, const Edge& b) -> void {//link two faces by an edge
 		pi x = edge(a); assert(edge(b) == pi(x.second, x.first));
 		other[a.face_num][a.edge_num] = b;
 		other[b.face_num][b.edge_num] = a;
 		return;
-		};//ensure face 0 is removed when i = 3
+	};//ensure face 0 is removed when i = 3
 
 	ad(0, 1, 2), ad(0, 2, 1);
 	if (abv(1, 3)) std::swap(candi[1], candi[2]);
@@ -257,10 +254,9 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 }
 ld query() {
 	std::cin >> knife;
-	CANDI.clear();
 	if (col == 1) return 0;
 	if (cop == 1) return graham_scan(poses, knife.norm());
-	
+	CANDI.clear();
 	for (const Seq& p : seq) {
 		Pos3D& cur = poses[p.x], nxt = poses[p.y];
 		int abv1 = above(knife, cur), abv2 = above(knife, nxt);
