@@ -87,7 +87,7 @@ void rotating_calipers() {
 		C.resize(N);
 		for (int i = N - 1; i >= 0; i--) {
 			std::cin >> C[i];
-			C[i].ci = N - i - 1;
+			C[i].ci = i;
 		}
 		H = graham_scan(C);
 		int sz = H.size();
