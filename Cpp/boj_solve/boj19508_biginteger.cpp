@@ -13,7 +13,7 @@ typedef long long ll;
 typedef double ld;
 typedef std::pair<int, int> pi;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-9;
 const int LEN = 1e3;
 int N, M, T, Q;
 ld sc[4];
@@ -224,73 +224,69 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	std::cin >> T;
-	for (int t = 1; t <= T; t++) {
-		memset(V, 0, sizeof V);
-		distorted.clear();
-		seq.clear();
-		std::cin >> N >> Q;
-		poses.resize(N);
-		for (int i = 0; i < N; i++) {
-			std::cin >> poses[i];
-			distorted.push_back(add_noise(poses[i]));
-		}
-		//Hull3D = convex_hull_3D(poses);
-		H3D = ConvexHull3D(distorted);
-		//H3D = ConvexHull3D(poses);
+	memset(V, 0, sizeof V);
+	distorted.clear();
+	seq.clear();
+	std::cin >> N >> Q;
+	poses.resize(N);
+	for (int i = 0; i < N; i++) {
+		std::cin >> poses[i];
+		distorted.push_back(add_noise(poses[i]));
+	}
+	//Hull3D = convex_hull_3D(poses);
+	H3D = ConvexHull3D(distorted);
+	//H3D = ConvexHull3D(poses);
 
-		for (int i = 0; i < H3D.size(); i++) {
-			int* v = H3D[i].v;
-			std::sort(v, v + 3);
-			for (int j = 0; j < 3; j++) {
-				for (int k = 0; k < j; k++) {
-					if (!V[v[j]][v[k]]) {
-						V[v[j]][v[k]] = 1;
-						seq.push_back(Seq(v[j], v[k]));
-					}
+	for (int i = 0; i < H3D.size(); i++) {
+		int* v = H3D[i].v;
+		std::sort(v, v + 3);
+		for (int j = 0; j < 3; j++) {
+			for (int k = 0; k < j; k++) {
+				if (!V[v[j]][v[k]]) {
+					V[v[j]][v[k]] = 1;
+					seq.push_back(Seq(v[j], v[k]));
 				}
 			}
 		}
-		std::cout << "Case #" << t << ":\n";
-		while (Q--) {
-			std::cin >> knife;
-			ld angle1 = -atan2(knife.b, knife.a);
-			ld dx = sqrtl(knife.a * knife.a + knife.b * knife.b);
-			ld angle2 = -atan2(dx, knife.c);
-			sc[0] = sin(angle1);
-			sc[1] = cos(angle1);
-			sc[2] = sin(angle2);
-			sc[3] = cos(angle2);
-			C.clear(); H.clear();
-			for (const Seq& p : seq) {
-				Pos3D cur = poses[p.x], nxt = poses[p.y];
-				int abv1 = above(knife, cur), abv2 = above(knife, nxt);
-				if (abv1 != abv2) {
-					Pos3D inx = intersection(knife, cur, nxt);
-					//if (inx == MAXP) continue;
-					inx = rotate(inx);
-					C.push_back(Pos(inx.x, inx.y));
-				}
+	}
+	while (Q--) {
+		std::cin >> knife;
+		ld angle1 = -atan2(knife.b, knife.a);
+		ld dx = sqrtl(knife.a * knife.a + knife.b * knife.b);
+		ld angle2 = -atan2(dx, knife.c);
+		sc[0] = sin(angle1);
+		sc[1] = cos(angle1);
+		sc[2] = sin(angle2);
+		sc[3] = cos(angle2);
+		C.clear(); H.clear();
+		for (const Seq& p : seq) {
+			Pos3D cur = poses[p.x], nxt = poses[p.y];
+			int abv1 = above(knife, cur), abv2 = above(knife, nxt);
+			if (abv1 != abv2) {
+				Pos3D inx = intersection(knife, cur, nxt);
+				//if (inx == MAXP) continue;
+				inx = rotate(inx);
+				C.push_back(Pos(inx.x, inx.y));
 			}
-			std::sort(C.begin(), C.end());
-			if (C.size() <= 2) { for (const Pos& p : C) H.push_back(p); }
-			else {
-				for (int i = 0; i < C.size(); i++) {
-					while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
-						H.pop_back();
-					H.push_back(C[i]);
-				}
-				H.pop_back();
-				int s = H.size() + 1;
-				for (int i = C.size() - 1; i >= 0; i--) {
-					while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
-						H.pop_back();
-					H.push_back(C[i]);
-				}
-				H.pop_back();
-			}
-			std::cout << area(H) << "\n";
 		}
+		std::sort(C.begin(), C.end());
+		if (C.size() <= 2) { for (const Pos& p : C) H.push_back(p); }
+		else {
+			for (int i = 0; i < C.size(); i++) {
+				while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+					H.pop_back();
+				H.push_back(C[i]);
+			}
+			H.pop_back();
+			int s = H.size() + 1;
+			for (int i = C.size() - 1; i >= 0; i--) {
+				while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+					H.pop_back();
+				H.push_back(C[i]);
+			}
+			H.pop_back();
+		}
+		std::cout << area(H) << "\n";
 	}
 	return;
 }
@@ -348,3 +344,80 @@ test
 
 */
 
+
+//void solve() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cout << std::fixed;
+//	std::cout.precision(3);
+//	std::cin >> T;
+//	for (int t = 1; t <= T; t++) {
+//		memset(V, 0, sizeof V);
+//		distorted.clear();
+//		seq.clear();
+//		std::cin >> N >> Q;
+//		poses.resize(N);
+//		for (int i = 0; i < N; i++) {
+//			std::cin >> poses[i];
+//			distorted.push_back(add_noise(poses[i]));
+//		}
+//		//Hull3D = convex_hull_3D(poses);
+//		H3D = ConvexHull3D(distorted);
+//		//H3D = ConvexHull3D(poses);
+//
+//		for (int i = 0; i < H3D.size(); i++) {
+//			int* v = H3D[i].v;
+//			std::sort(v, v + 3);
+//			for (int j = 0; j < 3; j++) {
+//				for (int k = 0; k < j; k++) {
+//					if (!V[v[j]][v[k]]) {
+//						V[v[j]][v[k]] = 1;
+//						seq.push_back(Seq(v[j], v[k]));
+//					}
+//				}
+//			}
+//		}
+//		std::cout << "Case #" << t << ":\n";
+//		while (Q--) {
+//			std::cin >> knife;
+//			ld angle1 = -atan2(knife.b, knife.a);
+//			ld dx = sqrtl(knife.a * knife.a + knife.b * knife.b);
+//			ld angle2 = -atan2(dx, knife.c);
+//			sc[0] = sin(angle1);
+//			sc[1] = cos(angle1);
+//			sc[2] = sin(angle2);
+//			sc[3] = cos(angle2);
+//			C.clear(); H.clear();
+//			for (const Seq& p : seq) {
+//				Pos3D cur = poses[p.x], nxt = poses[p.y];
+//				int abv1 = above(knife, cur), abv2 = above(knife, nxt);
+//				if (abv1 != abv2) {
+//					Pos3D inx = intersection(knife, cur, nxt);
+//					//if (inx == MAXP) continue;
+//					inx = rotate(inx);
+//					C.push_back(Pos(inx.x, inx.y));
+//				}
+//			}
+//			std::sort(C.begin(), C.end());
+//			if (C.size() <= 2) { for (const Pos& p : C) H.push_back(p); }
+//			else {
+//				for (int i = 0; i < C.size(); i++) {
+//					while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+//						H.pop_back();
+//					H.push_back(C[i]);
+//				}
+//				H.pop_back();
+//				int s = H.size() + 1;
+//				for (int i = C.size() - 1; i >= 0; i--) {
+//					while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+//						H.pop_back();
+//					H.push_back(C[i]);
+//				}
+//				H.pop_back();
+//			}
+//			std::cout << area(H) << "\n";
+//		}
+//	}
+//	return;
+//}
+//int main() { solve(); return 0; }//boj19508 Convex Hull - refer to BIGINTEGER
