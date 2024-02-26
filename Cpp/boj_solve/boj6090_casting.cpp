@@ -10,9 +10,10 @@ typedef double ld;
 //const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
-int T, N, M, Q, prl, nprl, total;
+int T, N, M, Q;
+ll prl, nprl, total;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
-ll nC2(const ll& x) { return ((x + 1) * x) >> 1; }
+ll nC2(const ll& x) { return ((x - 1) * x) >> 1; }
 
 struct Pos {
 	ll x, y, ci, hi, cnt;
@@ -76,10 +77,10 @@ void init() {
 	std::cin >> T;
 	return;
 }
-bool ccw(const std::vector<Pos>& H, const int& i, const int& f) {
+int ccw(const std::vector<Pos>& H, const int& i, const int& f) {
 	int sz = H.size();
 	int idx1 = i % sz, idx2 = f % sz;
-	return (H[(i + 1) % sz] - H[i]) / (H[(f + 1) % sz], H[f]);
+	return (H[(idx1 + 1) % sz] - H[idx1]) / (H[(idx2 + 1) % sz] - H[idx2]);
 }
 void rotating_calipers() {
 	while (T--) {
@@ -99,25 +100,31 @@ void rotating_calipers() {
 
 		for (int i = 0; i < sz; i++) {
 			H[i].hi = i;
-			int on_seg = H[(i + 1) % sz].ci - H[i].ci;
+			ll on_seg = H[(i + 1) % sz].ci - H[i].ci;
 			H[i].cnt = (on_seg + N) % N + 1;
 		}
+		//for (int i = 0; i < sz; i++) std::cout << H[i];
 		prl = 0; nprl = 0; total = 0;
-		for (int i = 0, f; i < sz; i++) {
+		for (int i = 0, f = 1; i < sz; i++) {
 			while (ccw(H, i, f) > 0) f = (f + 1) % sz;
+			//std::cout << i << " " << f << " ccw: " << ccw(H, i, f) << "\n";
 			if (!ccw(H, i, f)) {
 				prl += H[i].cnt * H[f].cnt - 1;
 				if (H[i].hi == H[(f + 2) % sz].hi) prl--;
-				if (H[(i + 1) % sz].hi == H[f].hi) prl--;
+				if (H[(i + 2) % sz].hi == H[f].hi) prl--;
 			}
 			else {
 				nprl += H[i].cnt - 1;
 				if (H[i].hi == H[(f + 1) % sz].hi) nprl--;
 			}
-			if (ccw(H, i + 1, (i - 1 + sz) % sz) <= 0) total += nC2(H[i].cnt);
+			//std::cout << H[i].cnt << '\n';
+			//std::cout << H[i].cnt * H[f].cnt - 1 << "\n";
+			//std::cout << nC2(H[i].cnt) << '\n';
+			if (ccw(H, i + 1, (i - 1 + sz) % sz) >= 0) total += nC2(H[i].cnt);
 		}
+		//std::cout << total << " " << nprl << " " << prl << "\n";
 		total += nprl + (prl >> 1);
-		std::cout << total << "\n";
+		std::cout << total << "\n\n";
 	}
 	return;
 }
