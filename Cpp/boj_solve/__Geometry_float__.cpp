@@ -16,14 +16,14 @@ const ld TOL = 1e-7;
 const int LEN = 1e3;
 int N, M, T, Q;
 bool V[LEN + 1][LEN + 1];
+bool zero(const ld& x) { return std::abs(x) < TOL; }
+int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
 std::vector<Seq> seq;
 
 //2D============================================================================//
 //2D============================================================================//
 //2D============================================================================//
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 struct Pos {
 	ld x, y;
 	int i;
@@ -116,11 +116,12 @@ bool inner_check(Pos H[], const int& sz, const Pos& p) {
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	//bool f3 = on_seg_strong(s1, s2, p1) ||
-	//	on_seg_strong(s1, s2, p2) ||
-	//	on_seg_strong(p1, p2, s1) ||
-	//	on_seg_strong(p1, p2, s2);
-	return (f1 && f2);// || f3;
+	return f1 && f2;
+	//bool f3 = on_seg_strong(s1, s2, d1) ||
+	//	on_seg_strong(s1, s2, d2) ||
+	//	on_seg_strong(d1, d2, s1) ||
+	//	on_seg_strong(d1, d2, s2);
+	//return (f1 && f2) || f3;
 }
 std::vector<Pos> monotone_chain(std::vector<Pos>& C, std::vector<Pos>& H) {
 	std::sort(C.begin(), C.end());

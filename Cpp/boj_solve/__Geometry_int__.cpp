@@ -16,6 +16,8 @@ const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
 int N, M, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
+int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
+int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
 struct Info { ll area, l, r; };
 
 //2D============================================================================//
@@ -39,6 +41,7 @@ struct Pos {
 	Pos operator ~ () const { return { -y, x }; }
 	ll operator ! () const { return x * y; }
 	ll Euc() const { return x * x + y * y; }
+	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
 	friend std::istream& operator >> (std::istream& is, Pos& p);
 	friend std::ostream& operator << (std::ostream& os, const Pos& p);
@@ -63,11 +66,12 @@ bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	//bool f3 = on_seg_strong(s1, s2, p1) ||
-	//	on_seg_strong(s1, s2, p2) ||
-	//	on_seg_strong(p1, p2, s1) ||
-	//	on_seg_strong(p1, p2, s2);
-	return (f1 && f2);// || f3;
+	return f1 && f2;
+	//bool f3 = on_seg_strong(s1, s2, d1) ||
+	//	on_seg_strong(s1, s2, d2) ||
+	//	on_seg_strong(d1, d2, s1) ||
+	//	on_seg_strong(d1, d2, s2);
+	//return (f1 && f2) || f3;
 }
 void get_area_memo(Pos H[], ll memo[], const int& sz) {
 	memo[0] = 0;
@@ -143,17 +147,18 @@ int inner_check_bi_search(std::vector<Pos>& H, const Pos& p) {//convex
 std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	std::vector<Pos> H;
 	std::sort(C.begin(), C.end());
+	C.erase(unique(C.begin(), C.end()), C.end());
 	if (C.size() <= 2) { for (const Pos& pos : C) H.push_back(pos); }
 	else {
 		for (int i = 0; i < C.size(); i++) {
-			while (H.size() > 1 && cross(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+			while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
 				H.pop_back();
 			H.push_back(C[i]);
 		}
 		H.pop_back();
 		int s = H.size() + 1;
 		for (int i = C.size() - 1; i >= 0; i--) {
-			while (H.size() > s && cross(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+			while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
 				H.pop_back();
 			H.push_back(C[i]);
 		}
@@ -174,7 +179,7 @@ std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 		return ret > 0;
 		}
 	);
-	//C.erase(unique(C.begin(), C.end()), C.end());
+	C.erase(unique(C.begin(), C.end()), C.end());
 	int sz = C.size();
 	for (int i = 0; i < sz; i++) {
 		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
@@ -485,9 +490,6 @@ ld graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
 bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) {
 	return ((b - a) / (c - b)).Euc() == 0;
 }
-int dot_cross(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
-	return cross(a, b, c) * (p - a);
-}
 bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
 	return cross(a, b, c) * (p - a) == 0;
 }
@@ -606,6 +608,8 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	for (int i = 0; i < faces.size(); i++) if (active[i]) hull3D.push_back(faces[i]);
 	return hull3D;
 }
+
+
 
 using pi = std::pair<int, int>;
 #define sz(v) ((int)((v).size()))
