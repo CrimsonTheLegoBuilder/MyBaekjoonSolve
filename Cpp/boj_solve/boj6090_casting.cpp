@@ -266,6 +266,11 @@ int main() { rotating_calipers(); return 0; }//boj6090 casting
 3
 7
 
+
+1
+4
+0 0 0 5 3 3 4 -1
+
 */
 
 //#define _CRT_SECURE_NO_WARNINGS
