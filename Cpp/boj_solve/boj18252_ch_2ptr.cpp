@@ -7,6 +7,7 @@
 typedef long long ll;
 const int LEN = 1e5 + 1;
 int N, M, T, Q;
+bool V[LEN];
 
 struct Pos {
 	ll x, y;
@@ -107,90 +108,92 @@ std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 
 */
 
-void solve() {
-	Pos top, bot;
-	ll y, xst, xen;
-	std::cin >> N >> top >> bot;
-	C = { top, bot };
-	for (int i = 0; i < N; i++) {
-		std::cin >> y >> xst >> xen;
-		if (ccw(bot, top, Pos(xst, y)) < 0) C.push_back(Pos(xst, y));
-		if (ccw(bot, top, Pos(xen, y)) > 0) C.push_back(Pos(xen, y));
-	}
-	H = graham_scan(C);
-	int sz = H.size();
-	if (sz == 2) { std::cout << "0.0000000\n"; return; }
-	if (sz == 3) {
-		ll ret = cross(H[0], H[1], H[2]);
-		std::cout << (ret >> 1) << (ret & 1 ? ".5000000\n" : ".0000000\n"); return;
-	}
-
-	ll pre = 0, ans = 0;
-	int i = 0, j = 2, k = 1;
-	for (i, j, k; i < sz; i++) {//O(N)
-		pre = 0;
-		j = (j - 1 + sz) % sz;
-		while ((j + 1) % sz != i) {
-			while ((k + 1) % sz != j && cross(H[i], H[(k + 1) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k + 1) % sz;
-			ll cur = cross(H[i], H[k], H[j]);
-			if (pre > cur) break;
-			pre = cur;
-			ans = std::max(ans, pre);
-			j = (j + 1) % sz;
-		}
-	}
-	std::cout << (ans >> 1) << (ans & 1 ? ".5000000\n" : ".0000000\n"); return;
-}
-int main() { solve(); return 0; }//boj18252 The Starry Night
+//void solve() {
+//	Pos top, bot;
+//	ll y, xst, xen;
+//	std::cin >> N >> top >> bot;
+//	C = { top, bot };
+//	for (int i = 0; i < N; i++) {
+//		std::cin >> y >> xst >> xen;
+//		if (ccw(bot, top, Pos(xst, y)) < 0) C.push_back(Pos(xst, y));
+//		if (ccw(bot, top, Pos(xen, y)) > 0) C.push_back(Pos(xen, y));
+//	}
+//	H = graham_scan(C);
+//	int sz = H.size();
+//	if (sz == 2) { std::cout << "0.0000000\n"; return; }
+//	if (sz == 3) {
+//		ll ret = cross(H[0], H[1], H[2]);
+//		std::cout << (ret >> 1) << (ret & 1 ? ".5000000\n" : ".0000000\n"); return;
+//	}
+//
+//	ll pre = 0, ans = 0;
+//	int i = 0, j = 2, k = 1;
+//	for (i, j, k; i < sz; i++) {//O(N)
+//		pre = 0;
+//		j = (j - 1 + sz) % sz;
+//		while ((j + 1) % sz != i) {
+//			while ((k + 1) % sz != j && cross(H[i], H[(k + 1) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k + 1) % sz;
+//			ll cur = cross(H[i], H[k], H[j]);
+//			if (pre > cur) break;
+//			pre = cur;
+//			ans = std::max(ans, pre);
+//			j = (j + 1) % sz;
+//		}
+//	}
+//	std::cout << (ans >> 1) << (ans & 1 ? ".5000000\n" : ".0000000\n"); return;
+//}
+//int main() { solve(); return 0; }//boj18252 The Starry Night
 
 			//while ((k - 1 + sz) % sz != i && cross(H[i], H[(k - 1 + sz) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k - 1 + sz) % sz;
 //j = (i + 2) % sz;
 //k = (i + 1) % sz;
 
-//void solve() {
-//	Pos top, bot;
-//	ll y, xst, xen;
-//	freopen("boj9484_triangle_in.txt", "r", stdin);
-//	while (1) {
-//		std::cin >> N;
-//		if (!N) return;
-//		//std::cin >> top >> bot;
-//		//C = { top, bot };
-//		C.resize(N);
-//		for (int i = 0; i < N; i++) {
-//			std::cin >> C[i];
-//			//std::cin >> y >> xst >> xen;
-//			//if (ccw(bot, top, Pos(xst, y)) < 0) C.push_back(Pos(xst, y));
-//			//if (ccw(bot, top, Pos(xen, y)) > 0) C.push_back(Pos(xen, y));
-//		}
-//		H = graham_scan(C);
-//		int sz = H.size();
-//		if (sz == 2) { std::cout << "0.0000000\n"; continue; }
-//		if (sz == 3) {
-//			ll ret = cross(H[0], H[1], H[2]);
-//			std::cout << (ret >> 1) << (ret & 1 ? ".5000000\n" : ".0000000\n"); continue;
-//		}
-//
-//		ll pre = 0, ans = 0;
-//		int i = 0, j = 2, k = 1;
-//		for (i, j, k; i < sz; i++) {
-//			//j = (i + 2) % sz;
-//			//k = (i + 1) % sz;
-//			pre = 0;
-//			j = (j - 1 + sz) % sz;
-//			while ((j + 1) % sz != i) {
-//				//while ((k - 1 + sz) % sz != i && cross(H[i], H[(k - 1 + sz) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k - 1 + sz) % sz;
-//				//while ((j - 1 + sz) % sz != k && cross(H[i], H[k], H[(j - 1 + sz) % sz]) > cross(H[i], H[k], H[j])) j = (j - 1 + sz) % sz;
-//				while ((k + 1) % sz != j && cross(H[i], H[(k + 1) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k + 1) % sz;
-//				ll cur = cross(H[i], H[k], H[j]);
-//				if (pre > cur) break;
-//				pre = cur;
-//				ans = std::max(ans, pre);
-//				j = (j + 1) % sz;
-//			}
-//		}
-//		//std::cout << ans << "\n";
-//		std::cout << (ans >> 1) << (ans & 1 ? ".5000000\n" : ".0000000\n");
-//	}
-//}
-//int main() { solve(); return 0; }
+void solve() {
+	Pos top, bot;
+	ll y, xst, xen;
+	freopen("boj9484_triangle_in.txt", "r", stdin);
+	while (1) {
+		std::cin >> N;
+		if (!N) return;
+		//std::cin >> top >> bot;
+		//C = { top, bot };
+		C.resize(N);
+		for (int i = 0; i < N; i++) {
+			std::cin >> C[i];
+			//std::cin >> y >> xst >> xen;
+			//if (ccw(bot, top, Pos(xst, y)) < 0) C.push_back(Pos(xst, y));
+			//if (ccw(bot, top, Pos(xen, y)) > 0) C.push_back(Pos(xen, y));
+		}
+		H = graham_scan(C);
+		int sz = H.size();
+		if (sz == 2) { std::cout << "0.0000000\n"; continue; }
+		if (sz == 3) {
+			ll ret = cross(H[0], H[1], H[2]);
+			std::cout << (ret >> 1) << (ret & 1 ? ".5000000\n" : ".0000000\n"); continue;
+		}
+
+		ll pre = 0, ans = 0;
+		int i = 0, j = 2, k = 1;
+		for (i, j, k; i < sz; i++) {
+			//j = (i + 2) % sz;
+			//k = (i + 1) % sz;
+			pre = 0;
+			j = (j - 1 + sz) % sz;
+			while ((j + 1) % sz != i) {
+				//while ((k - 1 + sz) % sz != i && cross(H[i], H[(k - 1 + sz) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k - 1 + sz) % sz;
+				//while ((j - 1 + sz) % sz != k && cross(H[i], H[k], H[(j - 1 + sz) % sz]) > cross(H[i], H[k], H[j])) j = (j - 1 + sz) % sz;
+				while ((k + 1) % sz != j && cross(H[i], H[(k + 1) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k + 1) % sz;
+				ll cur = cross(H[i], H[k], H[j]);
+				if (pre > cur) break;
+				pre = cur;
+				ans = std::max(ans, pre);
+				V[j] = 1;
+				j = (j + 1) % sz;
+			}
+			if (V[i]) break;
+		}
+		//std::cout << ans << "\n";
+		std::cout << (ans >> 1) << (ans & 1 ? ".5000000\n" : ".0000000\n");
+	}
+}
+int main() { solve(); return 0; }
