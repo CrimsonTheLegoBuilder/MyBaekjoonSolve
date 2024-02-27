@@ -139,6 +139,9 @@ bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) {
 bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
 	return zero(cross(a, b, c) * (p - a));
 }
+bool coplanar(const std::vector<Pos3D> H, const Plane& S) {
+	return zero((cross(H[0], H[1], H[2]) / S.norm()).mag()) * !above(S, H[0]);
+}
 bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {// is p strictly above plane
 	return cross(a, b, c) * (p - a) > 0;
 }
@@ -255,7 +258,7 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 ld query() {
 	std::cin >> knife;
 	if (col == 1) return 0;
-	if (cop == 1) return graham_scan(poses, knife.norm());
+	if (cop == 1) return graham_scan(poses, knife.norm()) * coplanar(poses, knife);
 	CANDI.clear();
 	for (const Seq& p : seq) {
 		Pos3D& cur = poses[p.x], nxt = poses[p.y];
@@ -291,3 +294,15 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj19508 Convex Hull - refer to koosaga, BIGINTEGER
+
+/*
+
+3 3
+0 0 0
+1 1 0
+1 0 0
+0 0 1 0
+0 0 1 1
+1 1 1 0
+
+*/
