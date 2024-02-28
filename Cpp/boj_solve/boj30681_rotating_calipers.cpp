@@ -10,7 +10,7 @@ typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const int LEN = 1e5 + 1;
-int N, T;
+int N;
 ld memo[LEN];
 
 struct Pos {
@@ -26,7 +26,7 @@ struct Pos {
 	ld mag() const { return hypot(x, y); }
 	friend std::istream& operator >> (std::istream& is, Pos& p);
 	friend std::ostream& operator << (std::ostream& os, const Pos& p);
-}; const Pos O = { 0, 0 };
+};
 std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y << "\n"; return os; }
 std::vector<Pos> C, H;
@@ -65,14 +65,9 @@ void rotating_calipers() {
 	N = H.size();
 
 	if (N == 2) { std::cout << (H[0] - H[1]).mag() << "\n"; return; }
-	//if (N == 3) {
-	//	ld ret = std::min({ (H[0] - H[1]).mag(), (H[1] - H[2]).mag(), (H[2] - H[0]).mag() });
-	//	std::cout << ret << "\n"; return;
-	//}
-
 	get_round_memo(H, memo);
 
-	ld MIN{ INF };
+	ld MIN = INF ;
 	for (int i = 0, f = 1; i < N; i++) {
 		while (ccw(H, i, f) > 0) f = (f + 1) % N;
 		int idx1 = i, idx2 = f;
@@ -95,3 +90,9 @@ void solve() {
 	rotating_calipers();
 }
 int main() { solve(); return 0; }//boj30681 Star capture
+
+
+//if (N == 3) {
+//	ld ret = std::min({ (H[0] - H[1]).mag(), (H[1] - H[2]).mag(), (H[2] - H[0]).mag() });
+//	std::cout << ret << "\n"; return;
+//}

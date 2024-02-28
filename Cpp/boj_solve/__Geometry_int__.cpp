@@ -81,6 +81,15 @@ void get_area_memo(Pos H[], ll memo[], const int& sz) {
 	}
 	return;
 }
+void get_round_memo(std::vector<Pos>& H, ld memo[]) {
+	int sz = H.size();
+	memo[0] = .0;
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		memo[i + 1] = (cur - nxt).mag() + memo[i];//memo[sz] == convex hull's round
+	}
+	return;
+}
 ll area(Pos H[], const int& sz) {
 	ll ret = 0;
 	for (int i = 0; i < sz; i++) {
