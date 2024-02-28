@@ -14,7 +14,7 @@ typedef std::pair<int, int> pi;
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
-int N, M, Q;
+int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
@@ -45,7 +45,7 @@ struct Pos {
 	ld mag() const { return hypot(x, y); }
 	friend std::istream& operator >> (std::istream& is, Pos& p);
 	friend std::ostream& operator << (std::ostream& os, const Pos& p);
-} NH[LEN], MH[LEN], seq[LEN]; const Pos O = { 0, 0 };
+}; const Pos O = { 0, 0 };
 std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y << "\n"; return os; }
 std::vector<Pos> C, H;

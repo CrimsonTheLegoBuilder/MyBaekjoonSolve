@@ -127,7 +127,7 @@ void solve() {
 	}
 	ll pre = 0, ans = 0;
 	int i = 0, j = 2, k = 1;
-	for (i, j, k; i < sz; i++) {//O(N)
+	for (; i < sz; i++) {//O(N)
 		pre = 0;
 		j = (j - 1 + sz) % sz;
 		while ((j + 1) % sz != i) {
