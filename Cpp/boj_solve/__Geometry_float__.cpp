@@ -42,15 +42,18 @@ struct Pos {
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return hypot(x, y); }
-	friend std::istream& operator >> (std::istream& is, Pos& p);
-	friend std::ostream& operator << (std::ostream& os, const Pos& p);
+	friend std::istream& operator >> (std::istream& is, Pos& p) {
+		is >> p.x >> p.y;
+		return is;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) {
+		os << p.x << " " << p.y << "\n"; return os;
+	}
 }; const Pos O = { 0, 0, -1 };
-std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
-std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y << "\n"; return os; }
 struct Vec {
 	ld vy, vx;
-	bool operator < (const Vec& v) const { return z(vy - v.vy) ? vx < v.vx : vy < v.vy; }
-	bool operator == (const Vec& v) const { return (z(vy - v.vy) && z(vx - v.vx)); }
+	bool operator < (const Vec& v) const { return zero(vy - v.vy) ? vx < v.vx : vy < v.vy; }
+	bool operator == (const Vec& v) const { return (zero(vy - v.vy) && zero(vx - v.vx)); }
 	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
 	Vec operator ~ () const { return { -vx, vy }; }
 }; const Vec Zero = { 0, 0 };
@@ -204,11 +207,30 @@ struct Pos3D {
 	Pos3D& operator *= (const ld& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
 	ld Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
-	friend std::istream& operator >> (std::istream& is, Pos3D& p);
-	friend std::ostream& operator << (std::ostream& os, const Pos3D& p);
+	ld lon() const { return atan2(y, x); }
+	ld lat() const { return atan2(z, sqrtl(x * x + y * y)); }
+	Pos3D unit() const { return *this / mag(); }
+	Pos3D norm(const Pos3D& p) const { return (*this / p).unit(); }
+	Pos3D rotate(const ld& th, const Pos3D& axis) const {
+		ld SIN = sin(th), COS = cos(th);
+		Pos3D norm = axis.unit();
+		return norm * (*this * norm) * (1 - COS) + (*this * COS) - *this / norm * SIN;
+	}
+	friend std::istream& operator >> (std::istream& is, Pos3D& p) {
+		is >> p.x >> p.y >> p.z;
+		return is;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) {
+		os << p.x << " " << p.y << " " << p.z << "\n";
+		return os;
+	}
 }; const Pos3D MAXP3D = { INF, INF, INF };
-std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
-std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z << "\n"; return os; }
+std::vector<Pos3D> pos;
+Pos3D S2C(const ld& lon, const ld& lat) {//Spherical to Cartesian
+	ld phi = lon * PI / 180;
+	ld the = lat * PI / 180;
+	return Pos3D(cos(phi) * cos(the), sin(phi) * cos(the), sin(the));
+}
 std::vector<Pos3D> poses, distorted;//3D
 std::vector<Pos3D> CANDI;//2D
 struct Line3D {
@@ -219,11 +241,48 @@ struct Plane {
 	ld a, b, c, d;
 	Plane(ld A = 0, ld B = 0, ld C = 0, ld D = 0) : a(A), b(B), c(C), d(D) {}
 	Pos3D norm() const { return Pos3D(a, b, c); };
-	friend std::istream& operator >> (std::istream& is, Plane& f);
-	friend std::ostream& operator << (std::ostream& os, const Plane& f);
+	friend std::istream& operator >> (std::istream& is, Plane& f) { 
+		is >> f.a >> f.b >> f.c >> f.d;
+		return is;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Plane& f) {
+		os << f.a << " " << f.b << " " << f.c << " " << f.d << "\n";
+		return os;
+	}
 } knife;
-std::istream& operator >> (std::istream& is, Plane& f) { is >> f.a >> f.b >> f.c >> f.d; return is; }
-std::ostream& operator << (std::ostream& os, const Plane& f) { os << f.a << " " << f.b << " " << f.c << " " << f.d << "\n"; return os; }
+bool circle_intersection(const Pos3D& a, const Pos3D& b, const ld& th, std::vector<Pos3D>& inxs) {
+	inxs.clear();
+	Pos3D mid = (a + b) * .5;
+	if (zero(mid.mag())) return 0;
+	ld x = cos(th) / mid.mag();
+	if (x < -1 || 1 < x) return 0;
+	Pos3D w = mid.unit() * x;
+	ld ratio = sqrtl(1 - x * x);
+	Pos3D h = (mid.unit() / (b - a).unit()) * ratio;
+	inxs.push_back(w + h);
+	inxs.push_back(w - h);
+	return 1;
+}
+bool plane_circle_intersection(const Pos3D& a, const Pos3D& perp, const ld& th, std::vector<Pos3D>& inxs) {
+	inxs.clear();
+	Pos3D vec = a - (perp * (perp * a));
+	if (zero(vec.mag())) return 0;
+	ld x = cos(th) / vec.mag();
+	if (x < -1 || 1 < x) return 0;
+	Pos3D w = vec.unit() * x;
+	ld ratio = sqrtl(1 - x * x);
+	Pos3D h = (vec.unit() / perp) * ratio;
+	inxs.push_back(w + h);
+	inxs.push_back(w - h);
+	return 1;
+}
+Pos3D point(const Pos3D Xaxis, const Pos3D Yaxis, const ld& th) { return Xaxis * cos(th) + Yaxis * sin(th); }
+ld angle(const Pos3D Xaxis, const Pos3D Yaxis, const Pos3D& p) {
+	ld X = Xaxis * p;
+	ld Y = Yaxis * p;
+	ld th = atan2(Y, X);
+	return norm(th);
+}
 int above(const Plane& S, const Pos3D& p) {
 	ld ret = p * S.norm() + S.d;
 	return dcmp(ret);

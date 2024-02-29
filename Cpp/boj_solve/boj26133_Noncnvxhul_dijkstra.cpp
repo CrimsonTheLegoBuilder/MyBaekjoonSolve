@@ -10,8 +10,8 @@ const ld TOL = 1e-8;
 const ld INF = 1e17;
 const int LEN = 102;
 int N, t;
-ld COST[LEN];
 
+ld COST[LEN];
 struct Info {
 	int i;
 	ld c;

@@ -741,6 +741,12 @@
     <ClCompile Include="boj30681_rotating_calipers.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj4212_3DGeo_dijkstra.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="koosaga_boj4212_3DGeo_floyd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

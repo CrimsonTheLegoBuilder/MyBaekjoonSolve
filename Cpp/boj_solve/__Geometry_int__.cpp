@@ -43,11 +43,15 @@ struct Pos {
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
-	friend std::istream& operator >> (std::istream& is, Pos& p);
-	friend std::ostream& operator << (std::ostream& os, const Pos& p);
+	friend std::istream& operator >> (std::istream& is, Pos& p) {
+		is >> p.x >> p.y;
+		return is;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) {
+		os << p.x << " " << p.y << "\n";
+		return os;
+	}
 }; const Pos O = { 0, 0 };
-std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
-std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y << "\n"; return os; }
 std::vector<Pos> C, H;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
@@ -424,11 +428,15 @@ struct Pos3D {
 	Pos3D& operator *= (const ll& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
 	ll Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
-	friend std::istream& operator >> (std::istream& is, Pos3D& p);
-	friend std::ostream& operator << (std::ostream& os, const Pos3D& p);
+	friend std::istream& operator >> (std::istream& is, Pos3D& p) {
+		is >> p.x >> p.y >> p.z;
+		return is;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) {
+		os << p.x << " " << p.y << " " << p.z << "\n";
+		return os;
+	}
 } candi[LEN], willy, MAXP{ INF, INF, INF };
-std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
-std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z << "\n"; return os; }
 using Face = std::array<int, 3>;
 std::vector<Face> Hull3D;
 struct Edge {
