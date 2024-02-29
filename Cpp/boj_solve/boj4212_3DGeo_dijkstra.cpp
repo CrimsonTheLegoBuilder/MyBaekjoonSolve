@@ -5,8 +5,8 @@
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
