@@ -127,13 +127,15 @@ void solve() {
 	}
 	ll pre = 0, ans = 0;
 	int i = 0, j = 2, k = 1;
-	for (; i < sz; i++) {//O(N)
+	for (; i < sz; i++) {//O(N^2)
+		j = (i + 2) % sz;
+		k = (i + 1) % sz;
 		pre = 0;
-		j = (j - 1 + sz) % sz;
+		//j = (j - 1 + sz) % sz;
 		while ((j + 1) % sz != i) {
 			while ((k + 1) % sz != j && cross(H[i], H[(k + 1) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k + 1) % sz;
 			ll cur = cross(H[i], H[k], H[j]);
-			if (pre > cur) break;
+			//if (pre > cur) break;//wrong code
 			pre = cur;
 			ans = std::max(ans, pre);
 			j = (j + 1) % sz;
@@ -144,8 +146,6 @@ void solve() {
 int main() { solve(); return 0; }//boj18252 The Starry Night
 
 			//while ((k - 1 + sz) % sz != i && cross(H[i], H[(k - 1 + sz) % sz], H[j]) > cross(H[i], H[k], H[j])) k = (k - 1 + sz) % sz;
-//j = (i + 2) % sz;
-//k = (i + 1) % sz;
 
 //void solve() {
 //	Pos top, bot;
