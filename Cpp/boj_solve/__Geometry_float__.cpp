@@ -18,6 +18,12 @@ int N, M, T, Q;
 bool V[LEN + 1][LEN + 1];
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
+int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
+ld norm(ld& th) {
+	while (th < -TOL) th += PI * 2;
+	while (th > PI * 2) th -= PI * 2;
+	return th;
+}
 struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
 std::vector<Seq> seq;
 
