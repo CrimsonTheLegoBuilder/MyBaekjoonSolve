@@ -13,6 +13,7 @@ typedef long long ll;
 typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
+const ld PI = acos(-1);
 const int LEN = 1e3;
 int N, M, T, Q;
 bool V[LEN + 1][LEN + 1];
