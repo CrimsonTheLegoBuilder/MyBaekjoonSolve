@@ -76,6 +76,42 @@ struct Line {
 	}
 	ld operator / (const Line& l) const { return s / l.s; }
 };
+struct Circle {
+	Pos c;
+	ld R;
+	Circle(Pos C = Pos(0, 0, 0), ld r = 0) : c(C), R(r) {}
+	bool operator == (const Circle& p) const { return c == p.c && std::abs(R - p.R) < TOL; }
+	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - c.r) >= TOL; }
+	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, R + C.R }; }
+	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, R - C.R }; }
+	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + R; }// coord trans | check right
+	friend std::istream& operator >> (std::istream& is, Circle& c) {
+		is >> c.c.x >> c.c.y >> c.R;
+		return is;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
+		os << c.c.x << " " << c.c.y << " " << c.R << "\n"; return os;
+	}
+};
+std::vector<Pos> get_node(const Circle& a, const Circle& b) {
+	Pos ca = a.c, cb = b.c;
+	Pos vec = cb - ca;
+	ld ra = a.R, rb = b.R;
+	ld distance = vec.mag();
+
+	if (distance > ra + rb + TOL) return {};
+	if (distance < std::abs(ra - rb) - TOL) return {};
+
+	//2nd hyprblc law of cos
+	ld X = (ra * ra - rb * rb + distance * distance) / (2 * distance);
+	ld Y = sqrt(ra * ra - X * X);
+	Pos m = ca + vec * (X / distance);
+	if (Y > 0) {
+		ld ratio = Y / distance;
+		return { m + ~vec * ratio, m - ~vec * ratio };
+	}
+	else return { m };
+}
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
