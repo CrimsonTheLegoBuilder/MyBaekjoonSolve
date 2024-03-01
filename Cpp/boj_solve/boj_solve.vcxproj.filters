@@ -159,9 +159,6 @@
     <ClCompile Include="boj9382_circle_greedy.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj29566_3_circles.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj3271_MST_prim.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
@@ -748,6 +745,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="boj29566_3circle.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj29499_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
