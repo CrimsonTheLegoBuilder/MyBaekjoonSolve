@@ -126,36 +126,37 @@ void query() {
 	lat = parser(2); lon = parser(3);
 	d2 = S2C(lon, lat, 1);
 
+	Pos3D top;
 	if (d1 == Z_axis || d2 == Z_axis) { std::cout << "90,0N\n"; return; }
 	else if (d1 == d2) { std::cout << info[0] << "\n"; return; }
 	else if ((d1 + d2) * .5 == O) { std::cout << "undefined\n"; return; }
 	else if (zero(d1.z) && zero(d2.z)) { std::cout << "0,0N\n"; return; }
-	else if (d1.z < 0 + TOL && d2.z < 0 + TOL) {
-		Pos3D top = d1.z < d2.z ? d2 : d1;
-		ld ans = top.lat() * 180 / PI;
-		int itgr = ans;
-		int deci = std::abs(itgr - ans) * 60 + .5;
-		std::cout << std::abs(itgr) << "," << deci << "S\n";
-	}
 
+	else if (d1.z < 0 + TOL && d2.z < 0 + TOL) {
+		top = d1.z < d2.z ? d2 : d1;
+		//ld ans = top.lat() * 180 / PI;
+		//int itgr = ans;
+		//int deci = std::abs(itgr - ans) * 60 + .5;
+		//std::cout << std::abs(itgr) << "," << deci << "S\n";
+	}
 	else {
 		Pos3D perp = (d1 / d2).unit();
 		if (perp.z < 0) perp *= -1;
 		lon = norm(perp.lon() + PI);
 		lat = flip(perp.lat());
-		Pos3D top = S2C(lon, lat);
+		top = S2C(lon, lat);
 		if (inner_check(d1, d2, top)) {
 			//if (top.z > d1.z && top.z > d2.z) top = top;
 			//else top = d1.z < d2.z ? d2 : d1;
 		}
 		else top = d1.z < d2.z ? d2 : d1;
-		ld ans = top.lat() * 180 / PI;
-		int itgr = ans;
-		int deci = std::abs(itgr - ans) * 60 + .5;
-		itgr = std::abs(itgr);
-		if (deci == 60) itgr++, deci = 0;
-		std::cout << itgr << "," << deci << (ans > 0 ? "N\n" : "S\n");
 	}
+	ld ans = top.lat() * 180 / PI;
+	int itgr = ans;
+	int deci = std::abs(itgr - ans) * 60 + .5;
+	itgr = std::abs(itgr);
+	if (deci == 60) itgr++, deci = 0;
+	std::cout << itgr << "," << deci << (ans > 0 ? "N\n" : "S\n");
 	return;
 }
 void solve() {
@@ -171,13 +172,56 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj4296 Great Circle
 
-
 /*
 
 1
 53,17S 110,48E 85,4N 10,38W
 
 */
+
+//void query() {
+//	ld lon, lat;
+//	Pos3D d1, d2;
+//	for (int i = 0; i < 4; i++) std::cin >> info[i];
+//
+//	lat = parser(0); lon = parser(1);
+//	d1 = S2C(lon, lat, 1);
+//
+//	lat = parser(2); lon = parser(3);
+//	d2 = S2C(lon, lat, 1);
+//
+//	if (d1 == Z_axis || d2 == Z_axis) { std::cout << "90,0N\n"; return; }
+//	else if (d1 == d2) { std::cout << info[0] << "\n"; return; }
+//	else if ((d1 + d2) * .5 == O) { std::cout << "undefined\n"; return; }
+//	else if (zero(d1.z) && zero(d2.z)) { std::cout << "0,0N\n"; return; }
+//	else if (d1.z < 0 + TOL && d2.z < 0 + TOL) {
+//		Pos3D top = d1.z < d2.z ? d2 : d1;
+//		ld ans = top.lat() * 180 / PI;
+//		int itgr = ans;
+//		int deci = std::abs(itgr - ans) * 60 + .5;
+//		std::cout << std::abs(itgr) << "," << deci << "S\n";
+//	}
+//
+//	else {
+//		Pos3D perp = (d1 / d2).unit();
+//		if (perp.z < 0) perp *= -1;
+//		lon = norm(perp.lon() + PI);
+//		lat = flip(perp.lat());
+//		Pos3D top = S2C(lon, lat);
+//		if (inner_check(d1, d2, top)) {
+//			//if (top.z > d1.z && top.z > d2.z) top = top;
+//			//else top = d1.z < d2.z ? d2 : d1;
+//		}
+//		else top = d1.z < d2.z ? d2 : d1;
+//		ld ans = top.lat() * 180 / PI;
+//		int itgr = ans;
+//		int deci = std::abs(itgr - ans) * 60 + .5;
+//		itgr = std::abs(itgr);
+//		if (deci == 60) itgr++, deci = 0;
+//		std::cout << itgr << "," << deci << (ans > 0 ? "N\n" : "S\n");
+//	}
+//	return;
+//}
 
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
