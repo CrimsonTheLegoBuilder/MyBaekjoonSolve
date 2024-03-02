@@ -145,11 +145,12 @@ void query() {
 		lon = norm(perp.lon() + PI);
 		lat = flip(perp.lat());
 		top = S2C(lon, lat);
-		if (inner_check(d1, d2, top)) {
-			//if (top.z > d1.z && top.z > d2.z) top = top;
-			//else top = d1.z < d2.z ? d2 : d1;
-		}
-		else top = d1.z < d2.z ? d2 : d1;
+		//if (inner_check(d1, d2, top)) {
+		//	//if (top.z > d1.z && top.z > d2.z) top = top;
+		//	//else top = d1.z < d2.z ? d2 : d1;
+		//}
+		//else top = d1.z < d2.z ? d2 : d1;
+		if (!inner_check(d1, d2, top)) top = d1.z < d2.z ? d2 : d1;
 	}
 	ld ans = top.lat() * 180 / PI;
 	int itgr = ans;
