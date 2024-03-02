@@ -105,7 +105,6 @@ bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t) {
 ld parser(const int& i) {
 	ld ret;
 	int itgr = 0, deci = 0, t = 0;
-	//std::cout << info[i] << "\n";
 	while (info[i][t] != ',')
 		itgr *= 10, itgr += info[i][t++] - '0';
 	t++;
@@ -114,7 +113,6 @@ ld parser(const int& i) {
 
 	ret = itgr + (ld)deci / 60;
 	if (info[i][t] == 'S' || info[i][t] == 'W') ret *= -1;
-	//std::cout << ret << "\n";
 	return ret;
 }
 void query() {
@@ -147,8 +145,8 @@ void query() {
 		lat = flip(perp.lat());
 		Pos3D top = S2C(lon, lat);
 		if (inner_check(d1, d2, top)) {
-			if (top.z > d1.z && top.z > d2.z) top = top;
-			else top = d1.z < d2.z ? d2 : d1;
+			//if (top.z > d1.z && top.z > d2.z) top = top;
+			//else top = d1.z < d2.z ? d2 : d1;
 		}
 		else top = d1.z < d2.z ? d2 : d1;
 		ld ans = top.lat() * 180 / PI;
