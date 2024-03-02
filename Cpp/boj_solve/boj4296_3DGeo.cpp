@@ -74,7 +74,7 @@ const Pos3D Z_axis = { 0, 0, 1 };
 const Pos3D MAXP3D = { INF, INF, INF };
 std::vector<Pos3D> pos;
 Pos3D S2C(const ld& lon, const ld& lat, bool f = 0) {//Spherical to Cartesian
-	ld phi = lon;
+	ld phi = norm(lon);
 	ld the = lat;
 	if (f) phi = norm(lon * PI / 180);
 	if (f) the = lat * PI / 180;
