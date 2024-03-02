@@ -5,6 +5,7 @@
 #include <cstring>
 typedef long long ll;
 typedef double ld;
+const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
 char info[4][10];
@@ -19,7 +20,7 @@ ld flip(ld lat) {
 	if (zero(lat)) return PI * .5;
 	if (lat > 0) return PI * .5 - lat;
 	if (lat < 0) return -(PI * .5) - lat;
-	return 1e17;
+	return INF;
 }
 
 int T;
