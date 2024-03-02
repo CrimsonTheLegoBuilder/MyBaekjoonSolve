@@ -123,7 +123,7 @@ void query() {
 	lat = parser(0); lon = parser(1);
 	d1 = S2C(lon, lat, 1);
 
-	lat = parser(2);  lon = parser(3);
+	lat = parser(2); lon = parser(3);
 	d2 = S2C(lon, lat, 1);
 
 	if (d1 == Z_axis || d2 == Z_axis) { std::cout << "90,0N\n"; return; }
