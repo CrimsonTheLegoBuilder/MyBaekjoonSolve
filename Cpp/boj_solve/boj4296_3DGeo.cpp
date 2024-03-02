@@ -72,7 +72,6 @@ bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t) {
 	return ccw(O, p1, t, nrm) >= 0 && ccw(O, p2, t, nrm) <= 0;
 }
 ld parser(const int& i) {
-	ld ret;
 	int itgr = 0, deci = 0, t = 0;
 	while (info[i][t] != ',')
 		itgr *= 10, itgr += info[i][t++] - '0';
@@ -80,7 +79,7 @@ ld parser(const int& i) {
 	while ('0' <= info[i][t] && info[i][t] <= '9')
 		deci *= 10, deci += info[i][t++] - '0';
 
-	ret = itgr + (ld)deci / 60;
+	ld ret = itgr + (ld)deci / 60;
 	if (info[i][t] == 'S' || info[i][t] == 'W') ret *= -1;
 	return ret;
 }
