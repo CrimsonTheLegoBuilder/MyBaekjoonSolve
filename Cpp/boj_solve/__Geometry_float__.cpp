@@ -268,7 +268,12 @@ struct Pos3D {
 		os << p.x << " " << p.y << " " << p.z << "\n";
 		return os;
 	}
-}; const Pos3D MAXP3D = { INF, INF, INF };
+};
+const Pos3D O = { 0, 0, 0 };
+const Pos3D X_axis = { 1, 0, 0 };
+const Pos3D Y_axis = { 0, 1, 0 };
+const Pos3D Z_axis = { 0, 0, 1 };
+const Pos3D MAXP3D = { INF, INF, INF };
 std::vector<Pos3D> pos;
 Pos3D S2C(const ld& lon, const ld& lat) {//Spherical to Cartesian
 	ld phi = lon * PI / 180;
