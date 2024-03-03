@@ -1,34 +1,18 @@
-//#include <iostream>
-//#include <algorithm>
-//#include <cstring>
-//#include <vector>
-//#include <cmath>
-//typedef long long ll;
-//ll N, ans;
-//
-//int main() {
-//	std::cin >> N;
-//	ans = N % 8;
-//	if (!ans) std::cout << "2\n";
-//	else if (1 <= ans && ans <= 5) std::cout << ans << "\n";
-//	//else std::cout << 10 - ans << "\n";
-//	return 0;
-//}
+#include <iostream>
+#include <algorithm>
+#include <cstring>
+#include <vector>
+#include <cmath>
+typedef long long ll;
+typedef long double ld;
+const ld MILE = 1609.344;
+const ld GALLON = 3.785411784;
+ld A;
 
-#include<iostream>
-using namespace std;
-int main()
-{
-    int n = 1, i, a, m;
-    cin >> m;
-    for (i = 1; i <= m; i++)
-    {
-        cin >> a;
-        if (i == 1 || i == m)
-        {
-            n = n * a;
-        }
-    }
-    cout << n;
-    return 0;
+int main() {
+	std::cout << std::fixed;
+	std::cout.precision(7);
+	std::cin >> A;
+	//std::cout << A * GALLON / MILE * 1000 << "\n";
+	return 0;
 }
