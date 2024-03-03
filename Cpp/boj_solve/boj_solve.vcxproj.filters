@@ -738,7 +738,7 @@
     <ClCompile Include="boj30681_rotating_calipers.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj4212_3DGeo_dijkstra.cpp">
+    <ClCompile Include="boj4212_3DGeo_spherical_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="koosaga_boj4212_3DGeo_floyd.cpp">
@@ -750,7 +750,10 @@
     <ClCompile Include="boj29499_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj4296_3DGeo.cpp">
+    <ClCompile Include="boj4296_3DGeo_sphere.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj17978_3DGeo_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

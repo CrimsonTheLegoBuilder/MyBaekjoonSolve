@@ -25,6 +25,13 @@ ld norm(ld& th) {
 	while (th > PI * 2) th -= PI * 2;
 	return th;
 }
+ld flip(ld lat) {
+	if (zero(lat - PI * .5) || zero(lat + PI * .5)) return 0;
+	if (zero(lat)) return PI * .5;
+	if (lat > 0) return PI * .5 - lat;
+	if (lat < 0) return -(PI * .5) - lat;
+	return INF;
+}
 struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
 std::vector<Seq> seq;
 
@@ -248,7 +255,9 @@ struct Pos3D {
 	Pos3D operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
 	Pos3D operator / (const ld& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
 	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
+	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
 	Pos3D& operator *= (const ld& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
+	Pos3D& operator /= (const ld& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
 	ld Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
 	ld lon() const { return atan2(y, x); }
@@ -269,7 +278,7 @@ struct Pos3D {
 		return os;
 	}
 };
-const Pos3D O = { 0, 0, 0 };
+const Pos3D O3D = { 0, 0, 0 };
 const Pos3D X_axis = { 1, 0, 0 };
 const Pos3D Y_axis = { 0, 1, 0 };
 const Pos3D Z_axis = { 0, 0, 1 };
@@ -407,6 +416,12 @@ Pos3D intersection(const Plane& S, const Pos3D& p1, const Pos3D& p2) {
 	Pos3D inx = intersection(S, l);
 	//if (!on_seg_strong(p1, p2, inx)) return { INF, INF, INF };
 	return inx;
+}
+bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t) {
+	Pos3D nrm = cross(O3D, d1, d2);
+	Pos3D p1 = d1, p2 = d2;
+	if (ccw(O3D, p1, p2, nrm) < 0) std::swap(p1, p2);
+	return ccw(O3D, p1, t, nrm) >= 0 && ccw(O3D, p2, t, nrm) <= 0;
 }
 int inner_check(std::vector<Pos3D>& H, const Pos3D& p) {//for convex hull
 	int sz = H.size();
