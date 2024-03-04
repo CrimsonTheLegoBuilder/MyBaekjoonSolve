@@ -43,6 +43,7 @@ struct Pos {
 	int i;
 	Pos(ld X = 0, ld Y = 0, int I = 0) : x(X), y(Y), i(I) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
+	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y, 0 }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y, 0 }; }
@@ -53,7 +54,9 @@ struct Pos {
 	Pos operator ~ () const { return { -y, x, 0 }; }
 	ld operator ! () const { return x * y; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
+	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return hypot(x, y); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) {
