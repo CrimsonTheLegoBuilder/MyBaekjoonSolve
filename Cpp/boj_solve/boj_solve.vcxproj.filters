@@ -741,9 +741,6 @@
     <ClCompile Include="boj4212_3DGeo_spherical_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="koosaga_boj4212_3DGeo_floyd.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj29566_3circle.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -756,7 +753,16 @@
     <ClCompile Include="boj17978_3DGeo_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj4212_3DGeo_wrong.cpp">
+    <ClCompile Include="boj4212_3DGeo_spherical_dijkstra_sweeping.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="koosaga_boj4212_3DGeo_floyd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj14837_3DGeo.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj14837_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
