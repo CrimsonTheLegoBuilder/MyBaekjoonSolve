@@ -266,8 +266,8 @@ struct Pos3D {
 	Pos3D norm(const Pos3D& p) const { return (*this / p).unit(); }
 	Pos3D rotate(const ld& th, const Pos3D& axis) const {
 		ld SIN = sin(th), COS = cos(th);
-		Pos3D norm = axis.unit();
-		return norm * (*this * norm) * (1 - COS) + (*this * COS) - *this / norm * SIN;
+		Pos3D u = axis.unit();
+		return u * (*this * u) * (1 - COS) + (*this * COS) - (*this / u) * SIN;
 	}
 	friend std::istream& operator >> (std::istream& is, Pos3D& p) {
 		is >> p.x >> p.y >> p.z;
