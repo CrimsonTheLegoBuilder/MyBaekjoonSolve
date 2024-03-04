@@ -756,7 +756,7 @@
     <ClCompile Include="boj17978_3DGeo_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj4212_3DGeo_fast.cpp">
+    <ClCompile Include="boj4212_3DGeo_wrong.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

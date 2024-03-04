@@ -158,6 +158,7 @@ bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, co
 	std::vector<ld> tmp = { 0, hi };
 	std::vector<Pos3D> inxs;
 	for (int i = 0; i < N; i++) {
+		if (acos(a * P[i]) < th + TOL && acos(b * P[i]) < th + TOL) return 1;
 		if (plane_circle_intersection(P[i], perp, th, inxs)) {
 			for (const Pos3D& inx : inxs) {
 				ld ang = angle(X, Y, inx);

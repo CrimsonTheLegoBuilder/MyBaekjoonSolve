@@ -175,6 +175,7 @@ bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, co
 	std::vector<ld> tmp = { 0, hi };
 	std::vector<Pos3D> inxs;
 	for (int i = 0; i < N; i++) {
+		if (acos(a * P[i]) < th - TOL && acos(b * P[i]) < th - TOL) return 1;
 		if (plane_circle_intersection(P[i], perp, th, inxs)) {
 			for (const Pos3D& inx : inxs) {
 				ld ang = angle(X, Y, inx);
@@ -208,13 +209,14 @@ bool connectable2(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, c
 	std::vector<Seq> tmp = { { 0, 0 }, { hi, 0 } };
 	std::vector<Pos3D> inxs;
 	for (int i = 0; i < N; i++) {
+		if (acos(a * P[i]) < th + TOL && acos(b * P[i]) < th + TOL) return 1;
 		if (plane_circle_intersection(P[i], perp, th, inxs)) {
 			if (inxs.size() == 1) continue;
 			Pos3D hi = inxs[0], lo = inxs[1];
 			if (ccw(O, lo, hi, perp) < 0) std::swap(hi, lo);
-			if (inner_check(lo, hi, a, perp) ||
-				inner_check(lo, hi, b, perp) ||
-				inner_check(a, b, lo, perp) ||
+			bool fwd = hi * P[i] > 0;
+			if (!fwd) std::swap(hi, lo);
+			if (inner_check(a, b, lo, perp) ||
 				inner_check(a, b, hi, perp)
 				) {
 				tmp.push_back({ angle(X, Y, lo), -1 });
