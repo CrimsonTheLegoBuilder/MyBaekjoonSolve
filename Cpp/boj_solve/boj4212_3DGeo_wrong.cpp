@@ -205,8 +205,8 @@ bool connectable2(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, c
 	Pos3D perp = (a / b).unit();
 	Pos3D X = a.unit();//X-axis
 	Pos3D Y = (perp / a).unit();//Y-axis
-	ld hi = angle(X, Y, b);
-	std::vector<Seq> tmp = { { 0, 0 }, { hi, 0 } };
+	ld ang = angle(X, Y, b);
+	std::vector<Seq> tmp = { { 0, 0 }, { ang, 0 } };
 	std::vector<Pos3D> inxs;
 	for (int i = 0; i < N; i++) {
 		if (acos(a * P[i]) < th + TOL && acos(b * P[i]) < th + TOL) return 1;
