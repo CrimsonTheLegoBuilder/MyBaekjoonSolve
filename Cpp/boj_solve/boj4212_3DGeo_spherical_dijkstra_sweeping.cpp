@@ -151,7 +151,7 @@ bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, co
 	Pos3D X = a.unit();//X-axis
 	Pos3D Y = (perp / a).unit();//Y-axis
 	ld ang = angle(X, Y, b);
-	std::vector<Info> tmp = { { 0, 0 }, { 0, -ang } };
+	std::vector<Info> tmp = { { 0, 0 }, { 0, ang } };
 	std::vector<Pos3D> inxs;
 	for (int i = 0; i < N; i++) {//sweeping
 		if (acos(a * P[i]) < th + TOL && acos(b * P[i]) < th + TOL) return 1;
@@ -160,37 +160,37 @@ bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, co
 			Pos3D axis = (P[i] / perp).unit();
 			Pos3D mid = (perp / axis).unit();
 			Pos3D hi = inxs[0], lo = inxs[1];
-			if (ccw(O, mid, lo - mid, perp) > 0) std::swap(hi, lo);
+			if (ccw(O, mid, lo, perp) > 0) std::swap(hi, lo);
 			ld h = angle(X, Y, hi), l = angle(X, Y, lo);
 			if (inner_check(a, b, lo, perp) &&
 				inner_check(a, b, hi, perp)) {
 				if (h < l) {
-					tmp.push_back({ -1, INF });
-					tmp.push_back({ 1, -l });
-					tmp.push_back({ -1, -h });
 					tmp.push_back({ 1, -INF });
+					tmp.push_back({ -1, l });
+					tmp.push_back({ 1, h });
+					tmp.push_back({ -1, INF });
 				}
 				else {
-					tmp.push_back({ -1, -l });
-					tmp.push_back({ 1, -h });
+					tmp.push_back({ 1, l });
+					tmp.push_back({ -1, h });
 				}
 			}
 			else if (inner_check(a, b, lo, perp)) {
 				if (h < 0) h += 2 * PI;
-				tmp.push_back({ -1, -l });
-				tmp.push_back({ 1, -h });
+				tmp.push_back({ 1, l });
+				tmp.push_back({ -1, h });
 			}
 			else if (inner_check(a, b, hi, perp)) {
 				if (l > 0) l -= 2 * PI;
-				tmp.push_back({ -1, -l });
-				tmp.push_back({ 1, -h });
+				tmp.push_back({ 1, l });
+				tmp.push_back({ -1, h });
 			}
 		}
 	}
 	std::sort(tmp.begin(), tmp.end());
 	int toggle = 0;
 	bool f = 0;
-	for (const Info& s : tmp) {//sweeping
+	for (const Info& s : tmp) {
 		toggle -= s.i;
 		if (!s.i) f = !f;
 		if (f && toggle <= 0) return 0;
