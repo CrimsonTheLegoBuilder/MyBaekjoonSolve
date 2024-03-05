@@ -9,17 +9,21 @@
 #include <array>
 #include <tuple>
 typedef long long ll;
-typedef long double ld;
+//typedef long double ld;
+typedef double ld;
 typedef std::pair<int, int> pi;
 const ll INF = 1e17;
-const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
+const int LEN = 1e3;
 int N, M, T, Q;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
-int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
-struct Info { ll area, l, r; };
+bool COL, COP;
+// 3D Convex Hull in O(n log n)
+// Very well tested. Good as long as not all points are coplanar
+// In case of collinear faces, returns arbitrary triangulation
+// Credit: Benq
+// refer to Koosaga
 
+bool zero(const ld& x) { return std::abs(x) < TOL; }
 struct Pos3D {
 	ll x, y, z;
 	Pos3D(ll X = 0, ll Y = 0, ll Z = 0) : x(X), y(Y), z(Z) {}
@@ -49,17 +53,34 @@ struct Pos3D {
 		os << p.x << " " << p.y << " " << p.z << "\n";
 		return os;
 	}
-} candi[LEN], willy, MAXP{ INF, INF, INF };
+} willy, MAXP{ INF, INF, INF };
+const Pos3D O3D = { 0, 0, 0 };
+std::vector<Pos3D> C, H;
 using Face = std::array<int, 3>;
 std::vector<Face> Hull3D;
 struct Edge {
 	int face_num, edge_num;
 	Edge(int t = 0, int v = 0) : face_num(t), edge_num(v) {}
 };
+std::vector<Pos3D> tri1, tri2;
+struct Line3D {
+	Pos3D dir, p0;
+	Line3D(Pos3D DIR = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : dir(DIR), p0(P0) {}
+};
+struct Plane {
+	Pos3D norm, p0;
+	Plane(Pos3D NORM = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : norm(NORM), p0(P0) {}
+};
 Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
-Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
-ll dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& d4) { return (d2 - d1) * (d4 - d3); }
+int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
+	Pos3D CCW = cross(d1, d2, d3);
+	ld ret = CCW * norm;
+	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
+}
+Pos3D norm(const std::vector<Pos3D>& H, const Face& F) {
+	return cross(H[F[0]], H[F[1]], H[F[2]]);
+}
 bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	ll ret = dot(d1, d3, d2);
 	return !cross(d1, d2, d3).mag() && ret >= 0;
@@ -68,37 +89,22 @@ bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	ll ret = dot(d1, d3, d2);
 	return !cross(d1, d2, d3).mag() && ret > 0;
 }
-int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
-	Pos3D CCW = cross(d1, d2, d3);
-	ll ret = CCW * norm;
-	return !ret ? 0 : ret > 0 ? 1 : -1;
-}
-ld area(const std::vector<Pos3D>& H, const Pos3D& norm) {
-	ll ret = 0;
-	if (H.size() < 3) return ret;
-	Pos3D O = H[0];
+int inner_check(const std::vector<Pos3D>& H, const Pos3D& norm, const Pos3D& p) {
 	int sz = H.size();
+	bool col = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos3D cur = H[i], nxt = H[(i + 1) % sz];
-		ret += cross(O, cur, nxt) * norm / norm.Euc();
+		if (ccw(cur, nxt, p, norm) < 0) return -1;
+		if (!ccw(cur, nxt, p, norm)) col = 1;
 	}
-	return std::abs(ret * .5);
+	if (col) return 0;
+	return 1;
 }
-bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
-	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3).mag()) && (ret > 0 || zero(ret));
-}
-bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
-	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3).mag()) && ret > 0;
-}
-//std::vector<Pos3D> graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
-ld graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
-	//if (C.size() < 3) {
-	//	std::sort(C.begin(), C.end());
-	//	return C;
-	// }
-	if (C.size() < 3) return 0;
+std::vector<Pos3D> graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
+	if (C.size() < 3) {
+		std::sort(C.begin(), C.end());
+		return C;
+	 }
 	std::vector<Pos3D> H;
 	std::swap(C[0], *min_element(C.begin(), C.end()));
 	std::sort(C.begin() + 1, C.end(), [&](const Pos3D& p, const Pos3D& q) -> bool {
@@ -114,8 +120,29 @@ ld graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
 			H.pop_back();
 		H.push_back(C[i]);
 	}
-	//return H;
-	return area(H, norm);
+	return H;
+}
+bool graham_scan(std::vector<Pos3D>& C, const Pos3D& norm, const Pos3D& p) {
+	if (C.size() < 3) {
+		std::sort(C.begin(), C.end());
+		return on_seg_strong(C[0], C[C.size() - 1], p);
+	}
+	std::vector<Pos3D> H;
+	std::swap(C[0], *min_element(C.begin(), C.end()));
+	std::sort(C.begin() + 1, C.end(), [&](const Pos3D& p, const Pos3D& q) -> bool {
+		int ret = ccw(C[0], p, q, norm);
+		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
+		return ret > 0;
+		}
+	);
+	C.erase(unique(C.begin(), C.end()), C.end());
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i], norm) <= 0)
+			H.pop_back();
+		H.push_back(C[i]);
+	}
+	return inner_check(H, norm, p) > -1;
 }
 bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) {
 	return ((b - a) / (c - b)).Euc() == 0;
@@ -126,7 +153,7 @@ bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
 bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {// is p strictly above plane
 	return cross(a, b, c) * (p - a) > 0;
 }
-void prep(std::vector<Pos3D>& p) {//refer to Koosaga'
+int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
 	shuffle(p.begin(), p.end(), std::mt19937(0x14004));
 	int dim = 1;
 	for (int i = 1; i < p.size(); i++) {
@@ -142,18 +169,27 @@ void prep(std::vector<Pos3D>& p) {//refer to Koosaga'
 				std::swap(p[3], p[i]), ++dim;
 		}
 	}
-	assert(dim == 4);
-	return;
+	//assert(dim == 4);
+	return dim;
 }
-ld dist(const std::vector<Pos3D>& C, const Face& F, const Pos3D& p) {
-	Pos3D norm = cross(C[F[0]], C[F[1]], C[F[2]]);
-	ll ret = norm * (p - C[F[0]]);
-	return std::abs(ret / (norm.mag()));
+int above(const std::vector<Pos3D>& C, const Face& F, const Pos3D& p) {
+	Pos3D nrm = cross(C[F[0]], C[F[1]], C[F[2]]);
+	//for (int i = 0; i < 3; i++) {
+	//	//if (on_seg_strong(C[F[i]], C[F[(i + 1) % 3]], p)) return 2;
+	//	if (on_seg_strong(C[F[i]], C[F[(i + 1) % 3]], p)) return 0;
+	//}
+	ll ret = nrm * (p - C[F[0]]);
+	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
-ld get_min_dist(const std::vector<Pos3D>& C, const std::vector<Face>& F, const Pos3D& p) {
-	ld MIN = INF;
-	for (const Face& face : F) MIN = std::min(MIN, dist(C, face, p));
-	return MIN;
+int inner_check(const std::vector<Pos3D>& C, const std::vector<Face>& F, const Pos3D& p) {
+	bool cop = 0;
+	for (const Face& face : F) {
+		int f = above(C, face, p);
+		if (f == 0) cop = 1;
+		if (f > 0) return 0;
+	};
+	if (cop) return 0;
+	return 1;
 }
 std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	// 3D Convex Hull in O(n log n)
@@ -161,7 +197,10 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	// In case of collinear faces, returns arbitrary triangulation
 	// Credit: Benq
 	// refer to Koosaga'
-	prep(candi);
+	COL = 0; COP = 0;
+	int suf = prep(candi);
+	if (suf <= 2) { COL = 1; return {}; };
+	if (suf == 3) { COP = 1; return {}; };
 	int sz = candi.size();
 	std::vector<Face> faces;
 	std::vector<int> active;//whether face is active - face faces outside 
@@ -238,3 +277,43 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	for (int i = 0; i < faces.size(); i++) if (active[i]) hull3D.push_back(faces[i]);
 	return hull3D;
 }
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	//std::cout << std::fixed;
+	//std::cout.precision(4);
+	std::cin >> T;
+	for (int tc = 1; tc <= T; tc++) {
+		std::cout << "Case #" << tc << ": ";
+		std::cin >> N;
+		if (!N) return;
+		C.resize(N);
+		for (int i = 0; i < N; i++) std::cin >> C[i];
+		Hull3D = convex_hull_3D(C);
+		//for (const Face& face : Hull3D) {
+		//	for (int i = 0; i < 3; i++) std::cout << candi[face[i]];
+		//	std::cout << "\n";
+		//}
+		if (COL) {
+			std::sort(C.begin(), C.end());
+			int f = on_seg_strong(C[0], C[N - 1], O3D);
+			std::cout << (f < 1 ? "NO\n" : "YES\n");
+		}
+		else if (COP) {
+			int i = 2;
+			while (!cross(C[0], C[1], C[i]).Euc()) i++;
+			Pos3D nrm = cross(C[0], C[1], C[i]);
+			//H = graham_scan(C, nrm);
+			//int f = inner_check(H, nrm, O3D);
+			//std::cout << (f < 0 ? "NO\n" : "YES\n");
+			bool f = graham_scan(C, nrm, O3D);
+			std::cout << (f < 1 ? "NO\n" : "YES\n");
+		}
+		else {
+			int f = inner_check(C, Hull3D, O3D);
+			std::cout << (f < 0 ? "NO\n" : "YES\n");
+		}
+	}
+	return;
+}
+int main() { solve(); return 0; }//boj14837 Omnicircumnavigation (Large)
