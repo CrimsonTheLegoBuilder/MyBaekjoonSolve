@@ -141,6 +141,25 @@ bool graham_scan(std::vector<Pos3D>& C, const Pos3D& norm, const Pos3D& p) {
 	}
 	return inner_check(H, norm, p) > -1;
 }
+int above(const std::vector<Pos3D>& C, const Face& F, const Pos3D& p) {
+	Pos3D nrm = cross(C[F[0]], C[F[1]], C[F[2]]);
+	//for (int i = 0; i < 3; i++) {
+	//	//if (on_seg_strong(C[F[i]], C[F[(i + 1) % 3]], p)) return 2;
+	//	if (on_seg_strong(C[F[i]], C[F[(i + 1) % 3]], p)) return 0;
+	//}
+	ll ret = nrm * (p - C[F[0]]);
+	return !ret ? 0 : ret > 0 ? 1 : -1;
+}
+int inner_check(const std::vector<Pos3D>& C, const std::vector<Face>& F, const Pos3D& p) {
+	bool cop = 0;
+	for (const Face& face : F) {
+		int f = above(C, face, p);
+		if (f == 0) cop = 1;
+		if (f > 0) return -1;
+	};
+	if (cop) return 0;
+	return 1;
+}
 bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) {
 	return ((b - a) / (c - b)).Euc() == 0;
 }
@@ -168,25 +187,6 @@ int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
 	}
 	//assert(dim == 4);
 	return dim;
-}
-int above(const std::vector<Pos3D>& C, const Face& F, const Pos3D& p) {
-	Pos3D nrm = cross(C[F[0]], C[F[1]], C[F[2]]);
-	//for (int i = 0; i < 3; i++) {
-	//	//if (on_seg_strong(C[F[i]], C[F[(i + 1) % 3]], p)) return 2;
-	//	if (on_seg_strong(C[F[i]], C[F[(i + 1) % 3]], p)) return 0;
-	//}
-	ll ret = nrm * (p - C[F[0]]);
-	return !ret ? 0 : ret > 0 ? 1 : -1;
-}
-int inner_check(const std::vector<Pos3D>& C, const std::vector<Face>& F, const Pos3D& p) {
-	bool cop = 0;
-	for (const Face& face : F) {
-		int f = above(C, face, p);
-		if (f == 0) cop = 1;
-		if (f > 0) return -1;
-	};
-	if (cop) return 0;
-	return 1;
 }
 std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	// 3D Convex Hull in O(n log n)

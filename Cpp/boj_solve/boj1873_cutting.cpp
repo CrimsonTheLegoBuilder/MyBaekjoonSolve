@@ -138,6 +138,8 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	//	on_seg_strong(d1, d2, s2);
 	//return (f1 && f2) || f3; 
 }
+std::vector<Pos> hcoord;
+std::vector<ld> coord;
 void sweeping() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -146,15 +148,25 @@ void sweeping() {
 	int f = 0;
 	std::cin >> top >> bot;
 	if (top < bot) std::swap(top, bot);
+	bool d = zero(top.x - bot.x) ? 1 : 0;
+	ld lo = d ? bot.y : bot.x;
+	ld hi = d ? top.y : top.x;
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> pos[i];
 	for (int i = 0; i < N; i++) {
 		Pos pre = pos[(i - 1 + N) % N], cur = pos[i], nxt = pos[(i + 1) % N];
-		if (intersect(pre, cur, top, bot)) cnt++;
+		if (intersect(pre, cur, top, bot)) {
+			Pos inx = intersection(L(pre, cur), L(top, bot));
+			ld h = d ? inx.y : inx.x;
+			coord.push_back(h);
+		}
 		else if (on_seg_strong(top, bot, cur)) {
 			if (!ccw(pre, cur, top)) f = ccw(bot, top, pre);
-			if (ccw(bot, top, pre) * ccw(bot, top, nxt) == -1) cnt++;
-			else if (!ccw(cur, nxt, top)) continue;
+			if (ccw(bot, top, pre) * ccw(bot, top, nxt) == -1) {
+				ld h = d ? cur.y : cur.x;
+				coord.push_back(h);
+			}
+			else if (on_seg_strong(bot, top, nxt)) continue;
 			else if (ccw(pre, cur, bot) >= 0 && ccw(bot, top, nxt) <= 0) continue;
 			else if (ccw(pre, cur, bot) >= 0 && ccw(bot, top, nxt) > 0) cnt += 2;
 			else if (ccw(pre, cur, top) >= 0 && ccw(bot, top, nxt) >= 0) continue;
