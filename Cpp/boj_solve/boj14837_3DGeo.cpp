@@ -295,8 +295,8 @@ void solve() {
 		//}
 		if (COL) {
 			std::sort(C.begin(), C.end());
-			int f = on_seg_strong(C[0], C[N - 1], O3D);
-			std::cout << (f < 1 ? "NO\n" : "YES\n");
+			bool f = on_seg_strong(C[0], C[N - 1], O3D);
+			std::cout << (!f ? "NO\n" : "YES\n");
 		}
 		else if (COP) {
 			int i = 2;
