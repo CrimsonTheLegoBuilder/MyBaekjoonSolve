@@ -39,10 +39,10 @@ struct Pos3D {
 		return ret;
 	}
 	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
-	Pos3D& operator += (const Pos3D& p) { x + p.x; y + p.y; z + p.z; return *this; }
 	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
 	Pos3D operator * (const ll& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	Pos3D& operator *= (const ll& scalar) { x* scalar; y* scalar; z* scalar; return *this; }
+	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
+	Pos3D& operator *= (const ll& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
 	ll Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos3D& p) {
