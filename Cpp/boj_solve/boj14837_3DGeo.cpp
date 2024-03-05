@@ -78,9 +78,6 @@ int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
 	ld ret = CCW * norm;
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-Pos3D norm(const std::vector<Pos3D>& H, const Face& F) {
-	return cross(H[F[0]], H[F[1]], H[F[2]]);
-}
 bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	ll ret = dot(d1, d3, d2);
 	return !cross(d1, d2, d3).mag() && ret >= 0;
@@ -186,7 +183,7 @@ int inner_check(const std::vector<Pos3D>& C, const std::vector<Face>& F, const P
 	for (const Face& face : F) {
 		int f = above(C, face, p);
 		if (f == 0) cop = 1;
-		if (f > 0) return 0;
+		if (f > 0) return -1;
 	};
 	if (cop) return 0;
 	return 1;
