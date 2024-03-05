@@ -104,7 +104,7 @@ std::vector<Pos3D> graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
 	if (C.size() < 3) {
 		std::sort(C.begin(), C.end());
 		return C;
-	 }
+	}
 	std::vector<Pos3D> H;
 	std::swap(C[0], *min_element(C.begin(), C.end()));
 	std::sort(C.begin() + 1, C.end(), [&](const Pos3D& p, const Pos3D& q) -> bool {
