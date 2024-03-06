@@ -28,6 +28,8 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj18527 All Kill refer to koosaga
 
+
+
 //void solve() {
 //	std::cin.tie(0)->sync_with_stdio(0);
 //	std::cin >> N >> T;
