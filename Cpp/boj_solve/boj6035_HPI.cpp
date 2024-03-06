@@ -203,8 +203,8 @@ Pos ternary_search(std::vector<Pos>& H, Line hp, bool f = 0) {
 }
 void query() {
 	ld jx, jy, jz, bx, by, bz;
-	std::cin >> jx >> jy >> jz >> bx >> by >> bz;
-	Line l = Line({ (jy - by), (bx - jx) }, jz - bz);
+	std::cin >> jy >> jx >> jz >> by >> bx >> bz;
+	Line l = Line({ (jy - by), (jx - bx) }, jz - bz);
 	Line k = Y_axis * -1;
 	bool f = zero(k / l) ? k * l < 0 : k / l > 0;
 	if (!f) l *= -1;
@@ -237,8 +237,8 @@ void solve() {
 	std::cin >> N >> Q;
 	ld jx, jy, jz, bx, by, bz;
 	for (int i = 0; i < N; i++) {
-		std::cin >> JB >> jx >> jy >> jz >> bx >> by >> bz;
-		Line hp = Line({ (jy - by), (bx - jx) }, jz - bz);
+		std::cin >> JB >> jy >> jx >> jz >> by >> bx >> bz;
+		Line hp = Line({ (jy - by), (jx - bx) }, jz - bz);
 		if (JB == 'B') hp *= -1;
 		HP.push_back(hp);
 	}
