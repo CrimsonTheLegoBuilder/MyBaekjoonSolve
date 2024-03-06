@@ -10,7 +10,7 @@ ll T, S[LEN];
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cin >> N >> T;
-	for (int i = 0; i < N; i++) std::cin >> S[i], S[i];
+	for (int i = 0; i < N; i++) std::cin >> S[i];
 	ll SUM = 0;
 	for (int i = 0; i < N; i++) SUM += S[i];
 	ll P = T - SUM + 1;
@@ -28,7 +28,31 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj18527 All Kill refer to koosaga
 
-
+//ll POW(ll a, ll b) {
+//	ll ret = 1;
+//	while (b) {
+//		if (b & 1) ret = ret * a % MOD;
+//		b >>= 1; a = a * a % MOD;
+//	}
+//	return ret;
+//}
+//void solve() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cin >> N >> T;
+//	for (int i = 0; i < N; i++) std::cin >> S[i];
+//	ll SUM = 0;
+//	for (int i = 0; i < N; i++) SUM += S[i];
+//	ll tmp = T - SUM + N + 1;
+//	ll P = 1;
+//	for (int i = 0; i < N; i++) {
+//		P = P * tmp % MOD;
+//		tmp += (S[i] - 1);
+//	}
+//	P = P * POW(T - SUM + N + 1, MOD - 2) % MOD;
+//	std::cout << P << "\n";
+//	return;
+//}
+//int main() { solve(); return 0; }//boj18527 All Kill refer to koosaga
 
 //void solve() {
 //	std::cin.tie(0)->sync_with_stdio(0);
