@@ -220,8 +220,8 @@ void query() {
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("starc/starc.15.IN", "r", stdin);
-	//freopen("starc/boj6035_starc_out.txt", "w", stdout);
+	//freopen("../../../input_data/starc/starc.15.IN", "r", stdin);
+	//freopen("../../../input_data/starc/boj6035_starc_out.txt", "w", stdout);
 	std::cin >> N >> Q;
 	HP = {
 		Line({1, 0}, limit),
