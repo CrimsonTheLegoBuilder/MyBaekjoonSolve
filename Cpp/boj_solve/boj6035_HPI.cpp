@@ -250,7 +250,7 @@ void solve() {
 	while (Q--) query();
 	return;
 }
-int main() { solve(); return 0; }//boj6034 starcowraft
+int main() { solve(); return 0; }//boj6034 StarCowraft
 
 
 //#define _CRT_SECURE_NO_WARNINGS
