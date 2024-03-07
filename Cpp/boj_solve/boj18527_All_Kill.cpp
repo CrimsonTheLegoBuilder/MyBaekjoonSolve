@@ -1,6 +1,5 @@
 #include <iostream>
 #include <algorithm>
-#include <numeric>
 typedef long long ll;
 const ll MOD = 998244353;
 const ll LEN = 1e5;
@@ -10,19 +9,14 @@ ll T, S[LEN];
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cin >> N >> T;
-	for (int i = 0; i < N; i++) std::cin >> S[i];
 	ll SUM = 0;
-	for (int i = 0; i < N; i++) SUM += S[i];
+	for (int i = 0; i < N; i++) std::cin >> S[i], SUM += S[i];
 	ll P = T - SUM + 1;
 	ll tmp = S[N - 1] - 1;
 	for (int i = N - 2; i >= 0; i--) {
 		P = P * (T - tmp + 1) % MOD;
 		tmp += S[i] - 1;
 	}
-	//for (int i = 2; i <= N; i++) {
-	//	P = P * (T - tmp + 1) % MOD;
-	//	tmp += S[N - i] - 1;
-	//}
 	std::cout << P << "\n";
 	return;
 }
