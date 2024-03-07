@@ -94,7 +94,12 @@ struct Line {
 	ld operator * (const Line& l) const { return s * l.s; }
 	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
 	Line& operator *= (const ld& scalar) { s *= scalar; c *= scalar; return *this; }
-	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y + c; }
+	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
+	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
+	friend std::ostream& operator << (std::ostream& os, const Line& l) {
+		os << l.s.vy << " " << l.s.vx << " " << l.c << "\n";
+		return os;
+	}
 };
 const Line X_axis = { { 0, -1 }, 0 };
 const Line Y_axis = { { 1, 0 }, 0 };
@@ -182,13 +187,17 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 std::vector<Line> HP;
 std::vector<Pos> HPI, LO, UP;
 Pos ternary_search(std::vector<Pos>& H, const Line& hp, bool f = 0) {
+	std::cout << "l: " << hp;
 	int s = 0, e = H.size() - 1, l, r;
 	ld MAX = INF;
 	while (e - s > 2) {
 		l = (s + s + e) / 3;
 		r = (s + e + e) / 3;
+		std::cout << "l  r  " << l << " " << r << "\n";
+		std::cout << H[l] << H[r];
 		ld cl = hp.dist(H[l]) * (f ? -1 : 1);
 		ld cr = hp.dist(H[r]) * (f ? -1 : 1);
+		std::cout << "cl cr  " << cl << " " << cr << "\n";
 		if (cl > cr) s = l;
 		else e = r;
 	}
@@ -205,23 +214,26 @@ Pos ternary_search(std::vector<Pos>& H, const Line& hp, bool f = 0) {
 void query() {
 	ld jx, jy, jz, bx, by, bz;
 	std::cin >> jy >> jx >> jz >> by >> bx >> bz;
-	Line l = Line({ (jy - by), (jx - bx) }, jz - bz);
+	Line l = Line({ (jy - by), (jx - bx) }, bz - jz);
 
-	Line k = Y_axis * -1;
-	//bool f = zero(k / l) ? k * l < 0 : k / l > 0;
-	//if (!f) l *= -1;
-	//Pos lo = ternary_search(LO, l);
-	//Pos hi = ternary_search(UP, l, 1);
-	//if (!f) l *= -1;
-	//ld d1 = l.dist(lo);
-	//ld d2 = l.dist(hi);
-	//bool f1 = d1 > -TOL || d2 > -TOL;
-	//bool f2 = d1 < TOL || d2 < TOL;
-	bool f1 = 0, f2 = 0;
-	for (int i = 0; i < HPI.size(); i++) {
-		if (l.dist(HPI[i]) > -TOL) f1 = 1;
-		if (l.dist(HPI[i]) < TOL) f2 = 1;
-	}
+	Line k = Y_axis;
+	bool f = zero(k / l) ? k * l < 0 : k / l > 0;
+	if (!f) l *= -1;
+	Pos lo = ternary_search(LO, l);
+	Pos hi = ternary_search(UP, l, 1);
+	if (!f) l *= -1;
+	ld d1 = l.above(lo);
+	ld d2 = l.above(hi);
+	std::cout << lo << hi;
+	std::cout << "d1, d2 : " << d1 << " " << d2 << "\n";
+	bool f1 = d1 > -TOL || d2 > -TOL;
+	bool f2 = d1 < TOL || d2 < TOL;
+
+	//bool f1 = 0, f2 = 0;
+	//for (int i = 0; i < HPI.size(); i++) {
+	//	if (l.above(HPI[i]) > -TOL) f1 = 1;
+	//	if (l.above(HPI[i]) < TOL) f2 = 1;
+	//}
 	std::cout << f1 << " " << f2 << "\n";
 	if (f1 && f2) std::cout << "U\n";
 	else if (f1) std::cout << "J\n";
@@ -233,41 +245,38 @@ void init() {
 	std::cout.tie(0);
 	std::cin >> N >> Q;
 	HP = {
-		Line({-1, 0}, limit),
-		Line({0, -1}, limit),
-		Line({1, 0}, -1 / limit),
-		Line({0, 1}, -1 / limit),
-		Line({-1, limit}, 0),
-		Line({limit, -1}, 0)
+		Line({1, 0}, limit),
+		Line({0, 1}, limit),
+		Line({-1, 0}, -1 / limit),
+		Line({0, -1}, -1 / limit),
+		Line({1, -limit}, 0),
+		Line({-limit, 1}, 0)
 	};
-	//HP = {
-	//Line({1, 0}, -limit),
-	//Line({0, 1}, -limit),
-	//Line({-1, 0}, 1 / limit),
-	//Line({0, -1}, 1 / limit),
-	//Line({1, -limit}, 0),
-	//Line({-limit, 1}, 0)
-	//};
 	return;
 }
 void solve() {
 	init();
-	std::cout << HP.size() << "\n";
-	bool x = half_plane_intersection(HP, HPI);
-	std::cout << x << " " << HPI.size() << "\n";
-	for (const Pos& p : HPI) std::cout << p;
-	HPI.clear();
+	//std::cout << HP.size() << "\n";
+	//bool x = half_plane_intersection(HP, HPI);
+	//std::cout << x << " " << HPI.size() << "\n";
+	//for (const Pos& p : HPI) std::cout << p;
+	//HPI.clear();
 	ld jx, jy, jz, bx, by, bz;
 	for (int i = 0; i < N; i++) {
 		std::cin >> JB >> jy >> jx >> jz >> by >> bx >> bz;
-		Line hp = Line({ (jy - by), (jx - bx) }, jz - bz);
-		if (JB == 'B') hp *= -1;
+		Line hp = Line({ (jy - by), (jx - bx) }, bz - jz);
+		if (JB == 'J') hp *= -1;
 		HP.push_back(hp);
 	}
 	bool f = half_plane_intersection(HP, HPI);
-	std::cout << f << " " << HPI.size() << "\n";
-	//LO = lower_hull(HPI);
-	//UP = upper_hull(HPI);
+	//for (const Pos& p : HPI) std::cout << p;
+	//std::cout << "f, HPI: " << f << " " << HPI.size() << "\n";
+	LO = lower_hull(HPI);
+	UP = upper_hull(HPI);
+	std::cout << "LO\n";
+	for (const Pos& p : LO) std::cout << p;
+	std::cout << "HI\n";
+	for (const Pos& p : UP) std::cout << p;
 	while (Q--) query();
 	return;
 }
