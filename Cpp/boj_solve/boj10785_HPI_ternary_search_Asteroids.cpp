@@ -5,7 +5,7 @@
 #include <deque>
 #include <cmath>
 typedef long long ll;
-typedef long double ld;
+typedef double ld;
 const ld TOL = 1e-7;
 const ld INF = 1e7;
 int N[2];

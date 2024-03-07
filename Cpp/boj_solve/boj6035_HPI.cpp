@@ -124,11 +124,6 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-bool CW(const Line& l1, const Line& l2, const Line& target) {
-	if (l1.s / l2.s < TOL) return 0;
-	Pos p = intersection(l1, l2);
-	return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
-}
 std::vector<Pos> lower_hull(std::vector<Pos>& C) {//lower monotone chain
 	std::vector<Pos> H;
 	std::sort(C.begin(), C.end());
@@ -157,6 +152,12 @@ std::vector<Pos> upper_hull(std::vector<Pos>& C) {//upper monotone_chain
 	}
 	return H;
 }
+bool CW(const Line& l1, const Line& l2, const Line& target) {
+	if (l1.s / l2.s < TOL) return 0;
+	Pos p = intersection(l1, l2);
+	//return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
+	return target.s.vy * p.x + target.s.vx * p.y > target.c;
+}
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	std::deque<Line> dq;
 	std::sort(HP.begin(), HP.end());
@@ -180,7 +181,7 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 }
 std::vector<Line> HP;
 std::vector<Pos> HPI, LO, UP;
-Pos ternary_search(std::vector<Pos>& H, Line hp, bool f = 0) {
+Pos ternary_search(std::vector<Pos>& H, const Line& hp, bool f = 0) {
 	int s = 0, e = H.size() - 1, l, r;
 	ld MAX = INF;
 	while (e - s > 2) {
@@ -205,17 +206,26 @@ void query() {
 	ld jx, jy, jz, bx, by, bz;
 	std::cin >> jy >> jx >> jz >> by >> bx >> bz;
 	Line l = Line({ (jy - by), (jx - bx) }, jz - bz);
+
 	Line k = Y_axis * -1;
-	bool f = zero(k / l) ? k * l < 0 : k / l > 0;
-	if (!f) l *= -1;
-	Pos lo = ternary_search(LO, l);
-	Pos hi = ternary_search(UP, l);
-	if (!f) l *= -1;
-	int d1 = dcmp(l.dist(lo));
-	int d2 = dcmp(l.dist(hi));
-	if (d1 * d2 <= 0) std::cout << "U\n";
-	else if (d1 > 0 && d2 > 0) std::cout << "J\n";
-	else if (d1 < 0 && d2 < 0) std::cout << "B\n";
+	//bool f = zero(k / l) ? k * l < 0 : k / l > 0;
+	//if (!f) l *= -1;
+	//Pos lo = ternary_search(LO, l);
+	//Pos hi = ternary_search(UP, l, 1);
+	//if (!f) l *= -1;
+	//ld d1 = l.dist(lo);
+	//ld d2 = l.dist(hi);
+	//bool f1 = d1 > -TOL || d2 > -TOL;
+	//bool f2 = d1 < TOL || d2 < TOL;
+	bool f1 = 0, f2 = 0;
+	for (int i = 0; i < HPI.size(); i++) {
+		if (l.dist(HPI[i]) > -TOL) f1 = 1;
+		if (l.dist(HPI[i]) < TOL) f2 = 1;
+	}
+	std::cout << f1 << " " << f2 << "\n";
+	if (f1 && f2) std::cout << "U\n";
+	else if (f1) std::cout << "J\n";
+	else if (f2) std::cout << "B\n";
 	return;
 }
 void init() {
@@ -225,16 +235,28 @@ void init() {
 	HP = {
 		Line({-1, 0}, limit),
 		Line({0, -1}, limit),
-		Line({limit, 0}, -1),
-		Line({0, limit}, -1),
+		Line({1, 0}, -1 / limit),
+		Line({0, 1}, -1 / limit),
 		Line({-1, limit}, 0),
 		Line({limit, -1}, 0)
 	};
+	//HP = {
+	//Line({1, 0}, -limit),
+	//Line({0, 1}, -limit),
+	//Line({-1, 0}, 1 / limit),
+	//Line({0, -1}, 1 / limit),
+	//Line({1, -limit}, 0),
+	//Line({-limit, 1}, 0)
+	//};
 	return;
 }
 void solve() {
 	init();
-	std::cin >> N >> Q;
+	std::cout << HP.size() << "\n";
+	bool x = half_plane_intersection(HP, HPI);
+	std::cout << x << " " << HPI.size() << "\n";
+	for (const Pos& p : HPI) std::cout << p;
+	HPI.clear();
 	ld jx, jy, jz, bx, by, bz;
 	for (int i = 0; i < N; i++) {
 		std::cin >> JB >> jy >> jx >> jz >> by >> bx >> bz;
@@ -243,8 +265,9 @@ void solve() {
 		HP.push_back(hp);
 	}
 	bool f = half_plane_intersection(HP, HPI);
-	LO = lower_hull(HPI);
-	UP = upper_hull(HPI);
+	std::cout << f << " " << HPI.size() << "\n";
+	//LO = lower_hull(HPI);
+	//UP = upper_hull(HPI);
 	while (Q--) query();
 	return;
 }
