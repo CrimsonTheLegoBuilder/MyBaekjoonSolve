@@ -313,7 +313,7 @@ void solve() {
 		std::cout << "Case #" << tc << ": ";
 		std::cin >> N;
 		C.resize(N);
-		for (int i = 0; i < N; i++) std::cin >> C[i], C[i];
+		for (int i = 0; i < N; i++) std::cin >> C[i];// , C[i] = C[i].unit();
 		//std::cout << "\n";
 		//for (const Pos3D& p : C) std::cout << p;
 		Hull3D = convex_hull_3D(C);
