@@ -75,16 +75,16 @@ Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1
 ll dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
 int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
 	Pos3D CCW = cross(d1, d2, d3);
-	ld ret = CCW * norm;
+	ll ret = CCW * norm;
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
 bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	ll ret = dot(d1, d3, d2);
-	return !cross(d1, d2, d3).mag() && ret >= 0;
+	return !cross(d1, d2, d3).Euc() && ret >= 0;
 }
 bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	ll ret = dot(d1, d3, d2);
-	return !cross(d1, d2, d3).mag() && ret > 0;
+	return !cross(d1, d2, d3).Euc() && ret > 0;
 }
 int inner_check(const std::vector<Pos3D>& H, const Pos3D& norm, const Pos3D& p) {
 	int sz = H.size();
@@ -139,7 +139,8 @@ bool graham_scan(std::vector<Pos3D>& C, const Pos3D& norm, const Pos3D& p) {
 			H.pop_back();
 		H.push_back(C[i]);
 	}
-	return inner_check(H, norm, p) > -1;
+	if (H.size() == 2) return on_seg_strong(H[0], H[1], p);
+	return norm * (p - H[0]) == 0 && inner_check(H, norm, p) > -1;
 }
 int above(const std::vector<Pos3D>& C, const Face& F, const Pos3D& p) {
 	Pos3D nrm = cross(C[F[0]], C[F[1]], C[F[2]]);
@@ -172,7 +173,9 @@ bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {// i
 int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
 	shuffle(p.begin(), p.end(), std::mt19937(0x14004));
 	int dim = 1;
+	assert(p[0] == O3D);
 	for (int i = 1; i < p.size(); i++) {
+		assert(p[i] == O3D);
 		if (dim == 1) {
 			if (p[0] != p[i]) std::swap(p[1], p[i]), ++dim;
 		}
@@ -303,7 +306,7 @@ void solve() {
 			//int f = inner_check(H, nrm, O3D);
 			//std::cout << (f < 0 ? "NO\n" : "YES\n");
 			bool f = graham_scan(C, nrm, O3D);
-			std::cout << (f < 1 ? "NO\n" : "YES\n");
+			std::cout << (!f ? "NO\n" : "YES\n");
 		}
 		else {
 			int f = inner_check(C, Hull3D, O3D);

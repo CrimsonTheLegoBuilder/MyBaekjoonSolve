@@ -157,7 +157,7 @@ void init() {
 	return;
 }
 void brute(int tc) {
-	std::cout << "Case #" << tc << " ";
+	std::cout << "Case #" << tc << ": ";
 	std::cin >> N;
 	C.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i];
