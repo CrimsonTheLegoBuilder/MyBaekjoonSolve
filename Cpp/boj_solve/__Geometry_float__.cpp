@@ -66,7 +66,8 @@ struct Pos {
 		os << p.x << " " << p.y << "\n";
 		return os;
 	}
-}; const Pos O = { 0, 0, -1 };
+};
+const Pos O = { 0, 0 };
 struct Vec {
 	ld vy, vx;
 	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}

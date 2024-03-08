@@ -177,14 +177,14 @@ void brute(int tc) {
 		k = -1;
 		for (int j = 0; j < sz; j++) {
 			if (j == i || j == k) continue;
-			if (!~k || (tmp[i] / tmp[k]) * tmp[j] > 0) k = j;
+			if (k == -1 || (tmp[i] / tmp[k]) * tmp[j] > 0) k = j;
 		}
 		bool f = 1;
 		for (int j = 0; j < sz; j++) {
 			if (j == i || j == k) continue;
 			ll cop = (tmp[i] / tmp[k]) * tmp[j];
 			if (cop == 0) {//coplanar
-				if ((tmp[i] / tmp[k]) * (tmp[i] / tmp[j]) < 0) {
+				if ((tmp[i] / tmp[k]) * (tmp[j] / tmp[k]) < 0) {
 					f = 0; break;
 				}
 			}
