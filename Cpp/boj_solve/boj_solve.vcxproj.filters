@@ -759,16 +759,19 @@
     <ClCompile Include="koosaga_boj4212_3DGeo_floyd.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="boj14837_3DGeo.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj14837_brute.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj18527_All_Kill.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
     <ClCompile Include="boj6035_HPI.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="__Geometry_tester.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj14837_3DGeo_convexhull.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj14837_3DGeo.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

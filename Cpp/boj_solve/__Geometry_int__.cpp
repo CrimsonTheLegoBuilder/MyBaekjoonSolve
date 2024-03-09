@@ -439,7 +439,12 @@ struct Pos3D {
 		os << p.x << " " << p.y << " " << p.z << "\n";
 		return os;
 	}
-} candi[LEN], willy, MAXP{ INF, INF, INF };
+} candi[LEN];
+const Pos3D O3D = { 0, 0, 0 };
+const Pos3D X_axis = { 1, 0, 0 };
+const Pos3D Y_axis = { 0, 1, 0 };
+const Pos3D Z_axis = { 0, 0, 1 };
+const Pos3D MAXP3D = { INF, INF, INF };
 using Face = std::array<int, 3>;
 std::vector<Face> Hull3D;
 struct Edge {
@@ -516,25 +521,6 @@ bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
 bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {// is p strictly above plane
 	return cross(a, b, c) * (p - a) > 0;
 }
-void prep(std::vector<Pos3D>& p) {//refer to Koosaga'
-	shuffle(p.begin(), p.end(), std::mt19937(0x14004));
-	int dim = 1;
-	for (int i = 1; i < p.size(); i++) {
-		if (dim == 1) {
-			if (p[0] != p[i]) std::swap(p[1], p[i]), ++dim;
-		}
-		else if (dim == 2) {
-			if (!collinear(p[0], p[1], p[i]))
-				std::swap(p[2], p[i]), ++dim;
-		}
-		else if (dim == 3) {
-			if (!coplanar(p[0], p[1], p[2], p[i]))
-				std::swap(p[3], p[i]), ++dim;
-		}
-	}
-	assert(dim == 4);
-	return;
-}
 ld dist(const std::vector<Pos3D>& C, const Face& F, const Pos3D& p) {
 	Pos3D norm = cross(C[F[0]], C[F[1]], C[F[2]]);
 	ll ret = norm * (p - C[F[0]]);
@@ -545,18 +531,38 @@ ld get_min_dist(const std::vector<Pos3D>& C, const std::vector<Face>& F, const P
 	for (const Face& face : F) MIN = std::min(MIN, dist(C, face, p));
 	return MIN;
 }
+int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
+	shuffle(p.begin(), p.end(), std::mt19937(0x14004));
+	int dim = 1;
+	assert(p[0] != O3D);
+	for (int i = 1; i < p.size(); i++) {
+		assert(p[i] != O3D);
+		if (dim == 1) {
+			if (p[0] != p[i]) std::swap(p[1], p[i]), ++dim;
+		}
+		else if (dim == 2) {//collinear
+			if (!collinear(p[0], p[1], p[i]))
+				std::swap(p[2], p[i]), ++dim;
+		}
+		else if (dim == 3) {//coplanar
+			if (!coplanar(p[0], p[1], p[2], p[i]))
+				std::swap(p[3], p[i]), ++dim;
+		}
+	}
+	//assert(dim == 4);
+	return dim;
+}
+bool COL, COP;
 std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	// 3D Convex Hull in O(n log n)
 	// Very well tested. Good as long as not all points are coplanar
 	// In case of collinear faces, returns arbitrary triangulation
 	// Credit: Benq
 	// refer to Koosaga'
-	//COL = 0; COP = 0;
-	//int suf = prep(candi);
-	//if (suf <= 2) { COL = 1; return {}; };
-	//if (suf == 3) { COP = 1; return {}; };
-	//int sz = candi.size();
-	prep(candi);
+	COL = 0; COP = 0;
+	int suf = prep(candi);
+	if (suf == 2) { COL = 1; return {}; };
+	if (suf == 3) { COP = 1; return {}; };
 	int sz = candi.size();
 	std::vector<Face> faces;
 	std::vector<int> active;//whether face is active - face faces outside 
@@ -569,25 +575,25 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 		rvis.emplace_back();
 		other.emplace_back();
 		return;
-	};
+		};
 	auto visible = [&](const int& a, const int& b) -> void {
 		vis[b].push_back(a);
 		rvis[a].push_back(b);
 		return;
-	};
+		};
 	auto abv = [&](const int& a, const int& b) -> bool {//above
 		Face tri = faces[a];
 		return above(candi[tri[0]], candi[tri[1]], candi[tri[2]], candi[b]);
-	};
+		};
 	auto edge = [&](const Edge& e) -> pi {
 		return { faces[e.face_num][e.edge_num], faces[e.face_num][(e.edge_num + 1) % 3] };
-	};
+		};
 	auto glue = [&](const Edge& a, const Edge& b) -> void {//link two faces by an edge
 		pi x = edge(a); assert(edge(b) == pi(x.second, x.first));
 		other[a.face_num][a.edge_num] = b;
 		other[b.face_num][b.edge_num] = a;
 		return;
-	};//ensure face 0 is removed when i = 3
+		};//ensure face 0 is removed when i = 3
 
 	ad(0, 1, 2), ad(0, 2, 1);
 	if (abv(1, 3)) std::swap(candi[1], candi[2]);
@@ -633,8 +639,6 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 	for (int i = 0; i < faces.size(); i++) if (active[i]) hull3D.push_back(faces[i]);
 	return hull3D;
 }
-
-
 
 using pi = std::pair<int, int>;
 #define sz(v) ((int)((v).size()))
