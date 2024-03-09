@@ -576,9 +576,6 @@
     <ClCompile Include="boj27656_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="uart01.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj29992.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -687,9 +684,6 @@
     <ClCompile Include="boj9212_3DGeo.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Geo_CH3D_koosaga.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj4795_3DGeo_CH3D.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -729,9 +723,6 @@
     <ClCompile Include="boj18252_ch_2ptr.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="koosaga_wf2012_j.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj18252_memory_down.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -756,22 +747,22 @@
     <ClCompile Include="boj4212_3DGeo_spherical_dijkstra_sweeping.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="koosaga_boj4212_3DGeo_floyd.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj18527_All_Kill.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
     <ClCompile Include="boj6035_HPI.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="__Geometry_tester.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="boj14837_3DGeo_convexhull.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj14837_3DGeo_slow.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7427_HPI.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="__Geometry_tester.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
