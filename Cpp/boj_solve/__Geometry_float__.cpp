@@ -8,6 +8,8 @@
 #include <queue>
 #include <deque>
 #include <random>
+#include <array>
+#include <tuple>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -105,9 +107,9 @@ const Line Yaxis = { { 1, 0 }, 0 };
 struct Circle {
 	Pos c;
 	ld r;
-	Circle(Pos C = Pos(0, 0, 0), ld R = 0) : c(C), r(R) {}
+	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& p) const { return c == p.c && std::abs(r - p.r) < TOL; }
-	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - c.r) >= TOL; }
+	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - C.r) >= TOL; }
 	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }// coord trans | check right
