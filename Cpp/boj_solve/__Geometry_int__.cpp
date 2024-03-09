@@ -1,10 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
-#include <vector>
 #include <cmath>
 #include <cstring>
 #include <cassert>
+#include <vector>
 #include <random>
 #include <array>
 #include <tuple>
