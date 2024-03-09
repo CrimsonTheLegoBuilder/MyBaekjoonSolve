@@ -276,6 +276,10 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {
 }
 int above(const std::vector<Pos3D>& C, const Face& F, const Pos3D& p) {
 	Pos3D nrm = cross(C[F[0]], C[F[1]], C[F[2]]);
+	//if (on_seg_strong(C[F[0]], C[F[1]], p) ||
+	//	on_seg_strong(C[F[1]], C[F[2]], p) ||
+	//	on_seg_strong(C[F[2]], C[F[0]], p)
+	//	) return 2;
 	ll ret = nrm * (p - C[F[0]]);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
@@ -284,6 +288,7 @@ int inner_check(const std::vector<Pos3D>& C, const std::vector<Face>& F, const P
 	for (const Face& face : F) {
 		int f = above(C, face, p);
 		if (f > 0) return -1;
+		//if (f == 2) return 0;
 		if (!f) cop = 1;
 	};
 	if (cop) return 0;
@@ -310,14 +315,19 @@ void solve() {
 		else if (COP) {
 			Pos3D nrm = cross(C3D[0], C3D[1], C3D[2]);
 			ll cop = nrm * (O3D - C3D[0]);
-			C2D.resize(N);
-			if (!(nrm * Z_axis)) {
-				if (!(nrm * Y_axis)) for (int i = 0; i < N; i++) C2D[i] = Pos(C3D[i].y, C3D[i].z);
-				else for (int i = 0; i < N; i++) C2D[i] = Pos(C3D[i].x, C3D[i].z);
+			bool f = 0;
+			if (!cop) {
+				C2D.resize(N);
+				if (!(nrm * Z_axis)) {
+					if (!(nrm * Y_axis)) for (int i = 0; i < N; i++) C2D[i] = Pos(C3D[i].y, C3D[i].z);
+					else for (int i = 0; i < N; i++) C2D[i] = Pos(C3D[i].x, C3D[i].z);
+				}
+				else for (int i = 0; i < N; i++) C2D[i] = Pos(C3D[i].x, C3D[i].y);
+				H2D = graham_scan(C2D);
+				f = (inner_check_bi_search(H2D, O) > -1) * (!cop);
+
 			}
-			else for (int i = 0; i < N; i++) C2D[i] = Pos(C3D[i].x, C3D[i].y);
-			H2D = graham_scan(C2D);
-			bool f = (inner_check_bi_search(H2D, O) > -1) * (!cop);
+			//bool f = (inner_check_bi_search(H2D, O) > -1) * (!cop);
 			std::cout << (!f ? "NO\n" : "YES\n");
 		}
 		else {
