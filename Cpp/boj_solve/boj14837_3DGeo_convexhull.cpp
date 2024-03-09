@@ -298,6 +298,7 @@ void solve() {
 	for (int tc = 1; tc <= T; tc++) {
 		std::cout << "Case #" << tc << ": ";
 		std::cin >> N;
+		//std::cout << " N: " << N << " ans: ";
 		C3D.resize(N);
 		for (int i = 0; i < N; i++) std::cin >> C3D[i];
 		Hull3D = convex_hull_3D(C3D);

@@ -771,7 +771,7 @@
     <ClCompile Include="boj14837_3DGeo_convexhull.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj14837_3DGeo.cpp">
+    <ClCompile Include="boj14837_3DGeo_slow.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
