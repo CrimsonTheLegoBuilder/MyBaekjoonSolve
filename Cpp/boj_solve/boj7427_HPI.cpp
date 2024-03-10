@@ -120,7 +120,6 @@ bool CW(const Line& l1, const Line& l2, const Line& target) {
 	if (l1.s / l2.s < 0) return 0;
 	Pos p = intersection(l1, l2);
 	return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
-	//return target.s.vy * p.x + target.s.vx * p.y > target.c;
 }
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	std::deque<Line> dq;
@@ -183,27 +182,14 @@ bool init(const int& i) {
 	}
 	//std::cout << "DEBUG Line\n";
 	//for (const Line& l : HP) std::cout << l;
-	//std::cout << "DEBUG Line\n";
+	//std::cout << "DEBUG Line\n\n";
 	for (Line& l : HP) l -= EPS;
 	//std::cout << "DEBUG Line\n";
 	//for (const Line& l : HP) std::cout << l;
-	//std::cout << "DEBUG Line\n";
+	//std::cout << "DEBUG Line\n\n";
 	HPI.clear();
 	return 1;
 }
-//bool intersect(int x) {
-//	Line X = HP[x];
-//	int idx = !x ? 1 : 0;
-//	Pos inx = intersection(X, HP[idx]);
-//	int sz = HP.size();
-//	bool f = 1;
-//	for (int i = 0; i < sz; i++) {
-//		if (i == x || i == idx) continue;
-//		if ((HP[i].above(inx)) > 0) f = 0;
-//		//std::cout << HP[i].above(inx) << "\n";
-//	}
-//	return f;
-// }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -254,3 +240,17 @@ int main() { solve(); return 0; }//boj7427 Triathlon
 //	HPI.clear();
 //	return;
 //}
+
+//bool intersect(int x) {
+//	Line X = HP[x];
+//	int idx = !x ? 1 : 0;
+//	Pos inx = intersection(X, HP[idx]);
+//	int sz = HP.size();
+//	bool f = 1;
+//	for (int i = 0; i < sz; i++) {
+//		if (i == x || i == idx) continue;
+//		if ((HP[i].above(inx)) > 0) f = 0;
+//		//std::cout << HP[i].above(inx) << "\n";
+//	}
+//	return f;
+// }
