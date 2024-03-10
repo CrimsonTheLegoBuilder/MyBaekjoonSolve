@@ -9,7 +9,7 @@ typedef long long ll;
 typedef long double ld;
 //typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-11;
+const ld TOL = 1e-12;
 const ld EPS = 1e-7;
 const ld limit = 1e4 + 1;
 const ll SCALE = 1;
@@ -47,8 +47,7 @@ struct Pos {
 		os << p.x << " " << p.y << "\n";
 		return os;
 	}
-};
-const Pos O = { 0, 0 };
+}; const Pos O = { 0, 0 };
 struct Vec {
 	ld vy, vx;
 	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
@@ -93,8 +92,6 @@ struct Line {//ax + by = c
 		return os;
 	}
 };
-const Line X_axis = { { 0, -1 }, 0 };
-const Line Y_axis = { { 1, 0 }, 0 };
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
@@ -134,7 +131,7 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	while (dq.size() >= 3 && CW(dq.back(), dq.front(), dq[1])) dq.pop_front();
 	for (int i = 0; i < dq.size(); i++) {
 		Line cur = dq[i], nxt = dq[(i + 1) % dq.size()];
-		if (cur / nxt < -TOL) {
+		if (cur / nxt < TOL) {
 			hull.clear();
 			return 0;
 		}
@@ -146,15 +143,9 @@ std::vector<Line> HP;
 std::vector<Pos> HPI;
 struct Vel {
 	ll v, u, w;
-	bool operator == (const Vel& s) {
-		return !(v - s.v) && !(u - s.u) && !(w - s.w);
-	}
-	bool operator <= (const Vel& s) {
-		return v <= s.v && u <= s.u && w <= s.w;
-	}
-	bool operator >= (const Vel& s) {
-		return v >= s.v && u >= s.u && w >= s.w;
-	}
+	bool operator == (const Vel& s) { return v == s.v && u == s.u && w == s.w; }
+	bool operator <= (const Vel& s) { return v <= s.v && u <= s.u && w <= s.w; }
+	bool operator >= (const Vel& s) { return v >= s.v && u >= s.u && w >= s.w; }
 	Vel& operator *= (const ld& ratio) {
 		v *= ratio; u *= ratio; w*= ratio;
 		return *this;
@@ -173,14 +164,6 @@ struct Vel {
 } seq[LEN];
 bool init(const int& i) {
 	HP.clear();
-	//HP = {
-	//	Line({1, 0}, limit),
-	//	Line({0, 1}, limit),
-	//	Line({-1, 0}, -1 / limit),
-	//	Line({0, -1}, -1 / limit),
-	//	Line({1, -limit}, 0),
-	//	Line({-limit, 1}, 0)
-	//};
 	HP = {
 		Line({1, 0}, limit),
 		Line({0, 1}, limit),
@@ -190,26 +173,18 @@ bool init(const int& i) {
 	for (int j = 0; j < N; j++) {
 		if (j == i) continue;
 		if (seq[i] <= seq[j]) { HP.clear(); return 0; }
-		if (seq[i] >= seq[j]) { continue; }
+		if (seq[i] >= seq[j]) continue;
 		if (j != i) HP.push_back(seq[i].L(seq[j], 1));
-		//std::cout << "DEBUG " << j << " : ";
-		//std::cout << seq[i].L(seq[j], 1);
 	}
-	//std::cout << "DEBUG Line\n";
-	//for (const Line& l : HP) std::cout << l;
-	//std::cout << "DEBUG Line\n\n";
 	for (Line& l : HP) l += EPS;
-	//std::cout << "DEBUG Line\n";
-	//for (const Line& l : HP) std::cout << l;
-	//std::cout << "DEBUG Line\n\n";
 	HPI.clear();
 	return 1;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("../../../input_data/triathlon_tests/triath.02", "r", stdin);
-	freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
+	//freopen("../../../input_data/triathlon_tests/triath.20", "r", stdin);
+	//freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> seq[i];
 	for (int i = 0; i < N; i++) {
@@ -222,8 +197,43 @@ void solve() {
 int main() { solve(); return 0; }//boj7427 Triathlon
 
 
+
+//bool init(const int& i) {
+//	HP.clear();
+//	HP = {
+//		Line({1, 0}, limit),
+//		Line({0, 1}, limit),
+//		Line({-1, 0}, 0),
+//		Line({0, -1}, 0)
+//	};
+//	for (int j = 0; j < N; j++) {
+//		if (j == i) continue;
+//		if (seq[i] <= seq[j]) { HP.clear(); return 0; }
+//		if (seq[i] >= seq[j]) { continue; }
+//		if (j != i) HP.push_back(seq[i].L(seq[j], 1));
+//		//std::cout << "DEBUG " << j << " : ";
+//		//std::cout << seq[i].L(seq[j], 1);
+//	}
+//	//std::cout << "DEBUG Line\n";
+//	//for (const Line& l : HP) std::cout << l;
+//	//std::cout << "DEBUG Line\n\n";
+//	for (Line& l : HP) l += EPS;
+//	//std::cout << "DEBUG Line\n";
+//	//for (const Line& l : HP) std::cout << l;
+//	//std::cout << "DEBUG Line\n\n";
+//	HPI.clear();
+//	return 1;
+//}
 //void init(const int& i) {
 //	//HP.clear();
+// 	//HP = {
+	//	Line({1, 0}, limit),
+	//	Line({0, 1}, limit),
+	//	Line({-1, 0}, -1 / limit),
+	//	Line({0, -1}, -1 / limit),
+	//	Line({1, -limit}, 0),
+	//	Line({-limit, 1}, 0)
+	//};
 //	//HP = {
 //	//	Line({1, 0}, limit),
 //	//	Line({0, 1}, limit),
