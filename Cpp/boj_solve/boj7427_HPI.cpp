@@ -6,13 +6,13 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-15;
-const ld EPS = 1e-6;
-const ld PI = acos(-1);
-const ld limit = 10000;
+const ld TOL = 1e-11;
+const ld EPS = 1e-7;
+const ld limit = 1e4 + 1;
+const ll SCALE = 1;
 const int LEN = 100;
 int N;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
@@ -117,7 +117,7 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 bool CW(const Line& l1, const Line& l2, const Line& target) {
-	if (l1.s / l2.s < 0) return 0;
+	if (l1.s / l2.s < TOL) return 0;
 	Pos p = intersection(l1, l2);
 	return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
 }
@@ -134,7 +134,7 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	while (dq.size() >= 3 && CW(dq.back(), dq.front(), dq[1])) dq.pop_front();
 	for (int i = 0; i < dq.size(); i++) {
 		Line cur = dq[i], nxt = dq[(i + 1) % dq.size()];
-		if (cur / nxt < TOL) {
+		if (cur / nxt < -TOL) {
 			hull.clear();
 			return 0;
 		}
@@ -145,18 +145,24 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 std::vector<Line> HP;
 std::vector<Pos> HPI;
 struct Vel {
-	ld v, u, w;
+	ll v, u, w;
 	bool operator == (const Vel& s) {
-		return zero(v - s.v) && zero(u - s.u) && zero(w - s.w);
+		return !(v - s.v) && !(u - s.u) && !(w - s.w);
+	}
+	bool operator <= (const Vel& s) {
+		return v <= s.v && u <= s.u && w <= s.w;
+	}
+	bool operator >= (const Vel& s) {
+		return v >= s.v && u >= s.u && w >= s.w;
 	}
 	Vel& operator *= (const ld& ratio) {
 		v *= ratio; u *= ratio; w*= ratio;
 		return *this;
 	}
 	Line L(const Vel& s, bool f = 0) const {
-		ld vy = (v - s.v) / (v * s.v);
-		ld vx = (u - s.u) / (u * s.u);
-		ld c = (s.w - w) / (w * s.w);
+		ld vy = (v - s.v) * SCALE / (ld)(v * s.v);
+		ld vx = (u - s.u) * SCALE / (ld)(u * s.u);
+		ld c = (s.w - w) * SCALE / (ld)(w * s.w);
 		if (f) vy *= -1, vx *= -1, c *= -1;
 		return Line(Vec(vy, vx), c);
 	}
@@ -167,23 +173,32 @@ struct Vel {
 } seq[LEN];
 bool init(const int& i) {
 	HP.clear();
+	//HP = {
+	//	Line({1, 0}, limit),
+	//	Line({0, 1}, limit),
+	//	Line({-1, 0}, -1 / limit),
+	//	Line({0, -1}, -1 / limit),
+	//	Line({1, -limit}, 0),
+	//	Line({-limit, 1}, 0)
+	//};
 	HP = {
 		Line({1, 0}, limit),
 		Line({0, 1}, limit),
-		Line({-1, 0}, -1 / limit),
-		Line({0, -1}, -1 / limit),
-		Line({1, -limit}, 0),
-		Line({-limit, 1}, 0)
+		Line({-1, 0}, 0),
+		Line({0, -1}, 0)
 	};
 	for (int j = 0; j < N; j++) {
 		if (j == i) continue;
+		if (seq[i] <= seq[j]) { HP.clear(); return 0; }
+		if (seq[i] >= seq[j]) { continue; }
 		if (j != i) HP.push_back(seq[i].L(seq[j], 1));
-		if (seq[i] == seq[j]) { HP.clear(); return 0; }
+		//std::cout << "DEBUG " << j << " : ";
+		//std::cout << seq[i].L(seq[j], 1);
 	}
 	//std::cout << "DEBUG Line\n";
 	//for (const Line& l : HP) std::cout << l;
 	//std::cout << "DEBUG Line\n\n";
-	for (Line& l : HP) l -= EPS;
+	for (Line& l : HP) l += EPS;
 	//std::cout << "DEBUG Line\n";
 	//for (const Line& l : HP) std::cout << l;
 	//std::cout << "DEBUG Line\n\n";
@@ -193,7 +208,7 @@ bool init(const int& i) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("../../../input_data/triathlon_tests/triath.01", "r", stdin);
+	freopen("../../../input_data/triathlon_tests/triath.02", "r", stdin);
 	freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> seq[i];
@@ -206,7 +221,7 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj7427 Triathlon
 
-		//bool f2 = intersect(i);
+
 //void init(const int& i) {
 //	//HP.clear();
 //	//HP = {
@@ -240,17 +255,3 @@ int main() { solve(); return 0; }//boj7427 Triathlon
 //	HPI.clear();
 //	return;
 //}
-
-//bool intersect(int x) {
-//	Line X = HP[x];
-//	int idx = !x ? 1 : 0;
-//	Pos inx = intersection(X, HP[idx]);
-//	int sz = HP.size();
-//	bool f = 1;
-//	for (int i = 0; i < sz; i++) {
-//		if (i == x || i == idx) continue;
-//		if ((HP[i].above(inx)) > 0) f = 0;
-//		//std::cout << HP[i].above(inx) << "\n";
-//	}
-//	return f;
-// }
