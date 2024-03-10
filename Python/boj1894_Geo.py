@@ -13,7 +13,7 @@ class Pos:
         self.x = x_
         self.y = y_
 
-    def __eq__(self, p: 'Pos') -> 'bool':
+    def __eq__(self, p: 'Pos') -> bool:
         return zero(self.x - p.x) and zero(self.y - p.y)
 
     def __add__(self, p: 'Pos') -> 'Pos':
