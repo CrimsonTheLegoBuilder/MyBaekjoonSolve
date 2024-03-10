@@ -9,8 +9,8 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
-const ld EPS = 1e-1;
+const ld TOL = 1e-15;
+const ld EPS = 1e-6;
 const ld PI = acos(-1);
 const ld limit = 10000;
 const int LEN = 100;
@@ -58,6 +58,7 @@ struct Vec {
 	ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
 	Vec operator ~ () const { return { -vx, vy }; }
 	Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
+	Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
 }; const Vec Zero = { 0, 0 };
 struct Line {//ax + by = c
 	Vec s;
@@ -73,7 +74,18 @@ struct Line {//ax + by = c
 	ld operator / (const Line& l) const { return s / l.s; }
 	ld operator * (const Line& l) const { return s * l.s; }
 	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
+	Line& operator += (const ld& scalar) {
+		ld tol = hypot(s.vy, s.vx) * scalar;
+		c += tol;
+		return *this;
+	}
+	Line& operator -= (const ld& scalar) {
+		ld tol = hypot(s.vy, s.vx) * scalar;
+		c -= tol;
+		return *this;
+	}
 	Line& operator *= (const ld& scalar) { s *= scalar; c *= scalar; return *this; }
+	Line& operator /= (const ld& scalar) { s /= scalar; c /= scalar; return *this; }
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) {
@@ -133,62 +145,51 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 }
 std::vector<Line> HP;
 std::vector<Pos> HPI;
-struct Seq {
+struct Vel {
 	ld v, u, w;
-	friend std::istream& operator >> (std::istream& is, Seq& s) {
-		is >> s.v >> s.u >> s.w;
-		return is;
+	bool operator == (const Vel& s) {
+		return zero(v - s.v) && zero(u - s.u) && zero(w - s.w);
 	}
-	Seq& operator *= (const ld& ratio) {
+	Vel& operator *= (const ld& ratio) {
 		v *= ratio; u *= ratio; w*= ratio;
 		return *this;
 	}
-	Line LU(const Seq& s) const {
-		ld vy = v - s.v;
-		ld vx = u - s.u;
-		ld c = s.w - w;
+	Line L(const Vel& s, bool f = 0) const {
+		ld vy = (v - s.v) / (v * s.v);
+		ld vx = (u - s.u) / (u * s.u);
+		ld c = (s.w - w) / (w * s.w);
+		if (f) vy *= -1, vx *= -1, c *= -1;
 		return Line(Vec(vy, vx), c);
 	}
-	Line LD(const Seq& s, bool f = 0) const {
-		ld vy = s.v - v;
-		ld vx = s.u - u;
-		ld c = w - s.w;
-		if (f) c += hypot(vy, vx) * EPS;
-		return Line(Vec(vy, vx), c);
+	friend std::istream& operator >> (std::istream& is, Vel& s) {
+		is >> s.v >> s.u >> s.w;
+		return is;
 	}
 } seq[LEN];
-void init(const int& i) {
-	//HP.clear();
-	//HP = {
-	//	Line({1, 0}, limit),
-	//	Line({0, 1}, limit),
-	//	Line({-1, 0}, -1 / limit),
-	//	Line({0, -1}, -1 / limit),
-	//	Line({1, -limit}, 0),
-	//	Line({-limit, 1}, 0)
-	//};
-	//HP = {
-	//Line({1, 0}, limit + EPS),
-	//Line({0, 1}, limit + EPS),
-	//Line({-1, 0}, -1 / limit + EPS),
-	//Line({0, -1}, -1 / limit + EPS),
-	//Line({1, -limit}, 0 + hypot(1, limit) * EPS),
-	//Line({-limit, 1}, 0 + hypot(1, limit) * EPS)
-	//};
+bool init(const int& i) {
+	HP.clear();
 	HP = {
-		Line({1, 0}, limit - EPS),
-		Line({0, 1}, limit - EPS),
-		Line({-1, 0}, -1 / limit - EPS),
-		Line({0, -1}, -1 / limit - EPS),
-		Line({1, -limit}, 0 - hypot(1, limit) * EPS),
-		Line({-limit, 1}, 0 - hypot(1, limit) * EPS)
+		Line({1, 0}, limit),
+		Line({0, 1}, limit),
+		Line({-1, 0}, -1 / limit),
+		Line({0, -1}, -1 / limit),
+		Line({1, -limit}, 0),
+		Line({-limit, 1}, 0)
 	};
-	for (int j = 0; j < N; j++) if (j != i) HP.push_back(seq[i].LD(seq[j], 1));
+	for (int j = 0; j < N; j++) {
+		if (j == i) continue;
+		if (j != i) HP.push_back(seq[i].L(seq[j], 1));
+		if (seq[i] == seq[j]) { HP.clear(); return 0; }
+	}
+	//std::cout << "DEBUG Line\n";
+	//for (const Line& l : HP) std::cout << l;
+	//std::cout << "DEBUG Line\n";
+	for (Line& l : HP) l -= EPS;
 	//std::cout << "DEBUG Line\n";
 	//for (const Line& l : HP) std::cout << l;
 	//std::cout << "DEBUG Line\n";
 	HPI.clear();
-	return;
+	return 1;
 }
 //bool intersect(int x) {
 //	Line X = HP[x];
@@ -211,11 +212,45 @@ void solve() {
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> seq[i];
 	for (int i = 0; i < N; i++) {
-		init(i);
-		bool f1 = half_plane_intersection(HP, HPI);
-		//bool f2 = intersect(i);
-		std::cout << (f1 ? "Yes\n" : "No\n");
+		bool f = 0;
+		if (init(i)) f = half_plane_intersection(HP, HPI);
+		std::cout << (f ? "Yes\n" : "No\n");
 	}
 	return;
 }
 int main() { solve(); return 0; }//boj7427 Triathlon
+
+		//bool f2 = intersect(i);
+//void init(const int& i) {
+//	//HP.clear();
+//	//HP = {
+//	//	Line({1, 0}, limit),
+//	//	Line({0, 1}, limit),
+//	//	Line({-1, 0}, -1 / limit),
+//	//	Line({0, -1}, -1 / limit),
+//	//	Line({1, -limit}, 0),
+//	//	Line({-limit, 1}, 0)
+//	//};
+//	//HP = {
+//	//Line({1, 0}, limit + EPS),
+//	//Line({0, 1}, limit + EPS),
+//	//Line({-1, 0}, -1 / limit + EPS),
+//	//Line({0, -1}, -1 / limit + EPS),
+//	//Line({1, -limit}, 0 + hypot(1, limit) * EPS),
+//	//Line({-limit, 1}, 0 + hypot(1, limit) * EPS)
+//	//};
+//	HP = {
+//		Line({1, 0}, limit - EPS),
+//		Line({0, 1}, limit - EPS),
+//		Line({-1, 0}, -1 / limit - EPS),
+//		Line({0, -1}, -1 / limit - EPS),
+//		Line({1, -limit}, 0 - hypot(1, limit) * EPS),
+//		Line({-limit, 1}, 0 - hypot(1, limit) * EPS)
+//	};
+//	for (int j = 0; j < N; j++) if (j != i) HP.push_back(seq[i].LD(seq[j], 1));
+//	//std::cout << "DEBUG Line\n";
+//	//for (const Line& l : HP) std::cout << l;
+//	//std::cout << "DEBUG Line\n";
+//	HPI.clear();
+//	return;
+//}
