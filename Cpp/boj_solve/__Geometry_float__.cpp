@@ -94,6 +94,16 @@ struct Line {//ax + by = c
 	ld operator / (const Line& l) const { return s / l.s; }
 	ld operator * (const Line& l) const { return s * l.s; }
 	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
+	Line operator + (const ld& scalar) const {
+		ld tol = hypot(s.vy, s.vx) * scalar;
+		ld nc = c + tol;
+		return Line(s, nc);
+	}
+	Line operator - (const ld& scalar) const {
+		ld tol = hypot(s.vy, s.vx) * scalar;
+		ld nc = c - tol;
+		return Line(s, nc);
+	}
 	Line& operator += (const ld& scalar) {
 		ld tol = hypot(s.vy, s.vx) * scalar;
 		c += tol;
