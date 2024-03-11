@@ -316,6 +316,84 @@ ld area(std::vector<Pos>& H) {
 	}
 	return ret / 2;
 }
+ld ternary_search(const Pos& d1, const Pos& v1, const Pos& d2, const Pos& v2, const ld& len) {
+	auto diagonal = [&](const ld& s) -> ld {
+		return ((d1 + v1 * s) - (d2 + v2 * s)).mag();
+		};
+	ld s = 0, e = len, l, r;
+	int cnt = 20;
+	while (cnt--) {
+		l = (s + s + e) / 3;
+		r = (s + e + e) / 3;
+		if (diagonal(l) < diagonal(r)) e = r;
+		else s = l;
+	}
+	return diagonal((s + e) * .5);
+}
+std::vector<Pos> C, H;
+void init() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(7);
+	std::cin >> N;
+	C.resize(N);
+	for (int i = 0; i < N; i++) std::cin >> C[i];
+	H = graham_scan(C);
+	return;
+}
+void hull_round_divide() {
+	init();
+	ld R = 0;
+	int sz = H.size();
+	//if (sz == 2) { std::cout << "0\n"; return; }
+	for (int i = 0; i < sz; i++) R += (H[i] - H[(i + 1) % sz]).mag();
+
+	Pos S = H[0], E = H[0];
+	int s = 0, e = 0;
+	ld cur = 0;
+	while (1) {
+		ld seg = (H[(e + 1) % sz] - H[e]).mag();
+		if (cur + seg < R * .5 + TOL) {
+			cur += seg;
+			e = (e + 1) % sz;
+			E = H[e];
+		}
+		else {
+			ld rem = R * .5 - cur;
+			E += (H[(e + 1) % sz] - H[e]) * (rem / seg);
+			break;
+		}
+	}
+
+	ld ret = (S - E).mag();
+	int cnt = sz << 1;
+	while (cnt--) {
+		Pos v1 = H[(s + 1) % sz] - S;
+		Pos v2 = H[(e + 1) % sz] - E;
+		ld l = v1.mag();
+		ld r = v2.mag();
+		ret = std::min(ret, ternary_search(S, v1 / l, E, v2 / r, std::min(l, r)));
+		if (zero(l - r)) {
+			s = (s + 1) % sz;
+			e = (e + 1) % sz;
+			S = H[s], E = H[e];
+		}
+		else if (l < r) {
+			s = (s + 1) % sz;
+			S = H[s];
+			E += v2 * (l / r);
+		}
+		else {
+			e = (e + 1) % sz;
+			E = H[e];
+			S += v1 * (r / l);
+		}
+		if (!e) break;
+	}
+	std::cout << ret << "\n";
+	return;
+}
 bool CW(const Line& l1, const Line& l2, const Line& target) {
 	if (l1.s / l2.s < TOL) return 0;
 	Pos p = intersection(l1, l2);
