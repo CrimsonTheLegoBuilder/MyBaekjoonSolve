@@ -61,7 +61,7 @@ bool haslog(vector<pt>& p, pt q) {
 		else b = c;
 	}
 	return !q.left2(p[a], p[a + 1]);
-}
+} 
 
 vector<pt> minkowski_sum(vector<pt> p, vector<pt> q) {
 	int n = SZ(p), m = SZ(q), x = 0, y = 0;
