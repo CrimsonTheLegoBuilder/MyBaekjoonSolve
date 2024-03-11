@@ -60,6 +60,20 @@ struct Pos {
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return hypot(x, y); }
+	Pos unit() const { return *this / mag(); }
+	friend ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+	friend ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+	friend int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+		ld ret = cross(d1, d2, d3); return zero(ret) ? 0 : ret > 0 ? 1 : -1;
+	}
+	friend bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
+		ld ret = dot(d1, d3, d2);
+		return zero(cross(d1, d2, d3)) && (ret > 0 || zero(ret));
+	}
+	friend bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
+		ld ret = dot(d1, d3, d2);
+		return zero(cross(d1, d2, d3)) && ret > 0;
+	}
 	friend std::istream& operator >> (std::istream& is, Pos& p) {
 		is >> p.x >> p.y;
 		return is;
@@ -249,6 +263,28 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	//	on_seg_strong(d1, d2, s1) ||
 	//	on_seg_strong(d1, d2, s2);
 	//return (f1 && f2) || f3;
+}
+std::vector<Pos> graham_scan(std::vector<Pos>& C) {
+	std::vector<Pos> H;
+	if (C.size() < 3) {
+		std::sort(C.begin(), C.end());
+		return C;
+	}
+	std::swap(C[0], *min_element(C.begin(), C.end()));
+	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
+		int ret = ccw(C[0], p, q);
+		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
+		return ret > 0;
+		}
+	);
+	C.erase(unique(C.begin(), C.end()), C.end());
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
+			H.pop_back();
+		H.push_back(C[i]);
+	}
+	return H;
 }
 std::vector<Pos> monotone_chain(std::vector<Pos>& C, std::vector<Pos>& H) {
 	std::sort(C.begin(), C.end());

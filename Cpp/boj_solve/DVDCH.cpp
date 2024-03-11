@@ -1,4 +1,7 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <cmath>
 using namespace std;
 
 // https://github.com/ToxicPie/NaCl
@@ -107,5 +110,5 @@ int main() {
             p1 = p1 + (p[(cur1 + 1) % n] - p1) * (rem / rem_len_1);
         }
     }
-    cout << fixed << setprecision(15) << ans << '\n';
+    cout << ans << '\n';
 }
