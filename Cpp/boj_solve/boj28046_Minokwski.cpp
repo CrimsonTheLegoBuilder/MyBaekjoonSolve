@@ -102,7 +102,7 @@ std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const b
 		for (Pos& p : A) p *= 2;
 		for (Pos& p : B) p *= -1;
 	}
-	int a, b;
+	int a = 0, b = 0;
 	for (int i = 0; i < sza; i++) if (A[i] < A[a]) a = i;
 	for (int j = 0; j < szb; j++) if (B[j] < B[b]) b = j;
 	minkowsum.push_back(A[a] + B[b]);
@@ -119,6 +119,15 @@ std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const b
 	}
 	return minkowsum;
 }
+void query() {
+	Pos p;
+	std::cin >> p;
+	if (inner_check_bi_search(MM, p * 2) >= 0 &&
+		inner_check_bi_search(ML, p) >= 0 &&
+		inner_check_bi_search(MR, p) >= 0) std::cout << "Y\n";
+	else std::cout << "N\n";
+	return;
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -132,9 +141,7 @@ void solve() {
 	ML = Minkowski_sum(H1, H2, 1);
 	MR = Minkowski_sum(H2, H1, 1);
 	std::cin >> Q;
-	while (Q--) {
-		Pos p;
-		std::cin >> p;
-	}
+	while (Q--) query();
+	return;
 }
-int main() { return 0; }//boj28046 Gravitational Wave Detector
+int main() { solve(); return 0; }//boj28046 Gravitational Wave Detector
