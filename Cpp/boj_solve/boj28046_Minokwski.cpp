@@ -110,8 +110,8 @@ std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const b
 		Pos a1 = A[(a + 1) % sza] + B[b];
 		Pos b1 = B[(b + 1) % szb] + A[a];
 		Pos& cur = *minkowsum.end();
-		if (ccw(cur, a1, b1) > 0) minkowsum.push_back(a1), a = (a + 1) % sza;
-		else minkowsum.push_back(b1), b = (b + 1) % szb;
+		if (ccw(cur, a1, b1) > 0) minkowsum.push_back(a1), b = (b + 1) % szb;
+		else minkowsum.push_back(b1), a = (a + 1) % sza;
 	}
 	if (f) {
 		for (Pos& p : A) p *= 2;
@@ -130,7 +130,7 @@ void solve() {
 	for (int j = 0; j < M; j++) std::cin >> H2[j];
 	MM = Minkowski_sum(H1, H2);
 	ML = Minkowski_sum(H1, H2, 1);
-	MR = Minkowski_sum(H2, H1);
+	MR = Minkowski_sum(H2, H1, 1);
 	std::cin >> Q;
 	while (Q--) {
 		Pos p;
