@@ -45,9 +45,7 @@ struct Pos {
 }; const Pos O = { 0, 0 };
 std::vector<Pos> H1, H2, MM, ML, MR;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
@@ -72,28 +70,6 @@ int inner_check_bi_search(std::vector<Pos>& H, const Pos& p) {//convex
 	else if (on_seg_strong(H[s], H[e], p)) return 0;
 	else return -1;
 }
-std::vector<Pos> graham_scan(std::vector<Pos>& C) {
-	std::vector<Pos> H;
-	if (C.size() < 3) {
-		std::sort(C.begin(), C.end());
-		return C;
-	}
-	std::swap(C[0], *min_element(C.begin(), C.end()));
-	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
-		int ret = ccw(C[0], p, q);
-		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
-		return ret > 0;
-		}
-	);
-	//C.erase(unique(C.begin(), C.end()), C.end());
-	int sz = C.size();
-	for (int i = 0; i < sz; i++) {
-		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
-			H.pop_back();
-		H.push_back(C[i]);
-	}
-	return H;
-}
 std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const bool& f = 0) {
 	int sza = A.size();
 	int szb = B.size();
@@ -104,7 +80,7 @@ std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const b
 	int a = 0, b = 0;
 	for (int i = 0; i < sza; i++) if (A[i] < A[a]) a = i;
 	for (int j = 0; j < szb; j++) if (B[j] < B[b]) b = j;
-	//std::cout << "DEBUG\n";
+	//std::cout << "DEBUG\n"; 
 	minkowsum.push_back(A[a] + B[b]);
 	//std::cout << sza + szb << "\n";
 	for (int k = 1; k < sza + szb; k++) {
@@ -146,3 +122,27 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj28046 Gravitational Wave Detector
+
+
+//std::vector<Pos> graham_scan(std::vector<Pos>& C) {
+//	std::vector<Pos> H;
+//	if (C.size() < 3) {
+//		std::sort(C.begin(), C.end());
+//		return C;
+//	}
+//	std::swap(C[0], *min_element(C.begin(), C.end()));
+//	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
+//		int ret = ccw(C[0], p, q);
+//		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
+//		return ret > 0;
+//		}
+//	);
+//	//C.erase(unique(C.begin(), C.end()), C.end());
+//	int sz = C.size();
+//	for (int i = 0; i < sz; i++) {
+//		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
+//			H.pop_back();
+//		H.push_back(C[i]);
+//	}
+//	return H;
+//}
