@@ -98,10 +98,9 @@ std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const b
 	int sza = A.size();
 	int szb = B.size();
 	std::vector<Pos> minkowsum;
-	if (f) {
-		for (Pos& p : A) p *= 2;
-		for (Pos& p : B) p *= -1;
-	}
+
+	if (f) { for (Pos& p : A) p *= 2; for (Pos& p : B) p *= -1; }
+
 	int a = 0, b = 0;
 	for (int i = 0; i < sza; i++) if (A[i] < A[a]) a = i;
 	for (int j = 0; j < szb; j++) if (B[j] < B[b]) b = j;
@@ -113,17 +112,16 @@ std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const b
 		if (ccw(cur, a1, b1) > 0) minkowsum.push_back(a1), b = (b + 1) % szb;
 		else minkowsum.push_back(b1), a = (a + 1) % sza;
 	}
-	if (f) {
-		for (Pos& p : A) p *= 2;
-		for (Pos& p : B) p *= -1;
-	}
+
+	if (f) { for (Pos& p : A) p /= 2; for (Pos& p : B) p *= -1; }
+
 	return minkowsum;
 }
 void query() {
 	Pos p;
 	std::cin >> p;
-	if (inner_check_bi_search(MM, p * 2) >= 0 &&
-		inner_check_bi_search(ML, p) >= 0 &&
+	if (inner_check_bi_search(MM, p * 2) >= 0 ||
+		inner_check_bi_search(ML, p) >= 0 ||
 		inner_check_bi_search(MR, p) >= 0) std::cout << "Y\n";
 	else std::cout << "N\n";
 	return;
