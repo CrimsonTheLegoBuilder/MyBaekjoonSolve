@@ -42,7 +42,7 @@ struct Pos {
     Pos unit() const { return *this / mag(); }
     friend ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
     friend ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-    friend ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1); }
+    friend ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
     friend int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
         ld ret = cross(d1, d2, d3); return zero(ret) ? 0 : ret > 0 ? 1 : -1;
     }
@@ -217,7 +217,7 @@ void brute() {
                     jj = std::min(jj, projection(I, J, inx));
                 }
             }
-            MAX = std::max(MAX, (ii + jj) / (I = J).mag());
+            MAX = std::max(MAX, ii + jj);
         }
     }
     std::cout << MAX << "\n";
