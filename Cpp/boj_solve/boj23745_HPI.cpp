@@ -6,10 +6,10 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-16;
 const ld limit = 1e5;
 const int LEN = 2e3 + 1;
 int N, M, Q;
@@ -71,28 +71,11 @@ struct Line {//ax + by = c
 	ld operator / (const Line& l) const { return s / l.s; }
 	ld operator * (const Line& l) const { return s * l.s; }
 	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
-	Line operator + (const ld& scalar) const {
-		ld tol = hypot(s.vy, s.vx) * scalar;
-		ld nc = c + tol;
-		return Line(s, nc);
-	}
-	Line operator - (const ld& scalar) const {
-		ld tol = hypot(s.vy, s.vx) * scalar;
-		ld nc = c - tol;
-		return Line(s, nc);
-	}
-	Line& operator += (const ld& scalar) {
-		ld tol = hypot(s.vy, s.vx) * scalar;
-		c += tol;
-		return *this;
-	}
-	Line& operator -= (const ld& scalar) {
-		ld tol = hypot(s.vy, s.vx) * scalar;
-		c -= tol;
-		return *this;
-	}
-	Line& operator *= (const ld& scalar) { s *= scalar; c *= scalar; return *this; }
-	Line& operator /= (const ld& scalar) { s /= scalar; c /= scalar; return *this; }
+	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
+	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
+	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
+	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
+	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) {
@@ -186,7 +169,6 @@ Pos ternary_search(std::vector<Pos>& H, const Line& hp, bool f = 0) {
 		r = (s + e + e) / 3;
 		ld cl = hp.above(H[l]) * (f ? -1 : 1);
 		ld cr = hp.above(H[r]) * (f ? -1 : 1);
-		//std::cout << cl << " " << cr << "\n";
 		if (cl > cr) s = l;
 		else e = r;
 	}
@@ -194,7 +176,6 @@ Pos ternary_search(std::vector<Pos>& H, const Line& hp, bool f = 0) {
 	Pos EX;
 	for (int i = s; i <= e; i++) {
 		ld D = hp.above(H[i]) * (f ? -1 : 1);
-		//std::cout << D << "\n";
 		if (D < MAX) { MAX = D; EX = H[i]; }
 	}
 	return EX;
@@ -237,7 +218,7 @@ bool init() {
 		Line({0, -1}, 0)
 	};
 	for (int j = 0; j < M; j++) compare();
-	//for (Line& l : HP) l -= TOL;
+	for (Line& l : HP) l -= 1e-10;
 	HPI.clear();
 	return half_plane_intersection(HP, HPI);
 }
@@ -250,7 +231,6 @@ void query(bool F) {
 	if (val[i] >= val[j]) { std::cout << ">\n"; return; }
 	if (val[i] <= val[j]) { std::cout << "<\n"; return; }
 
-	//O(QlogN)
 	Line l = L(val[i], val[j]);
 	Line k = Y_axis;
 	bool f = zero(k / l) ? k * l < 0 : k / l > 0;
@@ -260,25 +240,11 @@ void query(bool F) {
 	if (!f) l *= -1;
 	ld d1 = l.above(lo);
 	ld d2 = l.above(hi);
-	//std::cout << "lo hi\n" << lo << hi;
-	//std::cout << "d1, d2 : " << d1 << " " << d2 << "\n";
 	bool f1 = d1 > 0 || d2 > 0;
 	bool f2 = d1 < 0 || d2 < 0;
 	if (f1 && f2) std::cout << "?\n";
 	else if (f1) std::cout << ">\n";
 	else if (f2) std::cout << "<\n";
-
-	////O(QN)
-	//Line l = L(val[i], val[j]);
-	//bool f1 = 0, f2 = 0;
-	//for (int i = 0; i < HPI.size(); i++) {
-	//	if (l.above(HPI[i]) > 0) f1 = 1;
-	//	if (l.above(HPI[i]) < 0) f2 = 1;
-	//	//std::cout << l.above(HPI[i]) << "\n";
-	//}
-	//if (f1 && f2) std::cout << "?\n";
-	//else if (f1) std::cout << ">\n";
-	//else if (f2) std::cout << "<\n";
 	return;
 }
 void solve() {

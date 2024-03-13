@@ -5,19 +5,14 @@
 #include <cstring>
 #include <vector>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 205;
 int N;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
-ld norm(ld th) {
-    while (th < -TOL) th += PI * 2;
-    while (th > PI * 2) th -= PI * 2;
-    return th;
-}
 
 struct Pos {
     ld x, y;
@@ -42,25 +37,13 @@ struct Pos {
     Pos unit() const { return *this / mag(); }
     friend ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
     friend ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-    friend ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
     friend int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
         ld ret = cross(d1, d2, d3); return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-    }
-    friend int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-        ld ret = (d2 - d1) / (d4 - d3);
-        return zero(ret) ? 0 : ret > 0 ? 1 : -1;
     }
     friend int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
         return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
     }
-    friend bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-        ld ret = dot(d1, d3, d2);
-        return zero(cross(d1, d2, d3)) && (ret > 0 || zero(ret));
-    }
-    friend bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-        ld ret = dot(d1, d3, d2);
-        return zero(cross(d1, d2, d3)) && ret > 0;
-    }
+    friend ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
     friend std::istream& operator >> (std::istream& is, Pos& p) {
         is >> p.x >> p.y;
         return is;
@@ -78,8 +61,6 @@ struct Vec {
     ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
     ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
     Vec operator ~ () const { return { -vx, vy }; }
-    Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
-    Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
 }; const Vec Zero = { 0, 0 };
 struct Line {//ax + by = c
     Vec s;
@@ -94,29 +75,10 @@ struct Line {//ax + by = c
     }
     ld operator / (const Line& l) const { return s / l.s; }
     ld operator * (const Line& l) const { return s * l.s; }
-    Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
-    Line operator + (const ld& scalar) const {
-        ld tol = hypot(s.vy, s.vx) * scalar;
-        ld nc = c + tol;
-        return Line(s, nc);
-    }
-    Line operator - (const ld& scalar) const {
-        ld tol = hypot(s.vy, s.vx) * scalar;
-        ld nc = c - tol;
-        return Line(s, nc);
-    }
-    Line& operator += (const ld& scalar) {
-        ld tol = hypot(s.vy, s.vx) * scalar;
-        c += tol;
-        return *this;
-    }
-    Line& operator -= (const ld& scalar) {
-        ld tol = hypot(s.vy, s.vx) * scalar;
-        c -= tol;
-        return *this;
-    }
-    Line& operator *= (const ld& scalar) { s *= scalar; c *= scalar; return *this; }
-    Line& operator /= (const ld& scalar) { s /= scalar; c /= scalar; return *this; }
+    Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
+    Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
+    Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
+    Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
     ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
     ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
     friend std::ostream& operator << (std::ostream& os, const Line& l) {
@@ -124,8 +86,6 @@ struct Line {//ax + by = c
         return os;
     }
 };
-const Line Xaxis = { { 0, -1 }, 0 };
-const Line Yaxis = { { 1, 0 }, 0 };
 Line L(const Pos& s, const Pos& e) {
     ld dy, dx, c;
     dy = e.y - s.y;
@@ -141,28 +101,6 @@ Pos intersection(const Line& l1, const Line& l2) {
         (l2.c * v1.vy - l1.c * v2.vy) / det,
     };
 }
-bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
-    bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
-    bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-    return f1 && f2;
-    //bool f3 = on_seg_strong(s1, s2, d1) ||
-    //  on_seg_strong(s1, s2, d2) ||
-    //  on_seg_strong(d1, d2, s1) ||
-    //  on_seg_strong(d1, d2, s2);
-    //return (f1 && f2) || f3;
-}
-bool inner_check(Pos H[], const int& sz, const Pos& p) {//concave
-    int cnt{ 0 };
-    for (int i = 0; i < sz; i++) {
-        Pos cur = H[i], nxt = H[(i + 1) % sz];
-        if (on_seg_strong(cur, nxt, p)) return 1;
-        if (zero(cur.y - nxt.y)) continue;
-        if (nxt.y < cur.y) std::swap(cur, nxt);
-        if (nxt.y - TOL < p.y || cur.y > p.y) continue;
-        cnt += ccw(cur, nxt, p) > 0;
-    }
-    return cnt & 1;
-}
 ld area(std::vector<Pos>& H) {
     Pos P = { 0, 0 };
     ld ret = 0;
@@ -173,10 +111,7 @@ ld area(std::vector<Pos>& H) {
     }
     return ret / 2;
 }
-void norm(std::vector<Pos>& H) {
-    if (area(H) < 0) std::reverse(H.begin(), H.end());
-    return;
-}
+void norm(std::vector<Pos>& H) { if (area(H) < 0) std::reverse(H.begin(), H.end()); }
 std::vector<Pos> H;
 void brute() {
     std::cin.tie(0)->sync_with_stdio(0);
@@ -224,6 +159,8 @@ void brute() {
     return;
 }
 int main() { brute(); return 0; }//boj14633 Airport Construction
+
+
 
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>

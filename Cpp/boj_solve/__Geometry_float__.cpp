@@ -74,6 +74,10 @@ struct Pos {
 		ld ret = dot(d1, d3, d2);
 		return zero(cross(d1, d2, d3)) && ret > 0;
 	}
+	friend ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
+	friend int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+		return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
+	}
 	friend std::istream& operator >> (std::istream& is, Pos& p) {
 		is >> p.x >> p.y;
 		return is;
@@ -108,28 +112,11 @@ struct Line {//ax + by = c
 	ld operator / (const Line& l) const { return s / l.s; }
 	ld operator * (const Line& l) const { return s * l.s; }
 	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
-	Line operator + (const ld& scalar) const {
-		ld tol = hypot(s.vy, s.vx) * scalar;
-		ld nc = c + tol;
-		return Line(s, nc);
-	}
-	Line operator - (const ld& scalar) const {
-		ld tol = hypot(s.vy, s.vx) * scalar;
-		ld nc = c - tol;
-		return Line(s, nc);
-	}
-	Line& operator += (const ld& scalar) {
-		ld tol = hypot(s.vy, s.vx) * scalar;
-		c += tol;
-		return *this;
-	}
-	Line& operator -= (const ld& scalar) {
-		ld tol = hypot(s.vy, s.vx) * scalar;
-		c -= tol;
-		return *this;
-	}
-	Line& operator *= (const ld& scalar) { s *= scalar; c *= scalar; return *this; }
-	Line& operator /= (const ld& scalar) { s /= scalar; c /= scalar; return *this; }
+	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
+	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
+	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
+	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
+	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) {
