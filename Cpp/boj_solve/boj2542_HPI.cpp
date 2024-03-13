@@ -243,7 +243,7 @@ bool init() {
 		if (nq == '>') l *= -1;
 		HP.push_back(l);
 	}
-	for (Line& l : HP) l -= 1e8;
+	//for (Line& l : HP) l -= 1e8;
 	return half_plane_intersection(HP, HPI);
 }
 void query(bool F) {
