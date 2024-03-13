@@ -124,7 +124,6 @@ std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const b
 
 	if (f) { for (Pos& p : A) p /= 2; for (Pos& p : B) p *= -1; }
 	return graham_scan(minkowsum);
-	//return minkowsum;
 }
 void query() {
 	Pos p;
@@ -154,25 +153,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj28046 Gravitational Wave Detector
-//std::vector<Pos> graham_scan(std::vector<Pos>& C) {
-//	std::vector<Pos> H;
-//	if (C.size() < 3) {
-//		std::sort(C.begin(), C.end());
-//		return C;
-//	}
-//	std::swap(C[0], *min_element(C.begin(), C.end()));
-//	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
-//		int ret = ccw(C[0], p, q);
-//		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
-//		return ret > 0;
-//		}
-//	);
-//	//C.erase(unique(C.begin(), C.end()), C.end());
-//	int sz = C.size();
-//	for (int i = 0; i < sz; i++) {
-//		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
-//			H.pop_back();
-//		H.push_back(C[i]);
-//	}
-//	return H;
-//}
