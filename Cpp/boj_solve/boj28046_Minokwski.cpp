@@ -153,9 +153,7 @@ void solve() {
 	while (Q--) query();
 	return;
 }
-int main() { solve(); return 0; }//Gravitational Wave Detector
-
-//boj28046 Gravitational Wave Detector
+int main() { solve(); return 0; }//boj28046 Gravitational Wave Detector
 //std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 //	std::vector<Pos> H;
 //	if (C.size() < 3) {
