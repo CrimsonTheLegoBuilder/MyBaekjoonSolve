@@ -202,9 +202,9 @@ void brute() {
                 if (collinear(I, J, d1, d2)) {
                     ld dot1 = projection(I, J, d1), dot2 = projection(I, J, d2);
                     if (dot1 >= 0 && dot1 >= dot2 && ccw(I, J, d0) < 0) jj = std::min(jj, projection(I, J, d1));
-                    if (dot1 <= 0 && dot1 <= dot2 && ccw(I, J, d0) > 0) ii = std::min(jj, -projection(I, J, d1));
+                    if (dot1 <= 0 && dot1 <= dot2 && ccw(I, J, d0) > 0) ii = std::min(ii, -projection(I, J, d1));
                     if (dot2 >= 0 && dot2 >= dot1 && ccw(I, J, d3) > 0) jj = std::min(jj, projection(I, J, d2));
-                    if (dot2 <= 0 && dot2 <= dot1 && ccw(I, J, d3) < 0) ii = std::min(jj, -projection(I, J, d2));
+                    if (dot2 <= 0 && dot2 <= dot1 && ccw(I, J, d3) < 0) ii = std::min(ii, -projection(I, J, d2));
                 }
                 else if (ccw(d1, d2, I) >= 0 && ccw(I, J, d2) < 0 &&
                     (ccw(I, J, d1) > 0 || (!ccw(I, J, d1) && ccw(I, J, d0) > 0))) {
