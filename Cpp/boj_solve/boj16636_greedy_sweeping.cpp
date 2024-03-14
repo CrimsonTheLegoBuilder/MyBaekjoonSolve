@@ -71,19 +71,10 @@ Line L(const Pos& s, const Pos& e) {
 struct Seg {
 	Line l;
 	Pos s, e;
-	Seg(Line L = Line(Vec(0, 0), 0),
-		Pos S = Pos(0, 0),
-		Pos E = Pos(0, 0)
-	) : l(L), s(S), e(E) {}
-	bool operator < (const Seg& S) const {
-		if (l == S.l) {
-			if (s == S.s) return e < S.e;
-			return s < S.s;
-		}
-		return l < S.l;
-	}
+	Seg(Line LN = Line(Vec(0, 0), 0), Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : l(LN), s(S), e(E) {}
 	bool operator == (const Seg& S) const { return l == S.l && s == S.s && e == S.e; }
 	bool operator != (const Seg& S) const { return !(*this == S); }
+	bool operator < (const Seg& S) const { return (l == S.l) ? (s == S.s) ? e < S.e : s < S.s : l < S.l; }
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) {
 		os << "DEBUG::Seg l: " << S.l << " | s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n";
 		return os;
@@ -148,9 +139,7 @@ void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {
 				V[nxt].s = tmp;
 			}
 		}
-		for (int k = i; k < j; k++)
-			if (V[k].s != V[k].e)
-				V2.push_back(V[k]);
+		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
 	}
 	return;
 }
