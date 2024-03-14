@@ -91,7 +91,7 @@ struct Seg {
 };
 void make_seg(std::vector<Seg>& V, const Pos& x1, const Pos& x2) {
 	Pos d1 = x1, d2 = x2;
-	assert(d2 == d1);
+	assert(d2 != d1);
 	//if (d2 == d1) return;
 	if (d2 < d1) std::swap(d1, d2);
 	V.push_back(Seg(L(d1, d2), d1, d2));
