@@ -65,7 +65,7 @@ struct Pos {
 		return is;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) {
-		os << p.x << " " << p.y << "\n";
+		os << p.x << " " << p.y;
 		return os;
 	}
 }; const Pos O = { 0, 0 };

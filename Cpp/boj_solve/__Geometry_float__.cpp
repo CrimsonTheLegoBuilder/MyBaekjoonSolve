@@ -83,7 +83,7 @@ struct Pos {
 		return is;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) {
-		os << p.x << " " << p.y << "\n";
+		os << p.x << " " << p.y;
 		return os;
 	}
 }; const Pos O = { 0, 0 };
@@ -120,7 +120,7 @@ struct Line {//ax + by = c
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) {
-		os << l.s.vy << " " << l.s.vx << " " << l.c << "\n";
+		os << l.s.vy << " " << l.s.vx << " " << l.c;
 		return os;
 	}
 };
@@ -140,7 +140,7 @@ struct Circle {
 		return is;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
-		os << c.c.x << " " << c.c.y << " " << c.r << "\n"; return os;
+		os << c.c.x << " " << c.c.y << " " << c.r; return os;
 	}
 };
 std::vector<Pos> get_node(const Circle& a, const Circle& b) {
@@ -448,7 +448,7 @@ struct Pos3D {
 		return is;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) {
-		os << p.x << " " << p.y << " " << p.z << "\n";
+		os << p.x << " " << p.y << " " << p.z;
 		return os;
 	}
 };
@@ -478,7 +478,7 @@ struct Plane {
 		return is;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Plane& f) {
-		os << f.a << " " << f.b << " " << f.c << " " << f.d << "\n";
+		os << f.a << " " << f.b << " " << f.c << " " << f.d;
 		return os;
 	}
 } knife;
