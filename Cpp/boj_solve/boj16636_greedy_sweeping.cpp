@@ -77,7 +77,7 @@ struct Seg {
 	) : l(L), s(S), e(E) {}
 	bool operator < (const Seg& S) const {
 		if (l == S.l) {
-			if (s == S.s) return S.e < e;
+			if (s == S.s) return e < S.e;
 			return s < S.s;
 		}
 		return l < S.l;
