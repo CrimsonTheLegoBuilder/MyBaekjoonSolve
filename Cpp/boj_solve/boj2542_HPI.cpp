@@ -180,30 +180,6 @@ Pos ternary_search(std::vector<Pos>& H, const Line& hp, bool f = 0) {
 	}
 	return EX;
 }
-struct Val {
-	ll p, q, r;
-	bool operator == (const Val& s) { return p == s.p && q == s.q && r == s.r; }
-	bool operator <= (const Val& s) { return p <= s.p && q <= s.q && r <= s.r; }
-	bool operator >= (const Val& s) { return p >= s.p && q >= s.q && r >= s.r; }
-	friend Line L(const Val& v, const Val& u, bool f = 0) {
-		ld vy = v.p - u.p;
-		ld vx = v.q - u.q;
-		ld c = u.r - v.r;
-		if (f) vy *= -1, vx *= -1, c *= -1;
-		return Line(Vec(vy, vx), c);
-	}
-	friend std::istream& operator >> (std::istream& is, Val& s) {
-		is >> s.p >> s.q >> s.r;
-		return is;
-	}
-} val[LEN];
-void compare() {
-	int i, j;
-	std::cin >> i >> j;//i.score > j.score
-	i--; j--;
-	HP.push_back(L(val[j], val[i]));
-	return;
-}
 bool init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
