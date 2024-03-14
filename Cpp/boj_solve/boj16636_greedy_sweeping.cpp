@@ -161,7 +161,7 @@ void solve() {
 		return;
 	}
 	for (int i = 0; i < sz; i++) {
-		if (G2[i] != J[i]) {
+		if (G2[i] != J2[i]) {
 			std::cout << "no\n"; return;
 		}
 	}
