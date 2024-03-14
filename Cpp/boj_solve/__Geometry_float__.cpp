@@ -34,6 +34,15 @@ ld flip(ld lat) {
 	if (lat < 0) return -(PI * .5) - lat;
 	return INF;
 }
+//ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
+ll gcd(ll a, ll b) {
+	while (b) {
+		ll tmp = a % b;
+		a = b;
+		b = tmp;
+	}
+	return a;
+}
 struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
 std::vector<Seq> seq;
 
@@ -90,10 +99,10 @@ struct Pos {
 struct Vec {
 	ld vy, vx;
 	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
-	bool operator < (const Vec& v) const { return zero(vy - v.vy) ? vx < v.vx : vy < v.vy; }
 	bool operator == (const Vec& v) const { return (zero(vy - v.vy) && zero(vx - v.vx)); }
-	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
+	bool operator < (const Vec& v) const { return zero(vy - v.vy) ? vx < v.vx : vy < v.vy; }
 	ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
+	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
 	Vec operator ~ () const { return { -vx, vy }; }
 	Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
 	Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
@@ -111,12 +120,12 @@ struct Line {//ax + by = c
 	}
 	ld operator / (const Line& l) const { return s / l.s; }
 	ld operator * (const Line& l) const { return s * l.s; }
-	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
-	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
 	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
 	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
+	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
 	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
+	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) {

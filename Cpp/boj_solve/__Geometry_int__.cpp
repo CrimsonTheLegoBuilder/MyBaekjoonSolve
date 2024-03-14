@@ -18,6 +18,15 @@ int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
+//ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
+ll gcd(ll a, ll b) {
+	while (b) {
+		ll tmp = a % b;
+		a = b;
+		b = tmp;
+	}
+	return a;
+}
 struct Info { ll area, l, r; };
 
 //2D============================================================================//
@@ -70,6 +79,60 @@ struct Pos {
 	}
 }; const Pos O = { 0, 0 };
 std::vector<Pos> C, H;
+struct Vec {
+	ll vy, vx;
+	Vec(ll Y = 0, ll X = 0) : vy(Y), vx(X) {}
+	bool operator == (const Vec& v) const { return vy == v.vy && vx == v.vx; }
+	bool operator < (const Vec& v) const { return vy == v.vy ? vx < v.vx : vy < v.vy; }
+	ll operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
+}; const Vec Zero = { 0, 0 };
+struct Line {//ax + by = c
+	Vec s;
+	ll c;
+	Line(Vec V = Vec(0, 0), ll C = 0) : s(V), c(C) {}
+	bool operator == (const Line& l) const { return s == l.s && c == l.c; }
+	bool operator < (const Line& l) const {
+		bool f1 = Zero < s;
+		bool f2 = Zero < l.s;
+		if (f1 != f2) return f1;
+		ll CCW = s / l.s;
+		return !CCW ? c < l.c : CCW > 0;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Line& l) {
+		os << l.s.vy << " " << l.s.vx << " " << l.c;
+		return os;
+	}
+};
+Line L(const Pos& s, const Pos& e) {
+	ll dy, dx, c;
+	dy = e.y - s.y;
+	dx = s.x - e.x;
+	ll _gcd = gcd(std::abs(dy), std::abs(dx));
+	dy /= _gcd; dx /= _gcd;
+	c = dy * s.x + dx * s.y;
+	return Line(Vec(dy, dx), c);
+}
+struct Seg {
+	Line l;
+	Pos s, e;
+	Seg(Line L = Line(Vec(0, 0), 0),
+		Pos S = Pos(0, 0),
+		Pos E = Pos(0, 0)
+	) : l(L), s(S), e(E) {}
+	bool operator < (const Seg& S) const {
+		if (l == S.l) {
+			if (s == S.s) return e < S.e;
+			return s < S.s;
+		}
+		return l < S.l;
+	}
+	bool operator == (const Seg& S) const { return l == S.l && s == S.s && e == S.e; }
+	bool operator != (const Seg& S) const { return !(*this == S); }
+	friend std::ostream& operator << (std::ostream& os, const Seg& S) {
+		os << "DEBUG::Seg l: " << S.l << " | s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n";
+		return os;
+	}
+};
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }

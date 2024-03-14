@@ -38,8 +38,8 @@ struct Pos {
 struct Vec {
 	ll vy, vx;
 	Vec(ll Y = 0, ll X = 0) : vy(Y), vx(X) {}
-	bool operator < (const Vec& v) const { return vy == v.vy ? vx < v.vx : vy < v.vy; }
 	bool operator == (const Vec& v) const { return vy == v.vy && vx == v.vx; }
+	bool operator < (const Vec& v) const { return vy == v.vy ? vx < v.vx : vy < v.vy; }
 	ll operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
 }; const Vec Zero = { 0, 0 };
 struct Line {//ax + by = c
