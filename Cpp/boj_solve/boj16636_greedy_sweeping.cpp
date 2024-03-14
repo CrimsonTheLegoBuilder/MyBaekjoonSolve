@@ -132,6 +132,11 @@ void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {
 		for (int k = i; k < j - 1; k++) {
 			int nxt = k + 1;
 			if (V[k].e < V[nxt].s) continue;
+			else if (V[k].e == V[nxt].s) {
+				tmp = V[k].s;
+				V[k].s = V[nxt].s;
+				V[nxt].s = tmp;
+			}
 			else if (V[nxt].e < V[k].e) {
 				tmp = V[k].e;
 				V[k].e = V[nxt].s;
