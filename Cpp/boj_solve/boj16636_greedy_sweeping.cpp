@@ -128,9 +128,9 @@ void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {
 	int sz = V.size();
 	for (int i = 0, j; i < sz; i = j) {//sweeping
 		j = i;
-		std::cout << sz << " " << i << " " << j << " DEBUG\n";
-		while (V[i].l == V[j].l) j++;
-		std::cout << sz << " " << i << " " << j << " DEBUG\n";
+		//std::cout << sz << " " << i << " " << j << " DEBUG\n";
+		while (j < sz && V[i].l == V[j].l) j++;
+		//std::cout << sz << " " << i << " " << j << " DEBUG\n";
 		for (int k = i; k < j - 1; k++) {
 			int nxt = k + 1;
 			if (V[k].e < V[nxt].s) continue;
@@ -155,8 +155,8 @@ void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {
 			if (V[k].s != V[k].e)
 				V2.push_back(V[k]);
 	}
-	std::cout << "DEBUG_end\n";
-	std::sort(V2.begin(), V2.end());
+	//std::cout << "DEBUG_end\n";
+	//std::sort(V2.begin(), V2.end());
 	return;
 }
 void solve() {
