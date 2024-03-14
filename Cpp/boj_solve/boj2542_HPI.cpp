@@ -238,7 +238,7 @@ bool init() {
 				if (X == 'B') b--;
 				if (X == '1') c++;
 			}
-		}
+		} 
 		Line l = Line(Vec(a, b), c);
 		if (nq == '>') l *= -1;
 		HP.push_back(l);
