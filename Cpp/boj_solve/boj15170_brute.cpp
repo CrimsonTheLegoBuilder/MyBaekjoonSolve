@@ -121,7 +121,7 @@ Circle C(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld r = (c - d1).Euc();
 	return { c, r };
 }
-Circle enclose_ssibal(const Pos& u, const Pos& v, const Pos& w) {
+Circle enclose(const Pos& u, const Pos& v, const Pos& w) {
 	Pos b = v - u, c = w - u;
 	ld B = b * b, C = c * c;
 	ld D = b / c;
@@ -131,10 +131,11 @@ Circle enclose_ssibal(const Pos& u, const Pos& v, const Pos& w) {
 	Pos m = Pos(X, Y);
 	return Circle(u + m, m * m);
 }
-Circle enclose(const Pos& u, const Pos& v, const Pos& w) {
+Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
 	Pos B = v - u, C = w - u;
 	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
 	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
+	if (zero(B_ / C_)) return { { 0, 0 }, -1 };
 	Pos inx = intersection(B_, C_);
 	return Circle(inx + u, inx.Euc());
 }

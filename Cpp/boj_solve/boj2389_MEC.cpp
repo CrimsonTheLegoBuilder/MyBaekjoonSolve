@@ -144,16 +144,17 @@ struct Circle {
 	}
 };
 Circle enclose_circle(const Pos& u, const Pos& v) {
-	Pos C = (u + v) * .5;
-	return Circle(C, (C - u).mag());
+	Pos c = (u + v) * .5;
+	return Circle(c, (c - u).mag());
 }
-//Circle enclose(const Pos& u, const Pos& v, const Pos& w) {
-//	Pos B = v - u, C = w - u;
-//	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
-//	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
-//	Pos inx = intersection(B_, C_);
-//	return Circle(inx + u, inx.mag());
-//}
+Circle enclose(const Pos& u, const Pos& v, const Pos& w) {
+	Pos B = v - u, C = w - u;
+	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
+	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
+	if (zero(B_ / C_)) return { { 0, 0 }, -1 };
+	Pos inx = intersection(B_, C_);
+	return Circle(inx + u, inx.mag());
+}
 Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
 	Line l1 = rotate90(L(u, v), (u + v) * .5);
 	Line l2 = rotate90(L(v, w), (v + w) * .5);
@@ -162,8 +163,8 @@ Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
 	ld r = (c - u).mag();
 	return Circle(c, r);
 }
-bool valid_check(const Circle& C, const std::vector<Pos>& P) {
-	for (const Pos& p : P) if (C < p) return 0;
+bool valid_check(const Circle& c, const std::vector<Pos>& P) {
+	for (const Pos& p : P) if (c < p) return 0;
 	return 1;
 }
 Circle get_min_circle(std::vector<Pos>& P) {
@@ -174,8 +175,8 @@ Circle get_min_circle(std::vector<Pos>& P) {
 	if (sz == 2) return enclose_circle(P[0], P[1]);
 	for (int i = 0; i < 2; i++) {
 		for (int j = i + 1; j < 3; j++) {
-			Circle C = enclose_circle(P[i], P[j]);
-			if (valid_check(C, P)) return C;
+			Circle ec = enclose_circle(P[i], P[j]);
+			if (valid_check(ec, P)) return ec;
 		}
 	}
 	return enclose_circle(P[0], P[1], P[2]);
@@ -203,8 +204,8 @@ void solve() {
 	std::cin >> N;
 	pos.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> pos[i];
-	Circle MEC = welzl(pos);
-	std::cout << MEC;
+	Circle mec = welzl(pos);
+	std::cout << mec;
 	return;
 }
 int main() { solve(); return 0; }//boj2389 at the center of the world...
