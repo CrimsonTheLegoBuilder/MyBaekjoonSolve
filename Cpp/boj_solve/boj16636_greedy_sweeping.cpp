@@ -141,6 +141,7 @@ void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {
 		}
 		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
 	}
+	//std::sort(V2.begin(), V2.end());
 	return;
 }
 void solve() {
