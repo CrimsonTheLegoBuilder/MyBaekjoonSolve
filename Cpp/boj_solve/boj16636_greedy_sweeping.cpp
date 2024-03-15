@@ -6,18 +6,8 @@
 #include <vector>
 #include <cassert>
 typedef long long ll;
-typedef double ld;
-const ll INF = 1e17;
 int N, M;
-//ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-ll gcd(ll a, ll b) {
-	while (b) {
-		ll tmp = a % b;
-		a = b;
-		b = tmp;
-	}
-	return a;
-}
+ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
 struct Pos {
 	ll x, y;
@@ -112,7 +102,7 @@ void init() {
 	}
 	return;
 }
-void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {
+void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {//remove greedily all overlapping segments
 	std::sort(V.begin(), V.end());
 	Pos tmp;
 	int sz = V.size();
@@ -155,7 +145,16 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj16636 Triangular Clouds
-
+//typedef double ld;
+//const ll INF = 1e17;
+//ll gcd(ll a, ll b) {
+//	while (b) {
+//		ll tmp = a % b;
+//		a = b;
+//		b = tmp;
+//	}
+//	return a;
+//}
 
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
