@@ -61,7 +61,6 @@ Line L(const Pos& s, const Pos& e) {
 struct Seg {
 	Line l;
 	Pos s, e;
-	//Seg(Line LN = Line(Vec(0, 0), 0), Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : l(LN), s(S), e(E) {}
 	Seg(Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : s(S), e(E) { l = L(S, E); }
 	bool operator == (const Seg& S) const { return l == S.l && s == S.s && e == S.e; }
 	bool operator != (const Seg& S) const { return !(*this == S); }
@@ -113,22 +112,13 @@ void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {//remove greedily all ove
 		for (int k = i; k < j - 1; k++) {
 			int nxt = k + 1;
 			if (V[k].e < V[nxt].s) continue;
-			else if (V[k].e == V[nxt].s) {
-				tmp = V[k].s;
-				V[k].s = V[nxt].s;
-				V[nxt].s = tmp;
-			}
-			else if (V[nxt].e < V[k].e) {
-				tmp = V[k].e;
-				V[k].e = V[nxt].s;
-				V[nxt].s = V[nxt].e;
-				V[nxt].e = tmp;
-			}
-			else if (V[k].e <= V[nxt].e) {
-				tmp = V[k].e;
-				V[k].e = V[nxt].s;
-				V[nxt].s = tmp;
-			}
+			else if (V[k].e == V[nxt].s)
+				std::swap(V[k].s, V[nxt].s);
+			else if (V[nxt].e < V[k].e)
+				std::swap(V[k].e, V[nxt].e), 
+				std::swap(V[k].e, V[nxt].s);
+			else if (V[k].e <= V[nxt].e)
+				std::swap(V[k].e, V[nxt].s);
 		}
 		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
 	}
@@ -157,6 +147,7 @@ int main() { solve(); return 0; }//boj16636 Triangular Clouds
 //	return a;
 //}
 
+
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
 //#include <algorithm>
@@ -165,18 +156,8 @@ int main() { solve(); return 0; }//boj16636 Triangular Clouds
 //#include <vector>
 //#include <cassert>
 //typedef long long ll;
-//typedef double ld;
-//const ll INF = 1e17;
 //int N, M;
-////ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-//ll gcd(ll a, ll b) {
-//	while (b) {
-//		ll tmp = a % b;
-//		a = b;
-//		b = tmp;
-//	}
-//	return a;
-//}
+//ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 //
 //struct Pos {
 //	ll x, y;
@@ -197,8 +178,8 @@ int main() { solve(); return 0; }//boj16636 Triangular Clouds
 //struct Vec {
 //	ll vy, vx;
 //	Vec(ll Y = 0, ll X = 0) : vy(Y), vx(X) {}
-//	bool operator < (const Vec& v) const { return vy == v.vy ? vx < v.vx : vy < v.vy; }
 //	bool operator == (const Vec& v) const { return vy == v.vy && vx == v.vx; }
+//	bool operator < (const Vec& v) const { return vy == v.vy ? vx < v.vx : vy < v.vy; }
 //	ll operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
 //}; const Vec Zero = { 0, 0 };
 //struct Line {//ax + by = c
@@ -230,19 +211,11 @@ int main() { solve(); return 0; }//boj16636 Triangular Clouds
 //struct Seg {
 //	Line l;
 //	Pos s, e;
-//	Seg(Line L = Line(Vec(0, 0), 0),
-//		Pos S = Pos(0, 0),
-//		Pos E = Pos(0, 0)
-//	) : l(L), s(S), e(E) {}
-//	bool operator < (const Seg& S) const {
-//		if (l == S.l) {
-//			if (s == S.s) return e < S.e;
-//			return s < S.s;
-//		}
-//		return l < S.l;
-//	}
+//	//Seg(Line LN = Line(Vec(0, 0), 0), Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : l(LN), s(S), e(E) {}
+//	Seg(Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : s(S), e(E) { l = L(S, E); }
 //	bool operator == (const Seg& S) const { return l == S.l && s == S.s && e == S.e; }
 //	bool operator != (const Seg& S) const { return !(*this == S); }
+//	bool operator < (const Seg& S) const { return (l == S.l) ? (s == S.s) ? e < S.e : s < S.s : l < S.l; }
 //	friend std::ostream& operator << (std::ostream& os, const Seg& S) {
 //		os << "DEBUG::Seg l: " << S.l << " | s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n";
 //		return os;
@@ -251,9 +224,8 @@ int main() { solve(); return 0; }//boj16636 Triangular Clouds
 //void make_seg(std::vector<Seg>& V, const Pos& x1, const Pos& x2) {
 //	Pos d1 = x1, d2 = x2;
 //	assert(d2 != d1);
-//	//if (d2 == d1) return;
 //	if (d2 < d1) std::swap(d1, d2);
-//	V.push_back(Seg(L(d1, d2), d1, d2));
+//	V.push_back(Seg(d1, d2));
 //	return;
 //}
 //std::vector<Seg> G, J, G2, J2;
@@ -281,7 +253,7 @@ int main() { solve(); return 0; }//boj16636 Triangular Clouds
 //	}
 //	return;
 //}
-//void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {
+//void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {//remove greedily all overlapping segments
 //	std::sort(V.begin(), V.end());
 //	Pos tmp;
 //	int sz = V.size();
@@ -294,25 +266,28 @@ int main() { solve(); return 0; }//boj16636 Triangular Clouds
 //			int nxt = k + 1;
 //			if (V[k].e < V[nxt].s) continue;
 //			else if (V[k].e == V[nxt].s) {
-//				tmp = V[k].s;
-//				V[k].s = V[nxt].s;
-//				V[nxt].s = tmp;
+//				//tmp = V[k].s;
+//				//V[k].s = V[nxt].s;
+//				//V[nxt].s = tmp;
+//				std::swap(V[k].s, V[nxt].s);
 //			}
 //			else if (V[nxt].e < V[k].e) {
-//				tmp = V[k].e;
-//				V[k].e = V[nxt].s;
-//				V[nxt].s = V[nxt].e;
-//				V[nxt].e = tmp;
+//				//tmp = V[k].e;
+//				//V[k].e = V[nxt].s;
+//				//V[nxt].s = V[nxt].e;
+//				//V[nxt].e = tmp;
+//				//V[k].e = V[nxt].s;
+//				std::swap(V[k].e, V[nxt].e);
+//				std::swap(V[k].e, V[nxt].s);
 //			}
 //			else if (V[k].e <= V[nxt].e) {
-//				tmp = V[k].e;
-//				V[k].e = V[nxt].s;
-//				V[nxt].s = tmp;
+//				//tmp = V[k].e;
+//				//V[k].e = V[nxt].s;
+//				//V[nxt].s = tmp;
+//				std::swap(V[k].e, V[nxt].s);
 //			}
 //		}
-//		for (int k = i; k < j; k++)
-//			if (V[k].s != V[k].e)
-//				V2.push_back(V[k]);
+//		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
 //	}
 //	//std::cout << "DEBUG_end\n";
 //	//std::sort(V2.begin(), V2.end());
