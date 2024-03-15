@@ -61,7 +61,8 @@ Line L(const Pos& s, const Pos& e) {
 struct Seg {
 	Line l;
 	Pos s, e;
-	Seg(Line LN = Line(Vec(0, 0), 0), Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : l(LN), s(S), e(E) {}
+	//Seg(Line LN = Line(Vec(0, 0), 0), Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : l(LN), s(S), e(E) {}
+	Seg(Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : s(S), e(E) { l = L(S, E); }
 	bool operator == (const Seg& S) const { return l == S.l && s == S.s && e == S.e; }
 	bool operator != (const Seg& S) const { return !(*this == S); }
 	bool operator < (const Seg& S) const { return (l == S.l) ? (s == S.s) ? e < S.e : s < S.s : l < S.l; }
@@ -74,7 +75,7 @@ void make_seg(std::vector<Seg>& V, const Pos& x1, const Pos& x2) {
 	Pos d1 = x1, d2 = x2;
 	assert(d2 != d1);
 	if (d2 < d1) std::swap(d1, d2);
-	V.push_back(Seg(L(d1, d2), d1, d2));
+	V.push_back(Seg(d1, d2));
 	return;
 }
 std::vector<Seg> G, J, G2, J2;
