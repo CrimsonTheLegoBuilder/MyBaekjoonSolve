@@ -38,6 +38,7 @@ struct Pos {
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ll& n) const { return { x * n, y * n }; }
@@ -115,24 +116,54 @@ Line L(const Pos& s, const Pos& e) {
 struct Seg {
 	Line l;
 	Pos s, e;
-	Seg(Line L = Line(Vec(0, 0), 0),
-		Pos S = Pos(0, 0),
-		Pos E = Pos(0, 0)
-	) : l(L), s(S), e(E) {}
-	bool operator < (const Seg& S) const {
-		if (l == S.l) {
-			if (s == S.s) return e < S.e;
-			return s < S.s;
-		}
-		return l < S.l;
-	}
+	Seg(Line LN = Line(Vec(0, 0), 0), Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : l(LN), s(S), e(E) {}
 	bool operator == (const Seg& S) const { return l == S.l && s == S.s && e == S.e; }
 	bool operator != (const Seg& S) const { return !(*this == S); }
+	bool operator < (const Seg& S) const { return (l == S.l) ? (s == S.s) ? e < S.e : s < S.s : l < S.l; }
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) {
 		os << "DEBUG::Seg l: " << S.l << " | s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n";
 		return os;
 	}
 };
+void make_seg(std::vector<Seg>& V, const Pos& x1, const Pos& x2) {
+	Pos d1 = x1, d2 = x2;
+	assert(d2 != d1);
+	if (d2 < d1) std::swap(d1, d2);
+	V.push_back(Seg(L(d1, d2), d1, d2));
+	return;
+}
+void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {
+	std::sort(V.begin(), V.end());
+	Pos tmp;
+	int sz = V.size();
+	for (int i = 0, j; i < sz; i = j) {//sweeping
+		j = i;
+		while (j < sz && V[i].l == V[j].l) j++;
+		for (int k = i; k < j - 1; k++) {
+			int nxt = k + 1;
+			if (V[k].e < V[nxt].s) continue;
+			else if (V[k].e == V[nxt].s) {
+				tmp = V[k].s;
+				V[k].s = V[nxt].s;
+				V[nxt].s = tmp;
+			}
+			else if (V[nxt].e < V[k].e) {
+				tmp = V[k].e;
+				V[k].e = V[nxt].s;
+				V[nxt].s = V[nxt].e;
+				V[nxt].e = tmp;
+			}
+			else if (V[k].e <= V[nxt].e) {
+				tmp = V[k].e;
+				V[k].e = V[nxt].s;
+				V[nxt].s = tmp;
+			}
+		}
+		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
+	}
+	//std::sort(V2.begin(), V2.end());
+	return;
+}
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
