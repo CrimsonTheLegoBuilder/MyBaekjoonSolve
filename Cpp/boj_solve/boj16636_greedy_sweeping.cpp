@@ -7,11 +7,11 @@
 #include <cassert>
 typedef long long ll;
 int N, M;
-ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
+int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
 struct Pos {
-	ll x, y;
-	Pos(ll X = 0, ll Y = 0) : x(X), y(Y) {}
+	int x, y;
+	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -26,11 +26,11 @@ struct Pos {
 	}
 }; const Pos O = { 0, 0 };
 struct Vec {
-	ll vy, vx;
-	Vec(ll Y = 0, ll X = 0) : vy(Y), vx(X) {}
+	int vy, vx;
+	Vec(int Y = 0, int X = 0) : vy(Y), vx(X) {}
 	bool operator == (const Vec& v) const { return vy == v.vy && vx == v.vx; }
 	bool operator < (const Vec& v) const { return vy == v.vy ? vx < v.vx : vy < v.vy; }
-	ll operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
+	ll operator / (const Vec& v) const { return (ll)vy * v.vx - (ll)vx * v.vy; }
 }; const Vec Zero = { 0, 0 };
 struct Line {//ax + by = c
 	Vec s;
@@ -50,12 +50,12 @@ struct Line {//ax + by = c
 	}
 };
 Line L(const Pos& s, const Pos& e) {
-	ll dy, dx, c;
+	int dy, dx; ll c;
 	dy = e.y - s.y;
 	dx = s.x - e.x;
-	ll _gcd = gcd(std::abs(dy), std::abs(dx));
+	int _gcd = gcd(std::abs(dy), std::abs(dx));
 	dy /= _gcd; dx /= _gcd;
-	c = dy * s.x + dx * s.y;
+	c = (ll)dy * s.x + (ll)dx * s.y;
 	return Line(Vec(dy, dx), c);
 }
 struct Seg {
@@ -115,7 +115,7 @@ void sweep(std::vector<Seg>& V, std::vector<Seg>& V2) {//remove greedily all ove
 			else if (V[k].e == V[nxt].s)
 				std::swap(V[k].s, V[nxt].s);
 			else if (V[nxt].e < V[k].e)
-				std::swap(V[k].e, V[nxt].e), 
+				std::swap(V[k].e, V[nxt].e),
 				std::swap(V[k].e, V[nxt].s);
 			else if (V[k].e <= V[nxt].e)
 				std::swap(V[k].e, V[nxt].s);
