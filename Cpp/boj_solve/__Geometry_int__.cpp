@@ -54,22 +54,6 @@ struct Pos {
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
-	friend ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-	friend ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-	friend int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-		ll ret = cross(d1, d2, d3); return !ret ? 0 : ret > 0 ? 1 : -1;
-	}
-	friend bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-		ll ret = dot(d1, d3, d2);
-		return zero(cross(d1, d2, d3)) && ret >= 0;
-	}
-	friend bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-		ll ret = dot(d1, d3, d2);
-		return zero(cross(d1, d2, d3)) && ret > 0;
-	}
-	friend int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-		return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
-	}
 	friend std::istream& operator >> (std::istream& is, Pos& p) {
 		is >> p.x >> p.y;
 		return is;
@@ -177,6 +161,10 @@ bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
+}
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
+int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
 }
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;

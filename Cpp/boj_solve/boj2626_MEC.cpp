@@ -130,7 +130,7 @@ struct Circle {
 	bool operator == (const Circle& p) const { return c == p.c && std::abs(r - p.r) < TOL; }
 	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - C.r) >= TOL; }
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
-	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
+	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }//is valid
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, r - C.r }; }
@@ -140,7 +140,7 @@ struct Circle {
 		return is;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
-		os << c.c.x << " " << c.c.y << " " << c.r; return os;
+		os << c.c.x << " " << c.c.y << "\n" << c.r; return os;
 	}
 };
 Circle enclose_circle(const Pos& u, const Pos& v) {
@@ -200,7 +200,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
+	std::cout.precision(3);
 	std::cin >> N;
 	pos.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> pos[i];
@@ -208,4 +208,4 @@ void solve() {
 	std::cout << mec;
 	return;
 }
-int main() { solve(); return 0; }//boj2389 at the center of the world...
+int main() { solve(); return 0; }//boj2626 H

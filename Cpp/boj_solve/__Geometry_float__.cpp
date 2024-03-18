@@ -10,6 +10,7 @@
 #include <random>
 #include <array>
 #include <tuple>
+#include <complex>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -70,23 +71,6 @@ struct Pos {
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return hypot(x, y); }
 	Pos unit() const { return *this / mag(); }
-	friend ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-	friend ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-	friend int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-		ld ret = cross(d1, d2, d3); return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-	}
-	friend bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-		ld ret = dot(d1, d3, d2);
-		return zero(cross(d1, d2, d3)) && (ret > 0 || zero(ret));
-	}
-	friend bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-		ld ret = dot(d1, d3, d2);
-		return zero(cross(d1, d2, d3)) && ret > 0;
-	}
-	friend ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
-	friend int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-		return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
-	}
 	friend std::istream& operator >> (std::istream& is, Pos& p) {
 		is >> p.x >> p.y;
 		return is;
@@ -204,6 +188,10 @@ bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = dot(d1, d3, d2);
 	return zero(cross(d1, d2, d3)) && ret > 0;
+}
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
+int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
 }
 bool inner_check(Pos H[], const int& sz, const Pos& p) {//concave
 	int cnt{ 0 };
@@ -415,6 +403,196 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 		hull.push_back(intersection(cur, nxt));
 	}
 	return 1;
+}
+struct Circle {
+	Pos c;
+	ld r;
+	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
+	bool operator == (const Circle& p) const { return c == p.c && std::abs(r - p.r) < TOL; }
+	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - C.r) >= TOL; }
+	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
+	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }//is valid
+	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
+	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, r + C.r }; }
+	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, r - C.r }; }
+	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }// coord trans | check right
+	friend std::istream& operator >> (std::istream& is, Circle& c) {
+		is >> c.c.x >> c.c.y >> c.r;
+		return is;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
+		os << c.c.x << " " << c.c.y << "\n" << c.r; return os;
+	}
+};
+Circle enclose_circle(const Pos& u, const Pos& v) {
+	Pos c = (u + v) * .5;
+	return Circle(c, (c - u).mag());
+}
+Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
+	Pos B = v - u, C = w - u;
+	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
+	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
+	if (zero(B_ / C_)) return { { 0, 0 }, -1 };
+	Pos inx = intersection(B_, C_);
+	return Circle(inx + u, inx.mag());
+}
+//Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
+//	Line l1 = rotate90(L(u, v), (u + v) * .5);
+//	Line l2 = rotate90(L(v, w), (v + w) * .5);
+//	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
+//	Pos c = intersection(l1, l2);
+//	ld r = (c - u).mag();
+//	return Circle(c, r);
+//}
+bool valid_check(const Circle& c, const std::vector<Pos>& P) {
+	for (const Pos& p : P) if (c < p) return 0;
+	return 1;
+}
+Circle get_min_circle(std::vector<Pos>& P) {
+	int sz = P.size();
+	assert(sz <= 3);
+	if (!sz) return Circle(Pos(0, 0), 0);
+	if (sz == 1) return Circle(P[0], 0);
+	if (sz == 2) return enclose_circle(P[0], P[1]);
+	for (int i = 0; i < 2; i++) {
+		for (int j = i + 1; j < 3; j++) {
+			Circle ec = enclose_circle(P[i], P[j]);
+			if (valid_check(ec, P)) return ec;
+		}
+	}
+	return enclose_circle(P[0], P[1], P[2]);
+}
+Circle welzl(std::vector<Pos>& P, std::vector<Pos> R, int sz) {
+	if (!sz || R.size() == 3) return get_min_circle(R);
+	int idx = rand() % sz;
+	Pos p = P[idx];
+	std::swap(P[idx], P[sz - 1]);
+	Circle mec = welzl(P, R, sz - 1);
+	if (mec >= p) return mec;
+	R.push_back(p);
+	return welzl(P, R, sz - 1);
+}
+Circle welzl(std::vector<Pos>& P) {
+	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
+	return welzl(P, {}, P.size());
+}
+struct circle {
+	ll x, y, r;// [x, y] - center, r - radius
+	constexpr circle operator+(const circle& c) const { return { x + c.x, y + c.y, r + c.r }; }
+	constexpr circle operator-(const circle& c) const { return { x - c.x, y - c.y, r - c.r }; }
+	bool operator!=(circle c) const { return std::abs(x - c.x) >= TOL || std::abs(y - c.y) >= TOL || std::abs(r - c.r) >= TOL; }
+	ld H(const ld& th) const { return sin(th) * x + cos(th) * y + r; }// coord trans | check right
+};
+struct arc {
+	ld lo, hi;// [lo, hi] - radian range of arc
+	circle c; // c.r - radius of arc
+};
+ld norm(ld th) {// angle normalization
+	while (th < 0) th += 2 * PI;
+	while (th >= 2 * PI) th -= 2 * PI;
+	return th;
+}
+std::vector<arc> merge(circle p, circle q, ld cur, ld nxt) {// merge 2 disks
+	if (cur >= nxt) return std::vector<arc>();// ignore when next disk is inside the hull
+
+	circle delta = p - q;// difference between p and q : delta.r > 0 when p.r > q.r
+	if (std::abs(delta.x) < TOL && std::abs(delta.y) < TOL) {
+		if (delta.r >= 0) return { { cur, nxt, p } };// same center :: p.r > q.r  
+		else return { { cur, nxt, q } };             // same center :: p.r < q.r
+	}
+
+	ld t = -ld(delta.r) / hypot(delta.x, delta.y);// angle between tangent and line segment between centers && size comparison
+	if (t <= -1) return { { cur, nxt, p } };      // p > q
+	if (t >= 1) return { { cur, nxt, q } };       // p < q
+
+	ld phi = atan2l(delta.y, delta.x);// angle between x-line and line segment between centers
+	ld x1 = asin(std::abs(t)) + (t < 0 ? PI : 0);// normalizated angle between tangent and line segment between centers
+	ld x2 = PI - x1;
+	x1 = norm(x1 - phi);// absolute angle of tangent 1
+	x2 = norm(x2 - phi);// absolute angle of tangent 2
+	if (x1 > x2) std::swap(x1, x2);
+
+	std::vector<arc> h2d;
+	if (p.H((x1 + x2) / 2) < q.H((x1 + x2) / 2)) // p is to the right of q
+		h2d = { {ld(0), x1, p}, {x1, x2, q}, {x2, 2 * PI, p} };// when the HullDisks starts at p
+	else // p is to the left of q
+		h2d = { {ld(0), x1, q}, {x1, x2, p}, {x2, 2 * PI, q} };// when the HullDisks starts at q
+
+	std::vector<arc> hull;
+	for (auto [lo, hi, c] : h2d) {// ignore all arc when it out of angle cur - nxt
+		lo = std::max(lo, cur);
+		hi = std::min(hi, nxt);
+		if (lo >= hi) continue;
+		hull.push_back({ lo, hi, c });
+	}
+	return hull;
+}
+std::vector<arc> merge(std::vector<arc>& H1, std::vector<arc>& H2) {// merge hull H1, H2
+	int i = 0, j = 0;
+	ld cur = 0;// merge continues until "cur" completes one revolution
+	std::vector<arc> tmp;
+	while (i < H1.size() && j < H2.size()) {
+		if (H1[i].hi < H2[j].hi) {// tangent of H1[i] is superior to H2[j]'s
+			std::vector<arc> h2d = merge(H1[i].c, H2[j].c, cur, H1[i].hi);
+			cur = H1[i++].hi;// hand over the initiative to next disk
+			for (const arc& x : h2d) tmp.push_back(x);
+		}
+		else {
+			std::vector<arc> h2d = merge(H1[i].c, H2[j].c, cur, H2[j].hi);
+			cur = H2[j++].hi;
+			for (const arc& x : h2d) tmp.push_back(x);
+		}
+	}
+
+	std::vector<arc> hull;
+	cur = 0;
+	for (int i = 0; i < tmp.size(); i++) {
+		if (i + 1 == tmp.size() || tmp[i + 1].c != tmp[i].c) {
+			hull.push_back({ cur, tmp[i].hi, tmp[i].c });// complete one revolution
+			cur = tmp[i].hi;
+		}
+	}
+	return hull;
+}
+std::vector<arc> solve(int l, int r, std::vector<circle>& C) {// divide and conquer
+	if (l == r) return { {0, 2 * PI, C[l]} };
+	int m = l + r >> 1;
+	std::vector<arc> HL = solve(l, m, C);
+	std::vector<arc> HR = solve(m + 1, r, C);
+	return merge(HL, HR);
+}
+std::vector<arc> HullDisks(std::vector<circle>& C) {
+	for (auto& c : C) std::swap(c.x, c.y);// swap x - y coord for convenience of angle calculation
+	std::vector<arc> hull = solve(0, C.size() - 1, C);
+	for (auto& A : hull) std::swap(A.c.x, A.c.y);// set back
+	return hull;
+}
+ld getRound(std::vector<arc>& H) {// hull = [[lo, hi, c], [lo, hi, c], [lo, hi, c]...]
+	ld  R = 0;
+	for (int i = 0; i < H.size(); i++) {
+		arc  p = H[i], q = H[(i + 1) % H.size()];
+		circle d = p.c - q.c;
+		R += p.c.r * (p.hi - p.lo);// calculate arc / r * theta
+		R += sqrt((d.x * d.x + d.y * d.y) - d.r * d.r);// calculate bridge / sqrt(a^2 - c^2) = b
+	}
+	return R;
+}
+ld getArea(std::vector<arc>& H) {
+	using point = complex<ld>;
+	std::vector<point> v;
+	ld A = 0;
+	for (auto& [lo, hi, c] : H) {
+		A += 1.0 * c.r * c.r * (hi - lo);
+		A += c.r * (c.x * (sin(hi) - sin(lo)) - c.y * (cos(hi) - cos(lo)));
+		point x{ 1.0 * c.x, 1.0 * c.y };
+		point r{ 1.0 * c.r, 0.0 };
+		v.push_back(x + r * exp(point(0, lo)));
+		v.push_back(x + r * exp(point(0, hi)));
+	}
+	for (int i = 0; i < v.size(); i += 2) {
+		A += (conj(v[(i + v.size() - 1) % v.size()]) * v[i]).imag();
+	}
+	return A * .5;
 }
 //3D============================================================================//
 //3D============================================================================//

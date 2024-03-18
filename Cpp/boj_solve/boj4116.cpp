@@ -5,8 +5,6 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <random>
-#include <cstdlib>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -14,15 +12,20 @@ const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e3;
-int N;
+int N, M, T, Q;
+
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 
+
+//2D============================================================================//
+//2D============================================================================//
+//2D============================================================================//
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
-	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	bool operator < (const Pos& p) const { return zero(x - p.x) ? y > p.y : x > p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
@@ -84,8 +87,6 @@ struct Line {//ax + by = c
 		return os;
 	}
 };
-const Line Xaxis = { { 0, -1 }, 0 };
-const Line Yaxis = { { 1, 0 }, 0 };
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
@@ -107,105 +108,34 @@ Pos intersection(const Line& l1, const Line& l2) {
 	};
 }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = cross(d1, d2, d3); return zero(ret) ? 0 : ret > 0 ? 1 : -1;
+	ld ret = cross(d1, d2, d3);
+	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3)) && (ret > 0 || zero(ret));
-}
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3)) && ret > 0;
-}
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
-int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
-}
-struct Circle {
-	Pos c;
-	ld r;
-	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
-	bool operator == (const Circle& p) const { return c == p.c && std::abs(r - p.r) < TOL; }
-	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - C.r) >= TOL; }
-	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
-	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
-	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
-	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, r + C.r }; }
-	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, r - C.r }; }
-	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }// coord trans | check right
-	friend std::istream& operator >> (std::istream& is, Circle& c) {
-		is >> c.c.x >> c.c.y >> c.r;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
-		os << c.c.x << " " << c.c.y << " " << c.r; return os;
-	}
-};
-Circle enclose_circle(const Pos& u, const Pos& v) {
-	Pos c = (u + v) * .5;
-	return Circle(c, (c - u).mag());
-}
-Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
-	Pos B = v - u, C = w - u;
-	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
-	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
-	if (zero(B_ / C_)) return { { 0, 0 }, -1 };
-	Pos inx = intersection(B_, C_);
-	return Circle(inx + u, inx.mag());
-}
-//Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
-//	Line l1 = rotate90(L(u, v), (u + v) * .5);
-//	Line l2 = rotate90(L(v, w), (v + w) * .5);
-//	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
-//	Pos c = intersection(l1, l2);
-//	ld r = (c - u).mag();
-//	return Circle(c, r);
-//}
-bool valid_check(const Circle& c, const std::vector<Pos>& P) {
-	for (const Pos& p : P) if (c < p) return 0;
-	return 1;
-}
-Circle get_min_circle(std::vector<Pos>& P) {
-	int sz = P.size();
-	assert(sz <= 3);
-	if (!sz) return Circle(Pos(0, 0), 0);
-	if (sz == 1) return Circle(P[0], 0);
-	if (sz == 2) return enclose_circle(P[0], P[1]);
-	for (int i = 0; i < 2; i++) {
-		for (int j = i + 1; j < 3; j++) {
-			Circle ec = enclose_circle(P[i], P[j]);
-			if (valid_check(ec, P)) return ec;
-		}
-	}
-	return enclose_circle(P[0], P[1], P[2]);
-}
-Circle welzl(std::vector<Pos>& P, std::vector<Pos> R, int sz) {
-	if (!sz || R.size() == 3) return get_min_circle(R);
-	int idx = rand() % sz;
-	Pos p = P[idx];
-	std::swap(P[idx], P[sz - 1]);
-	Circle mec = welzl(P, R, sz - 1);
-	if (mec >= p) return mec;
-	R.push_back(p);
-	return welzl(P, R, sz - 1);
-}
-Circle welzl(std::vector<Pos>& P) {
-	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
-	return welzl(P, {}, P.size());
-}
-std::vector<Pos> pos;
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
-	std::cin >> N;
-	pos.resize(N);
-	for (int i = 0; i < N; i++) std::cin >> pos[i];
-	Circle mec = welzl(pos);
-	std::cout << mec;
-	return;
+	std::cout.precision(3);
+	Pos a, b, c, d;
+	while (1) {
+		std::cin >> a >> b >> c >> d;
+		if (zero(a.mag()) && zero(b.mag()) && zero(c.mag()) && zero(d.mag())) return;
+		Pos m = intersection(L(a, c), L(b, d));
+		Pos p, q, r, s;
+		p = { std::abs(cross(a, b, m)) * .5,
+			(a - b).mag() + (a - m).mag() + (b - m).mag() };	
+		q = { std::abs(cross(b, c, m)) * .5,
+			(b - c).mag() + (b - m).mag() + (c - m).mag() };	
+		r = { std::abs(cross(c, d, m)) * .5,
+			(c - d).mag() + (c - m).mag() + (d - m).mag() };	
+		s = { std::abs(cross(d, a, m)) * .5,
+			(d - a).mag() + (d - m).mag() + (a - m).mag() };
+		std::vector<Pos> tmp = { p, q, r, s };
+		std::sort(tmp.begin(), tmp.end());
+		for (const Pos& t : tmp) std::cout << t << " ";
+		//std::cout << "\n";
+	}
 }
-int main() { solve(); return 0; }//boj2389 at the center of the world...
+int main() { solve(); return 0; }//boj4116
