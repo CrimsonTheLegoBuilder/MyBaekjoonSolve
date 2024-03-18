@@ -189,7 +189,7 @@ Circle welzl(std::vector<Pos>& P, std::vector<Pos> R, int sz) {
 	Circle mec = welzl(P, R, sz - 1);
 	if (mec >= p) return mec;
 	R.push_back(p);
-	return welzl(P, R, sz - 1);
+	return welzl(P, R, sz - 1); 
 }
 Circle welzl(std::vector<Pos>& P) {
 	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
