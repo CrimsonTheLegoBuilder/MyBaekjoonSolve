@@ -5,29 +5,12 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <random>
-#include <array>
-#include <tuple>
 typedef long long ll;
 typedef long double ld;
-typedef std::pair<int, int> pi;
 const ll INF = 1e17;
-const int LEN = 1e5 + 1;
+const int LEN = 55;
 const ld TOL = 1e-7;
-int N, M, T, Q;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
-int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
-//ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-ll gcd(ll a, ll b) {
-	while (b) {
-		ll tmp = a % b;
-		a = b;
-		b = tmp;
-	}
-	return a;
-}
-struct Info { ll area, l, r; };
+int N, T;
 
 struct Pos {
 	ll x, y;
@@ -68,13 +51,13 @@ void solve() {
 		std::cin >> N;
 		for (int i = 0; i < N; i++) std::cin >> pos[i], pos[i] *= 2;
 		std::sort(pos, pos + N);
-		Pos mid = (pos[0] + pos[(N - 1) % N]) / 2;
+		Pos mid = (pos[0] + pos[(N - 1 + N) % N]) / 2;
 		bool f = 1;
 		for (int i = 0; i <= (N >> 1) + 1; i++) {
 			Pos v1 = mid - pos[i], v2 = pos[N - 1 - i] - mid;
 			if (v1 != v2) { std::cout << "no\n"; f = 0; break; }
 		}
-		if (f) std::cout << "yes\n"; return;
+		if (f) std::cout << "yes\n";
 	}
 }
 int main() { solve(); return 0; }//boj1768
