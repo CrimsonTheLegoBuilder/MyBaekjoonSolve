@@ -108,8 +108,9 @@ void solve() {
 					stack.push_back(i + 1);
 				}
 			}
+			if (!bvis) continue;
 			else if (H[i % N] / H[(i + 1) % N] == 0) {//move vertical
-				if (!bvis) continue;
+				//if (!bvis) continue;
 				if (H[i % N].Euc() > H[(i + 1) % N].Euc()) {
 					if (rvs) rvs = 0;
 					stack.pop_back();
@@ -117,7 +118,7 @@ void solve() {
 				}
 			}
 			else if (H[i % N] / H[(i + 1) % N] > 0) {//move forward
-				if (!bvis) continue;
+				//if (!bvis) continue;
 				if (rvs && ccw(H[(i - 1 + N) % N], H[i % N], H[(i + 1) % N]) > 0) {
 					rvs = 0;
 					bvis = 0;
