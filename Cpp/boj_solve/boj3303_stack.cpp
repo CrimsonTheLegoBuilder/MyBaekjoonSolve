@@ -104,7 +104,7 @@ void solve() {
 				if (bvis || (!bvis && H[stack.back()] / H[(i + 1) % N] < 0)) {
 					if (!bvis) bvis = 1;
 					stack.pop_back();
-					while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back()])) H.pop_back();
+					while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back()])) stack.pop_back();
 					stack.push_back(i + 1);
 				}
 			}
