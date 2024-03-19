@@ -92,7 +92,7 @@ void solve() {
 	stack.push_back(r);
 	V[H[r].i] = 1;// , V[H[l].i] = 1;
 	for (int i = r; i < r + N; i++) {
-		if (i % N == l) break;
+		if ((i + 1) % N == l) break;
 		if (fvis) {
 			if (H[i % N] / H[(i + 1) % N] < 0) {//move backward
 				if (bvis && !rvs && ccw(H[(i - 1 + N) % N], H[i % N], H[(i + 1) % N]) < 0) {
@@ -140,6 +140,7 @@ void solve() {
 		}
 	}
 	for (const int& i : stack) V[H[i].i] = 1;
+	std::cout << stack.size() << "\n";
 	for (int i = 1; i <= N; i++) if (V[i]) std::cout << i << " ";
 	return;
 }
