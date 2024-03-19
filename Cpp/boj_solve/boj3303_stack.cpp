@@ -96,7 +96,7 @@ void solve() {
 		if (fvis) {
 			if (H[i % N] / H[(i + 1) % N] < 0) {//move backward
 				if (bvis && !rvs && ccw(H[(i - 1 + N) % N], H[i % N], H[(i + 1) % N]) < 0) {
-					rvs = 0;
+					rvs = 1;
 					fvis = 0;
 					continue;
 				}
@@ -133,6 +133,7 @@ void solve() {
 		}
 		if (!fvis) {
 			if (H[stack.back()] / H[(i + 1) % N] > 0) {
+				rvs = 0;
 				fvis = 1;
 				stack.push_back(i + 1);
 			}
