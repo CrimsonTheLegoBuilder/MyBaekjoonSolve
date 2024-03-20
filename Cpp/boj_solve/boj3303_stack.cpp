@@ -56,8 +56,8 @@ bool norm(std::vector<Pos>& H) {
 	return 0;
 }
 int invisible(const Pos& p1, const Pos& p2, const Pos& t) {
-	if (p1 / t == 0 && p1.Euc() < t.Euc()) return 1;
-	if (p2 / t == 0 && p2.Euc() < t.Euc()) return 1;
+	if (p1 / t == 0 && p1.Euc() <= t.Euc()) return 1;
+	if (p2 / t == 0 && p2.Euc() <= t.Euc()) return 1;
 	return ccw(O, p1, t) < 0 && ccw(O, p2, t) > 0 && ccw(p1, p2, t) > 0;
 }
 std::vector<int> stack;
@@ -87,62 +87,76 @@ void solve() {
 	stack.push_back(r);
 	V[H[r].i] = 1;// , V[H[l].i] = 1;
 	for (int i = r; i < r + N; i++) {
-		if ((i + 1) % N == l) break;
+		if (i % N == l) break;
+		std::cout << i % N + 2 << " ";
+		for (const int& j : stack) std::cout << H[j % N].i + 1 << " crd: " << H[j % N] << " :: ";
+		std::cout << "\n";
+		std::cout << fvis << "\n";
 		if (fvis) {
 			int CCW = ccw(H[(i - 1 + N) % N], H[i % N], H[(i + 1) % N]);
 			if (H[i % N] / H[(i + 1) % N] < 0) {//move backward
+				std::cout << "DEBUG:: <\n";
 				if (bvis && !rvs && CCW < 0) {
 					rvs = 1;
 					fvis = 0;
 					continue;
 				}
 				rvs = 1;
-				if (bvis || (!bvis && H[stack.back()] / H[(i + 1) % N] < 0)) {
-					if (!bvis) bvis = 1;
-					stack.pop_back();
-					while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back()])) stack.pop_back();
-					stack.push_back(i + 1);
+				if (bvis || (!bvis && H[stack.back() % N] / H[(i + 1) % N] < 0)) {
+					if (!bvis) stack.pop_back(), bvis = 1;
+					while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back() % N])) stack.pop_back();
 				}
 			}
 			if (!bvis) continue;
 			else if (H[i % N] / H[(i + 1) % N] == 0) {//move vertical
+				std::cout << "DEBUG:: ==\n";
 				if (H[i % N].Euc() > H[(i + 1) % N].Euc()) {
 					if (rvs) rvs = 0;
-					if (stack.size() < 2 ||
-						H[stack.back()] / H[(i + 1) % N] > 0 ||
-						(H[stack.back()] / H[(i + 1) % N] <= 0 && ccw(H[stack.back()], H[stack[stack.size() - 1]], H[(i + 1) % N])))
-						stack.pop_back(), stack.push_back(i + 1);
-
+					if (stack[stack.size() - 1] == i) stack.pop_back();
+					if (stack.size() < 1 || H[stack.back() % N] / H[(i + 1) % N] > 0)
+						stack.push_back(i + 1);
 				}
 			}
 			else if (H[i % N] / H[(i + 1) % N] > 0) {//move forward
+				std::cout << "DEBUG:: >\n";
 				if (rvs && CCW > 0) {
+					//std::cout << "DEBUG:: rvs > CCW\n";
+					stack.push_back(i);
 					rvs = 0;
 					bvis = 0;
 					continue;
 				}
-				if (rvs && CCW < 0) stack.pop_back(), rvs = 0;
-				if (stack.size() < 2 ||
-					H[stack.back()] / H[(i + 1) % N] > 0 ||
-					(H[stack.back()] / H[(i + 1) % N] <= 0 && ccw(H[stack.back()], H[stack[stack.size() - 1]], H[(i + 1) % N])))
+				//std::cout << "DEBUG:: push_back(i)\n";
+				if (rvs && CCW < 0) {
+					//if (stack.size() < 1 || H[stack.back() % N] / H[(i + 1) % N] > 0) stack.push_back(i + 1);
+					rvs = 0;
+				}
+				//std::cout << "DEBUG:: push_back(i + 1)\n";
+				//std::cout << stack.size() << "\n";
+				if (stack.size() < 1 || H[stack.back() % N] / H[(i + 1) % N] > 0)
 					stack.push_back(i + 1);
 			}
 		}
 		if (!fvis) {
-			if (H[stack.back()] / H[(i + 1) % N] > 0) {
+			if (H[stack.back() % N] / H[(i + 1) % N] > 0) {
 				rvs = 0;
 				fvis = 1;
 				stack.push_back(i + 1);
 			}
 		}
 	}
-	for (const int& i : stack) V[H[i].i] = 1;
+	for (const int& i : stack) std::cout << H[i % N].i + 1 << " ";
+	std::cout << "\n";
+	for (const int& i : stack) V[H[i % N].i] = 1;
 	std::cout << stack.size() << "\n";
 	for (int i = 1; i <= N; i++) if (V[i]) std::cout << i << " ";
 	return;
 }
 int main() { solve(); return 0; }//boj3303 Printed Circuit Board
 
+/*
+121 2 12 22 46 47 50 51 52 53 54
+*/
 
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
