@@ -14,21 +14,13 @@ bool V[LEN];
 struct Pos {
 	int x, y, i;
 	Pos(int X = 0, int Y = 0, int I = 0) : x(X), y(Y), i(I) {}
-	ll operator * (const Pos& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
 	ll operator / (const Pos& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	ll Euc() const { return (ll)x * x + (ll)y * y; }
-	friend std::istream& operator >> (std::istream& is, Pos& p) {
-		is >> p.x >> p.y;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Pos& p) {
-		os << p.x << " " << p.y;
-		return os;
-	}
+	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
-std::vector<Pos> H;// , C;
+std::vector<Pos> H;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
@@ -58,7 +50,6 @@ std::vector<int> stack;
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	memset(V, 0, sizeof V);
 	std::cin >> N;
 	H.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> H[i], H[i].i = i + 1;
@@ -79,7 +70,6 @@ void solve() {
 
 	stack.clear();
 	stack.push_back(r);
-	V[H[r].i] = 1;
 
 	bool fvis = 1, bvis = 1, rvs = 0;
 	for (int i = r; i < r + N; i++) {
@@ -131,6 +121,8 @@ void solve() {
 			}
 		}
 	}
+
+	memset(V, 0, sizeof V);
 	for (const int& i : stack) V[H[i].i] = 1;
 	std::cout << stack.size() << "\n";
 	for (int i = 1; i <= N; i++) if (V[i]) std::cout << i << " ";
