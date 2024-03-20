@@ -104,7 +104,7 @@ void solve() {
 			}
 			else if (H[i % N] / H[(i + 1) % N] == 0) {//move vertical
 				if (H[i % N].Euc() > H[(i + 1) % N].Euc()) {
-					rvs = 0;
+					//rvs = 0;
 					if (stack[stack.size() - 1] == i) stack.pop_back();
 					if (stack.size() < 1 || H[stack.back() % N] / H[(i + 1) % N] > 0)
 						stack.push_back(i + 1);
@@ -117,6 +117,7 @@ void solve() {
 					bvis = 0;
 					continue;
 				}
+				if (rvs && H[stack.back() % N] / H[i % N] > 0) stack.push_back(i);
 				rvs = 0;
 				if (stack.size() < 1 || H[stack.back() % N] / H[(i + 1) % N] > 0)
 					stack.push_back(i + 1);
@@ -344,14 +345,14 @@ int main() { solve(); return 0; }//boj3303 Printed Circuit Board
 //	V[H[r].i] = 1;// , V[H[l].i] = 1;
 //	for (int i = r; i < r + N; i++) {
 //		if (i % N == l) break;
-//		std::cout << i % N + 2 << " ";
-//		for (const int& j : stack) std::cout << H[j % N].i + 1 << " crd: " << H[j % N] << " :: ";
-//		std::cout << "\n";
-//		std::cout << fvis << "\n";
+//		//std::cout << i % N + 2 << " ";
+//		//for (const int& j : stack) std::cout << H[j % N].i + 1 << " crd: " << H[j % N] << " :: ";
+//		//std::cout << "\n";
+//		//std::cout << fvis << "\n";
 //		if (fvis) {
 //			int CCW = ccw(H[(i - 1 + N) % N], H[i % N], H[(i + 1) % N]);
 //			if (H[i % N] / H[(i + 1) % N] < 0) {//move backward
-//				std::cout << "DEBUG:: <\n";
+//				//std::cout << "DEBUG:: <\n";
 //				if (bvis && !rvs && CCW < 0) {
 //					rvs = 1;
 //					fvis = 0;
@@ -365,7 +366,7 @@ int main() { solve(); return 0; }//boj3303 Printed Circuit Board
 //			}
 //			if (!bvis) continue;
 //			else if (H[i % N] / H[(i + 1) % N] == 0) {//move vertical
-//				std::cout << "DEBUG:: ==\n";
+//				//std::cout << "DEBUG:: ==\n";
 //				if (H[i % N].Euc() > H[(i + 1) % N].Euc()) {
 //					if (rvs) rvs = 0;
 //					if (stack[stack.size() - 1] == i) stack.pop_back();
@@ -374,7 +375,7 @@ int main() { solve(); return 0; }//boj3303 Printed Circuit Board
 //				}
 //			}
 //			else if (H[i % N] / H[(i + 1) % N] > 0) {//move forward
-//				std::cout << "DEBUG:: >\n";
+//				//std::cout << "DEBUG:: >\n";
 //				if (rvs && CCW > 0) {
 //					//std::cout << "DEBUG:: rvs > CCW\n";
 //					stack.push_back(i);
@@ -401,8 +402,8 @@ int main() { solve(); return 0; }//boj3303 Printed Circuit Board
 //			}
 //		}
 //	}
-//	for (const int& i : stack) std::cout << H[i % N].i + 1 << " ";
-//	std::cout << "\n";
+//	//for (const int& i : stack) std::cout << H[i % N].i + 1 << " ";
+//	//std::cout << "\n";
 //	for (const int& i : stack) V[H[i % N].i] = 1;
 //	std::cout << stack.size() << "\n";
 //	for (int i = 1; i <= N; i++) if (V[i]) std::cout << i << " ";
