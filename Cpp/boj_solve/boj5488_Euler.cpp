@@ -140,6 +140,7 @@ void solve() {
 			segs[i].s = tmp[i];
 			segs[i].e = tmp[(i + 1) % N];
 		}
+
 	}
 	return;
 }
