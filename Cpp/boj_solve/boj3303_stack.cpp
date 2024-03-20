@@ -104,7 +104,6 @@ void solve() {
 			}
 			else if (H[i % N] / H[(i + 1) % N] == 0) {//move vertical
 				if (H[i % N].Euc() > H[(i + 1) % N].Euc()) {
-					//rvs = 0;
 					if (stack[stack.size() - 1] == i) stack.pop_back();
 					if (stack.size() < 1 || H[stack.back() % N] / H[(i + 1) % N] > 0)
 						stack.push_back(i + 1);
