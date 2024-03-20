@@ -41,7 +41,7 @@ bool norm(std::vector<Pos>& H) {
 	if (A > 0) { std::reverse(H.begin(), H.end()); return 1; }
 	return 0;
 }
-int invisible(const Pos& p1, const Pos& p2, const Pos& t) {
+bool invisible(const Pos& p1, const Pos& p2, const Pos& t) {
 	if (p1 / t == 0 && p1.Euc() <= t.Euc()) return 1;
 	if (p2 / t == 0 && p2.Euc() <= t.Euc()) return 1;
 	return ccw(O, p1, t) < 0 && ccw(O, p2, t) > 0 && ccw(p1, p2, t) > 0;
