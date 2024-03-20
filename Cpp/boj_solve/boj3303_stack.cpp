@@ -99,9 +99,8 @@ void solve() {
 			}
 			else if (!DIR) {//move vertical
 				if (cur.Euc() > nxt.Euc()) {
-					if (stack.back() == i % N) stack.pop_back();
-					if (stack.size() < 1 || H[stack.back()] / nxt > 0)
-						stack.push_back((i + 1) % N);
+					if (stack.size() && stack.back() == i % N) stack.pop_back();
+					if (stack.size() < 1 || H[stack.back()] / nxt > 0) stack.push_back((i + 1) % N);
 				}
 			}
 			else if (DIR > 0) {//move forward
