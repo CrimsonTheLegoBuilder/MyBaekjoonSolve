@@ -12,7 +12,7 @@ typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
-const int LEN = 300;
+const int LEN = 305;
 int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 //ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
@@ -83,9 +83,7 @@ struct Seg {
 	Pos s, e;
 	Seg(Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : s(S), e(E) {}
 } segs[LEN];
-std::vector<Pos> tmp;
-std::vector<Pos> inxs[LEN << 1];
-void INIT() { for (int i = 0; i < LEN; i++) inxs[i].clear(); }
+std::vector<Pos> tmp, inxs;
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
@@ -118,20 +116,22 @@ bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	return f1 && f2;
-	//bool f3 = on_seg_strong(s1, s2, d1) ||
-	//	on_seg_strong(s1, s2, d2) ||
-	//	on_seg_strong(d1, d2, s1) ||
-	//	on_seg_strong(d1, d2, s2);
-	//return (f1 && f2) || f3;
+	//return f1 && f2;
+	bool f3 = on_seg_strong(s1, s2, d1) ||
+		on_seg_strong(s1, s2, d2) ||
+		on_seg_strong(d1, d2, s1) ||
+		on_seg_strong(d1, d2, s2);
+	return (f1 && f2) || f3;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	int v, e, f, tc = 0;
 	while (1) {
-		INIT();
 		std::cin >> N;
 		if (!N) break;
+		tc++;
+		v = 0;
 		tmp.resize(N);
 		for (int i = 0; i < N; i++) std::cin >> tmp[i];
 		tmp.pop_back();
@@ -140,8 +140,26 @@ void solve() {
 			segs[i].s = tmp[i];
 			segs[i].e = tmp[(i + 1) % N];
 		}
-
+		for (int i = 0; i < N; i++) {
+			for (int j = i + 1; j < N; j++) {
+				Seg& I = segs[i], J = segs[j];
+				if (intersect(I.s, I.e, J.s, J.e))
+					tmp.push_back(intersection(L(I.s, I.e), L(J.s, J.e)));
+			}
+		}
+		std::sort(tmp.begin(), tmp.end());
+		tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
+		v = tmp.size();
+		e = N;
+		for (int i = 0; i < N; i++) {
+			Seg& I = segs[i];
+			for (const Pos& p : tmp) {
+				if (on_seg_weak(I.s, I.e, p)) e++;
+			}
+		}
+		f = 1 - v + e;
+		std::cout << "Case " << tc << ": There are " << f + 1 << " pieces.\n";
 	}
 	return;
 }
-int main() { solve(); return 0; }//5488 That Nice Euler Circuit
+int main() { solve(); return 0; }//boj5488 That Nice Euler Circuit

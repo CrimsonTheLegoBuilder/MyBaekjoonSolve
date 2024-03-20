@@ -42,9 +42,7 @@ bool norm(std::vector<Pos>& H) {
 	return 0;
 }
 bool invisible(const Pos& p1, const Pos& p2, const Pos& t) {
-	if (p1 / t == 0 && p1.Euc() <= t.Euc()) return 1;
-	if (p2 / t == 0 && p2.Euc() <= t.Euc()) return 1;
-	return ccw(O, p1, t) < 0 && ccw(O, p2, t) > 0 && ccw(p1, p2, t) > 0;
+	return ccw(O, p1, t) <= 0 && ccw(O, p2, t) >= 0 && ccw(p1, p2, t) >= 0;
 }
 std::vector<int> stack;
 void solve() {
@@ -56,18 +54,10 @@ void solve() {
 	norm(H);//normalize cw
 
 	int r = 0, l = 0;
-	ll LMIN = H[0].Euc(), RMIN = H[0].Euc();
 	for (int i = 0; i < N; i++) {
-		if (H[r] / H[i] < 0 ||
-			(H[r] / H[i] == 0 && RMIN > H[i].Euc())) {
-			r = i, RMIN = H[i].Euc();
-		}
-		if (H[l] / H[i] > 0 ||
-			(H[l] / H[i] == 0 && LMIN > H[i].Euc())) {
-			l = i, LMIN = H[i].Euc();
-		}
+		if (H[r] / H[i] < 0 || (!(H[r] / H[i]) && H[r].Euc() > H[i].Euc())) r = i;
+		if (H[l] / H[i] > 0 || (!(H[l] / H[i]) && H[l].Euc() > H[i].Euc())) l = i;
 	}
-
 	stack.clear();
 	stack.push_back(r);
 
@@ -76,7 +66,7 @@ void solve() {
 		if (i % N == l) break;
 		Pos& pre = H[(i - 1 + N) % N], cur = H[i % N], nxt = H[(i + 1) % N];
 		if (fvis && bvis) {
-			ll DIR = cur / nxt;
+			ll DIR = cur / nxt;//ccw(O, cur, nxt);
 			int CCW = ccw(pre, cur, nxt);
 			if (DIR < 0) {//move backward
 				if (!rvs && CCW < 0) {
@@ -130,7 +120,18 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj3303 Printed Circuit Board
 
-
+//int r = 0, l = 0;
+//ll LMIN = H[0].Euc(), RMIN = H[0].Euc();
+//for (int i = 0; i < N; i++) {
+//	if (H[r] / H[i] < 0 ||
+//		(H[r] / H[i] == 0 && RMIN > H[i].Euc())) {
+//		r = i, RMIN = H[i].Euc();
+//	}
+//	if (H[l] / H[i] > 0 ||
+//		(H[l] / H[i] == 0 && LMIN > H[i].Euc())) {
+//		l = i, LMIN = H[i].Euc();
+//	}
+//}
 
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
