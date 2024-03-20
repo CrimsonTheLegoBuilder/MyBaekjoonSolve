@@ -29,6 +29,8 @@ ll gcd(ll a, ll b) {
 }
 struct Info { ll area, l, r; };
 
+//Euler characteristic : v - e + f == 1
+//Pick`s Theorem : A = i + b/2 - 1
 //2D============================================================================//
 //2D============================================================================//
 //2D============================================================================//
@@ -54,14 +56,8 @@ struct Pos {
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
-	friend std::istream& operator >> (std::istream& is, Pos& p) {
-		is >> p.x >> p.y;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Pos& p) {
-		os << p.x << " " << p.y;
-		return os;
-	}
+	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 std::vector<Pos> C, H;
 struct Vec {

@@ -47,6 +47,8 @@ ll gcd(ll a, ll b) {
 struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
 std::vector<Seq> seq;
 
+//Euler characteristic : v - e + f == 1
+//Pick`s Theorem : A = i + b/2 - 1
 //2D============================================================================//
 //2D============================================================================//
 //2D============================================================================//
@@ -71,14 +73,8 @@ struct Pos {
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return hypot(x, y); }
 	Pos unit() const { return *this / mag(); }
-	friend std::istream& operator >> (std::istream& is, Pos& p) {
-		is >> p.x >> p.y;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Pos& p) {
-		os << p.x << " " << p.y;
-		return os;
-	}
+	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 struct Vec {
 	ld vy, vx;
