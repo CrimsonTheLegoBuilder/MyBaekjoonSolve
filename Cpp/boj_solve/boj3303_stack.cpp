@@ -92,7 +92,7 @@ void solve() {
 		//for (const int& j : stack) std::cout << H[j % N].i + 1 << " crd: " << H[j % N] << " :: ";
 		//std::cout << "\n";
 		//std::cout << fvis << "\n";
-		if (fvis) {
+		if (fvis && bvis) {
 			int CCW = ccw(H[(i - 1 + N) % N], H[i % N], H[(i + 1) % N]);
 			if (H[i % N] / H[(i + 1) % N] < 0) {//move backward
 				//std::cout << "DEBUG:: <\n";
@@ -101,11 +101,14 @@ void solve() {
 					fvis = 0;
 					continue;
 				}
+				//rvs = 1;
+				//if (bvis || (!bvis && H[stack.back() % N] / H[(i + 1) % N] < 0)) {
+				//	if (!bvis) stack.pop_back(), bvis = 1;
+				//	while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back() % N])) stack.pop_back();
+				//}
 				rvs = 1;
-				if (bvis || (!bvis && H[stack.back() % N] / H[(i + 1) % N] < 0)) {
-					if (!bvis) stack.pop_back(), bvis = 1;
-					while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back() % N])) stack.pop_back();
-				}
+				while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back() % N])) stack.pop_back();
+				
 			}
 			if (!bvis) continue;
 			else if (H[i % N] / H[(i + 1) % N] == 0) {//move vertical
@@ -144,14 +147,14 @@ void solve() {
 				stack.push_back(i + 1);
 			}
 		}
-		//else if (!bvis) {
-		//	if (H[stack.back() % N] / H[(i + 1) % N] < 0) {
-		//		stack.pop_back();
-		//		rvs = 1;
-		//		bvis = 0;
-		//		while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back() % N])) stack.pop_back();
-		//	}
-		//}
+		else if (!bvis) {
+			if (H[stack.back() % N] / H[(i + 1) % N] < 0) {
+				stack.pop_back();
+				rvs = 1;
+				bvis = 1;
+				while (stack.size() && invisible(H[i % N], H[(i + 1) % N], H[stack.back() % N])) stack.pop_back();
+			}
+		}
 	}
 	//for (const int& i : stack) std::cout << H[i % N].i + 1 << " ";
 	//std::cout << "\n";
