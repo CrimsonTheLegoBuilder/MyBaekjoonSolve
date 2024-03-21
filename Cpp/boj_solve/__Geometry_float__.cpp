@@ -120,7 +120,7 @@ struct Circle {
 	ld r;
 	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
-	bool operator != (const Circle C) const { return !(*this == C); }
+	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
