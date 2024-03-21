@@ -159,7 +159,7 @@ int main() {
 	}
 	area += cross(O, p[N - 1], p[0]);
 	if (area > 0) std::reverse(p, p + N);
-	for (int i = 1; i < N; ++i) {
+	for (int i = 0; i < N; ++i) {
 		if (p[L] < p[i] || p[i] == p[L] && p[i].s() < p[L].s()) L = i;
 		if (p[i] < p[R] || p[i] == p[R] && p[i].s() < p[R].s()) R = i;
 	}
