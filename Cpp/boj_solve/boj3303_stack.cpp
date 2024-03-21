@@ -191,7 +191,6 @@ int main() {
 			else if (dir == 0) {
 				if (p[i].s() < p[i - 1].s()) {
 					if (stack.back() == i - 1) stack.pop_back();
-					if (stack.empty() || p[stack.back()] < p[i]) stack.push_back(i);
 				}
 			}
 			else if (dir > 0) { // ccw
@@ -200,10 +199,9 @@ int main() {
 					bv = i - 1;
 					continue;
 				}
-				if (!stack.empty() && cw && p[stack.back()] < p[i - 1]) stack.push_back(i - 1);
 				cw = 0;
-				if (stack.empty() || p[stack.back()] < p[i]) stack.push_back(i);
 			}
+				if (stack.empty() || p[stack.back()] < p[i]) stack.push_back(i);
 		}
 		else if (~fv) {
 			if (p[fv] < p[i]) {
@@ -217,7 +215,7 @@ int main() {
 				cw = 1;
 				bv = -1;
 				while (stack.size() && invisible(p[i - 1], p[i], p[stack.back()])) stack.pop_back();
-				//if (stack.empty() || p[stack.back()] < p[i]) stack.push_back(i);
+				if (stack.empty() || p[stack.back()] < p[i]) stack.push_back(i);
 			}
 		}
 	}
