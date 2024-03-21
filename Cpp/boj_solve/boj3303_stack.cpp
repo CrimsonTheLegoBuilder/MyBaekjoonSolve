@@ -171,9 +171,9 @@ int main() {
 
 	std::vector<int> stack; // monotonic, ccw order
 	stack.push_back(0);
-	//if (L > 1) stack.push_back(1);
+	if (L > 1) stack.push_back(1);
 
-	for (int i = 1, fv = -1, bv = -1, cw = 0; i <= L; ++i) {
+	for (int i = 2, fv = -1, bv = -1, cw = 0; i <= L; ++i) {
 		// j -> i
 		ll dir = cross(O, p[i - 1], p[i]);
 		ll ccw = cross(p[i - 2], p[i - 1], p[i]);
