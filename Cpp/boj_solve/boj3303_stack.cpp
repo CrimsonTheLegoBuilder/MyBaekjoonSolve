@@ -225,6 +225,7 @@ int main() {
 	std::vector<int> ret;
 	for (const int& i : stack) ret.push_back(p[i].i);
 	std::sort(ret.begin(), ret.end());
+	ret.erase(unique(ret.begin(), ret.end()), ret.end());
 	std::cout << ret.size() << '\n';
 	for (const int& i : ret) std::cout << i << ' ';
 }
