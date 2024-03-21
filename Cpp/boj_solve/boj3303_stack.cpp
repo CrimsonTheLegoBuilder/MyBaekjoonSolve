@@ -175,8 +175,8 @@ int main() {
 
 	for (int i = 2, fv = -1, bv = -1, cw = 0; i <= L; ++i) {
 		// j -> i
-		ll dir = cross(O, p[(i - 1 + N) % N], p[i]);
-		ll ccw = cross(p[(i - 2 + N) % N], p[(i - 1 + N) % N], p[i]);
+		ll dir = cross(O, p[i - 1], p[i]);
+		ll ccw = cross(p[i - 2], p[i - 1], p[i]);
 
 		if (!~fv && !~bv) {
 			if (dir < 0) { // cw
