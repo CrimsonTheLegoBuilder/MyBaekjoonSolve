@@ -412,7 +412,7 @@ void solve() {
 	for (int i = 0; i < N; i++) std::cin >> C3D[i];
 	H3D = convex_hull_3D(C3D);
 
-	ld MAX = -INF;
+	ld MIN = INF;
 	for (const Face& F : H3D) {
 		C2D.clear();
 		ld h = 0;
@@ -426,10 +426,10 @@ void solve() {
 			C2D.push_back(projecting2D(sc, inx));
 		}
 		Circle mec = welzl(C2D);
-		MAX = std::max(MAX, h * mec.A());
+		MIN = std::min(MIN, h * mec.A());
 	}
 
-	std::cout << MAX << "\n";
+	std::cout << MIN << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj14507 Stars in a Can
