@@ -135,6 +135,7 @@ struct Circle {
 	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }// coord trans | check right
+	ld A() const { return r * r * PI; }
 	friend std::istream& operator >> (std::istream& is, Circle& c) {
 		is >> c.c.x >> c.c.y >> c.r;
 		return is;

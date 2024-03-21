@@ -119,18 +119,17 @@ struct Circle {
 	Pos c;
 	ld r;
 	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
-	bool operator == (const Circle& p) const { return c == p.c && std::abs(r - p.r) < TOL; }
-	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - C.r) >= TOL; }
+	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
+	bool operator != (const Circle C) const { return !(*this == C); }
+	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
+	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
+	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }// coord trans | check right
-	friend std::istream& operator >> (std::istream& is, Circle& c) {
-		is >> c.c.x >> c.c.y >> c.r;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
-		os << c.c.x << " " << c.c.y << " " << c.r; return os;
-	}
+	ld A() const { return r * r * PI; }
+	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c.x >> c.c.y >> c.r; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c.x << " " << c.c.y << " " << c.r; return os; }
 };
 std::vector<Pos> get_node(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
@@ -854,4 +853,26 @@ std::vector<Face> ConvexHull3D(const std::vector<Pos3D>& P) {//refer to BIGINTEG
 		cur = next;
 	}
 	return cur;
+}
+ld sc[4];
+void get_angle(ld sc[], const Pos3D& norm) {
+	ld a = norm.x, b = norm.y, c = norm.z;
+	ld angle1 = -atan2(b, a);
+	ld dx = sqrtl(a * a + b * b);
+	ld angle2 = -atan2(dx, c);
+	sc[0] = sin(angle1);
+	sc[1] = cos(angle1);
+	sc[2] = sin(angle2);
+	sc[3] = cos(angle2);
+	return;
+}
+Pos3D rotate(ld sc[], const Pos3D& p) {//project to xy_plane
+	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
+	return Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
+}
+void rotate(ld sc[], const Pos3D& p, std::vector<Pos>& C) {//project to xy_plane
+	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
+	Pos3D q = Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
+	C.push_back(Pos(q.x, q.y));
+	return;
 }
