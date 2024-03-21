@@ -201,7 +201,7 @@ int main() {
 				}
 				cw = 0;
 			}
-				if (stack.empty() || p[stack.back()] < p[i]) stack.push_back(i);
+			if (stack.empty() || p[stack.back()] < p[i]) stack.push_back(i);
 		}
 		else if (~fv) {
 			if (p[fv] < p[i]) {
