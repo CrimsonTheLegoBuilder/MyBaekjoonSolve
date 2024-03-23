@@ -44,13 +44,12 @@ Node search(int s, int e, int l = 1, int r = N, int n = 1) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cin >> N;
+	std::cin >> N >> Q;
 	for (int i = 1; i <= N; i++) std::cin >> arr[i];
 	init();
 	//for (int i = 1; i <= N; i++) {
 	//	std::cout << tree[i].idx << " min.idx " << tree[i].num << " min.num\n";
 	//}
-	std::cin >> Q;
 	int s, e;
 	while (Q--) {
 		std::cin >> s >> e;
