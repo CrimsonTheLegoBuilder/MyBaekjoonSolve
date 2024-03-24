@@ -1,12 +1,12 @@
 #include <iostream>
 #include <algorithm>
-#include <cstring>
 #include <cmath>
-#include <vector>
+#include <cstring>
 typedef long long ll;
-const int LEN = 1e6 + 1;
-int N;
-ll a, b, c;
+const int LEN = 100'001;
+const int INF = 2e9;
+int T, N, B, P, Q;
+char X;
 ll arr[LEN];
 ll segtree[LEN << 2];
 
@@ -35,37 +35,29 @@ ll search(int s, int e, int l = 1, int r = LEN - 1, int n = 1) {
 	ll R = search(s, e, m + 1, r, n << 1 | 1);
 	return L + R;
 }
-ll bi_search(const int& b) {
-	int s = 1, e = 1'000'000, m;
-	while (s < e) {
-		m = s + e >> 1;
-		ll cnt = search(1, m);
-		if (cnt >= b) e = m;
-		else s = m + 1;
-	}
-	if (s == LEN) return LEN - 1;
-	if (search(1, s) == b) return s;
-	return s - 1;
-}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	memset(arr, 0, sizeof arr);
-	memset(segtree, 0, sizeof segtree);
-	std::cin >> N;
-	while (N--) {
-		std::cin >> a;
-		if (a == 1) {
-			std::cin >> b;
-			b = bi_search(b);
-			std::cout << b << "\n";
-			update(1, LEN - 1, b, 1, -1);
-		}
-		else if (a == 2) {
-			std::cin >> b >> c;
-			update(1, LEN - 1, b, 1, c);
+	std::cin >> T;
+	while (T--) {
+		std::cin >> B >> P >> Q;
+		N = P + Q;
+		memset(arr, 0, sizeof arr);
+		memset(segtree, 0, sizeof segtree);
+		ll s, e;
+		while (N--) {
+			std::cin >> X >> s >> e;
+			if (X == 'P') {
+				ll diff = e - arr[s];
+				update(1, B, s, 1, diff);
+				arr[s] = e;
+			}
+			else if (X == 'Q') {
+				ll q = search(s, e);
+				std::cout << q << "\n";
+			}
 		}
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj2243 candy box
+int main() { solve(); return 0; }//boj2357
