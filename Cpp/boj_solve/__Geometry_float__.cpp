@@ -399,77 +399,138 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	}
 	return 1;
 }
+//struct Circle {
+//	Pos c;
+//	ld r;
+//	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
+//	bool operator == (const Circle& p) const { return c == p.c && std::abs(r - p.r) < TOL; }
+//	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - C.r) >= TOL; }
+//	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
+//	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }//is valid
+//	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
+//	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, r + C.r }; }
+//	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, r - C.r }; }
+//	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }// coord trans | check right
+//	friend std::istream& operator >> (std::istream& is, Circle& c) {
+//		is >> c.c.x >> c.c.y >> c.r;
+//		return is;
+//	}
+//	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
+//		os << c.c.x << " " << c.c.y << "\n" << c.r; return os;
+//	}
+//};
+//Circle enclose_circle(const Pos& u, const Pos& v) {
+//	Pos c = (u + v) * .5;
+//	return Circle(c, (c - u).mag());
+//}
+//Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
+//	Pos B = v - u, C = w - u;
+//	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
+//	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
+//	if (zero(B_ / C_)) return { { 0, 0 }, -1 };
+//	Pos inx = intersection(B_, C_);
+//	return Circle(inx + u, inx.mag());
+//}
+////Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
+////	Line l1 = rotate90(L(u, v), (u + v) * .5);
+////	Line l2 = rotate90(L(v, w), (v + w) * .5);
+////	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
+////	Pos c = intersection(l1, l2);
+////	ld r = (c - u).mag();
+////	return Circle(c, r);
+////}
+//bool valid_check(const Circle& c, const std::vector<Pos>& P) {
+//	for (const Pos& p : P) if (c < p) return 0;
+//	return 1;
+//}
+//Circle get_min_circle(std::vector<Pos>& P) {
+//	int sz = P.size();
+//	assert(sz <= 3);
+//	if (!sz) return Circle(Pos(0, 0), 0);
+//	if (sz == 1) return Circle(P[0], 0);
+//	if (sz == 2) return enclose_circle(P[0], P[1]);
+//	for (int i = 0; i < 2; i++) {
+//		for (int j = i + 1; j < 3; j++) {
+//			Circle ec = enclose_circle(P[i], P[j]);
+//			if (valid_check(ec, P)) return ec;
+//		}
+//	}
+//	return enclose_circle(P[0], P[1], P[2]);
+//}
+//Circle welzl(std::vector<Pos>& P, std::vector<Pos> R, int sz) {
+//	if (!sz || R.size() == 3) return get_min_circle(R);
+//	int idx = rand() % sz;
+//	Pos p = P[idx];
+//	std::swap(P[idx], P[sz - 1]);
+//	Circle mec = welzl(P, R, sz - 1);
+//	if (mec >= p) return mec;
+//	R.push_back(p);
+//	return welzl(P, R, sz - 1);
+//}
+//Circle welzl(std::vector<Pos>& P) {
+//	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
+//	return welzl(P, {}, P.size());
+//}
+
 struct Circle {
 	Pos c;
 	ld r;
 	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
-	bool operator == (const Circle& p) const { return c == p.c && std::abs(r - p.r) < TOL; }
-	bool operator != (const Circle C) const { return std::abs(C.c.x - c.x) >= TOL || std::abs(C.c.y - c.y) >= TOL || std::abs(r - C.r) >= TOL; }
+	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
+	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
-	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }//is valid
+	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { {c.x + C.c.x, c.y + C.c.y}, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { {c.x - C.c.x, c.y - C.c.y}, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }// coord trans | check right
-	friend std::istream& operator >> (std::istream& is, Circle& c) {
-		is >> c.c.x >> c.c.y >> c.r;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
-		os << c.c.x << " " << c.c.y << "\n" << c.r; return os;
-	}
-};
+	ld A() const { return r * r * PI; }
+	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c.x >> c.c.y >> c.r; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c.x << " " << c.c.y << " " << c.r; return os; }
+} INVAL = { { 0, 0 }, -1 };
 Circle enclose_circle(const Pos& u, const Pos& v) {
 	Pos c = (u + v) * .5;
 	return Circle(c, (c - u).mag());
 }
 Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
-	Pos B = v - u, C = w - u;
-	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
-	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
-	if (zero(B_ / C_)) return { { 0, 0 }, -1 };
-	Pos inx = intersection(B_, C_);
-	return Circle(inx + u, inx.mag());
+	Line l1 = rotate90(L(u, v), (u + v) * .5);
+	Line l2 = rotate90(L(v, w), (v + w) * .5);
+	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
+	Pos c = intersection(l1, l2);
+	ld r = (c - u).mag();
+	return Circle(c, r);
 }
-//Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
-//	Line l1 = rotate90(L(u, v), (u + v) * .5);
-//	Line l2 = rotate90(L(v, w), (v + w) * .5);
-//	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
-//	Pos c = intersection(l1, l2);
-//	ld r = (c - u).mag();
-//	return Circle(c, r);
-//}
-bool valid_check(const Circle& c, const std::vector<Pos>& P) {
-	for (const Pos& p : P) if (c < p) return 0;
-	return 1;
-}
-Circle get_min_circle(std::vector<Pos>& P) {
+Circle minimum_enclose_circle(std::vector<Pos> P) {
+	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
+	Circle mec = INVAL;
 	int sz = P.size();
-	assert(sz <= 3);
-	if (!sz) return Circle(Pos(0, 0), 0);
-	if (sz == 1) return Circle(P[0], 0);
-	if (sz == 2) return enclose_circle(P[0], P[1]);
-	for (int i = 0; i < 2; i++) {
-		for (int j = i + 1; j < 3; j++) {
-			Circle ec = enclose_circle(P[i], P[j]);
-			if (valid_check(ec, P)) return ec;
+	for (int i = 0; i < sz; i++) {
+		if (mec.r < -1 || mec < P[i]) {
+			mec = Circle(P[i], 0);
+			for (int j = 0; j <= i; j++) {
+				if (mec < P[j]) {
+					Circle ans = enclose_circle(P[i], P[j]);
+					if (zero(mec.r)) { mec = ans; continue; }
+					Circle l = INVAL, r = INVAL;
+					Pos vec = P[j] - P[i];
+					for (int k = 0; k <= j; k++) {
+						if (ans < P[k]) {
+							ld CCW = vec / (P[k] - P[j]);
+							Circle c = enclose_circle(P[i], P[j], P[k]);
+							if (c.r < 0) continue;
+							else if (CCW > 0 && (l.r < 0 || (vec / (c.c - P[i])) >(vec / (l.c - P[i])))) l = c;
+							else if (CCW < 0 && (r.r < 0 || (vec / (c.c - P[i])) < (vec / (r.c - P[i])))) r = c;
+						}
+					}
+					if (l.r < 0 && r.r < 0) mec = ans;
+					else if (l.r < 0) mec = r;
+					else if (r.r < 0) mec = l;
+					else mec = l.r < r.r ? l : r;
+				}
+			}
 		}
 	}
-	return enclose_circle(P[0], P[1], P[2]);
-}
-Circle welzl(std::vector<Pos>& P, std::vector<Pos> R, int sz) {
-	if (!sz || R.size() == 3) return get_min_circle(R);
-	int idx = rand() % sz;
-	Pos p = P[idx];
-	std::swap(P[idx], P[sz - 1]);
-	Circle mec = welzl(P, R, sz - 1);
-	if (mec >= p) return mec;
-	R.push_back(p);
-	return welzl(P, R, sz - 1);
-}
-Circle welzl(std::vector<Pos>& P) {
-	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
-	return welzl(P, {}, P.size());
+	return mec;
 }
 struct circle {
 	ll x, y, r;// [x, y] - center, r - radius

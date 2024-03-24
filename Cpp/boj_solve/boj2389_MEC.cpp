@@ -143,27 +143,27 @@ struct Circle {
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
 		os << c.c.x << " " << c.c.y << " " << c.r; return os;
 	}
-};
+} INVAL = { { 0, 0 }, -1 };
 Circle enclose_circle(const Pos& u, const Pos& v) {
 	Pos c = (u + v) * .5;
 	return Circle(c, (c - u).mag());
 }
-Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
-	Pos B = v - u, C = w - u;
-	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
-	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
-	if (zero(B_ / C_)) return { { 0, 0 }, -1 };
-	Pos inx = intersection(B_, C_);
-	return Circle(inx + u, inx.mag());
-}
 //Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
-//	Line l1 = rotate90(L(u, v), (u + v) * .5);
-//	Line l2 = rotate90(L(v, w), (v + w) * .5);
-//	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
-//	Pos c = intersection(l1, l2);
-//	ld r = (c - u).mag();
-//	return Circle(c, r);
+//	Pos B = v - u, C = w - u;
+//	Line B_ = Line({ B.x, B.y }, B.Euc() / 2);
+//	Line C_ = Line({ C.x, C.y }, C.Euc() / 2);
+//	if (zero(B_ / C_)) return { { 0, 0 }, -1 };
+//	Pos inx = intersection(B_, C_);
+//	return Circle(inx + u, inx.mag());
 //}
+Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
+	Line l1 = rotate90(L(u, v), (u + v) * .5);
+	Line l2 = rotate90(L(v, w), (v + w) * .5);
+	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
+	Pos c = intersection(l1, l2);
+	ld r = (c - u).mag();
+	return Circle(c, r);
+}
 bool valid_check(const Circle& c, const std::vector<Pos>& P) {
 	for (const Pos& p : P) if (c < p) return 0;
 	return 1;
@@ -196,6 +196,38 @@ Circle welzl(std::vector<Pos>& P) {
 	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
 	return welzl(P, {}, P.size());
 }
+Circle minimum_enclose_circle(std::vector<Pos> P) {
+	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
+	Circle mec = INVAL;
+	int sz = P.size();
+	for (int i = 0; i < sz; i++) {
+		if (mec.r < -1 || mec < P[i]) {
+			mec = Circle(P[i], 0);
+			for (int j = 0; j <= i; j++) {
+				if (mec < P[j]) {
+					Circle ans = enclose_circle(P[i], P[j]);
+					if (zero(mec.r)) { mec = ans; continue; }
+					Circle l = INVAL, r = INVAL;
+					Pos vec = P[j] - P[i];
+					for (int k = 0; k <= j; k++) {
+						if (ans < P[k]) {
+							ld CCW = vec / (P[k] - P[j]);
+							Circle c = enclose_circle(P[i], P[j], P[k]);
+							if (c.r < 0) continue;
+							else if (CCW > 0 && (l.r < 0 || (vec / (c.c - P[i])) >(vec / (l.c - P[i])))) l = c;
+							else if (CCW < 0 && (r.r < 0 || (vec / (c.c - P[i])) < (vec / (r.c - P[i])))) r = c;
+						}
+					}
+					if (l.r < 0 && r.r < 0) mec = ans;
+					else if (l.r < 0) mec = r;
+					else if (r.r < 0) mec = l;
+					else mec = l.r < r.r ? l : r;
+				}
+			}
+		}
+	}
+	return mec;
+}
 std::vector<Pos> pos;
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -205,7 +237,8 @@ void solve() {
 	std::cin >> N;
 	pos.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> pos[i];
-	Circle mec = welzl(pos);
+	//Circle mec = welzl(pos);
+	Circle mec = minimum_enclose_circle(pos);
 	std::cout << mec;
 	return;
 }

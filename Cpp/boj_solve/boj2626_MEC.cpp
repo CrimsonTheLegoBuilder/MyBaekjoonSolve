@@ -142,7 +142,7 @@ struct Circle {
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) {
 		os << c.c.x << " " << c.c.y << "\n" << c.r; return os;
 	}
-};
+} INVAL = { { 0, 0 }, -1 };
 Circle enclose_circle(const Pos& u, const Pos& v) {
 	Pos c = (u + v) * .5;
 	return Circle(c, (c - u).mag());
@@ -196,6 +196,39 @@ Circle welzl(std::vector<Pos>& P) {
 	return welzl(P, {}, P.size());
 }
 std::vector<Pos> pos;
+
+Circle MEC(std::vector<Pos> P) {
+	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
+	Circle mec = INVAL;
+	int sz = P.size();
+	for (int i = 0; i < sz; i++) {
+		if (mec.r < -1 || mec < P[i]) {
+			mec = Circle(P[i], 0);
+			for (int j = 0; j <= i; j++) {
+				if (mec < P[j]) {
+					Circle ans = enclose_circle(P[i], P[j]);
+					if (zero(mec.r)) { mec = ans; continue; }
+					Circle l = INVAL, r = INVAL;
+					Pos vec = P[j] - P[i];
+					for (int k = 0; k <= j; k++) {
+						if (ans < P[k]) {
+							ld CCW = vec / (P[k] - P[j]);
+							Circle c = enclose_circle(P[i], P[j], P[k]);
+							if (c.r < 0) continue;
+							else if (CCW > 0 && (l.r < 0 || (vec / (c.c - P[i])) > (vec / (l.c - P[i])))) l = c;
+							else if (CCW < 0 && (r.r < 0 || (vec / (c.c - P[i])) < (vec / (r.c - P[i])))) r = c;
+						}
+					}
+					if (l.r < 0 && r.r < 0) mec = ans;
+					else if (l.r < 0) mec = r;
+					else if (r.r < 0) mec = l;
+					else mec = l.r < r.r ? l : r;
+				}
+			}
+		}
+	}
+	return mec;
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -204,7 +237,8 @@ void solve() {
 	std::cin >> N;
 	pos.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> pos[i];
-	Circle mec = welzl(pos);
+	//Circle mec = welzl(pos);
+	Circle mec = MEC(pos);
 	std::cout << mec;
 	return;
 }
