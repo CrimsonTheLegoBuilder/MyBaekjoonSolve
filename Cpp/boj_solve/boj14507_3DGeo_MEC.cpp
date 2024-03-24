@@ -19,7 +19,7 @@ const int LEN = 1e3;
 int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
-ld norm(ld& th) {
+ld norm(ld th) {
 	while (th < -TOL) th += PI * 2;
 	while (th > PI * 2) th -= PI * 2;
 	return th;
@@ -72,6 +72,14 @@ struct Line {//ax + by = c
 	Vec s;
 	ld c;
 	Line(Vec V = Vec(0, 0), ld C = 0) : s(V), c(C) {}
+	Line(Vec V = Vec(0, 0), Pos p = Pos(0, 0)) : s(V) { c = s.vy * p.x + s.vx * p.y; }
+	Line(Pos ps = Pos(0, 0), Pos pe = Pos(0, 0)) {
+		ld dy, dx;
+		dy = pe.y - ps.y;
+		dx = ps.x - pe.x;
+		s = Vec(dy, dx);
+		c = dy * ps.x + dx * ps.y;
+	}
 	bool operator < (const Line& l) const {
 		bool f1 = Zero < s;
 		bool f2 = Zero < l.s;
@@ -89,10 +97,7 @@ struct Line {//ax + by = c
 	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
-	friend std::ostream& operator << (std::ostream& os, const Line& l) {
-		os << l.s.vy << " " << l.s.vx << " " << l.c;
-		return os;
-	}
+	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
 };
 const Line Xaxis = { { 0, -1 }, 0 };
 const Line Yaxis = { { 1, 0 }, 0 };
@@ -104,9 +109,10 @@ Line L(const Pos& s, const Pos& e) {
 	return { { dy, dx } , c };
 }
 Line rotate90(const Line& l, const Pos& p) {
-	Vec s = ~l.s;
-	ld c = s.vy * p.x + s.vx * p.y;
-	return { s, c };
+	//Vec s = ~l.s;
+	//ld c = s.vy * p.x + s.vx * p.y;
+	//return { s, c };
+	return Line(~l.s, p);
 }
 Pos intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
@@ -161,14 +167,17 @@ Circle minimum_enclose_circle(std::vector<Pos> P) {
 					Circle ans = enclose_circle(P[i], P[j]);
 					if (zero(mec.r)) { mec = ans; continue; }
 					Circle l = INVAL, r = INVAL;
-					Pos vec = P[j] - P[i];
+					//Pos vec = P[j] - P[i];
 					for (int k = 0; k <= j; k++) {
 						if (ans < P[k]) {
-							ld CCW = vec / (P[k] - P[j]);
+							//ld CCW = vec / (P[k] - P[j]);
+							ld CCW = cross(P[i], P[j], P[k]);
 							Circle c = enclose_circle(P[i], P[j], P[k]);
 							if (c.r < 0) continue;
-							else if (CCW > 0 && (l.r < 0 || (vec / (c.c - P[i])) >(vec / (l.c - P[i])))) l = c;
-							else if (CCW < 0 && (r.r < 0 || (vec / (c.c - P[i])) < (vec / (r.c - P[i])))) r = c;
+							//else if (CCW > 0 && (l.r < 0 || (vec / (c.c - P[i])) > (vec / (l.c - P[i])))) l = c;
+							//else if (CCW < 0 && (r.r < 0 || (vec / (c.c - P[i])) < (vec / (r.c - P[i])))) r = c;
+							else if (CCW > 0 && (l.r < 0 || cross(P[i], P[j], c.c) > cross(P[i], P[j], l.c))) l = c;
+							else if (CCW < 0 && (r.r < 0 || cross(P[i], P[j], c.c) < cross(P[i], P[j], r.c))) r = c;
 						}
 					}
 					if (l.r < 0 && r.r < 0) mec = ans;
@@ -180,6 +189,28 @@ Circle minimum_enclose_circle(std::vector<Pos> P) {
 		}
 	}
 	return mec;
+}
+Circle enclose_circle(std::vector<Pos> R) {
+	if (R.size() == 0) return Circle(O, -1);
+	else if (R.size() == 1) return Circle(R[0], 0);
+	else if (R.size() == 2) return enclose_circle(R[0], R[1]);
+	else return enclose_circle(R[0], R[1], R[2]);
+}
+Circle welzl(std::vector<Pos>& P, int i, std::vector<Pos> R) {
+	if (i == P.size() || R.size() == 3) return enclose_circle(R);
+	else {
+		Circle D = welzl(P, i + 1, R);
+		if (D < P[i]) {
+			R.push_back(P[i]);
+			D = welzl(P, i + 1, R);
+		}
+		return D;
+	}
+}
+Circle welzl(std::vector<Pos>& P) {// Call this function.
+	P.erase(unique(P.begin(), P.end()), P.end());
+	shuffle(P.begin(), P.end(), std::mt19937(0x14004));
+	return welzl(P, 0, std::vector<Pos>());
 }
 //========================================================================//
 struct Pos3D {
@@ -206,70 +237,71 @@ struct Pos3D {
 	friend std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z; return os; }
 }; const Pos3D INF3D = { INF, INF, INF };
-Pos3D rotate(ld sc[], const Pos3D& p) {//project to xy_plane
-	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
-	return Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
-}
-void rotate(ld sc[], const Pos3D& p, std::vector<Pos>& C) {//project to xy_plane
-	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
-	Pos3D q = Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
-	C.push_back(Pos(q.x, q.y));
-	return;
-}
-Pos projecting2D(ld sc[], const Pos3D& p) {//project to xy_plane
-	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
-	Pos3D q = Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
-	return Pos(q.x, q.y);
-}
-Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
-ld dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
-bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
-	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3).mag()) && (ret > 0 || zero(ret));
-}
-bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
-	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3).mag()) && ret > 0;
-}
-int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
-	Pos3D torque = cross(d1, d2, d3);
-	ld ret = torque * norm;
-	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-}
 struct Line3D {
 	Pos3D dir, p0;
 	Line3D(Pos3D DIR = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : dir(DIR), p0(P0) {}
 };
-Line3D L(const Pos3D& p1, const Pos3D& p2) { return { p2 - p1, p1 }; }
 struct Planar {
 	Pos3D norm, p0;
 	Planar(Pos3D NORM = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : norm(NORM), p0(P0) {}
 	friend std::istream& operator >> (std::istream& is, Planar& P) { is >> P.norm >> P.p0; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Planar& P) { os << P.norm << " " << P.p0; return os; }
 };
+Line3D L(const Pos3D& p1, const Pos3D& p2) { return { p2 - p1, p1 }; }
 Planar P(const Pos3D& p1, const Pos3D& p2, const Pos3D& p3) {
 	Pos3D norm = (p2 - p1) / (p3 - p2);
 	return Planar(norm, p1);
 }
 ld above(const Planar& P, const Pos3D& t) { return ((t - P.p0) * P.norm) / P.norm.mag(); }
-Pos3D intersection(const Planar& S, const Line3D& l) {
-	ld det = S.norm * l.dir;
-	if (zero(det)) return { INF, INF, INF };
-	//ld t = (S.norm * S.p0 - S.norm * l.p0) / det;
-	ld t = (S.norm * (S.p0 - l.p0)) / det;
-	return l.p0 + (l.dir * t);
-}
 ld sc[4];
 void get_angle(ld sc[], const Pos3D& norm) {
 	ld a = norm.x, b = norm.y, c = norm.z;
 	ld angle1 = -atan2(b, a);
-	ld dx = sqrtl(a * a + b * b);
+	//ld dx = sqrtl(a * a + b * b);
+	ld dx = hypot(a, b);
 	ld angle2 = -atan2(dx, c);
 	sc[0] = sin(angle1);
 	sc[1] = cos(angle1);
 	sc[2] = sin(angle2);
 	sc[3] = cos(angle2);
 	return;
+}
+//Pos3D rotate(ld sc[], const Pos3D& p) {//project to xy_plane
+//	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
+//	return Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
+//}
+//void rotate(ld sc[], const Pos3D& p, std::vector<Pos>& C) {//project to xy_plane
+//	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
+//	Pos3D q = Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
+//	C.push_back(Pos(q.x, q.y));
+//	return;
+//}
+Pos projecting2D(ld sc[], const Pos3D& p) {//project to xy_plane
+	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
+	Pos3D q = Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
+	return Pos(q.x, q.y);
+}
+Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
+//ld dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
+//bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
+//	ld ret = dot(d1, d3, d2);
+//	return zero(cross(d1, d2, d3).mag()) && (ret > 0 || zero(ret));
+//}
+//bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
+//	ld ret = dot(d1, d3, d2);
+//	return zero(cross(d1, d2, d3).mag()) && ret > 0;
+//}
+//int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
+//	Pos3D torque = cross(d1, d2, d3);
+//	ld ret = torque * norm;
+//	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
+//}
+Pos3D intersection(const Planar& S, const Line3D& l) {
+	ld det = S.norm * l.dir;
+	if (zero(det)) return { INF, INF, INF };
+	//ld t = (S.norm * S.p0 - S.norm * l.p0) / det;
+	ld t = (S.norm * (S.p0 - l.p0)) / det;
+	return l.p0 + (l.dir * t);
 }
 bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) { return zero(((b - a) / (c - b)).Euc()); }
 bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) { return zero(cross(a, b, c) * (p - a)); }
@@ -279,7 +311,8 @@ int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
 	int dim = 1;
 	for (int i = 1; i < p.size(); i++) {
 		if (dim == 1) {
-			if (p[0] != p[i]) std::swap(p[1], p[i]), ++dim;
+			if (p[0] != p[i])
+				std::swap(p[1], p[i]), ++dim;
 		}
 		else if (dim == 2) {
 			if (!collinear(p[0], p[1], p[i]))
@@ -415,7 +448,8 @@ void solve() {
 			if (inx == INF3D) continue;
 			C2D.push_back(projecting2D(sc, inx));
 		}
-		Circle mec = minimum_enclose_circle(C2D);
+		//Circle mec = minimum_enclose_circle(C2D);
+		Circle mec = welzl(C2D);
 		MIN = std::min(MIN, h * mec.A());
 	}
 

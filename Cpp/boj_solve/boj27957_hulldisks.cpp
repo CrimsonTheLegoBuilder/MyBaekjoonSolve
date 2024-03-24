@@ -27,7 +27,7 @@ struct arc {
 };
 
 
-ld norm(ld th) {// angle normalization
+ld norm(ld& th) {// angle normalization
 	while (th < 0) th += 2 * PI;
 	while (th >= 2 * PI) th -= 2 * PI;
 	return th;
