@@ -25,7 +25,7 @@ void update(int l, int r, int idx, int n, ll diff) {
 	}
 	return;
 }
-ll search(int s, int e, int l = 1, int r = LEN, int n = 1) {
+ll search(int s, int e, int l = 1, int r = LEN - 1, int n = 1) {
 	if (r < s || e < l) return 0;
 	if (s <= l && r <= e) return segtree[n];
 	int m = l + r >> 1;
@@ -38,7 +38,7 @@ ll bi_search(const int& b) {
 	while (s <= e) {
 		m = s + e >> 1;
 		ll cnt = search(1, m);
-		if (cnt > b) e = m;
+		if (cnt >= b) e = m;
 		else s = m + 1;
 	}
 	return s;
@@ -55,11 +55,11 @@ void solve() {
 			std::cin >> b;
 			b = bi_search(b);
 			std::cout << b << "\n";
-			update(1, LEN, b, 1, -1);
+			update(1, LEN - 1, b, 1, -1);
 		}
 		else if (a == 2) {
 			std::cin >> b >> c;
-			update(1, LEN, b, 1, c);
+			update(1, LEN - 1, b, 1, c);
 		}
 	}
 	return;
