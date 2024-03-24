@@ -909,3 +909,8 @@ void rotate(ld sc[], const Pos3D& p, std::vector<Pos>& C) {//project to xy_plane
 	C.push_back(Pos(q.x, q.y));
 	return;
 }
+Pos projecting2D(ld sc[], const Pos3D& p) {//project to xy_plane
+	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
+	Pos3D q = Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
+	return Pos(q.x, q.y);
+}
