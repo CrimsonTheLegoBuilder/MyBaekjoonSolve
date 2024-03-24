@@ -5,16 +5,16 @@ typedef long long ll;
 const int LEN = 1e6 + 1;
 int N;
 ll a, b, c;
-//ll arr[LEN];
+ll arr[LEN];
 ll segtree[LEN << 2];
 
-//ll init(int l, int r, int n) {
-//	if (l == r) return segtree[n] = arr[l];
-//	int m = l + r >> 1;
-//	ll L = init(l, m, n << 1);
-//	ll R = init(m + 1, r, (n << 1) + 1);
-//	return segtree[n] = L + R;
-//}
+ll init(int l, int r, int n) {
+	if (l == r) return segtree[n] = arr[l];
+	int m = l + r >> 1;
+	ll L = init(l, m, n << 1);
+	ll R = init(m + 1, r, (n << 1) + 1);
+	return segtree[n] = L + R;
+}
 void update(int l, int r, int idx, int n, ll diff) {
 	if (r < idx || idx < l) return;
 	segtree[n] += diff;
@@ -35,7 +35,7 @@ ll search(int s, int e, int l = 1, int r = LEN - 1, int n = 1) {
 }
 ll bi_search(const int& b) {
 	int s = 1, e = 1'000'000, m;
-	while (s <= e) {
+	while (s < e) {
 		m = s + e >> 1;
 		ll cnt = search(1, m);
 		if (cnt >= b) e = m;
@@ -46,7 +46,7 @@ ll bi_search(const int& b) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//memset(arr, 0, sizeof arr);
+	memset(arr, 0, sizeof arr);
 	memset(segtree, 0, sizeof segtree);
 	std::cin >> N;
 	while (N--) {
