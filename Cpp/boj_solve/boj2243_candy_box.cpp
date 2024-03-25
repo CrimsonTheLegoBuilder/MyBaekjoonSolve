@@ -43,8 +43,9 @@ ll bi_search(const int& b) {
 		if (cnt >= b) e = m;
 		else s = m + 1;
 	}
+	//std::cout << "DEBUG:: " << s << "\n";
 	if (s == LEN) return LEN - 1;
-	//if (search(1, s) == b) return s;
+	//if (search(1, s) <= b) return s;
 	return s;
 }
 void solve() {
