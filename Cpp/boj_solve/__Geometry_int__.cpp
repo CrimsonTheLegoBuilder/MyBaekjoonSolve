@@ -162,13 +162,16 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return (d2 - d1) * (d4 - d3) / (d2 - d1).mag();
+}
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0;
 }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
 }
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
 int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
 }
@@ -311,6 +314,9 @@ ll ccw(const std::vector<Pos>& H, const int& i, const int& f) {
 	return (H[(i + 1) % sz] - H[i]) / (H[(f + 1) % sz] - H[f]);
 }
 ll rotating_calipers(const std::vector<Pos>& H) {
+	auto CROSS = [&](const int& i, const int& f) -> ll {
+		return (H[(i + 1) % N] - H[i]) / (H[(f + 1) % N] - H[f]);
+		};
 	ll MD = 0;
 	int f = 0, l = H.size();
 	for (int i = 0; i < l; i++) {
