@@ -91,14 +91,6 @@ struct Line {//ax + by = c
 	Vec s;
 	ld c;
 	Line(Vec V = Vec(0, 0), ld C = 0) : s(V), c(C) {}
-	Line(Vec V = Vec(0, 0), Pos p = Pos(0, 0)) : s(V) { c = s.vy * p.x + s.vx * p.y; }
-	Line(Pos ps = Pos(0, 0), Pos pe = Pos(0, 0)) {
-		ld dy, dx;
-		dy = pe.y - ps.y;
-		dx = ps.x - pe.x;
-		s = Vec(dy, dx);
-		c = dy * ps.x + dx * ps.y;
-	}
 	bool operator < (const Line& l) const {
 		bool f1 = Zero < s;
 		bool f2 = Zero < l.s;
@@ -121,18 +113,16 @@ struct Line {//ax + by = c
 const Line Xaxis = { { 0, -1 }, 0 };
 const Line Yaxis = { { 1, 0 }, 0 };
 Line L(const Pos& s, const Pos& e) {
-	//ld dy, dx, c;
-	//dy = e.y - s.y;
-	//dx = s.x - e.x;
-	//c = dy * s.x + dx * s.y;
-	//return { { dy, dx } , c };
-	return Line(s, e);
+	ld dy, dx, c;
+	dy = e.y - s.y;
+	dx = s.x - e.x;
+	c = dy * s.x + dx * s.y;
+	return { { dy, dx } , c };
 }
 Line rotate90(const Line& l, const Pos& p) {
-	//Vec s = ~l.s;
-	//ld c = s.vy * p.x + s.vx * p.y;
-	//return { s, c };
-	return Line(~l.s, p);
+	Vec s = ~l.s;
+	ld c = s.vy * p.x + s.vx * p.y;
+	return { s, c };
 }
 Pos intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
