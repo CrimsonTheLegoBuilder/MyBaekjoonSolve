@@ -6,6 +6,7 @@
 #include <cassert>
 typedef long long ll;
 typedef long double ld;
+//typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
@@ -42,7 +43,8 @@ struct Pos {
 	ll operator ! () const { return x * y; }
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
-	ld mag() const { return hypot(x, y); }
+	//ld mag() const { return hypot(x, y); }
+	ld mag() const { return sqrtl(Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
@@ -175,7 +177,7 @@ ld get_width(ld the, const Line& B, const Line& C, const Line& A, const Pos& pb,
 }
 
 ld ternary_search(const std::vector<Pos>& H, const int& i, const int& r, const int& l, const Line& B, const Line& C, const Line& A) {
-	int sz = H.size(), cnt = 30;
+	int sz = H.size(), cnt = 70;
 	ld the, a, b, c;
 	Line tmp;
 	tmp = L(H[(i + 1) % sz], H[(i + 2) % sz]);
@@ -218,17 +220,20 @@ void rotating_calipers() {
 	}
 	if (N == 2) {
 		ld d = (H[0] - H[1]).mag();
-		ld r1 = 3 * d + len;
-		ld r2 = 6 * d / sqrtl(3) + len;
+		ld r1 = d + len;
+		ld r2 = 2 * d / sqrtl(3) + len;
 		std::cout << r1 << "\n" << r2 << "\n";
 		return;
 	}
+
+	//for (const Pos& p : H) std::cout << p << "\n";
 	//auto CROSS = [&](const int& i, const int& f) -> ll {
 	//	return (H[(i + 1) % N] - H[i]) / (H[(f + 1) % N] - H[f]);
 	//	};
 	auto r_side = [&](const int& i, const int& j) -> bool {
+		int CCW = ccw(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
 		ld proj = projection(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
-		return proj > -((H[j] - H[(j + 1) % N]).mag() * .5 + TOL);
+		return CCW >= 0 && (proj > 0 || -proj < (H[j] - H[(j + 1) % N]).mag() * .5 + TOL);
 		};
 	auto l_side = [&](const int& i, const int& j) -> bool {
 		int CCW = ccw(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
@@ -239,21 +244,36 @@ void rotating_calipers() {
 	ld MIN = INF, MAX = -INF;
 	int r = 0;
 	while (r_side(0, r)) r = (r + 1) % N;
+	//while (r_side(0, r)) {
+	//	r = (r + 1) % N;
+	//	std::cout << projection(H[0], H[(0 + 1) % N], H[r], H[(r + 1) % N]) << "\n";
+	//	std::cout << (H[r] - H[(r + 1) % N]).mag() * .5 + TOL << "\n";
+	//	std::cout << H[r] << "\n";
+	//}
+	//std::cout << "DEBUG::r_find\n";
 	int l = r;
 	while (l_side(0, l)) l = (l + 1) % N;
+	//std::cout << "DEBUG::l_find\n";
 
 	for (int i = 0; i < N; i++) {
 		while (r_side(i, r)) r = (r + 1) % N;
 		while (l_side(i, l)) l = (l + 1) % N;
+		//std::cout << "DEBUG::\n";
+		//std::cout << "idx: " << i << " coord: " << H[i] << "\n\n";
+		//std::cout << "idx: " << (i + 1) % N << " coord: " << H[(i + 1) % N] << "\n";
+		//std::cout << "idx: " << r << " coord: " << H[r] << "\n";
+		//std::cout << "idx: " << l << " coord: " << H[l] << "\n";
+		//std::cout << "DEBUG::\n";
 
 		Line B = L(H[i], H[(i + 1) % N]);//base
 		Line C = rotate(B, H[r], PI2);
 		Line A = rotate(B, H[l], PI4);
 		Pdd pa = intersection(B, A), pc = intersection(B, C);
 		ld d = (pa - pc).mag();
-		MIN = std::min(MIN, 3 * d + len);
+		MIN = std::min(MIN, d + len);
 		d = ternary_search(H, i, r, l, B, C, A);
-		MAX = std::max(MAX, 3 * d + len);
+		MAX = std::max(MAX, d + len);
+		//std::cout << MIN << " " << MAX << "\n";
 	}
 	std::cout << MIN << "\n" << MAX << "\n";
 	return;
