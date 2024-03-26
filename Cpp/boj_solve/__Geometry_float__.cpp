@@ -573,6 +573,10 @@ std::vector<Arc> merge(const std::vector<Arc>& H1, const std::vector<Arc>& H2) {
 	return hull;
 }
 std::vector<Arc> solve(int l, int r, std::vector<Circle>& C) {// divide and conquer
+	// Returns the convex hull of circles in O(N log N)
+	// Arcs are in the form (lo, hi, c) where (c.x, c.y) denotes the center, c.r denotes the radius, and [lo, hi] denotes the radian range.
+	// Code inspired by https://codeforces.com/gym/104334/submission/204263938
+	// refer to koosaga'
 	if (l == r) return { {0, 2 * PI, C[l]} };
 	int m = l + r >> 1;
 	std::vector<Arc> HL = solve(l, m, C);
