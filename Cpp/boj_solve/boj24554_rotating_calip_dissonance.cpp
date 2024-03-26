@@ -233,7 +233,7 @@ void rotating_calipers() {
 	auto r_side = [&](const int& i, const int& j) -> bool {
 		int CCW = ccw(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
 		ld proj = projection(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
-		return CCW >= 0 && (proj > 0 || -proj < (H[j] - H[(j + 1) % N]).mag() * .5 + TOL);
+		return CCW >= 0 && (proj > 0 || proj > -((H[j] - H[(j + 1) % N]).mag() * .5 + TOL));
 		};
 	auto l_side = [&](const int& i, const int& j) -> bool {
 		int CCW = ccw(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
@@ -286,3 +286,14 @@ int main() { solve(); return 0; }//boj24554 dissonance
 //	int sz = H.size();
 //	return (H[(i + 1) % sz] - H[i]) / (H[(f + 1) % sz] - H[f]);
 //}
+
+/*
+
+3 100000
+100000000 -100000000
+-100000000 -100000000
+0 73205100
+200346432.381545931100845
+400346432.381545901298523
+
+*/
