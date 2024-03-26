@@ -8,7 +8,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-9;
 const ld PI = acos(-1);
 const ld PI2 = PI * 2 / 3;
 const ld PI4 = PI * 4 / 3;
@@ -16,6 +16,7 @@ int N;
 ll R;
 ld len;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
+ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 ld norm(ld th) {
 	while (th < -TOL) th += PI * 2;
 	while (th > PI * 2) th -= PI * 2;
@@ -131,6 +132,15 @@ Line L(const Pos& s, const Pos& e) {
 	c = dy * s.x + dx * s.y;
 	return { { dy, dx } , c };
 }
+//Line L(const Pos& s, const Pos& e) {
+//	ll dy, dx, c;
+//	dy = e.y - s.y;
+//	dx = s.x - e.x;
+//	ll _gcd = gcd(std::abs(dy), std::abs(dx));
+//	dy /= _gcd; dx /= _gcd;
+//	c = dy * s.x + dx * s.y;
+//	return Line(Vec(dy, dx), c);
+//}
 Line rotate(const Line& l, const Pos& p, ld the) {
 	Vec s = l.s;
 	ld x = -s.vx, y = s.vy;
@@ -169,6 +179,18 @@ ld get_width(ld the, const Line& I, const Line& J, const Line& K, const Pos& pi,
 	Pdd dk = intersection(base, lk);
 	return (dk - dj).mag();
 }
+//ld get_width(ld the, const Line& I, const Line& J, const Line& K, const Pos& pi, const Pos& pj, const Pos& pk) {
+//	Line base = rotate(I, pi, the);
+//	Line lj = rotate(J, pj, the);
+//	Line lk = rotate(K, pk, the);
+//	Pdd dj = intersection(base, lj);
+//	Pdd dk = intersection(base, lk);
+//	Pdd di = intersection(lj, lk);
+//	ld a = (di - dj).mag();
+//	ld b = (dj - dk).mag();
+//	ld c = (dk - di).mag();
+//	return (a + b + c) / 3;
+//}
 
 ld ternary_search(const std::vector<Pos>& H, const int& i, const int& j, const int& k, const Line& I, const Line& J, const Line& K) {
 	int sz = H.size(), cnt = 50;
@@ -181,9 +203,9 @@ ld ternary_search(const std::vector<Pos>& H, const int& i, const int& j, const i
 	tmp = L(H[k], H[(k + 1) % sz]);
 	t3 = get_theta(K, tmp);
 	the = std::min({ t1, t2, t3 });
-	ld s = 0, e = the, m1 = 0, m2 = 0, l = 0, r = INF;
+	ld s = 0, e = the, m1 = 0, m2 = 0, l = 0, r = 0;
 	while (cnt--) {
-	//while (!zero(l - r)) {
+	//while (!zero(e - s)) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
 		l = get_width(m1, I, J, K, H[i], H[j], H[k]);
@@ -331,6 +353,15 @@ int main() { solve(); return 0; }//boj24554 dissonance
 0 100000000
 215470053.837925165891647
 223071014.330082148313522
+
+4 0
+100000000 100000000
+100000000 -100000000
+-100000000 -100000000
+-100000000 100000000
+430940107.675850391387939
+446142028.660164296627045
+
 
 3 0
 3000000 0
