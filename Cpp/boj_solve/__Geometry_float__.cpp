@@ -99,8 +99,8 @@ struct Line {//ax + by = c
 		ld CCW = s / l.s;
 		return zero(CCW) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : CCW > 0;
 	}
-	ld operator / (const Line& l) const { return s / l.s; }
 	ld operator * (const Line& l) const { return s * l.s; }
+	ld operator / (const Line& l) const { return s / l.s; }
 	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
 	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
 	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }

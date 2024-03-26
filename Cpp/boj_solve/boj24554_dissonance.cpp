@@ -78,8 +78,8 @@ struct Line {//ax + by = c
 	Vec s;
 	ld c;
 	Line(Vec V = Vec(0, 0), ld C = 0) : s(V), c(C) {}
-	ld operator / (const Line& l) const { return s / l.s; }
 	ld operator * (const Line& l) const { return s * l.s; }
+	ld operator / (const Line& l) const { return s / l.s; }
 	ld mag() const { return s.mag(); }
 };
 const Line Xaxis = { { 0, -1 }, 0 };
