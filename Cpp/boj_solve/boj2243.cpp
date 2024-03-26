@@ -33,7 +33,7 @@ ll bs(ll* F, ll x, int N) {
 }
 
 
-int main() {
+int main() { 
 	int n, a;
 	ll b, c;
 	std::cin >> n;
