@@ -130,7 +130,7 @@ ld get_width(ld the, const Line& I, const Line& J, const Line& K, const Pos& pi,
 	return (dk - dj).mag();
 }
 ld ternary_search(const std::vector<Pos>& H, const int& i, const int& j, const int& k, const Line& I, const Line& J, const Line& K) {
-	int sz = H.size();
+	int sz = H.size();// , cnt = 50;
 	ld the, t1, t2, t3;
 	Line tmp;
 	tmp = L(H[i], H[(i + 1) % sz]);
@@ -141,6 +141,7 @@ ld ternary_search(const std::vector<Pos>& H, const int& i, const int& j, const i
 	t3 = get_theta(K, tmp);
 	the = std::min({ t1, t2, t3 });
 	ld s = 0, e = the, m1 = 0, m2 = 0, l = 0, r = 0;
+	//while (cnt--) {
 	while (!zero(e - s)) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
