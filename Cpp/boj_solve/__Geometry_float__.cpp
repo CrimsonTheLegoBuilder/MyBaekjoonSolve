@@ -86,6 +86,7 @@ struct Vec {
 	Vec operator ~ () const { return { -vx, vy }; }
 	Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
 	Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
+	ld mag() const { return hypot(vy, vx); }
 }; const Vec Zero = { 0, 0 };
 struct Line {//ax + by = c
 	Vec s;
@@ -108,6 +109,7 @@ struct Line {//ax + by = c
 	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
+	ld mag() const { return s.mag(); }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
 };
 const Line Xaxis = { { 0, -1 }, 0 };
@@ -118,6 +120,14 @@ Line L(const Pos& s, const Pos& e) {
 	dx = s.x - e.x;
 	c = dy * s.x + dx * s.y;
 	return { { dy, dx } , c };
+}
+Line rotate(const Line& l, const Pos& p, ld the) {
+	Vec s = l.s;
+	ld x = -s.vx, y = s.vy;
+	ld vx = -(x * cos(the) - y * sin(the));
+	ld vy = x * sin(the) + y * cos(the);
+	ld c = vy * p.x + vx * p.y;
+	return Line(Vec(vy, vx), c);
 }
 Line rotate90(const Line& l, const Pos& p) {
 	Vec s = ~l.s;
@@ -131,6 +141,11 @@ Pos intersection(const Line& l1, const Line& l2) {
 		(l1.c * v2.vx - l2.c * v1.vx) / det,
 		(l2.c * v1.vy - l1.c * v2.vy) / det,
 	};
+}
+ld get_theta(const Line& b, const Line& l) {
+	ld proj = (b * l) / b.mag();
+	ld arm = (b / l) / b.mag();
+	return atan2(arm, proj);
 }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
