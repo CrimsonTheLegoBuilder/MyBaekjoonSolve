@@ -43,8 +43,8 @@ struct Pos {
 	ll operator ! () const { return x * y; }
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
-	//ld mag() const { return hypot(x, y); }
-	ld mag() const { return sqrtl(Euc()); }
+	ld mag() const { return hypot(x, y); }
+	//ld mag() const { return sqrtl(Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
@@ -432,5 +432,12 @@ int main() { solve(); return 0; }//boj24554 dissonance
 -7 3
 -7 0
 -6 -5
+
+2 1
+0 0
+0 1
+4.464101615137754
+4.618802153517006
+
 
 */
