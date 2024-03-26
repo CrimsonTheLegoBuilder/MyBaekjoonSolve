@@ -204,6 +204,7 @@ void init() {
 	std::cout << std::fixed;
 	std::cout.precision(15);
 	std::cin >> N >> R;
+	//len = R * 3.4641016151377545870548926830117447338856;
 	len = R * 2.0 * sqrt(3);
 	C.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i];
@@ -215,7 +216,8 @@ void rotating_calipers() {
 	assert(N);
 	if (N == 1) {
 		int cnt = 2;
-		while (cnt--) std::cout << 3.4641016151377545870548926830117447338856 * R << "\n";
+		//while (cnt--) std::cout << 3.4641016151377545870548926830117447338856 * R << "\n";
+		while (cnt--) std::cout << len << "\n";
 		return;
 	}
 	if (N == 2) {
