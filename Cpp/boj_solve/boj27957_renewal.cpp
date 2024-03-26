@@ -12,6 +12,7 @@ const ld PI = acos(-1);// pi = 3.14159265...
 // Returns the convex hull of circles in O(N log N)
 // Arcs are in the form (lo, hi, c) where (c.x, c.y) denotes the center, c.r denotes the radius, and [lo, hi] denotes the radian range.
 // Code inspired by https://codeforces.com/gym/104334/submission/204263938
+// refer to koosaga'
 
 int N;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
