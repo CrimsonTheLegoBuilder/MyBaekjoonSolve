@@ -177,7 +177,7 @@ ld get_width(ld the, const Line& B, const Line& C, const Line& A, const Pos& pb,
 }
 
 ld ternary_search(const std::vector<Pos>& H, const int& i, const int& r, const int& l, const Line& B, const Line& C, const Line& A) {
-	int sz = H.size(), cnt = 70;
+	int sz = H.size(), cnt = 50;
 	ld the, a, b, c;
 	Line tmp;
 	tmp = L(H[(i + 1) % sz], H[(i + 2) % sz]);
