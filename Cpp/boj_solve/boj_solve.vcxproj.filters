@@ -831,9 +831,6 @@
     <ClCompile Include="boj27520_HPI_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj24554_rotating_calip_dissonance.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj24554_dissonance.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>

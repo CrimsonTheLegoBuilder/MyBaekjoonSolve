@@ -143,9 +143,9 @@ Pos intersection(const Line& l1, const Line& l2) {
 	};
 }
 ld get_theta(const Line& b, const Line& l) {
-	ld proj = (b * l) / b.mag();
-	ld arm = (b / l) / b.mag();
-	return atan2(arm, proj);
+	ld x = (b * l) / b.mag();//dot
+	ld y = (b / l) / b.mag();//cross
+	return atan2(y, x);
 }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {

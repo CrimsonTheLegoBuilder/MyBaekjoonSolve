@@ -16,33 +16,17 @@ int N;
 ll R;
 ld len;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
-ld norm(ld th) {
-	while (th < -TOL) th += PI * 2;
-	while (th > PI * 2) th -= PI * 2;
-	return th;
-}
 
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
-	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ll& n) const { return { x * n, y * n }; }
-	Pos operator / (const ll& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
 	ll operator / (const Pos& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator ~ () const { return { -y, x }; }
-	ll operator ! () const { return x * y; }
 	ll Euc() const { return (ll)x * x + (ll)y * y; }
-	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
@@ -50,8 +34,6 @@ struct Pos {
 std::vector<Pos> C, H;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return (d2 - d1) * (d4 - d3) / (d2 - d1).mag();
 }
@@ -76,7 +58,7 @@ std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 		return ret > 0;
 		}
 	);
-	C.erase(unique(C.begin(), C.end()), C.end());
+	//C.erase(unique(C.begin(), C.end()), C.end());
 	int sz = C.size();
 	for (int i = 0; i < sz; i++) {
 		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
@@ -88,38 +70,17 @@ std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 struct Vec {
 	ld vy, vx;
 	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
-	bool operator == (const Vec& v) const { return (zero(vy - v.vy) && zero(vx - v.vx)); }
-	bool operator < (const Vec& v) const { return zero(vy - v.vy) ? vx < v.vx : vy < v.vy; }
 	ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
 	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
-	Vec operator ~ () const { return { -vx, vy }; }
-	Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
-	Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
 	ld mag() const { return hypot(vy, vx); }
 }; const Vec Zero = { 0, 0 };
 struct Line {//ax + by = c
 	Vec s;
 	ld c;
 	Line(Vec V = Vec(0, 0), ld C = 0) : s(V), c(C) {}
-	bool operator < (const Line& l) const {
-		bool f1 = Zero < s;
-		bool f2 = Zero < l.s;
-		if (f1 != f2) return f1;
-		ld CCW = s / l.s;
-		return zero(CCW) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : CCW > 0;
-	}
 	ld operator / (const Line& l) const { return s / l.s; }
 	ld operator * (const Line& l) const { return s * l.s; }
-	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
-	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
-	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
-	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
-	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
-	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
-	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
-	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	ld mag() const { return s.mag(); }
-	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
 };
 const Line Xaxis = { { 0, -1 }, 0 };
 const Line Yaxis = { { 1, 0 }, 0 };
@@ -139,9 +100,9 @@ Line rotate(const Line& l, const Pos& p, ld the) {
 	return Line(Vec(vy, vx), c);
 }
 ld get_theta(const Line& b, const Line& l) {
-	ld proj = (b * l) / b.mag();
-	ld arm = (b / l) / b.mag();
-	return atan2(arm, proj);
+	ld x = (b * l) / b.mag();//dot
+	ld y = (b / l) / b.mag();//cross
+	return atan2(y, x);
 }
 
 struct Pdd {
@@ -169,7 +130,7 @@ ld get_width(ld the, const Line& I, const Line& J, const Line& K, const Pos& pi,
 	return (dk - dj).mag();
 }
 ld ternary_search(const std::vector<Pos>& H, const int& i, const int& j, const int& k, const Line& I, const Line& J, const Line& K) {
-	int sz = H.size();// , cnt = 50;
+	int sz = H.size();
 	ld the, t1, t2, t3;
 	Line tmp;
 	tmp = L(H[i], H[(i + 1) % sz]);
@@ -180,7 +141,6 @@ ld ternary_search(const std::vector<Pos>& H, const int& i, const int& j, const i
 	t3 = get_theta(K, tmp);
 	the = std::min({ t1, t2, t3 });
 	ld s = 0, e = the, m1 = 0, m2 = 0, l = 0, r = 0;
-	//while (cnt--) {
 	while (!zero(e - s)) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
@@ -190,7 +150,6 @@ ld ternary_search(const std::vector<Pos>& H, const int& i, const int& j, const i
 		else s = m1;
 	}
 	return l;
-	//return (l + r) * .5;
 }
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -198,7 +157,6 @@ void init() {
 	std::cout << std::fixed;
 	std::cout.precision(15);
 	std::cin >> N >> R;
-	//len = R * 3.4641016151377545870548926830117447338856;
 	len = R * 2.0 * sqrt(3);
 	C.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i];
@@ -207,7 +165,7 @@ void init() {
 }
 void rotating_calipers() {
 	N = H.size();
-	assert(N);
+	//assert(N);
 	if (N == 1) {
 		std::cout << len << "\n" << len << "\n";
 		return;
@@ -224,13 +182,11 @@ void rotating_calipers() {
 		int CCW = ccw(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
 		ld proj = projection(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
 		return CCW >= 0 && proj > -((H[j] - H[(j + 1) % N]).mag() * .5 + TOL);
-		//return CCW >= 0 && (proj > 0 || std::abs(proj) < (H[j] - H[(j + 1) % N]).mag() * .5 + TOL);
 		};
 	auto l_side = [&](const int& i, const int& j) -> bool {
 		int CCW = ccw(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
 		ld proj = projection(H[i], H[(i + 1) % N], H[j], H[(j + 1) % N]);
 		return CCW > 0 || proj < -((H[j] - H[(j + 1) % N]).mag() * .5 + TOL);
-		//return CCW > 0 || (proj < 0 && std::abs(proj) > (H[j] - H[(j + 1) % N]).mag() * .5 + TOL);
 		};
 
 	ld MIN = INF, MAX = -INF;
@@ -250,7 +206,7 @@ void rotating_calipers() {
 		ld d = (pj - pk).mag();
 		MIN = std::min(MIN, d + len);
 		d = ternary_search(H, (i + 1) % N, j, k, I, J, K);
-		MAX = std::max(MAX, d + len);
+		MAX = std::max({ MAX, MIN, d + len });
 	}
 	std::cout << MIN << "\n" << MAX << "\n";
 	return;
