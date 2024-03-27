@@ -8,10 +8,10 @@
 #include <queue>
 #include <deque>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-6;
 const ld PI = acos(-1);
 const int LEN = 2e4;
 int N;
@@ -99,7 +99,7 @@ bool CW(const Line& l1, const Line& l2, const Line& target) {
 }
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	std::deque<Line> dq;
-	std::sort(HP.begin(), HP.end());
+	//std::sort(HP.begin(), HP.end());
 	for (const Line& l : HP) {
 		if (!dq.empty() && zero(dq.back() / l)) continue;
 		while (dq.size() >= 2 && CW(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
@@ -120,7 +120,7 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 }
 ld bi_search(const std::vector<Line>& HP) {
 	ld s = 0, e = 1e12, m;
-	int cnt = 100;
+	//int cnt = 100;
 	//while (cnt--) {
 	while (!zero(e - s)) {
 		m = (s + e) * .5;
@@ -149,17 +149,8 @@ void solve() {
 		HP[t++] = hp;
 		HP[t++] = hp *= -1;
 	}
-	if (N == 1) { std::cout << "0.0000000000\n"; return; }
-	if (N == 2) {
-		ld d = 0;
-		if (zero(HP[0] / HP[2])) {
-			Vec s = HP[0].s;
-			if (HP[0] * HP[2] > 0) d = std::abs(HP[0].above(O) - HP[2].above(O)) / hypot(s.vy, s.vx);
-			else d = std::abs(HP[0].above(O) + HP[2].above(O)) / hypot(s.vy, s.vx);
-		}
-		std::cout << d * .5 << "\n";
-		return;
-	}
+	if (N <= 2) { std::cout << "0.0000000000\n"; return; }
+	std::sort(HP.begin(), HP.end());
 	std::cout << bi_search(HP) << "\n";
 	return;
 }
