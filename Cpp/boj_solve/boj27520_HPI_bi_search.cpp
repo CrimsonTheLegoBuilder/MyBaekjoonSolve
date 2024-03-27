@@ -185,4 +185,8 @@ int main() { solve(); return 0; }//boj27520 police officer
 1 1 -10
 1 -1 10
 
+2
+1 1 10
+2 2 20
+
 */
