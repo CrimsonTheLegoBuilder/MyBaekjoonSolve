@@ -121,7 +121,8 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 ld bi_search(const std::vector<Line>& HP) {
 	ld s = 0, e = 1e12, m;
 	int cnt = 100;
-	while (cnt--) {
+	//while (cnt--) {
+	while (!zero(e - s)) {
 		m = (s + e) * .5;
 		std::vector<Line> tmp;
 		std::vector<Pos> HPI;
@@ -139,16 +140,49 @@ void solve() {
 	std::cin >> N;
 	std::vector<Line> HP(N * 2);
 	int t = 0;
+	ll a, b; ld c;
 	for (int i = 0; i < N; i++) {
-		ll a, b; ld c;
 		std::cin >> a >> b >> c;
 		ll _gcd = gcd(std::abs(a), std::abs(b));
-		a /= _gcd, b /= _gcd, c /= _gcd;
+		a /= _gcd, b /= _gcd, c /= (ld)_gcd;
 		Line hp = Line(Vec(a, b), -c);
 		HP[t++] = hp;
 		HP[t++] = hp *= -1;
 	}
-	std::cout << bi_search(HP);
+	if (N == 1) { std::cout << "0.0000000000\n"; return; }
+	if (N == 2) {
+		ld d = 0;
+		if (zero(HP[0] / HP[2])) {
+			Vec s = HP[0].s;
+			if (HP[0] * HP[2] > 0) d = std::abs(HP[0].above(O) - HP[2].above(O)) / hypot(s.vy, s.vx);
+			else d = std::abs(HP[0].above(O) + HP[2].above(O)) / hypot(s.vy, s.vx);
+		}
+		std::cout << d * .5 << "\n";
+		return;
+	}
+	std::cout << bi_search(HP) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj27520 police officer
+
+/*
+
+2
+-1 -1 10
+1 1 -10
+
+2
+-1 -1 10
+1 1 10
+
+3
+-1 -1 10
+1 1 10
+1 -1 10
+
+3
+-1 -1 10
+1 1 -10
+1 -1 10
+
+*/

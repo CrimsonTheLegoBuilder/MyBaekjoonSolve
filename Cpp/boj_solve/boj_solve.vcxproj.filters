@@ -46,9 +46,6 @@
     <Filter Include="소스 파일\AtCoder">
       <UniqueIdentifier>{fc5d257c-d368-4c83-81a0-549f102848ca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\DP">
-      <UniqueIdentifier>{d9df2e60-8118-4511-a354-83eb066f7620}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\2nd_BORAMAECUP">
       <UniqueIdentifier>{6d0d34bc-059e-4b3c-8116-43ae674e14ec}</UniqueIdentifier>
     </Filter>
@@ -57,6 +54,9 @@
     </Filter>
     <Filter Include="소스 파일\graph_search">
       <UniqueIdentifier>{fae80ec2-1f94-4776-906b-a57dd6127712}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\dynamic_programming">
+      <UniqueIdentifier>{d9df2e60-8118-4511-a354-83eb066f7620}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -211,7 +211,7 @@
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
     <ClCompile Include="boj1446_DP.cpp">
-      <Filter>소스 파일\DP</Filter>
+      <Filter>소스 파일\dynamic_programming</Filter>
     </ClCompile>
     <ClCompile Include="boj1107.cpp">
       <Filter>소스 파일\implementation</Filter>
@@ -229,7 +229,7 @@
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
     <ClCompile Include="boj13549_hideNseek3_DP.cpp">
-      <Filter>소스 파일\DP</Filter>
+      <Filter>소스 파일\dynamic_programming</Filter>
     </ClCompile>
     <ClCompile Include="boj13913_hideNseek4.cpp">
       <Filter>소스 파일\graph_search</Filter>
@@ -286,13 +286,13 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj11909_escape.cpp">
-      <Filter>소스 파일\DP</Filter>
+      <Filter>소스 파일\dynamic_programming</Filter>
     </ClCompile>
     <ClCompile Include="boj1535_knapsack.cpp">
-      <Filter>소스 파일\DP</Filter>
+      <Filter>소스 파일\dynamic_programming</Filter>
     </ClCompile>
     <ClCompile Include="boj12865_knapsack.cpp">
-      <Filter>소스 파일\DP</Filter>
+      <Filter>소스 파일\dynamic_programming</Filter>
     </ClCompile>
     <ClCompile Include="boj3800_Art_Gallery.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -529,10 +529,10 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj2780.cpp">
-      <Filter>소스 파일\DP</Filter>
+      <Filter>소스 파일\dynamic_programming</Filter>
     </ClCompile>
     <ClCompile Include="boj2748_fibo.cpp">
-      <Filter>소스 파일\DP</Filter>
+      <Filter>소스 파일\dynamic_programming</Filter>
     </ClCompile>
     <ClCompile Include="boj6850.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -836,6 +836,9 @@
     </ClCompile>
     <ClCompile Include="__Geometry__namespace__.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj11726_11727.cpp">
+      <Filter>소스 파일\dynamic_programming</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
