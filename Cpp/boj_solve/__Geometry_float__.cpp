@@ -667,14 +667,8 @@ struct Pos3D {
 		Pos3D u = axis.unit();
 		return u * (*this * u) * (1 - COS) + (*this * COS) - (*this / u) * SIN;
 	}
-	friend std::istream& operator >> (std::istream& is, Pos3D& p) {
-		is >> p.x >> p.y >> p.z;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) {
-		os << p.x << " " << p.y << " " << p.z;
-		return os;
-	}
+	friend std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z; return os; }
 };
 const Pos3D O3D = { 0, 0, 0 };
 const Pos3D X_axis = { 1, 0, 0 };
