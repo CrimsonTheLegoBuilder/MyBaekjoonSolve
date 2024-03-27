@@ -8,7 +8,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-5;
+const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const ld PI2 = PI * 2 / 3;
 const ld PI4 = PI * 4 / 3;
