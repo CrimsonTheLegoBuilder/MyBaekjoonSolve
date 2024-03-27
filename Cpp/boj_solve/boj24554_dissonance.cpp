@@ -8,7 +8,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-6;
+const ld TOL = 1e-5;
 const ld PI = acos(-1);
 const ld PI2 = PI * 2 / 3;
 const ld PI4 = PI * 4 / 3;
@@ -151,6 +151,7 @@ ld ternary_search(const std::vector<Pos>& H, const int& i, const int& j, const i
 		else s = m1;
 	}
 	return l;
+	//return (l + r) * .5;
 }
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
