@@ -203,7 +203,7 @@ void rotating_calipers() {
 		Line I = L(H[i], H[(i + 1) % N]);//base
 		Line J = rotate(I, H[j], PI2);
 		Line K = rotate(I, H[k], PI4);
-		Pdd pj = intersection(I, K), pk = intersection(I, J);
+		Pdd pj = intersection(I, J), pk = intersection(I, K);
 		ld d = (pj - pk).mag();
 		MIN = std::min(MIN, d + len);
 		d = ternary_search(H, (i + 1) % N, j, k, I, J, K);
