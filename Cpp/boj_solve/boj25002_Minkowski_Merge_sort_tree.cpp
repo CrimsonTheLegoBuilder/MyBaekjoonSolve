@@ -154,6 +154,7 @@ void solve() {
 	MAX = -1e9;
 	for (int i = 0; i < N; i++) {
 		std::cin >> p >> idx;
+		assert(idx > 0);
 		C[idx].push_back(p);
 		MIN = std::min(idx, MIN);
 		MAX = std::max(idx, MAX);
