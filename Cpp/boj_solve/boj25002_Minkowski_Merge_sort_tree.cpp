@@ -121,6 +121,7 @@ ll search(int l = MIN, int r = MAX, int n = 1) {//divide_conquer
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	freopen("boj25002_tc", "r", stdin);
 	std::cin >> N;
 	Pos p;
 	int idx;
