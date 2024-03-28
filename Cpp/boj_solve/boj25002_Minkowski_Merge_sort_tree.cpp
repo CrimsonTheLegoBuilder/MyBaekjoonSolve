@@ -139,6 +139,7 @@ ll search(int l = MIN, int r = MAX, int n = 1) {//divide_conquer
 	for (Pos& p : H[n << 1]) tmp.push_back(p);
 	for (Pos& p : H[n << 1 | 1]) tmp.push_back(p);
 	graham_scan(tmp, H[n]);
+	tmp.clear();
 	H[n << 1].clear();
 	H[n << 1 | 1].clear();
 	return std::max({ L, R, S });
