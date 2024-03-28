@@ -66,7 +66,6 @@ void graham_scan(std::vector<Pos>& C, std::vector<Pos>& H) {
 	}
 	return;
 }
-//ll Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B);
 ll Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B) {
 	int sza = A.size();
 	int szb = B.size();
@@ -121,7 +120,7 @@ ll search(int l = MIN, int r = MAX, int n = 1) {//divide_conquer
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("boj25002_tc.txt", "r", stdin);
+	//freopen("boj25002_tc.txt", "r", stdin);
 	std::cin >> N;
 	Pos p;
 	int idx;
@@ -212,7 +211,7 @@ int main() { solve(); return 0; }//boj25002 Board Game
 //	}
 //	return H;
 //}
-
+//ll Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B);
 //ll Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B) {
 //	int sza = A.size();
 //	int szb = B.size();
