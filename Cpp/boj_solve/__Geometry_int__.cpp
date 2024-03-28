@@ -515,6 +515,28 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 	}
 	return area * .5;
 }
+std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const bool& f = 0) {
+	int sza = A.size();
+	int szb = B.size();
+	std::vector<Pos> MS;
+
+	if (f) { for (Pos& p : A) p *= 2; for (Pos& p : B) p *= -1; }
+	int a = 0, b = 0;
+	for (int i = 0; i < sza; i++) if (A[i] < A[a]) a = i;
+	for (int j = 0; j < szb; j++) if (B[j] < B[b]) b = j;
+	MS.push_back(A[a] + B[b]);
+	//std::cout << sza + szb << "\n";
+	for (int k = 1; k < sza + szb; k++) {
+		//std::cout << "DEBUG\n";
+		Pos a1 = A[(a + 1) % sza] + B[b];
+		Pos b1 = B[(b + 1) % szb] + A[a];
+		if (ccw(MS.back(), a1, b1) > 0) MS.push_back(a1), a = (a + 1) % sza;// , std::cout << a1;
+		else MS.push_back(b1), b = (b + 1) % szb;// , std::cout << b1;
+	}
+
+	if (f) { for (Pos& p : A) p /= 2; for (Pos& p : B) p *= -1; }
+	return graham_scan(MS);
+}
 //3D============================================================================//
 //3D============================================================================//
 //3D============================================================================//

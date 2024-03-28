@@ -95,10 +95,10 @@ ll Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B) {
 	int sza = A.size();
 	int szb = B.size();
 	if (!sza || !szb) return -INF;
-	std::vector<Pos> minkowsum;
 	ll ret = -INF;
 
 	for (Pos& p : B) p *= -1;
+
 	if (sza <= 2 || szb <= 2) {
 		for (const Pos& pa : A)
 			for (const Pos& pb : B)
@@ -106,22 +106,24 @@ ll Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B) {
 		for (Pos& p : B) p *= -1;
 		return ret;
 	}
+
+	std::vector<Pos> MS;
 	int a = 0, b = 0;
 	for (int i = 0; i < sza; i++) if (A[i] < A[a]) a = i;
 	for (int j = 0; j < szb; j++) if (B[j] < B[b]) b = j;
-	minkowsum.push_back(A[a] + B[b]);
-	ret = std::max(ret, minkowsum.back().Euc());
+	MS.push_back(A[a] + B[b]);
+	ret = std::max(ret, MS.back().Euc());
 	//std::cout << sza + szb << "\n";
 	for (int k = 1; k < sza + szb; k++) {
 		//std::cout << "DEBUG\n";
 		Pos a1 = A[(a + 1) % sza] + B[b];
 		Pos b1 = B[(b + 1) % szb] + A[a];
-		if (ccw(minkowsum.back(), a1, b1) > 0) minkowsum.push_back(a1), a = (a + 1) % sza;// , std::cout << a1;
-		else minkowsum.push_back(b1), b = (b + 1) % szb;// , std::cout << b1;
-		ret = std::max(ret, minkowsum.back().Euc());
+		if (ccw(MS.back(), a1, b1) > 0) MS.push_back(a1), a = (a + 1) % sza;// , std::cout << a1;
+		else MS.push_back(b1), b = (b + 1) % szb;// , std::cout << b1;
+		ret = std::max(ret, MS.back().Euc());
 	}
-
 	for (Pos& p : B) p *= -1;
+
 	return ret;
 }
 ll search(int l = MIN, int r = MAX, int n = 1) {//divide_conquer
