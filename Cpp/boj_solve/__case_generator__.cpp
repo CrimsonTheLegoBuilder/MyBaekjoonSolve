@@ -37,7 +37,7 @@ std::vector<Pos> C, H;
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("boj25002_tc", "w", stdout);
+	freopen("boj25002_tc.txt", "w", stdout);
 	//std::cout << 250000 << "\n";
 	//for (int i = 1; i <= 250000; i++) std::cout << i << " " << i << " " << i << "\n";
 	//for (int i = 1; i <= 250000; i++) {
