@@ -35,8 +35,8 @@ def solve():
     for s in range(N):
         tmp: int = 0
         for i in range(N):
-            for j in range(N):
-            # for j in range(i, N):
+            # for j in range(N):
+            for j in range(i, N):
                 if max_dist[i][j] == -1:
                     continue
                 remain: int = max_dist[i][j]
