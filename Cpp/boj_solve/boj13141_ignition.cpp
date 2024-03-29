@@ -39,10 +39,10 @@ void solve() {
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
 				if (max_dist[i][j] == -1) continue;
-				int cur = max_dist[i][j];
-				int rem = min_dist[s][j] - min_dist[s][i];
-				if (rem >= cur) continue;
-				tmp = std::max(tmp, ((cur - rem) >> 1) + min_dist[s][j]);
+				int remain = max_dist[i][j];
+				int diff = min_dist[s][j] - min_dist[s][i];
+				if (diff < 0 || diff >= remain) continue;
+				tmp = std::max(tmp, ((remain - diff) >> 1) + min_dist[s][j]);
 			}
 		}
 		ret = std::min(ret, tmp);
@@ -51,9 +51,9 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj13141 ignition
-				//if (rem < 0 || rem >= cur) continue;
 
 
+				//if (diff >= remain) continue;
 //#include <iostream>
 //#include <algorithm>
 //#include <cmath>
@@ -108,10 +108,10 @@ int main() { solve(); return 0; }//boj13141 ignition
 //		for (int i = 0; i < N; i++) {
 //			for (int j = 0; j < N; j++) {
 //				if (max_dist[i][j] == -1) continue;
-//				ll cur = max_dist[i][j];
-//				ll rem = min_dist[s][j] - min_dist[s][i];
-//				if (rem >= cur) continue;
-//				tmp = std::max(tmp, ((cur - rem) >> 1) + min_dist[s][j]);
+//				ll rem = max_dist[i][j];
+//				ll diff = min_dist[s][j] - min_dist[s][i];
+//				if (diff >= rem) continue;
+//				tmp = std::max(tmp, ((rem - diff) >> 1) + min_dist[s][j]);
 //			}
 //		}
 //		ret = std::min(ret, tmp);
