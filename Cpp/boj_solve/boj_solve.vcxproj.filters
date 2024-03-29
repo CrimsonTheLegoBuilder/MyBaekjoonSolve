@@ -141,9 +141,6 @@
     <ClCompile Include="boj11444_MPOW_fibo.cpp">
       <Filter>소스 파일\matrix</Filter>
     </ClCompile>
-    <ClCompile Include="test.cpp">
-      <Filter>소스 파일\_test</Filter>
-    </ClCompile>
     <ClCompile Include="boj1046_sweeping.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -848,6 +845,12 @@
     </ClCompile>
     <ClCompile Include="boj25002_Minkowski_Merge_sort_tree.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="__case_generator__.cpp">
+      <Filter>소스 파일\_test</Filter>
+    </ClCompile>
+    <ClCompile Include="boj13141_ignition.cpp">
+      <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
