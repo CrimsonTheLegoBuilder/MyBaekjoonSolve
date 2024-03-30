@@ -37,12 +37,13 @@ void solve() {
 	for (int s = 0; s < N; s++) {
 		tmp = 0;
 		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < N; j++) {
+			for (int j = i; j < N; j++) {
 				if (max_dist[i][j] == -1) continue;
-				int remain = max_dist[i][j];
-				int diff = min_dist[s][j] - min_dist[s][i];
-				if (diff < 0 || diff >= remain) continue;
-				tmp = std::max(tmp, ((remain - diff) >> 1) + min_dist[s][j]);
+				int remain = max_dist[i][j], diff;
+				diff = min_dist[s][j] - min_dist[s][i];
+				if (diff < remain) tmp = std::max(tmp, ((remain - diff) >> 1) + min_dist[s][j]);
+				diff = min_dist[s][i] - min_dist[s][j];
+				if (diff < remain) tmp = std::max(tmp, ((remain - diff) >> 1) + min_dist[s][i]);
 			}
 		}
 		ret = std::min(ret, tmp);
