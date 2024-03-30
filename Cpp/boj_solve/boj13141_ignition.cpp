@@ -27,8 +27,8 @@ void init() {
 	}
 	for (int k = 0; k < N; k++)//floyd_warshall
 		for (int i = 0; i < N; i++)
-			for (int j = 0; j < N; j++)
-				min_dist[i][j] = std::min(min_dist[i][j], min_dist[i][k] + min_dist[k][j]);
+			for (int j = i + 1; j < N; j++)
+				min_dist[i][j] = min_dist[j][i] = std::min(min_dist[i][j], min_dist[i][k] + min_dist[k][j]);
 	return;
 }
 void solve() {
