@@ -9,8 +9,8 @@
 #include <deque>
 #include <tuple>
 typedef long long ll;
-typedef long double lld;
 typedef double ld;
+typedef long double lld;
 const ld INF = 1e18;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
@@ -116,13 +116,13 @@ bool in_circle(Pii a, Pii b, Pii c, Pii d) {
 	lld det = -det3<lld>(b.x, b.y, b.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
 	det += det3<lld>(a.x, a.y, a.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
 	det -= det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
-	det += det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
-	if (abs(det) > 1e18) return det > 0;//overflow prevention
+	det += det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), c.x, c.y, c.Euc());
+	if (abs(det) > 1e18) return det > 0;//overflow prevention (refer to koosaga)
 	else {
 		ll det = -det3<ll>(b.x, b.y, b.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
 		det += det3<ll>(a.x, a.y, a.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
 		det -= det3<ll>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
-		det += det3<ll>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
+		det += det3<ll>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), c.x, c.y, c.Euc());
 		return det > 0;
 	}
 }
