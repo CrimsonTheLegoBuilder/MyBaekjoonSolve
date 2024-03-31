@@ -1,16 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
-#include <cmath>
 #include <cstring>
 #include <cassert>
+#include <cmath>
 #include <vector>
 #include <queue>
 #include <deque>
-#include <random>
-#include <array>
 #include <tuple>
-#include <complex>
 typedef long long ll;
 typedef long double lld;
 typedef double ld;
@@ -24,9 +21,12 @@ int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
+//O(N long N) Delaunay_triangulation && Voronoi_diagram solver 
+//code from Koosaga'
 struct Pii {
 	ll x, y;
-	Pii(ll X = 0, ll Y = 0) : x(X), y(Y) {}
+	int i;
+	Pii(ll X = 0, ll Y = 0, int I = 0) : x(X), y(Y), i(I) {}
 	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -59,7 +59,7 @@ int ccw(const Pii& d1, const Pii& d2, const Pii& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
-struct QuadEdge {//refer to Koosaga'
+struct QuadEdge {
 	Pii origin;
 	QuadEdge* rot = nullptr;
 	QuadEdge* onext = nullptr;
@@ -112,8 +112,108 @@ template <class T> T det3(T a1, T a2, T a3, T b1, T b2, T b3, T c1, T c2, T c3) 
 		- a2 * (b1 * c3 - c1 * b3) 
 		+ a3 * (b1 * c2 - c1 * b2);
 }
-
-
+bool in_circle(Pii a, Pii b, Pii c, Pii d) {
+	lld det = -det3<lld>(b.x, b.y, b.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
+	det += det3<lld>(a.x, a.y, a.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
+	det -= det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
+	det += det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
+	if (abs(det) > INF) return det > 0;
+	else {
+		ll det = -det3<ll>(b.x, b.y, b.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
+		det += det3<ll>(a.x, a.y, a.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
+		det -= det3<ll>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
+		det += det3<ll>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
+		return det > 0;
+	}
+}
+std::pair<QuadEdge*, QuadEdge*> build_tr(int l, int r, std::vector<Pii>& C) {
+	if (r - l + 1 == 2) {
+		QuadEdge* res = make_edge(C[l], C[r]);
+		return std::make_pair(res, res->rev());
+	}
+	if (r - l + 1 == 3) {
+		QuadEdge* a = make_edge(C[l], C[l + 1]), * b = make_edge(C[l + 1], C[r]);
+		splice(a->rev(), b);
+		int sign = dcmp(cross(C[l], C[l + 1], C[r]));
+		if (!sign) return std::make_pair(a, b->rev());
+		QuadEdge* c = connect(a, b->rev());
+		if (sign == 1) return std::make_pair(a, b->rev());
+		else return std::make_pair(c->rev(), c);
+	}
+	int m = l + r >> 1;
+	QuadEdge* ldo, * ldi, * rdo, * rdi;
+	std::tie(ldo, ldi) = build_tr(l, m, C);
+	std::tie(rdi, rdo) = build_tr(m + 1, r, C);
+	while (1) {
+		if (left_of(rdi->origin, ldi)) {
+			ldi = ldi->lnext();
+			continue;
+		}
+		if (right_of(ldi->origin, rdi)) {
+			rdi = rdi->rev()->onext;
+			continue;
+		}
+		break;
+	}
+	QuadEdge* basel = connect(rdi->rev(), ldi);
+	auto valid = [&basel](QuadEdge* e) { return right_of(e->dest(), basel); };
+	if (ldi->origin == ldo->origin) ldo = basel->rev();
+	if (rdi->origin == rdo->origin) rdo = basel;
+	while (1) {
+		QuadEdge* lcand = basel->rev()->onext;
+		if (valid(lcand)) {
+			while (in_circle(basel->dest(), basel->origin, lcand->dest(), lcand->onext->dest())) {
+				QuadEdge* t = lcand->onext;
+				delete_edge(lcand);
+				lcand = t;
+			}
+		}
+		QuadEdge* rcand = basel->oprev();
+		if (valid(rcand)) {
+			while (in_circle(basel->dest(), basel->origin, rcand->dest(), rcand->oprev()->dest())) {
+				QuadEdge* t = rcand->oprev();
+				delete_edge(rcand);
+				rcand = t;
+			}
+		}
+		if (!valid(lcand) && !valid(rcand)) break;
+		if (!valid(lcand) || (valid(rcand) && in_circle(lcand->dest(), lcand->origin, rcand->origin, rcand->dest())))
+			basel = connect(rcand, basel->rev());
+		else
+			basel = connect(basel->rev(), lcand->rev());
+	}
+	return std::make_pair(ldo, rdo);
+}
+std::vector<std::tuple<Pii, Pii, Pii>> Delaunay_triangulation(std::vector<Pii> C) {
+	//std::sort(C.begin(), C.end(), [](const Pii& p, const Pii& q) {
+	//	return p.x < q.x || (p.x == q.x && p.y < q.y);
+	//	});
+	std::sort(C.begin(), C.end());
+	int sz = C.size();
+	auto ret = build_tr(0, sz - 1, C);
+	QuadEdge* e = ret.first;
+	std::vector<QuadEdge*> edges = { e };
+	while (cross(e->onext->dest(), e->dest(), e->origin) < 0) e = e->onext;
+	auto add = [&C, &e, &edges]() {
+		QuadEdge* cur = e;
+		do {
+			cur->used = 1;
+			C.push_back(cur->origin);
+			edges.push_back(cur->rev());
+			cur = cur->lnext();
+		} while (cur != e);
+		};
+	add();
+	C.clear();
+	int t = 0;
+	while (t < edges.size()) {
+		if (!(e = edges[t++])->used) add();
+	}
+	sz = C.size();
+	std::vector<std::tuple<Pii, Pii, Pii>> triangles;
+	for (int i = 0; i < sz; i += 3) triangles.push_back(std::make_tuple(C[i], C[i + 1], C[i + 2]));
+	return triangles;
+}
 struct Pdd {
 	ld x, y;
 	Pdd(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -138,6 +238,7 @@ struct Pdd {
 	friend std::istream& operator >> (std::istream& is, Pdd& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pdd& p) { os << p.x << " " << p.y; return os; }
 }; const Pdd O = { 0, 0 };
+Pdd P(const Pii& p) { return Pdd((ld)p.x, (ld)p.y); }
 struct Vec {
 	ld vy, vx;
 	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
@@ -227,7 +328,7 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pdd>& hull) {
 	while (dq.size() >= 3 && CW(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
 	while (dq.size() >= 3 && CW(dq.back(), dq.front(), dq[1])) dq.pop_front();
 	for (int i = 0; i < dq.size(); i++) {
-		Line cur = dq[i], nxt = dq[(i + 1) % dq.size()];
+		Line cur = dq[i], nxt = dq[(i + 1) % (int)dq.size()];
 		if (cur / nxt < TOL) {
 			hull.clear();
 			return 0;
@@ -264,7 +365,67 @@ Circle enclose_circle(const Pdd& u, const Pdd& v, const Pdd& w) {
 	ld r = (c - u).mag();
 	return Circle(c, r);
 }
+std::vector<Pii> C;
+std::vector<Pdd> poly, vd[LEN];
+std::vector<int> gph[LEN];
+ld Voronoi_diagram(ld wl, ld wr, ld hd, ld hu, std::vector<Pii> C) {
+	int sz = C.size();
+	poly.resize(sz);
+	for (int i = 0; i < sz; i++) poly[i] = P(C[i]), C[i].i = i;
+	assert(sz);
+	if (sz == 1) {}
+	else if (sz == 2) {
+		gph[0].push_back(1);
+		gph[1].push_back(0);
+	}
+	else {
+		std::vector<std::tuple<Pii, Pii, Pii>> dt = Delaunay_triangulation(C);
+		for (const std::tuple<Pii, Pii, Pii>& tri : dt) {
+			int a = std::get<0>(tri).i;
+			int b = std::get<1>(tri).i;
+			int c = std::get<2>(tri).i;
+			gph[a].push_back(b);
+			gph[a].push_back(c);
+			gph[b].push_back(a);
+			gph[b].push_back(c);
+			gph[c].push_back(a);
+			gph[c].push_back(b);
+		}
+	}
+	ld ret = 0;
+	for (int i = 0; i < N; i++) {
+		std::sort(gph[i].begin(), gph[i].end());
+		gph[i].resize(unique(gph[i].begin(), gph[i].end()) - gph[i].begin());
+		std::vector<Line> HP;
+		for (const int& j : gph[i]) {
+			Line vec = L(poly[j], poly[i]);
+			Line hp = rotate90(~vec.s, (poly[i] + poly[j] * .5));
+			HP.push_back(hp);
+		}
+		HP.push_back(Line(Vec(0, 1), hu));
+		HP.push_back(Line(Vec(0, -1), hd));
+		HP.push_back(Line(Vec(1, 0), wr));
+		HP.push_back(Line(Vec(-1, 0), wl));
+		std::vector<Pdd> HPI = {};
+		if (half_plane_intersection(HP, HPI)) continue;
+		//vd[i] = HPI;
+		for (int j = 0; j < HPI.size(); j++) {
+			ld dist = (HPI[j] - poly[i]).mag();
+			ret = std::max(ret, dist);
+		}
+	}
+	return ret;
+}
 void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(10);
+	ld w, h;
+	std::cin >> N >> w >> h;
+	C.resize(N);
+	for (Pii& p : C) std::cin >> p;
+	std::cout << Voronoi_diagram(0, w, 0, h, C) << "\n";
 	return;
 }
 int main() { solve(); return 0; }
