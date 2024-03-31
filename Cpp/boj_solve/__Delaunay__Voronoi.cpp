@@ -21,7 +21,7 @@ int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
-//O(N long N) Delaunay_triangulation && Voronoi_diagram solver
+//O(N log N) Delaunay_triangulation && Voronoi_diagram solver
 //https://cp-algorithms.com/geometry/delaunay.html
 struct Pii {
 	ll x, y;
