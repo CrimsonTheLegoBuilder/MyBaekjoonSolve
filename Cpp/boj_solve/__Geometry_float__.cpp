@@ -350,22 +350,23 @@ void hull_round_divide() {
 	std::cout << ret << "\n";
 	return;
 }
-bool CW(const Line& l1, const Line& l2, const Line& target) {
+bool cw(const Line& l1, const Line& l2, const Line& target) {
 	if (l1.s / l2.s < TOL) return 0;
 	Pos p = intersection(l1, l2);
 	return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
+	//return target.above(p) > -TOL;
 }
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	std::deque<Line> dq;
 	std::sort(HP.begin(), HP.end());
 	for (const Line& l : HP) {
 		if (!dq.empty() && zero(dq.back() / l)) continue;
-		while (dq.size() >= 2 && CW(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
-		while (dq.size() >= 2 && CW(l, dq.front(), dq[1])) dq.pop_front();
+		while (dq.size() >= 2 && cw(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
+		while (dq.size() >= 2 && cw(l, dq.front(), dq[1])) dq.pop_front();
 		dq.push_back(l);
 	}
-	while (dq.size() >= 3 && CW(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
-	while (dq.size() >= 3 && CW(dq.back(), dq.front(), dq[1])) dq.pop_front();
+	while (dq.size() >= 3 && cw(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
+	while (dq.size() >= 3 && cw(dq.back(), dq.front(), dq[1])) dq.pop_front();
 	for (int i = 0; i < dq.size(); i++) {
 		Line cur = dq[i], nxt = dq[(i + 1) % dq.size()];
 		if (cur / nxt < TOL) {
