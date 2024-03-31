@@ -134,9 +134,9 @@ std::pair<QuadEdge*, QuadEdge*> build_tr(int l, int r, std::vector<Pii>& C) {
 	if (r - l + 1 == 3) {
 		QuadEdge* a = make_edge(C[l], C[l + 1]), * b = make_edge(C[l + 1], C[r]);
 		splice(a->rev(), b);
-		int sign = dcmp(cross(C[l], C[l + 1], C[r]));
+		int sign = ccw(C[l], C[l + 1], C[r]);
 		if (!sign) return std::make_pair(a, b->rev());
-		QuadEdge* c = connect(a, b->rev());
+		QuadEdge* c = connect(b, a);
 		if (sign == 1) return std::make_pair(a, b->rev());
 		else return std::make_pair(c->rev(), c);
 	}
@@ -203,9 +203,7 @@ std::vector<std::tuple<Pii, Pii, Pii>> Delaunay_triangulation(std::vector<Pii> C
 	add();
 	C.clear();
 	int kek = 0;
-	while (kek < edges.size()) {
-		if (!(e = edges[kek++])->used) add();
-	}
+	while (kek < edges.size()) if (!(e = edges[kek++])->used) add();
 	sz = C.size();
 	std::vector<std::tuple<Pii, Pii, Pii>> triangles;
 	for (int i = 0; i < sz; i += 3) triangles.push_back(std::make_tuple(C[i], C[i + 1], C[i + 2]));
