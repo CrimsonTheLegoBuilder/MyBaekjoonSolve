@@ -424,8 +424,7 @@ void solve() {
 	ld w, h;
 	std::cin >> N >> w >> h;
 	C.resize(N);
-	int t = 0;
-	for (Pii& p : C) std::cin >> p, p.i = t++;
+	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
 	std::cout << Voronoi_diagram(0, w, 0, h, C) << "\n";
 	return;
 }
