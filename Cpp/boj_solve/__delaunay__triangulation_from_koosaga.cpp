@@ -371,7 +371,7 @@ std::vector<int> gph[LEN];
 ld Voronoi_diagram(ld wl, ld wr, ld hd, ld hu, std::vector<Pii> C) {
 	int sz = C.size();
 	poly.resize(sz);
-	for (int i = 0; i < sz; i++) poly[i] = P(C[i]), C[i].i = i;
+	for (int i = 0; i < sz; i++) poly[i] = P(C[i]);
 	assert(sz);
 	if (sz == 1) {}
 	else if (sz == 2) {
@@ -424,7 +424,8 @@ void solve() {
 	ld w, h;
 	std::cin >> N >> w >> h;
 	C.resize(N);
-	for (Pii& p : C) std::cin >> p;
+	int t = 0;
+	for (Pii& p : C) std::cin >> p, p.i = t++;
 	std::cout << Voronoi_diagram(0, w, 0, h, C) << "\n";
 	return;
 }
