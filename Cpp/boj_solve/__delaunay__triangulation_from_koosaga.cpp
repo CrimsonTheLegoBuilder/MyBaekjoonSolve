@@ -205,9 +205,9 @@ std::vector<std::tuple<Pii, Pii, Pii>> Delaunay_triangulation(std::vector<Pii> C
 		};
 	add();
 	C.clear();
-	int t = 0;
-	while (t < edges.size()) {
-		if (!(e = edges[t++])->used) add();
+	int kek = 0;
+	while (kek < edges.size()) {
+		if (!(e = edges[kek++])->used) add();
 	}
 	sz = C.size();
 	std::vector<std::tuple<Pii, Pii, Pii>> triangles;
