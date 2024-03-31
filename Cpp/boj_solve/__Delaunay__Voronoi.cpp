@@ -49,8 +49,8 @@ struct Pii {
 	friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
 };
-const Pii O = { 0, 0 };
-const Pii INF_PT = { INF, INF };
+const Pii Oii = { 0, 0 };
+const Pii INF_PT = { (ll)INF, (ll)INF };
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
@@ -232,7 +232,7 @@ struct Pdd {
 	Pdd unit() const { return *this / mag(); }
 	friend std::istream& operator >> (std::istream& is, Pdd& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pdd& p) { os << p.x << " " << p.y; return os; }
-}; const Pdd O = { 0, 0 };
+}; const Pdd Odd = { 0, 0 };
 Pdd P(const Pii& p) { return Pdd((ld)p.x, (ld)p.y); }
 struct Vec {
 	ld vy, vx;
