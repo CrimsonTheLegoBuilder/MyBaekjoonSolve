@@ -11,7 +11,7 @@
 typedef long long ll;
 typedef long double lld;
 typedef double ld;
-const ld INF = 1e17;
+const ld INF = 1e18;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e5;
@@ -21,8 +21,8 @@ int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
-//O(N long N) Delaunay_triangulation && Voronoi_diagram solver 
-//code from Koosaga'
+//O(N long N) Delaunay_triangulation && Voronoi_diagram solver
+//https://cp-algorithms.com/geometry/delaunay.html
 struct Pii {
 	ll x, y;
 	int i;
@@ -50,7 +50,7 @@ struct Pii {
 	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
 };
 const Pii O = { 0, 0 };
-const Pii INFP = { INF, INF };
+const Pii INF_PT = { INF, INF };
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
@@ -76,7 +76,7 @@ QuadEdge* make_edge(Pii from, Pii to) {
 	QuadEdge* e4 = new QuadEdge;
 	e1->origin = from;
 	e2->origin = to;
-	e3->origin = e4->origin = INFP;
+	e3->origin = e4->origin = INF_PT;
 	e1->rot = e3;
 	e2->rot = e4;
 	e3->rot = e2;
@@ -117,7 +117,7 @@ bool in_circle(Pii a, Pii b, Pii c, Pii d) {
 	det += det3<lld>(a.x, a.y, a.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
 	det -= det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
 	det += det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
-	if (abs(det) > INF) return det > 0;
+	if (abs(det) > 1e18) return det > 0;//overflow prevention
 	else {
 		ll det = -det3<ll>(b.x, b.y, b.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
 		det += det3<ll>(a.x, a.y, a.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
@@ -185,9 +185,6 @@ std::pair<QuadEdge*, QuadEdge*> build_tr(int l, int r, std::vector<Pii>& C) {
 	return std::make_pair(ldo, rdo);
 }
 std::vector<std::tuple<Pii, Pii, Pii>> Delaunay_triangulation(std::vector<Pii> C) {
-	//std::sort(C.begin(), C.end(), [](const Pii& p, const Pii& q) {
-	//	return p.x < q.x || (p.x == q.x && p.y < q.y);
-	//	});
 	std::sort(C.begin(), C.end());
 	int sz = C.size();
 	auto ret = build_tr(0, sz - 1, C);
@@ -368,7 +365,7 @@ Circle enclose_circle(const Pdd& u, const Pdd& v, const Pdd& w) {
 std::vector<Pii> C;
 std::vector<Pdd> poly, vd[LEN];
 std::vector<int> gph[LEN];
-ld Voronoi_diagram(ld wl, ld wr, ld hd, ld hu, std::vector<Pii> C) {
+ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::vector<Pii> C) {
 	int sz = C.size();
 	poly.resize(sz);
 	for (int i = 0; i < sz; i++) poly[i] = P(C[i]);
