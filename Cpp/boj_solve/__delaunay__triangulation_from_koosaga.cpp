@@ -407,7 +407,7 @@ ld Voronoi_diagram(ld wl, ld wr, ld hd, ld hu, std::vector<Pii> C) {
 		HP.push_back(Line(Vec(1, 0), wr));
 		HP.push_back(Line(Vec(-1, 0), wl));
 		std::vector<Pdd> HPI = {};
-		if (half_plane_intersection(HP, HPI)) continue;
+		if (!half_plane_intersection(HP, HPI)) continue;
 		//vd[i] = HPI;
 		for (int j = 0; j < HPI.size(); j++) {
 			ld dist = (HPI[j] - poly[i]).mag();
