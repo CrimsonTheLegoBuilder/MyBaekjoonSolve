@@ -22,7 +22,7 @@ void solve() {
 	ll ans = 0;
 	for (int i = 0; i < N; i++) {
 		ll tmp = sco[i];
-		ans += (tmp * (pow_m(2, i) - pow_m(2, N) + MOD)) % MOD;
+		ans += tmp * ((pow_m(2, i) - pow_m(2, N) + MOD) % MOD);
 		ans %= MOD;
 	}
 	std::cout << ans << "\n";
