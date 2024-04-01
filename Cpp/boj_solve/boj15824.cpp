@@ -2,12 +2,13 @@
 #include <algorithm>
 typedef long long ll;
 const int LEN = 3e5 + 1;
-const ll MOD = 1e9 + 7;
+const ll MOD = 1'000'000'007;
 int N;
 ll sco[LEN];
 
 ll pow_m(ll A, ll B, const ll& mod = MOD) {  //divide & conquer
-	if (B <= 1) return A;
+	if (!B) return 1;
+	if (B == 1) return A;
 	ll b = B >> 1;
 	ll A_ = pow_m(A, b, mod);
 	if (B % 2) return (((A_ * A_) % mod) * A) % mod;
@@ -22,8 +23,7 @@ void solve() {
 	ll ans = 0;
 	for (int i = 0; i < N; i++) {
 		ll tmp = sco[i];
-		ans += tmp * ((pow_m(2, i) - pow_m(2, N) + MOD) % MOD);
-		ans %= MOD;
+		ans = (ans + tmp * ((pow_m(2, i) - pow_m(2, N - i - 1)) % MOD) + MOD) % MOD;
 	}
 	std::cout << ans << "\n";
 	return;
