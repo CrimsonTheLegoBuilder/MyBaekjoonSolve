@@ -14,6 +14,7 @@ typedef std::pair<int, int> pi;
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
+const ll MOD = 1'000'000'007;
 int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
@@ -26,6 +27,15 @@ ll gcd(ll a, ll b) {
 		b = tmp;
 	}
 	return a;
+}
+ll pow_fuck(ll a, ll b) {
+	ll ret = 1;
+	while (b) {
+		if (b & 1) ret = ret * a % MOD;
+		a = a * a % MOD;
+		b >>= 1;
+	}
+	return ret;
 }
 struct Info { ll area, l, r; };
 
