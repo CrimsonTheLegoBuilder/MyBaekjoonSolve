@@ -63,11 +63,11 @@ struct QuadEdge {
 	Pii origin;
 	QuadEdge* rot = nullptr;
 	QuadEdge* onext = nullptr;
-	bool used = false;
-	QuadEdge* rev() const { return rot->rot; }
+	bool used = 0;
+	QuadEdge* rev() const { return rot->rot; }//reverse
 	QuadEdge* lnext() const { return rot->rev()->onext->rot; }
 	QuadEdge* oprev() const { return rot->onext->rot; }
-	Pii dest() const { return rev()->origin; }
+	Pii dest() const { return rev()->origin; }//destination
 };
 QuadEdge* make_edge(Pii from, Pii to) {
 	QuadEdge* e1 = new QuadEdge;
@@ -108,19 +108,19 @@ QuadEdge* connect(QuadEdge* a, QuadEdge* b) {
 bool left_of(Pii p, QuadEdge* e) { return cross(p, e->origin, e->dest()) > 0; }
 bool right_of(Pii p, QuadEdge* e) { return cross(p, e->origin, e->dest()) < 0; }
 template <class T> T det3(T a1, T a2, T a3, T b1, T b2, T b3, T c1, T c2, T c3) {
-	return a1 * (b2 * c3 - c2 * b3) 
+	return a1 * (b2 * c3 - c2 * b3)
 		- a2 * (b1 * c3 - c1 * b3) 
 		+ a3 * (b1 * c2 - c1 * b2);
 }
 bool in_circle(Pii a, Pii b, Pii c, Pii d) {
-	lld det = -det3<lld>(b.x, b.y, b.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
-	det += det3<lld>(a.x, a.y, a.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
+	lld det = -det3<lld>(b.x, b.y, b.Euc(), c.x, c.y, c.Euc(), d.x, d.y, d.Euc());
+	det += det3<lld>(a.x, a.y, a.Euc(), c.x, c.y, c.Euc(), d.x, d.y, d.Euc());
 	det -= det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
 	det += det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), c.x, c.y, c.Euc());
 	if (abs(det) > 1e18) return det > 0;//overflow prevention (refer to koosaga)
 	else {
-		ll det = -det3<ll>(b.x, b.y, b.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
-		det += det3<ll>(a.x, a.y, a.Euc(), c.x, c.y, a.Euc(), d.x, d.y, d.Euc());
+		ll det = -det3<ll>(b.x, b.y, b.Euc(), c.x, c.y, c.Euc(), d.x, d.y, d.Euc());
+		det += det3<ll>(a.x, a.y, a.Euc(), c.x, c.y, c.Euc(), d.x, d.y, d.Euc());
 		det -= det3<ll>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
 		det += det3<ll>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), c.x, c.y, c.Euc());
 		return det > 0;
@@ -150,7 +150,7 @@ std::pair<QuadEdge*, QuadEdge*> build_tr(int l, int r, std::vector<Pii>& C) {
 			continue;
 		}
 		if (right_of(ldi->origin, rdi)) {
-			rdi = rdi->rev()->onext;
+			rdi = rdi->rev()->onext;//rnext
 			continue;
 		}
 		break;
@@ -363,7 +363,7 @@ Circle enclose_circle(const Pdd& u, const Pdd& v, const Pdd& w) {
 }
 std::vector<Pii> C;
 std::vector<Pdd> poly, vd[LEN];
-std::vector<int> gph[LEN];
+std::vector<int> seed[LEN];
 ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::vector<Pii> C) {
 	int sz = C.size();
 	poly.resize(sz);
@@ -371,8 +371,8 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 	assert(sz);
 	if (sz == 1) {}
 	else if (sz == 2) {
-		gph[0].push_back(1);
-		gph[1].push_back(0);
+		seed[0].push_back(1);
+		seed[1].push_back(0);
 	}
 	else {
 		std::vector<std::tuple<Pii, Pii, Pii>> dt = Delaunay_triangulation(C);
@@ -380,20 +380,20 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 			int a = std::get<0>(tri).i;
 			int b = std::get<1>(tri).i;
 			int c = std::get<2>(tri).i;
-			gph[a].push_back(b);
-			gph[a].push_back(c);
-			gph[b].push_back(a);
-			gph[b].push_back(c);
-			gph[c].push_back(a);
-			gph[c].push_back(b);
+			seed[a].push_back(b);
+			seed[a].push_back(c);
+			seed[b].push_back(a);
+			seed[b].push_back(c);
+			seed[c].push_back(a);
+			seed[c].push_back(b);
 		}
 	}
 	ld ret = 0;
 	for (int i = 0; i < N; i++) {
-		std::sort(gph[i].begin(), gph[i].end());
-		gph[i].resize(unique(gph[i].begin(), gph[i].end()) - gph[i].begin());
+		std::sort(seed[i].begin(), seed[i].end());
+		seed[i].resize(unique(seed[i].begin(), seed[i].end()) - seed[i].begin());
 		std::vector<Line> HP;
-		for (const int& j : gph[i]) {
+		for (const int& j : seed[i]) {
 			Line vec = L(poly[j], poly[i]);
 			Line hp = rotate90(~vec.s, (poly[i] + poly[j] * .5));
 			HP.push_back(hp);
