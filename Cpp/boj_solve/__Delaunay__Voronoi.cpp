@@ -279,6 +279,10 @@ Line L(const Pdd& s, const Pdd& e) {
 	c = dy * s.x + dx * s.y;
 	return { { dy, dx } , c };
 }
+Line L(const Vec& s, const Pdd& p) {
+	ld c = s.vy * p.x + s.vx * p.y;
+	return Line(s, c);
+}
 Line rotate(const Line& l, const Pdd& p, ld the) {
 	Vec s = l.s;
 	ld x = -s.vx, y = s.vy;
@@ -313,11 +317,9 @@ ld dot(const Pdd& d1, const Pdd& d2, const Pdd& d3) { return (d2 - d1) * (d3 - d
 //	return target.above(p) > -TOL;
 //}
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pdd>& hull) {
-	auto cw = [&](const Line & l1, const Line & l2, const Line & target) -> bool {
+	auto cw = [&](const Line& l1, const Line& l2, const Line& target) -> bool {
 		if (l1.s / l2.s < TOL) return 0;
-		Pdd p = intersection(l1, l2);
-		//return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
-		return target.above(p) > -TOL;
+		return target.above(intersection(l1, l2)) > -TOL;
 		};
 	std::deque<Line> dq;
 	std::sort(HP.begin(), HP.end());
@@ -350,7 +352,7 @@ struct Circle {
 	bool operator < (const Pdd& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
-	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }// coord trans | check right
+	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
 	ld A() const { return r * r * PI; }
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c.x >> c.c.y >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c.x << " " << c.c.y << " " << c.r; return os; }
@@ -400,8 +402,8 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 		seed[i].resize(unique(seed[i].begin(), seed[i].end()) - seed[i].begin());
 		std::vector<Line> HP;
 		for (const int& j : seed[i]) {
-			Line vec = L(poly[i], poly[j]);
-			Line hp = rotate90(vec, (poly[i] + poly[j]) * .5);
+			//Line hp = rotate90(L(poly[i], poly[j]), (poly[i] + poly[j]) * .5);
+			Line hp = L(~L(poly[i], poly[j]).s, (poly[i] + poly[j]) * .5);
 			HP.push_back(hp);
 		}
 		HP.push_back(Line(Vec(0, 1), hu));
