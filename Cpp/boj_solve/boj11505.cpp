@@ -18,7 +18,7 @@ ll mul(int s, int e, int l = 1, int r = N, int n = 1) {
 	return (L * R) % MOD;
 }
 ll update(int idx, int l = 1, int r = N, int n = 1) {
-	if (r < idx || idx < l) return 1;
+	if (r < idx || idx < l) return tree[n];
 	if (l == r) return tree[n] = arr[l];
 	int m = l + r >> 1;
 	ll L = update(idx, l, m, n << 1) % MOD;
