@@ -117,7 +117,7 @@ bool in_circle(Pii a, Pii b, Pii c, Pii d) {
 	det += det3<lld>(a.x, a.y, a.Euc(), c.x, c.y, c.Euc(), d.x, d.y, d.Euc());
 	det -= det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), d.x, d.y, d.Euc());
 	det += det3<lld>(a.x, a.y, a.Euc(), b.x, b.y, b.Euc(), c.x, c.y, c.Euc());
-	if (abs(det) > 1e18) return det > 0;//overflow prevention (refer to koosaga)
+	if (fabs(det) > 1e18) return det > 0;//overflow prevention (refer to koosaga)
 	else {
 		ll det = -det3<ll>(b.x, b.y, b.Euc(), c.x, c.y, c.Euc(), d.x, d.y, d.Euc());
 		det += det3<ll>(a.x, a.y, a.Euc(), c.x, c.y, c.Euc(), d.x, d.y, d.Euc());
@@ -394,8 +394,8 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 		seed[i].resize(unique(seed[i].begin(), seed[i].end()) - seed[i].begin());
 		std::vector<Line> HP;
 		for (const int& j : seed[i]) {
-			Line vec = L(poly[j], poly[i]);
-			Line hp = rotate90(~vec.s, (poly[i] + poly[j] * .5));
+			Line vec = L(poly[i], poly[j]);
+			Line hp = rotate90(vec, (poly[i] + poly[j]) * .5);
 			HP.push_back(hp);
 		}
 		HP.push_back(Line(Vec(0, 1), hu));
