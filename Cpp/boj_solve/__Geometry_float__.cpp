@@ -121,6 +121,10 @@ Line L(const Pos& s, const Pos& e) {
 	c = dy * s.x + dx * s.y;
 	return { { dy, dx } , c };
 }
+Line L(const Vec& s, const Pos& p) {
+	ld c = s.vy * p.x + s.vx * p.y;
+	return Line(s, c);
+}
 Line rotate(const Line& l, const Pos& p, ld the) {
 	Vec s = l.s;
 	ld x = -s.vx, y = s.vy;
