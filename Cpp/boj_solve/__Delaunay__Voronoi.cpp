@@ -306,13 +306,19 @@ int ccw(const Pdd& d1, const Pdd& d2, const Pdd& d3) {
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
 ld dot(const Pdd& d1, const Pdd& d2, const Pdd& d3) { return (d2 - d1) * (d3 - d2); }
-bool cw(const Line& l1, const Line& l2, const Line& target) {
-	if (l1.s / l2.s < TOL) return 0;
-	Pdd p = intersection(l1, l2);
-	//return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
-	return target.above(p) > -TOL;
-}
+//bool cw(const Line& l1, const Line& l2, const Line& target) {
+//	if (l1.s / l2.s < TOL) return 0;
+//	Pdd p = intersection(l1, l2);
+//	//return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
+//	return target.above(p) > -TOL;
+//}
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pdd>& hull) {
+	auto cw = [&](const Line & l1, const Line & l2, const Line & target) -> bool {
+		if (l1.s / l2.s < TOL) return 0;
+		Pdd p = intersection(l1, l2);
+		//return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
+		return target.above(p) > -TOL;
+		};
 	std::deque<Line> dq;
 	std::sort(HP.begin(), HP.end());
 	for (const Line& l : HP) {
