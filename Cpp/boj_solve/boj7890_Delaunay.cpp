@@ -242,8 +242,14 @@ void solve() {
 			}
 		}
 		for (int i = 0; i < N; i++) {
-
+			ll ret = INF;
+			std::sort(seed[i].begin(), seed[i].end());
+			seed[i].erase(unique(seed[i].begin(), seed[i].end()), seed[i].end());
+			//seed[i].resize(unique(seed[i].begin(), seed[i].end()) - seed[i].begin());
+			for (const int& j : seed[i]) ret = std::min(ret, (C[i] - C[j]).Euc());
+			std::cout << ret << "\n";
 		}
+		std::cout << "\n";
 	}
 	return;
 }

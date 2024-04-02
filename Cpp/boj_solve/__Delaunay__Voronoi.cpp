@@ -399,6 +399,7 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 	ld ret = 0;
 	for (int i = 0; i < N; i++) {
 		std::sort(seed[i].begin(), seed[i].end());
+		//seed[i].erase(unique(seed[i].begin(), seed[i].end()), seed[i].end());
 		seed[i].resize(unique(seed[i].begin(), seed[i].end()) - seed[i].begin());
 		std::vector<Line> HP;
 		for (const int& j : seed[i]) {
