@@ -249,7 +249,9 @@ void solve() {
 			for (const int& j : seed[i]) ret = std::min(ret, (C[i] - C[j]).Euc());
 			std::cout << ret << "\n";
 		}
-		std::cout << "\n";
+		//std::cout << "\n";
+		for (int i = 0; i < N; i++) std::vector<int>().swap(seed[i]);
+		//for (int i = 0; i < N; i++) seed[i].clear();
 	}
 	return;
 }
