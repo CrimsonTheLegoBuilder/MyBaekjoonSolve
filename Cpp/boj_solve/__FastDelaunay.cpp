@@ -15,7 +15,7 @@ const ld INF = 1e18;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e5;
-int N, M, T, Q;
+int N, M, T;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
@@ -85,19 +85,19 @@ int ccw(const Pii& d1, const Pii& d2, const Pii& d3) {
 //};
 //using pt = P<ll>;
 
-typedef struct Quad* Q;
 //typedef __int128_t lll; // (can be ll if coords are < 2e4)
-Pii arb(LLONG_MAX, LLONG_MAX); // not equal to any other point
+Pii arb = Pii(INF, INF); // not equal to any other point
 
 struct Quad {
     bool mark;
-    Q o, rot;
+    Quad* o, *rot;
     Pii p;
     Pii F() { return r()->p; }
-    Q r() { return rot->rot; }
-    Q prev() { return rot->o->rot; }
-    Q next() { return r()->prev(); }
+    Quad* r() { return rot->rot; }
+    Quad* prev() { return rot->o->rot; }
+    Quad* next() { return r()->prev(); }
 };
+typedef struct Quad* Q;
 
 bool circ(Pii p, Pii a, Pii b, Pii c) { // is p in the circumcircle?
     lld p2 = p.Euc(), A = a.Euc() - p2,
@@ -194,3 +194,52 @@ std::vector<Pii> triangulate(std::vector<Pii> pts) {
         if (!(e = q[qi++])->mark) ADD;
     return pts;
 }
+std::vector<Pii> C;
+std::vector<int> seed[LEN];
+void solve() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    std::cout.tie(0);
+    std::cout << std::fixed;
+    std::cout.precision(10);
+    std::cin >> T;
+    while (T--) {
+        std::cin >> N;
+        C.resize(N);
+        for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
+        assert(N);
+        if (N == 1) {}
+        else if (N == 2) {
+            seed[0].push_back(1);
+            seed[1].push_back(0);
+        }
+        else {
+            std::vector<Pii> dt = triangulate(C);
+            int sz = dt.size();
+            assert(!(sz % 3));
+            for (int i = 0; i < sz; i += 3) {
+                int a = dt[i].i;
+                int b = dt[i + 1].i;
+                int c = dt[i + 2].i;
+                seed[a].push_back(b);
+                seed[a].push_back(c);
+                seed[b].push_back(a);
+                seed[b].push_back(c);
+                seed[c].push_back(a);
+                seed[c].push_back(b);
+            }
+        }
+        for (int i = 0; i < N; i++) {
+            ll ret = INF;
+            std::sort(seed[i].begin(), seed[i].end());
+            seed[i].erase(unique(seed[i].begin(), seed[i].end()), seed[i].end());
+            //seed[i].resize(unique(seed[i].begin(), seed[i].end()) - seed[i].begin());
+            for (const int& j : seed[i]) ret = std::min(ret, (C[i] - C[j]).Euc());
+            std::cout << ret << "\n";
+        }
+        //std::cout << "\n";
+        for (int i = 0; i < N; i++) std::vector<int>().swap(seed[i]);
+        //for (int i = 0; i < N; i++) seed[i].clear();
+    }
+    return;
+}
+int main() { solve(); return 0; }
