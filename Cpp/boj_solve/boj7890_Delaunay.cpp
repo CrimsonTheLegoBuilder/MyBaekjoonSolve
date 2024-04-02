@@ -218,7 +218,7 @@ void Delaunay_triangulation(std::vector<Pii> C) {
 	return;
 }
 std::vector<Pii> C;
-std::vector<int> seed[LEN];
+//std::vector<int> seed[LEN];
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
