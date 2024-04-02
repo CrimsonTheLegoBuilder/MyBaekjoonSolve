@@ -14,7 +14,7 @@ ll mul(int s, int e, int l = 1, int r = N, int n = 1) {
 	if (s <= l && r <= e) return tree[n];
 	int m = l + r >> 1;
 	ll L = mul(s, e, l, m, n << 1) % MOD;
-	ll R = mul(s, e, m + 1, r, (n << 1) + 1) % MOD;
+	ll R = mul(s, e, m + 1, r, n << 1 | 1) % MOD;
 	return (L * R) % MOD;
 }
 ll update(int idx, int l = 1, int r = N, int n = 1) {
@@ -43,6 +43,7 @@ void solve() {
 		std::cin >> a >> b >> c;
 		if (a == 1) { arr[b] = c; update(b); }
 		else if (a == 2) { if (b > c) std::swap(b, c); std::cout << mul(b, c) << "\n"; }
+		std::cout << "DEBUG:: "; for (int i = 1; i <= N; i++) std::cout << arr[i] << " "; std::cout << "DEBUG::\n";
 	}
 	return;
 }

@@ -24,33 +24,32 @@ ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 //O(N log N) Delaunay_triangulation && Voronoi_diagram solver
 //https://cp-algorithms.com/geometry/delaunay.html
 struct Pii {
-	ll x, y;
-	int i;
-	Pii(ll X = 0, ll Y = 0, int I = 0) : x(X), y(Y), i(I) {}
+	int x, y, i;
+	Pii(int X = 0, int Y = 0, int I = 0) : x(X), y(Y), i(I) {}
 	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator <= (const Pii& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
 	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
-	Pii operator * (const ll& n) const { return { x * n, y * n }; }
-	Pii operator / (const ll& n) const { return { x / n, y / n }; }
-	ll operator * (const Pii& p) const { return { x * p.x + y * p.y }; }
-	ll operator / (const Pii& p) const { return { x * p.y - y * p.x }; }
+	Pii operator * (const int& n) const { return { x * n, y * n }; }
+	Pii operator / (const int& n) const { return { x / n, y / n }; }
+	ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
+	ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
 	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
 	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
-	Pii& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
-	Pii& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
+	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
+	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
 	Pii operator ~ () const { return { -y, x }; }
-	ll operator ! () const { return x * y; }
-	ll Euc() const { return x * x + y * y; }
-	ll Man() const { return std::abs(x) + std::abs(y); }
+	ll operator ! () const { return (ll)x * y; }
+	ll Euc() const { return (ll)x * x + (ll)y * y; }
+	int Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
 	friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
 };
 const Pii Oii = { 0, 0 };
-const Pii INF_PT = { (ll)INF, (ll)INF };
+const Pii INF_PT = { (int)INF, (int)INF };
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
