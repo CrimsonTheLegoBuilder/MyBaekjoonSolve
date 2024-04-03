@@ -786,9 +786,6 @@
     <ClCompile Include="boj1768_sort.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj3303_stack.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj1930_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -870,10 +867,13 @@
     <ClCompile Include="boj11689_Euler_phi.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="boj5719.cpp">
+    <ClCompile Include="boj5719_dijkstra.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
     <ClCompile Include="boj1725.cpp">
+      <Filter>소스 파일\stack</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3303_stack.cpp">
       <Filter>소스 파일\stack</Filter>
     </ClCompile>
   </ItemGroup>
