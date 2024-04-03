@@ -119,7 +119,7 @@ Line L(const Pos& s, const Pos& e) {
 	dy = e.y - s.y;
 	dx = s.x - e.x;
 	c = dy * s.x + dx * s.y;
-	return { { dy, dx } , c };
+	return Line(Vec(dy, dx), c);
 }
 Line L(const Vec& s, const Pos& p) {
 	ld c = s.vy * p.x + s.vx * p.y;
@@ -136,7 +136,7 @@ Line rotate(const Line& l, const Pos& p, ld the) {
 Line rotate90(const Line& l, const Pos& p) {
 	Vec s = ~l.s;
 	ld c = s.vy * p.x + s.vx * p.y;
-	return { s, c };
+	return Line(s, c);
 }
 Pos intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
@@ -159,18 +159,30 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3)) && (ret > 0 || zero(ret));
+	return !ccw(d1, d2, d3) && (ret > 0 || zero(ret));
 }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3)) && ret > 0;
+	return !ccw(d1, d2, d3) && ret > 0;
 }
 ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
 bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
 }
 bool inner_check(Pos H[], const int& sz, const Pos& p) {//concave
-	int cnt{ 0 };
+	int cnt = 0;
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (zero(cur.y - nxt.y)) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return cnt & 1;
+}
+bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+	int cnt = 0, sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
 		if (on_seg_strong(cur, nxt, p)) return 1;
@@ -197,7 +209,7 @@ int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {//convex
 	else if (on_seg_strong(H[s], H[e], p)) return 0;
 	else return -1;
 }
-int inner_check_bi_search(std::vector<Pos>& H, const Pos& p) {//convex
+int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
 	if (!sz) return -1;
 	if (sz == 1) return p == H[0] ? 0 : -1;

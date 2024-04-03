@@ -242,6 +242,18 @@ bool inner_check(Pos H[], const int& sz, const Pos& p) {//concave
 	}
 	return cnt & 1;
 }
+bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+	int cnt = 0, sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (cur.y == nxt.y) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y <= p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return cnt & 1;
+}
 int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {//convex
 	if (!sz) return -1;
 	if (sz == 1) return p == H[0] ? 0 : -1;
@@ -258,7 +270,7 @@ int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {//convex
 	else if (on_seg_strong(H[s], H[e], p)) return 0;
 	else return -1;
 }
-int inner_check_bi_search(std::vector<Pos>& H, const Pos& p) {//convex
+int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
 	if (!sz) return -1;
 	if (sz == 1) return p == H[0] ? 0 : -1;
