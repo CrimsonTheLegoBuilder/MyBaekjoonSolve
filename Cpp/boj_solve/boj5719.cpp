@@ -73,7 +73,9 @@ void solve() {
 		}
 		dijkstra(s, d, 1);
 		bfs(d, s);
-		std::cout << dijkstra(s, d) << "\n";
+		ll ret = dijkstra(s, d);
+		if (ret == INF) ret = -1;
+		std::cout << ret << "\n";
 	}
 }
-int main() { solve(); return 0; }//boj5719
+int main() { solve(); return 0; }//boj5719 refer to kibbomi
