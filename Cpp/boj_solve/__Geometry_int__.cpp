@@ -297,7 +297,7 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	}
 	return H;
 }
-std::vector<Pos> graham_scan(std::vector<Pos>& C) {
+std::vector<Pos> Graham_scan(std::vector<Pos>& C) {
 	std::vector<Pos> H;
 	if (C.size() < 3) {
 		std::sort(C.begin(), C.end());
