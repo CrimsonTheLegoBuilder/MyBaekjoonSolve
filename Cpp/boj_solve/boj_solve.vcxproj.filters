@@ -58,6 +58,9 @@
     <Filter Include="소스 파일\dynamic_programming">
       <UniqueIdentifier>{d9df2e60-8118-4511-a354-83eb066f7620}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\stack">
+      <UniqueIdentifier>{8c518765-eb29-4134-b2a2-5c0386b53d5e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="boj28401_cnvxhull.cpp">
@@ -869,6 +872,9 @@
     </ClCompile>
     <ClCompile Include="boj5719.cpp">
       <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1725.cpp">
+      <Filter>소스 파일\stack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

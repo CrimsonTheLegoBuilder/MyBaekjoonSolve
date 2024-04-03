@@ -12,15 +12,20 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> N;
-	for (int i = 0; i < N; i++) std::cin >> H[i];
+	for (int i = 1; i <= N; i++) std::cin >> H[i];
 	ll ans = 0;
-	for (int i = 0; i < N; i++) {
-		while (stack.size() && H[i] > H[stack.back()]) {
-			ans;
+	stack = { 0 };
+	for (int i = 1; i <= N; i++) {
+		while (stack.size() && H[i] < H[stack.back()]) {
+			ll h = stack.back();
 			stack.pop_back();
+			ans = std::max(ans, (i - 1 - stack.back()) * H[h]);
 		}
-		ans;
+		stack.push_back(i);
 	}
-	std::cout << ans;
+	for (int i = 1; i < stack.size(); i++) {
+		ans = std::max(ans, H[stack[i]] * (N - stack[i - 1]));
+	}
+	std::cout << ans << "\n";
 }
 int main() { solve(); return 0; }//boj1725 histogram
