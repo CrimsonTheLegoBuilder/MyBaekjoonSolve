@@ -455,7 +455,7 @@ void solve() {
 	std::cout << Voronoi_diagram(wl, wr, hd, hu, C) << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj15695 Panda Preserve
+int main() { solve(); return 0; }//boj15695 ACM-ICPC World Finals 2018 G Panda Preserve
 
 
 //Line hp = rotate90(L(poly[i], poly[j]), (poly[i] + poly[j]) * .5);
