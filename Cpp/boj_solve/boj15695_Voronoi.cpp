@@ -316,12 +316,12 @@ bool on_seg_strong(const Pdd& d1, const Pdd& d2, const Pdd& d3) {
 bool intersect(const Pdd& s1, const Pdd& s2, const Pdd& d1, const Pdd& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	return f1 && f2;
-	//bool f3 = on_seg_strong(s1, s2, d1) ||
-	//	on_seg_strong(s1, s2, d2) ||
-	//	on_seg_strong(d1, d2, s1) ||
-	//	on_seg_strong(d1, d2, s2);
-	//return (f1 && f2) || f3;
+	//return f1 && f2;
+	bool f3 = on_seg_strong(s1, s2, d1) ||
+		on_seg_strong(s1, s2, d2) ||
+		on_seg_strong(d1, d2, s1) ||
+		on_seg_strong(d1, d2, s2);
+	return (f1 && f2) || f3;
 }
 bool inner_check(const std::vector<Pdd>& H, const Pdd& p) {//concave
 	int cnt = 0, sz = H.size();
@@ -402,9 +402,9 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 			HP.push_back(hp);
 		}
 		HP.push_back(Line(Vec(0, 1), hu));
-		HP.push_back(Line(Vec(0, -1), hd));
+		HP.push_back(Line(Vec(0, -1), -hd));
 		HP.push_back(Line(Vec(1, 0), wr));
-		HP.push_back(Line(Vec(-1, 0), wl));
+		HP.push_back(Line(Vec(-1, 0), -wl));
 		std::vector<Pdd> HPI = {};
 		if (!half_plane_intersection(HP, HPI)) continue;
 		//vd[i] = HPI;
@@ -414,11 +414,11 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 				Pdd h1 = H[k], h2 = H[(k + 1) % H.size()];
 				if (intersect(p1, p2, h1, h2)) {
 					Line l1 = L(p1, p2), l2 = L(h1, h2);
+					if (zero(l1 / l2)) continue;
 					Pdd inx = intersection(l1, l2);
 					ret = std::max(ret, (H[i] - inx).mag());
 				}
 			}
-
 		}
 		std::sort(HPI.begin(), HPI.end(), [&](const Pdd& p, const Pdd& q) -> bool {
 			ld a = (H[i] - p).mag();
@@ -442,15 +442,15 @@ void solve() {
 	std::cin >> N;
 	C.resize(N);
 	H.resize(N);
-	ld  wl = INF, wr = -INF, hd = INF, hu = -INF;
+	ld wl = INF, wr = -INF, hd = INF, hu = -INF;
 	for (int i = 0; i < N; i++) {
 		std::cin >> C[i];
 		C[i].i = i;
 		H[i] = P(C[i]);
-		wl = std::min(wl, C[i].x - 10.);
-		wr = std::max(wr, C[i].x + 10.);
-		hd = std::min(hd, C[i].y - 10.);
-		hu = std::max(hu, C[i].y + 10.);
+		wl = std::min(wl, H[i].x - 10.);
+		wr = std::max(wr, H[i].x + 10.);
+		hd = std::min(hd, H[i].y - 10.);
+		hu = std::max(hu, H[i].y + 10.);
 	}
 	std::cout << Voronoi_diagram(wl, wr, hd, hu, C) << "\n";
 	return;
