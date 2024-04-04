@@ -407,9 +407,9 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 			HP.push_back(hp);
 		}
 		HP.push_back(Line(Vec(0, 1), hu));
-		HP.push_back(Line(Vec(0, -1), hd));
+		HP.push_back(Line(Vec(0, -1), -hd));
 		HP.push_back(Line(Vec(1, 0), wr));
-		HP.push_back(Line(Vec(-1, 0), wl));
+		HP.push_back(Line(Vec(-1, 0), -wl));
 		std::vector<Pdd> HPI = {};
 		if (!half_plane_intersection(HP, HPI)) continue;
 		//vd[i] = HPI;

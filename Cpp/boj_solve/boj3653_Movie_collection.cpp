@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -46,6 +47,8 @@ void query(const int& q, int& t) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	freopen("Movie.in", "r", stdin);
+	freopen("Movie_my.out", "w", stdout);
 	std::cin >> T;
 	while (T--) {
 		memset(stack, 0, sizeof stack);
@@ -53,10 +56,10 @@ void solve() {
 		memset(tree, 0, sizeof tree);
 		std::cin >> N >> M;
 		int t = N;
-		for (int i = 1; i <= N; i++) pos[i] = i, stack[i] = 1;
+		for (int i = 1; i <= N; i++) pos[i] = N - i + 1, stack[i] = 1;
 		N += M + 1;
 		init();
-		for (int j = 0; j < M; j++) std::cin >> Q, query(Q, ++t);
+		while (M--) std::cin >> Q, query(Q, ++t);
 		std::cout << "\n";
 	}
 	return;
