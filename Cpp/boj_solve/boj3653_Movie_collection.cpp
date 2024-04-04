@@ -4,19 +4,19 @@
 #include <cmath>
 #include <cstring>
 #include <cassert>
-typedef long long ll;
-const ll INF = 1e17;
+//typedef long long ll;
+//const ll INF = 1e17;
 const int LEN = 1e5 + 5;
 int T, N, M, Q;
 bool stack[LEN << 1];
 int pos[LEN], tree[LEN << 3];
 
-ll sum(const int& s, const int& e, int l = 1, int r = N, int n = 1) {
+int sum(const int& s, const int& e, int l = 1, int r = N, int n = 1) {
 	if (e < l || r < s) return 0;
 	if (s <= l && r <= e) return tree[n];
 	int m = l + r >> 1;
-	ll L = sum(s, e, l, m, n << 1);
-	ll R = sum(s, e, m + 1, r, n << 1 | 1);
+	int L = sum(s, e, l, m, n << 1);
+	int R = sum(s, e, m + 1, r, n << 1 | 1);
 	return L + R;
 }
 void update(const int& idx, const int& diff, int l = 1, int r = N, int n = 1) {
@@ -29,11 +29,11 @@ void update(const int& idx, const int& diff, int l = 1, int r = N, int n = 1) {
 	}
 	return;
 }
-ll init(int l = 1, int r = N, int n = 1) {
+int init(int l = 1, int r = N, int n = 1) {
 	if (l == r) return tree[n] = stack[l];
 	int m = l + r >> 1;
-	ll L = init(l, m, n << 1);
-	ll R = init(m + 1, r, (n << 1) + 1);
+	int L = init(l, m, n << 1);
+	int R = init(m + 1, r, (n << 1) + 1);
 	return tree[n] = L + R;
 }
 void query(const int& q, int& t) {
@@ -47,8 +47,8 @@ void query(const int& q, int& t) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("Movie.in", "r", stdin);
-	freopen("Movie_my.out", "w", stdout);
+	//freopen("Movie.in", "r", stdin);
+	//freopen("Movie_my.out", "w", stdout);
 	std::cin >> T;
 	while (T--) {
 		memset(stack, 0, sizeof stack);
