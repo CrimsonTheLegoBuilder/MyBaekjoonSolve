@@ -64,4 +64,4 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj3653 Movie collection
+int main() { solve(); return 0; }//boj3653 NWERC 2011 C Movie collection
