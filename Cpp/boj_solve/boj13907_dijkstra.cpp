@@ -12,7 +12,7 @@ int adj[LEN][LEN], C[LEN][LEN];
 
 struct Info {
 	int i, c, cnt;
-	Info(int i, int c, int cnt) : i(i), c(c), cnt(cnt) {}
+	Info(int i = 0, int c = 0, int cnt = 0) : i(i), c(c), cnt(cnt) {}
 	bool operator < (const Info& x) const { return c > x.c; }
 };
 std::priority_queue<Info> PQ;
@@ -57,7 +57,7 @@ void solve() {
 	}
 	for (int i = 1; i <= N; i++)
 		for (int j = 1; j <= N; j++)
-			if (~adj[i][j]) G[i].push_back(Info(j, adj[i][j], 0));
+			if (~adj[i][j]) G[i].push_back(Info(j, adj[i][j]));
 	dijkstra();
 	//std::cout << "dijkstra done\n";
 	std::vector<Info> tmp;
