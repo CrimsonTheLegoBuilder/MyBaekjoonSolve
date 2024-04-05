@@ -24,7 +24,6 @@ void dijkstra(int s = S, int e = E, int n = N) {
 			C[i][j] = INF;
 	C[0][s] = 0;
 	PQ.push(Info(s, 0, 0));
-	int x = 1;
 	while (PQ.size()) {
 		Info p = PQ.top(); PQ.pop();
 		if (C[p.cnt][p.i] < p.c) continue;
@@ -61,15 +60,22 @@ void solve() {
 			if (~adj[i][j]) G[i].push_back(Info(j, adj[i][j], 0));
 	dijkstra();
 	//std::cout << "dijkstra done\n";
+	std::vector<Info> tmp;
+	for (int i = 1; i <= N; i++)
+		if (C[i][E] < INF)
+			tmp.push_back(Info(0, C[i][E], i));
 	int MIN = INF;
 	K++;
 	P = 0;
 	while (K--) {
 		MIN = INF;
-		for (int i = 1; i <= N; i++)
-			if (C[i][E] < INF)
-				C[i][E] += P * i,
-				MIN = std::min(MIN, C[i][E]);
+		//for (int i = 1; i <= N; i++)
+		//	if (C[i][E] < INF)
+		//		C[i][E] += P * i,
+		//		MIN = std::min(MIN, C[i][E]);
+		for (Info& x : tmp)
+			x.c += x.cnt * P,
+			MIN = std::min(MIN, x.c);
 		std::cout << MIN << "\n";
 		if (K >= 1) std::cin >> P;
 	}
