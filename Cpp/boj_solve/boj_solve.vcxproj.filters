@@ -876,6 +876,21 @@
     <ClCompile Include="boj3303_stack.cpp">
       <Filter>소스 파일\stack</Filter>
     </ClCompile>
+    <ClCompile Include="boj13977_modulo.cpp">
+      <Filter>소스 파일\divide_conquer</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3653_Movie_collection.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj15695_Voronoi.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj13907_dijkstra.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="boj13334_Railway.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
