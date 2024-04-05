@@ -69,10 +69,6 @@ void solve() {
 	P = 0;
 	while (K--) {
 		MIN = INF;
-		//for (int i = 1; i <= N; i++)
-		//	if (C[i][E] < INF)
-		//		C[i][E] += P * i,
-		//		MIN = std::min(MIN, C[i][E]);
 		for (Info& x : tmp)
 			x.c += x.cnt * P,
 			MIN = std::min(MIN, x.c);
@@ -83,6 +79,10 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj13907
 
+		//for (int i = 1; i <= N; i++)
+		//	if (C[i][E] < INF)
+		//		C[i][E] += P * i,
+		//		MIN = std::min(MIN, C[i][E]);
 //#include <iostream>
 //#include <algorithm>
 //#include <cmath>
