@@ -25,7 +25,7 @@ void solve() {
 		if (s > e) std::swap(s, e);
 		V.push_back(Info(s, e));
 	}
-	std::sort(V.begin(), V.end(), [&](const Info& p, const Info& q) -> bool{
+	std::sort(V.begin(), V.end(), [&](const Info& p, const Info& q) -> bool {
 		return p.e == q.e ? p.s < q.s : p.e < q.e;
 		});
 	std::cin >> D;
