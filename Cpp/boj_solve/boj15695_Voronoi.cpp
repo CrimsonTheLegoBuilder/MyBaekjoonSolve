@@ -290,11 +290,6 @@ Line rotate(const Line& l, const Pdd& p, ld the) {
 	ld c = vy * p.x + vx * p.y;
 	return Line(Vec(vy, vx), c);
 }
-Line rotate90(const Line& l, const Pdd& p) {
-	Vec s = ~l.s;
-	ld c = s.vy * p.x + s.vx * p.y;
-	return Line(s, c);
-}
 Pdd intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
 	ld det = v1 / v2;
@@ -457,7 +452,11 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj15695 ACM-ICPC World Finals 2018 G Panda Preserve
 
-
+//Line rotate90(const Line& l, const Pdd& p) {
+//	Vec s = ~l.s;
+//	ld c = s.vy * p.x + s.vx * p.y;
+//	return Line(s, c);
+//}
 //Line hp = rotate90(L(poly[i], poly[j]), (poly[i] + poly[j]) * .5);
 
 
