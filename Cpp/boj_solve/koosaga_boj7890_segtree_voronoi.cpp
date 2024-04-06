@@ -1,6 +1,8 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <tuple>
 using namespace std;
 typedef pair<int, int> pi;
 typedef long long lint;
@@ -75,10 +77,9 @@ int main() {
 		}
 		init(0, n - 1, 1);
 		for (auto& i : qry) {
-			dap = 3e18;
+			dap = (lint)3e18;
 			solve(1, i);
 			printf("%lld\n", dap);
 		}
 	}
-
 }
