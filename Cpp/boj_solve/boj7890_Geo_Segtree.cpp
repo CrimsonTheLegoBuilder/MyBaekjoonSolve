@@ -55,8 +55,8 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
 struct Node {
-	Pos p;
-	bool spl;
+	Pos p;//mid point
+	bool spl;//dx < dy ?
 	int sx, ex, sy, ey;
 	Node(Pos P = Pos(0, 0), bool SPL = 0, int SX = 0, int EX = 0, int SY = 0, int EY = 0) :
 		p(P), spl(SPL), sx(SX), ex(EX), sy(SY), ey(EY) {}
