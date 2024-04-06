@@ -84,7 +84,7 @@ void init(int s = 0, int e = N - 1, int n = 1) {//divide & conquer
 	return;
 }
 ll search(const Pos& t, ll X = LINF, int n = 1) {//divide & conquer | refer to koosaga
-	ll A = LINF, S = LINF;
+	ll S = LINF, A = LINF;
 	if (t != tree[n].p) S = std::min(X, (t - tree[n].p).Euc());
 	if (tree[n].spl) {//if dy is dominant
 		if (!cmpy(tree[n].p, t)) {//p.y >= t.y
