@@ -121,7 +121,7 @@ void solve() {
 	while (T--) {
 		std::cin >> N;
 		memset(V, 0, sizeof V);
-		for (int i = 0; i < N; i++) std::cin >> pos[i], pos[i].i = i;// , Q[i] = pos[i];
+		for (int i = 0; i < N; i++) std::cin >> pos[i], pos[i].i = i;
 		init();
 		std::sort(pos, pos + N, cmpi);
 		for (int i = 0; i < N; i++) std::cout << search(pos[i]) << "\n";
@@ -406,3 +406,17 @@ int main() { solve(); return 0; }//boj7890 CERC 2008 J In case of failure
 		//	solve(Q[i]);
 		//	std::cout << MIN << "\n";
 		//}
+//void solve() {
+//	std::cin.tie(0)->sync_with_stdio(0);
+//	std::cout.tie(0);
+//	std::cin >> T;
+//	while (T--) {
+//		std::cin >> N;
+//		memset(V, 0, sizeof V);
+//		for (int i = 0; i < N; i++) std::cin >> pos[i], pos[i].i = i;// , Q[i] = pos[i];
+//		init();
+//		std::sort(pos, pos + N, cmpi);
+//		for (int i = 0; i < N; i++) std::cout << search(pos[i]) << "\n";
+//	}
+//	return;
+//}
