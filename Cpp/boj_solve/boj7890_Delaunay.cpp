@@ -185,7 +185,7 @@ std::pair<QuadEdge*, QuadEdge*> build_tr(int l, int r, std::vector<Pii>& C) {
 	return std::make_pair(ldo, rdo);
 }
 //std::vector<std::tuple<Pii, Pii, Pii>> Delaunay_triangulation(std::vector<Pii> C) {
-void Delaunay_triangulation(std::vector<Pii> C) {
+void Delaunay_triangulation(std::vector<Pii>& C) {
 	std::sort(C.begin(), C.end());
 	int sz = C.size();
 	auto ret = build_tr(0, sz - 1, C);
@@ -234,7 +234,7 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj7890
+int main() { solve(); return 0; }//boj7890 CERC 2008 J In case of failure
 
 
 
