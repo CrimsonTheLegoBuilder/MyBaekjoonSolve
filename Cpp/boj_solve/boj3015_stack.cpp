@@ -20,11 +20,12 @@ void solve() {
 	for (int i = 1; i <= N; i++) std::cin >> H[i];
 	ll cnt = 0;
 	for (int i = 1; i <= N; i++) {
-		while (S.size() && H[i] <= S.back().h) {
-			if (H[i] < S.back().h) S.pop_back();
+		while (S.size() && H[i] >= S.back().h) {
+			if (H[i] > S.back().h) cnt++, S.pop_back();
 			if (H[i] == S.back().h) S.back().n++;
 		}
-		stack.push_back(i);
+		cnt++;
+		S.push_back({ H[i], 1 });
 	}
 	return;
 }
