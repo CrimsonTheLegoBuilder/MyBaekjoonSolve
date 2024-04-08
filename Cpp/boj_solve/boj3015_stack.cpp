@@ -5,28 +5,40 @@
 typedef long long ll;
 const int LEN = 5e5 + 2;
 int N;
-ll H[LEN];
+ll cur, H[LEN];
 std::vector<int> stack;
 
 struct Num {
 	ll h;
 	int n;
+	Num(ll X = 0, ll Y = 0) : h(X), n(Y) {}
 };
 std::vector<Num> S;
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> N;
-	for (int i = 1; i <= N; i++) std::cin >> H[i];
 	ll cnt = 0;
-	for (int i = 1; i <= N; i++) {
-		while (S.size() && H[i] >= S.back().h) {
-			if (H[i] > S.back().h) cnt++, S.pop_back();
-			if (H[i] == S.back().h) S.back().n++;
+	ll tmp;
+	while (N--) {
+		std::cin >> cur;
+		tmp = 1;
+		while (S.size() && S.back().h < cur) {
+			cnt += S.back().n;
+			S.pop_back();
 		}
-		cnt++;
-		S.push_back({ H[i], 1 });
+		if (S.size()) {
+			if (S.back().h == cur) {
+				cnt += S.back().n;
+				tmp = S.back().n + 1;
+				if (S.size() > 1) cnt++;
+				S.pop_back();
+			}
+			else cnt++;
+		}
+		S.push_back(Num(cur, tmp));
 	}
+	std::cout << cnt << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj1725 histogram
+int main() { solve(); return 0; }//boj3015 PATRIK
