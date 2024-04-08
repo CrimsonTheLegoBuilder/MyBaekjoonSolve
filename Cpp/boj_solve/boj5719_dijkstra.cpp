@@ -53,6 +53,7 @@ void bfs(int s, int e) {
 		v = Q.front(); Q.pop();
 		for (const int& w : P[v]) {
 			G[w][v] = -1;
+			if (V[w]) continue;
 			V[w] = 1;
 			Q.push(w);
 		}
