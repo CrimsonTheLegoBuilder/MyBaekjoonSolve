@@ -10,7 +10,7 @@ std::vector<int> stack;
 
 struct Num {
 	ll h;
-	int n;
+	ll n;
 	Num(ll X = 0, ll Y = 0) : h(X), n(Y) {}
 };
 std::vector<Num> S;
