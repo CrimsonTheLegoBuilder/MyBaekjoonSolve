@@ -645,9 +645,6 @@
     <ClCompile Include="boj19586_rotating_calipers.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj1688.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj26133_Noncnvxhul_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -870,9 +867,6 @@
     <ClCompile Include="boj5719_dijkstra.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj1725.cpp">
-      <Filter>소스 파일\stack</Filter>
-    </ClCompile>
     <ClCompile Include="boj3303_stack.cpp">
       <Filter>소스 파일\stack</Filter>
     </ClCompile>
@@ -890,6 +884,30 @@
     </ClCompile>
     <ClCompile Include="boj13334_Railway.cpp">
       <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3015_stack.cpp">
+      <Filter>소스 파일\stack</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1725_stack.cpp">
+      <Filter>소스 파일\stack</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1688_conncave_inner.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7890_Geo_Segtree.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC348C.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC348A.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC348B.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7890_kdtree.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
