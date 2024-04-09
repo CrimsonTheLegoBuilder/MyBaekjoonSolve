@@ -72,6 +72,7 @@ struct Pos {
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return hypot(x, y); }
+	ld the() const { return atan2(y, x); }
 	Pos unit() const { return *this / mag(); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
@@ -236,7 +237,7 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	//	on_seg_strong(d1, d2, s2);
 	//return (f1 && f2) || f3;
 }
-std::vector<Pos> Graham_scan(std::vector<Pos>& C) {
+std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 	std::vector<Pos> H;
 	if (C.size() < 3) {
 		std::sort(C.begin(), C.end());
@@ -440,7 +441,7 @@ struct Arc {
 	ld lo, hi;// [lo, hi] - radian range of arc
 	Circle c; // c.r - radius of arc
 };
-std::vector<Pos> get_node(const Circle& a, const Circle& b) {
+std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
 	Pos vec = cb - ca;
 	ld ra = a.r, rb = b.r;

@@ -66,6 +66,7 @@ struct Pos {
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
+	ld ang() const { return atan2(y, x); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
@@ -338,7 +339,7 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	}
 	return H;
 }
-std::vector<Pos> Graham_scan(std::vector<Pos>& C) {
+std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 	std::vector<Pos> H;
 	if (C.size() < 3) {
 		std::sort(C.begin(), C.end());
@@ -566,7 +567,7 @@ ld find_inx_get_area_bi_search(Pos H_in[], ll memo_in[], const int& sz_in, Pos H
 	}
 	return area * .5;
 }
-std::vector<Pos> Minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const bool& f = 0) {
+std::vector<Pos> minkowski_sum(std::vector<Pos>& A, std::vector<Pos>& B, const bool& f = 0) {
 	int sza = A.size();
 	int szb = B.size();
 	std::vector<Pos> MS;
