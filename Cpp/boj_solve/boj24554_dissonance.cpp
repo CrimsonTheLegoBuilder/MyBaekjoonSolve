@@ -100,8 +100,8 @@ Line rotate(const Line& l, const Pos& p, ld the) {
 	return Line(Vec(vy, vx), c);
 }
 ld get_theta(const Line& b, const Line& l) {
-	ld x = (b * l) / b.mag();//dot
-	ld y = (b / l) / b.mag();//cross
+	ld x = b * l;//dot
+	ld y = b / l;//cross
 	return atan2(y, x);
 }
 
