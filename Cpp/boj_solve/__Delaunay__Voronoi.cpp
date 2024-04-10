@@ -183,7 +183,7 @@ std::pair<QuadEdge*, QuadEdge*> build_tr(int l, int r, std::vector<Pii>& C) {
 	}
 	return std::make_pair(ldo, rdo);
 }
-std::vector<std::tuple<Pii, Pii, Pii>> Delaunay_triangulation(std::vector<Pii> C) {
+std::vector<std::tuple<Pii, Pii, Pii>> delaunay_triangulation(std::vector<Pii> C) {
 	std::sort(C.begin(), C.end());
 	int sz = C.size();
 	auto ret = build_tr(0, sz - 1, C);
@@ -371,7 +371,7 @@ Circle enclose_circle(const Pdd& u, const Pdd& v, const Pdd& w) {
 std::vector<Pii> C;
 std::vector<Pdd> poly, vd[LEN];
 std::vector<int> seed[LEN];
-ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::vector<Pii> C) {
+ld voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::vector<Pii> C) {
 	int sz = C.size();
 	poly.resize(sz);
 	for (int i = 0; i < sz; i++) poly[i] = P(C[i]);
@@ -382,7 +382,7 @@ ld Voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::
 		seed[1].push_back(0);
 	}
 	else {
-		std::vector<std::tuple<Pii, Pii, Pii>> dt = Delaunay_triangulation(C);
+		std::vector<std::tuple<Pii, Pii, Pii>> dt = delaunay_triangulation(C);
 		for (const std::tuple<Pii, Pii, Pii>& tri : dt) {
 			int a = std::get<0>(tri).i;
 			int b = std::get<1>(tri).i;
@@ -429,7 +429,7 @@ void solve() {
 	std::cin >> N >> w >> h;
 	C.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
-	std::cout << Voronoi_diagram(0, w, 0, h, C) << "\n";
+	std::cout << voronoi_diagram(0, w, 0, h, C) << "\n";
 	return;
 }
 int main() { solve(); return 0; }
