@@ -159,6 +159,8 @@ ld ang(const Line& b, const Line& l) {
 	ld y = b / l;
 	return atan2(y, x);
 }
+//ld ang(const Pos& b, const Pos& l) { return atan2(b / l, b * l); }
+//ld ang(const Line& b, const Line& l) { return atan2(b / l, b * l); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
@@ -390,7 +392,7 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj22923
+int main() { solve(); return 0; }//boj22923 NAC 2021 B Apple Orchard
 
 //void init() {
 //	std::cin.tie(0)->sync_with_stdio(0);

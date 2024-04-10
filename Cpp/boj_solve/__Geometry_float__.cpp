@@ -422,6 +422,26 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	}
 	return 1;
 }
+std::vector<Pos> cut(const std::vector<Pos>& C, const Pos& b1, const Pos& b2) {
+	std::vector<Pos> ret;
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = C[i], nxt = C[(i + 1) % sz];
+		int c1 = ccw(b1, b2, cur), c2 = ccw(b1, b2, nxt);
+		if (c1 >= 0) ret.push_back(cur);
+		if (c1 * c2 < 0) ret.push_back(intersection(L(b1, b2), L(cur, nxt)));
+	}
+	return ret;
+}
+std::vector<Pos> sutherland_hodgman(const std::vector<Pos>& C, const std::vector<Pos>& clip) {
+	int sz = clip.size();
+	std::vector<Pos> ret = C;
+	for (int i = 0; i < sz; i++) {
+		Pos b1 = clip[i], b2 = clip[(i + 1) % sz];
+		ret = cut(ret, b1, b2);
+	}
+	return ret;
+}
 struct Circle {
 	Pos c;
 	ld r;
@@ -438,6 +458,7 @@ struct Circle {
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c.x >> c.c.y >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c.x << " " << c.c.y << " " << c.r; return os; }
 } INVAL = { { 0, 0 }, -1 };
+bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 struct Arc {
 	ld lo, hi;// [lo, hi] - radian range of arc
 	Circle c; // c.r - radius of arc
