@@ -26,11 +26,12 @@ void dijkstra(int s = S, int e = E, int n = N) {
 	PQ.push(Info(s, 0, 0));
 	while (PQ.size()) {
 		Info p = PQ.top(); PQ.pop();
-		if (C[p.cnt][p.i] < p.c) continue;
+		//if (C[p.cnt][p.i] < p.c) continue;
+		if (C[p.cnt][p.i] != p.c) continue;
 		if (p.i == e) continue;
 		for (const Info& w : G[p.i]) {
 			int cost = p.c + w.c;
-			if (C[p.cnt + 1][w.i] > cost) {
+			if (p.cnt + 1 < N && C[p.cnt + 1][w.i] > cost) {
 				C[p.cnt + 1][w.i] = cost;
 				PQ.push(Info(w.i, cost, p.cnt + 1));
 			}

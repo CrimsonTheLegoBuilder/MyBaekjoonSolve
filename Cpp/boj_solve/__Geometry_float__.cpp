@@ -73,6 +73,7 @@ struct Pos {
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return hypot(x, y); }
 	ld the() const { return atan2(y, x); }
+	ld ang() const { return atan2(y, x); }
 	Pos unit() const { return *this / mag(); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
