@@ -100,7 +100,6 @@ struct Line {//ax + by = c
 };
 const Line Xaxis = { { 0, -1 }, 0 };
 const Line Yaxis = { { 1, 0 }, 0 };
-Vec P2V(const Pos& p) { return Vec(p.y, -p.x); }
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
@@ -277,7 +276,6 @@ void init() {
 			ld distance = vec.mag();
 			ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
 			Pos m = ca + vec * X / distance;
-			//HP.push_back(L(P2V(~vec), m));
 			HP.push_back(L(m, m + ~vec));
 		}
 		if (!half_plane_intersection(HP, pd[i])) continue;
