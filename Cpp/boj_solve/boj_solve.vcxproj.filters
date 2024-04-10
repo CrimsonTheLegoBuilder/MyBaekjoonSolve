@@ -855,7 +855,7 @@
     <ClCompile Include="boj7890_Delaunay.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="__FastDelaunay.cpp">
+    <ClCompile Include="FastDelaunay.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj11505.cpp">
@@ -908,6 +908,15 @@
     </ClCompile>
     <ClCompile Include="boj7890_kdtree.cpp">
       <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj22923_apple_power_diagram.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="solapple.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj22923_apple_2nd.cpp">
+      <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

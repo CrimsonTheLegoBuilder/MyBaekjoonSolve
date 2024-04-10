@@ -37,6 +37,17 @@ ld flip(ld lat) {
 }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
+const ll MOD = 1e9 + 7;
+ll powmod(ll a, ll b) {
+	ll res = 1; a %= MOD;
+	assert(b >= 0);
+	for (; b; b >>= 1) {
+		if (b & 1) res = res * a % MOD;
+		a = a * a % MOD;
+	}
+	return res;
+}
+
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -218,6 +229,26 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	}
 	return 1;
 }
+std::vector<Pos> cut(const std::vector<Pos>& C, const Pos& b1, const Pos& b2) {
+	std::vector<Pos> ret;
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = C[i], nxt = C[(i + 1) % sz];
+		int c1 = ccw(b1, b2, cur), c2 = ccw(b1, b2, nxt);
+		if (c1 >= 0) ret.push_back(cur);
+		if (c1 * c2 < 0) ret.push_back(intersection(L(b1, b2), L(cur, nxt)));
+	}
+	return ret;
+}
+std::vector<Pos> sutherland_hodgman(const std::vector<Pos>& C, const std::vector<Pos>& clip) {
+	int sz = clip.size();
+	std::vector<Pos> ret = C;
+	for (int i = 0; i < sz; i++) {
+		Pos b1 = clip[i], b2 = clip[(i + 1) % sz];
+		ret = cut(ret, b1, b2);
+	}
+	return ret;
+}
 struct Circle {
 	Pos c;
 	ld r;
@@ -340,6 +371,10 @@ ld query(ld A, const std::vector<Pos> box) {
 		for (int j = 0; j < sz; j++) HP.push_back(L(pd[i][j], pd[i][(j + 1) % sz]));
 		if (!half_plane_intersection(HP, HPI)) continue;
 		a += valid_area(disks[i], HPI);
+
+		//std::vector<Pos> HPI = sutherland_hodgman(pd[i], box);
+		//if (HPI.size() < 3) continue;
+		//a += valid_area(disks[i], HPI);
 	}
 	return a * 100. / A;
 }
