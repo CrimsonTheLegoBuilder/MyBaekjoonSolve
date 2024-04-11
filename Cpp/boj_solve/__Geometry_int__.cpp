@@ -19,15 +19,9 @@ int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
+int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 //ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-ll gcd(ll a, ll b) {
-	while (b) {
-		ll tmp = a % b;
-		a = b;
-		b = tmp;
-	}
-	return a;
-}
+ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 ll pow_fuck(ll a, ll b) {
 	ll ret = 1;
 	while (b) {
@@ -80,6 +74,7 @@ struct Pos {
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
+typedef std::vector<Pos> Polygon;
 //struct Pos {
 //	int x, y, i;
 //	Pos(int X = 0, int Y = 0, int I = 0) : x(X), y(Y), i(I) {}
@@ -108,6 +103,7 @@ struct Pos {
 //bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
 //bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 //bool cmpi(const Pos& p, const Pos& q) { return p.i < q.i; }
+//typedef std::vector<Pos> Polygon;
 std::vector<Pos> C, H;
 std::vector<Pos> C, H;
 struct Vec {

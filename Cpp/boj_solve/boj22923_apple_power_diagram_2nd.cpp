@@ -10,7 +10,6 @@
 #include <random>
 #include <array>
 #include <tuple>
-#include <complex>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -18,7 +17,7 @@ const ld INF = 1e17;
 const ld TOL = 1e-9;
 const ld PI = acos(-1);
 const int LEN = 3e3 + 5;
-int N, M, T, Q;
+int N, Q;
 bool V[LEN];
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
@@ -27,25 +26,6 @@ ld norm(ld th) {
 	while (th < -TOL) th += PI * 2;
 	while (th > PI * 2) th -= PI * 2;
 	return th;
-}
-ld flip(ld lat) {
-	if (zero(lat - PI * .5) || zero(lat + PI * .5)) return 0;
-	if (zero(lat)) return PI * .5;
-	if (lat > 0) return PI * .5 - lat;
-	if (lat < 0) return -(PI * .5) - lat;
-	return INF;
-}
-ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-
-const ll MOD = 1e9 + 7;
-ll powmod(ll a, ll b) {
-	ll res = 1; a %= MOD;
-	assert(b >= 0);
-	for (; b; b >>= 1) {
-		if (b & 1) res = res * a % MOD;
-		a = a * a % MOD;
-	}
-	return res;
 }
 
 struct Pos {
@@ -145,23 +125,13 @@ Line rotate90(const Line& l, const Pos& p) {
 Pos intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
 	ld det = v1 / v2;
-	return {
+	return Pos(
 		(l1.c * v2.vx - l2.c * v1.vx) / det,
-		(l2.c * v1.vy - l1.c * v2.vy) / det,
-	};
+		(l2.c * v1.vy - l1.c * v2.vy) / det
+	);
 }
-ld ang(const Pos& b, const Pos& l) {
-	ld x = (b * l) / b.mag();
-	ld y = (b / l) / b.mag();
-	return atan2l(y, x);
-}
-ld ang(const Line& b, const Line& l) {
-	ld x = b * l;
-	ld y = b / l;
-	return atan2l(y, x);
-}
-//ld ang(const Pos& b, const Pos& l) { return atan2(b / l, b * l); }
-//ld ang(const Line& b, const Line& l) { return atan2(b / l, b * l); }
+ld ang(const Pos& b, const Pos& l) { return atan2l(b / l, b * l); }
+ld ang(const Line& b, const Line& l) { return atan2l(b / l, b * l); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
@@ -208,6 +178,31 @@ ld area(const std::vector<Pos>& H) {
 	//return ret / 2;
 	return ret;
 }
+//bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
+//	auto cw = [&](const Line& l1, const Line& l2, const Line& target) -> bool {
+//		if (l1.s / l2.s < TOL) return 0;
+//		return target.above(intersection(l1, l2)) > -TOL;
+//		};
+//	std::deque<Line> dq;
+//	std::sort(HP.begin(), HP.end());
+//	for (const Line& l : HP) {
+//		if (!dq.empty() && zero(dq.back() / l)) continue;
+//		while (dq.size() >= 2 && cw(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
+//		while (dq.size() >= 2 && cw(l, dq.front(), dq[1])) dq.pop_front();
+//		dq.push_back(l);
+//	}
+//	while (dq.size() >= 3 && cw(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
+//	while (dq.size() >= 3 && cw(dq.back(), dq.front(), dq[1])) dq.pop_front();
+//	for (int i = 0; i < dq.size(); i++) {
+//		Line cur = dq[i], nxt = dq[(i + 1) % (int)dq.size()];
+//		if (cur / nxt < TOL) {
+//			hull.clear();
+//			return 0;
+//		}
+//		hull.push_back(intersection(cur, nxt));
+//	}
+//	return 1;
+//}
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	auto cw = [&](const Line& l1, const Line& l2, const Line& target) -> bool {
 		if (l1.s / l2.s < TOL) return 0;
@@ -255,14 +250,14 @@ std::vector<Pos> sutherland_hodgman(const std::vector<Pos>& C, const std::vector
 }
 struct Circle {
 	Pos c;
-	int r;
-	Circle(Pos C = Pos(0, 0), int R = 0) : c(C), r(R) {}
+	ll r;
+	Circle(Pos C = Pos(0, 0), ll R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
 		ld dist = (c - q.c).mag();
-		//return r <= q.r && dist + r < q.r + TOL;
-		return r <= q.r && dist + r <= q.r;
+		return r <= q.r && dist + r < q.r + TOL;
+		//return r <= q.r && dist + r <= q.r;
 	}
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
@@ -276,7 +271,7 @@ struct Circle {
 } INVAL = { { 0, 0 }, -1 };
 std::vector<Pos> pd[LEN];//power diagram (Laguerre-Voronoi diagram)
 std::vector<Circle> disks;
-bool cmpr(const Circle& p, const Circle& q) { return p.r < q.r; }//sort descending order
+bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -287,20 +282,22 @@ void init() {
 	for (Circle& c : tmp) std::cin >> c;
 	std::sort(tmp.begin(), tmp.end(), cmpr);
 	memset(V, 0, sizeof V);
-	for (int i = 0; i < N; i++) {//remove duplicates
-		//if (V[i]) continue;
+	for (int i = 0; i < N; i++) {//remove
+		if (V[i]) continue;
 		for (int j = i + 1; j < N; j++) {
-			if (i == j) continue;
-			//if (tmp[j] == tmp[i]) V[j] = 1;
-			//if (tmp[j] < tmp[i]) V[j] = 1;
-			if (tmp[j] == tmp[i]) V[i] = 1;
-			if (tmp[i] < tmp[j]) V[i] = 1;
-			//if (tmp[i].r <= tmp[j].r && (tmp[j].r - tmp[i].r >= (tmp[i].c - tmp[j].c).mag())) V[i] = 1;
-			//if (std::make_pair(tmp[i].r, i) <= std::make_pair(tmp[j].r, j)) {
-			//	if (tmp[j].r - tmp[i].r >= (tmp[i].c - tmp[j].c).mag()) V[i] = 1;
-			//}
+			if (tmp[j] == tmp[i]) V[j] = 1;
+			if (tmp[j] < tmp[i]) V[j] = 1;
 		}
 	}
+	//memset(V, 0, sizeof V);
+	//for (int i = 0; i < N; i++) {//remove
+	//	for (int j = 0; j < N; j++) {
+	//		if (i == j) continue;
+	//		if (std::make_pair(tmp[i].r, i) <= std::make_pair(tmp[j].r, j)) {
+	//			if ((tmp[j].r - tmp[i].r) > (tmp[i].c - tmp[j].c).mag() - TOL) V[i] = 1;
+	//		}
+	//	}
+	//}
 	for (int i = 0; i < N; i++) if (!V[i]) disks.push_back(tmp[i]);
 	N = disks.size();
 	for (int i = 0; i < N; i++) {//compose power diagram
@@ -356,31 +353,31 @@ ld valid_area(const Circle& disk, const std::vector<Pos>& HPI) {
 		Pos m2 = m + vec * ratio / distance;
 		if (dot(v1, v2, m1, m2) < 0) std::swap(m1, m2);
 
-		//ld X = dot(O, v1, v2), Y = (v2 - v1).Euc(), D = X * X - Y * ((v1 - O).Euc() - r * r);
+		//ld X = dot(O, v1, v2), Y = (v2 - v1).Euc(), D = X * X - Y * (v1.Euc() - r * r);
 		//D = std::max(D, 0.);
 		//Pos m = v1 - (v2 - v1) * (X / Y), dr = (v2 - v1) * (sqrt(D) / Y);
 		//Pos m1 = m - dr, m2 = m + dr;
 
-		//bool f1 = v1.Euc() > r * r, f2 = v2.Euc() > r * r;
-		//if (f1 && f2) {
-		//	//if (on_seg_weak(v1, v2, m1)) a += r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2;
-		//	if (dot(v1, m1, v2) > 0) a += r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2;
-		//	else a += r * r * ang(v1, v2);
-		//}
-		//else if (f1) a += r * r * ang(v1, m1) + m1 / v2;
-		//else if (f2) a += v1 / m2 + r * r * ang(m2, v2);
-		//else a += v1 / v2;
+		bool f1 = v1.Euc() > r * r, f2 = v2.Euc() > r * r;
+		if (f1 && f2) {
+			//if (on_seg_weak(v1, v2, m1)) a += (r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2) * .5;
+			if (dot(v1, m1, v2) > 0) a += (r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2) * .5;
+			else a += (r * r * ang(v1, v2)) * .5;
+		}
+		else if (f1) a += (r * r * ang(v1, m1) + m1 / v2) * .5;
+		else if (f2) a += (v1 / m2 + r * r * ang(m2, v2)) * .5;
+		else a += (v1 / v2) * .5;
 
-		ld d1 = dot(m1, v1, m2), d2 = dot(m1, v2, m2);
-		if (d1 >= 0 && d2 >= 0) a += (v1 / v2) * .5;
-		else if (d1 >= 0) a += (v1 / m2 + r * r * ang(m2, v2)) * .5;
-		else if (d2 >= 0) a += (r * r * ang(v1, m1) + m1 / v2) * .5;
-		else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0) a += (r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2) * .5;
-		else a += (r * r * ang(v1, v2)) * .5;
+		//ld d1 = dot(m1, v1, m2), d2 = dot(m1, v2, m2);
+		//if (d1 >= 0 && d2 >= 0) a += (v1 / v2) * .5;
+		//else if (d1 >= 0) a += (v1 / m2 + r * r * ang(m2, v2)) * .5;
+		//else if (d2 >= 0) a += (r * r * ang(v1, m1) + m1 / v2) * .5;
+		//else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0) a += (r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2) * .5;
+		//else a += (r * r * ang(v1, v2)) * .5;
 	}
 	return a;
 }
-ld query(int w, int h, const std::vector<Pos>& box) {
+ld query(ll w, ll h, const std::vector<Pos>& box) {
 	ld a = 0;
 	for (int i = 0; i < N; i++) {
 		//int sz = pd[i].size();
@@ -396,12 +393,13 @@ ld query(int w, int h, const std::vector<Pos>& box) {
 		if (HPI.size() < 3) continue;
 		a += valid_area(disks[i], HPI);
 	}
-	//a = std::min(std::max(a, 0.), 100.);
-	return a * 100 / w / h;
+	a = a * 100 / w / h;
+	a = std::min(std::max(a, 0.), 100.);
+	return a;
 }
 void solve() {
 	init();
-	int x, y, w, h;
+	ll x, y, w, h;
 	std::vector<Pos> box;
 	while (Q--) {
 		std::cin >> x >> y >> w >> h;
@@ -411,84 +409,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj22923 NAC 2021 B Apple Orchard
-
-//void init() {
-//	std::cin.tie(0)->sync_with_stdio(0);
-//	std::cout.tie(0);
-//	std::cout << std::fixed;
-//	std::cout.precision(9);
-//	std::cin >> N >> Q;
-//	std::vector<Circle> tmp(N);
-//	for (Circle& c : tmp) std::cin >> c;
-//	memset(V, 0, sizeof V);
-//	for (int i = 0; i < N; i++) {
-//		if (V[i]) continue;
-//		for (int j = i + 1; j < N; j++) {
-//			if (tmp[i] == tmp[j]) V[j] = 1;
-//			if (tmp[i] < tmp[j]) V[i] = 1;
-//			if (tmp[j] < tmp[i]) V[j] = 1;
-//		}
-//	}
-//	for (int i = 0; i < N; i++) if (!V[i]) disks.push_back(tmp[i]);
-//	memset(V, 0, sizeof V);
-//	N = disks.size();
-//	for (int i = 0; i < N; i++) {
-//		for (int j = i + 1; j < N; j++) {
-//			if (intersection(disks, i, j)) V[i] = 1, V[j] = 1;
-//		}
-//		if (!V[i]) arc[i].push_back(Arc(-PI, PI, disks[i]));
-//	}
-//	return;
-//}
-
-//if (on_seg_strong(v1, v2, m1)) a += r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2;
-
-/*
-
-93.0216098450
-99.0347678878
-98.0517213941
-97.1141178396
-97.2310482882
-92.1962759683
-95.8852298981
-96.1504252260
-93.7838249921
-95.7376452171
-106.8157602188
-103.3882783087
-97.6830058802
-96.9228712621
-96.5891968801
-100.9312461499
-95.7106543194
-95.7627087341
-94.6201497646
-96.4659366881
-101.9503937539
-95...
-
-93.0216098450
-101.5545789562
-97.9422431718
-96.9868546837
-95.9567708374
-91.1910439720
-98.1410910087
-98.3534323184
-93.6850233553
-96.8253149365
-106.9552888648
-93.3988484846
-95.4725319279
-97.8036806201
-91.0190976694
-95.7176134016
-98.7832375536
-98.5479898435
-94.2141951156
-96.7124489663
-101.8262512597
-92....
-
-*/

@@ -1,4 +1,16 @@
-#include <bits/stdc++.h>
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <cassert>
+#include <vector>
+#include <queue>
+#include <deque>
+#include <random>
+#include <array>
+#include <tuple>
+#include <complex>
 using namespace std;
 #define rep(i,a,n) for (int i=a;i<n;i++)
 #define per(i,a,n) for (int i=n-1;i>=a;i--)
@@ -453,7 +465,7 @@ int main() {
 		}
 		bb = bb * 100 / w / h;
 		bb = min(max(bb, (db)0), (db)100);
-		printf("%.10f\n", bb);
+		printf("%.15f\n", bb);
 		//puts("----");
 	}
 }

@@ -233,7 +233,7 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	}
 	return 1;
 }
-std::vector<Pos> cut(const std::vector<Pos>& C, const Pos& b1, const Pos& b2) {
+std::vector<Pos> convex_cut(const std::vector<Pos>& C, const Pos& b1, const Pos& b2) {
 	std::vector<Pos> ret;
 	int sz = C.size();
 	for (int i = 0; i < sz; i++) {
@@ -249,7 +249,7 @@ std::vector<Pos> sutherland_hodgman(const std::vector<Pos>& C, const std::vector
 	std::vector<Pos> ret = C;
 	for (int i = 0; i < sz; i++) {
 		Pos b1 = clip[i], b2 = clip[(i + 1) % sz];
-		ret = cut(ret, b1, b2);
+		ret = convex_cut(ret, b1, b2);
 	}
 	return ret;
 }
@@ -261,8 +261,8 @@ struct Circle {
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
 		ld dist = (c - q.c).mag();
-		//return r <= q.r && dist + r < q.r + TOL;
-		return r <= q.r && dist + r <= q.r;
+		return r <= q.r && dist + r < q.r + TOL;
+		//return r <= q.r && dist + r <= q.r;
 	}
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
@@ -276,25 +276,25 @@ struct Circle {
 } INVAL = { { 0, 0 }, -1 };
 std::vector<Pos> pd[LEN];//power diagram (Laguerre-Voronoi diagram)
 std::vector<Circle> disks;
-bool cmpr(const Circle& p, const Circle& q) { return p.r < q.r; }//sort descending order
+bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(10);
+	std::cout.precision(15);
 	std::cin >> N >> Q;
 	std::vector<Circle> tmp(N);
 	for (Circle& c : tmp) std::cin >> c;
 	std::sort(tmp.begin(), tmp.end(), cmpr);
 	memset(V, 0, sizeof V);
 	for (int i = 0; i < N; i++) {//remove duplicates
-		//if (V[i]) continue;
+		if (V[i]) continue;
 		for (int j = i + 1; j < N; j++) {
-			if (i == j) continue;
-			//if (tmp[j] == tmp[i]) V[j] = 1;
-			//if (tmp[j] < tmp[i]) V[j] = 1;
-			if (tmp[j] == tmp[i]) V[i] = 1;
-			if (tmp[i] < tmp[j]) V[i] = 1;
+			//if (i == j) continue;
+			if (tmp[j] == tmp[i]) V[j] = 1;
+			if (tmp[j] < tmp[i]) V[j] = 1;
+			//if (tmp[j] == tmp[i]) V[i] = 1;
+			//if (tmp[i] < tmp[j]) V[i] = 1;
 			//if (tmp[i].r <= tmp[j].r && (tmp[j].r - tmp[i].r >= (tmp[i].c - tmp[j].c).mag())) V[i] = 1;
 			//if (std::make_pair(tmp[i].r, i) <= std::make_pair(tmp[j].r, j)) {
 			//	if (tmp[j].r - tmp[i].r >= (tmp[i].c - tmp[j].c).mag()) V[i] = 1;

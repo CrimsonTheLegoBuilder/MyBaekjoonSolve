@@ -23,6 +23,7 @@ bool V[LEN + 1][LEN + 1];
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
+int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 ld norm(ld th) {
 	while (th < -TOL) th += PI * 2;
 	while (th > PI * 2) th -= PI * 2;
@@ -78,6 +79,7 @@ struct Pos {
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
+typedef std::vector<Pos> Polygon;
 struct Vec {
 	ld vy, vx;
 	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
