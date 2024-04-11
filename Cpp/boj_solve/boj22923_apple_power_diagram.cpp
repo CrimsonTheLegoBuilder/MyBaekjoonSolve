@@ -15,7 +15,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-9;
 const ld PI = acos(-1);
 const int LEN = 3e3 + 5;
 int N, M, T, Q;
@@ -67,7 +67,8 @@ struct Pos {
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	ld Euc() const { return x * x + y * y; }
-	ld mag() const { return hypot(x, y); }
+	//ld mag() const { return hypot(x, y); }
+	ld mag() const { return sqrt(Euc()); }
 	ld ang() const { return atan2(y, x); }
 	Pos unit() const { return *this / mag(); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
@@ -150,14 +151,14 @@ Pos intersection(const Line& l1, const Line& l2) {
 	};
 }
 ld ang(const Pos& b, const Pos& l) {
-	ld x = b * l;
-	ld y = b / l;
-	return atan2(y, x);
+	ld x = (b * l) / b.mag();
+	ld y = (b / l) / b.mag();
+	return atan2l(y, x);
 }
 ld ang(const Line& b, const Line& l) {
 	ld x = b * l;
 	ld y = b / l;
-	return atan2(y, x);
+	return atan2l(y, x);
 }
 //ld ang(const Pos& b, const Pos& l) { return atan2(b / l, b * l); }
 //ld ang(const Line& b, const Line& l) { return atan2(b / l, b * l); }
@@ -167,6 +168,7 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
 	return cross(d1, d2, t) / (d1 - d2).mag();
 }
@@ -253,14 +255,14 @@ std::vector<Pos> sutherland_hodgman(const std::vector<Pos>& C, const std::vector
 }
 struct Circle {
 	Pos c;
-	ld r;
-	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
+	int r;
+	Circle(Pos C = Pos(0, 0), int R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
 		ld dist = (c - q.c).mag();
-		return r < q.r && dist + r < q.r + TOL;
-		//return r < q.r && dist + r <= q.r;
+		//return r <= q.r && dist + r < q.r + TOL;
+		return r <= q.r && dist + r <= q.r;
 	}
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
@@ -274,7 +276,7 @@ struct Circle {
 } INVAL = { { 0, 0 }, -1 };
 std::vector<Pos> pd[LEN];//power diagram (Laguerre-Voronoi diagram)
 std::vector<Circle> disks;
-bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
+bool cmpr(const Circle& p, const Circle& q) { return p.r < q.r; }//sort descending order
 void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -286,11 +288,17 @@ void init() {
 	std::sort(tmp.begin(), tmp.end(), cmpr);
 	memset(V, 0, sizeof V);
 	for (int i = 0; i < N; i++) {//remove duplicates
-		if (V[i]) continue;
+		//if (V[i]) continue;
 		for (int j = i + 1; j < N; j++) {
-			if (tmp[j] == tmp[i]) V[j] = 1;
-			if (tmp[j] < tmp[i]) V[j] = 1;
-			//if (tmp[i] < tmp[j]) V[i] = 1;
+			if (i == j) continue;
+			//if (tmp[j] == tmp[i]) V[j] = 1;
+			//if (tmp[j] < tmp[i]) V[j] = 1;
+			if (tmp[j] == tmp[i]) V[i] = 1;
+			if (tmp[i] < tmp[j]) V[i] = 1;
+			//if (tmp[i].r <= tmp[j].r && (tmp[j].r - tmp[i].r >= (tmp[i].c - tmp[j].c).mag())) V[i] = 1;
+			//if (std::make_pair(tmp[i].r, i) <= std::make_pair(tmp[j].r, j)) {
+			//	if (tmp[j].r - tmp[i].r >= (tmp[i].c - tmp[j].c).mag()) V[i] = 1;
+			//}
 		}
 	}
 	for (int i = 0; i < N; i++) if (!V[i]) disks.push_back(tmp[i]);
@@ -304,10 +312,11 @@ void init() {
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
 			Pos& ca = disks[i].c, cb = disks[j].c;
-			ld& ra = disks[i].r, rb = disks[j].r;
+			ld ra = disks[i].r, rb = disks[j].r;
 			Pos vec = cb - ca;//vec a -> b
 			ld distance = vec.mag();
 			ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
+			//ld X = (ra * ra - rb * rb + distance * distance) / (2 * distance);
 			Pos m = ca + vec * X / distance;
 			HP.push_back(L(m, m + ~vec));
 		}
@@ -319,7 +328,7 @@ void init() {
 		//	ld ra = disks[i].r, rb = disks[j].r;
 		//	Pos vec = (cb - ca) * 2;
 		//	ld X = (cb * cb - rb * rb) - (ca * ca - ra * ra);
-		//	Pos m;
+		//	Pos m(0, 0);
 		//	if (abs(vec.x) > abs(vec.y)) m = Pos(X / vec.x, 0);
 		//	else m = Pos(0, X / vec.y);
 		//	HP.push_back(L(m, m + ~vec));
@@ -328,7 +337,7 @@ void init() {
 	}
 	return;
 }
-ld valid_area(const Circle& disk, const std::vector<Pos> HPI) {
+ld valid_area(const Circle& disk, const std::vector<Pos>& HPI) {
 	int sz = HPI.size();
 	ld r = disk.r;
 	Pos c = disk.c;
@@ -338,57 +347,66 @@ ld valid_area(const Circle& disk, const std::vector<Pos> HPI) {
 		Pos v1 = p1 - c, v2 = p2 - c, vec = p2 - p1;
 		ld d = dist(v1, v2, O);
 		if (zero(d)) continue;
-		if (std::abs(d) > r - TOL) { a += r * r * ang(v1, v2); continue; }
-		Pos m = intersection(L(v1, v2), L(O, ~vec));
+		if (std::abs(d) > r - TOL) { a += (r * r * ang(v1, v2)) * .5; continue; }
+		//if (std::abs(d) > r) { a += r * r * ang(v1, v2); continue; }
+		Pos m = intersection(L(v1, v2), L(O, ~vec + O));
 		ld distance = vec.mag();
-		ld ratio = sqrtl(r * r - d * d);
+		ld ratio = sqrt(r * r - d * d);
 		Pos m1 = m - vec * ratio / distance;
 		Pos m2 = m + vec * ratio / distance;
+		if (dot(v1, v2, m1, m2) < 0) std::swap(m1, m2);
 
 		//ld X = dot(O, v1, v2), Y = (v2 - v1).Euc(), D = X * X - Y * ((v1 - O).Euc() - r * r);
 		//D = std::max(D, 0.);
 		//Pos m = v1 - (v2 - v1) * (X / Y), dr = (v2 - v1) * (sqrt(D) / Y);
 		//Pos m1 = m - dr, m2 = m + dr;
 
-		bool f1 = v1.Euc() > r * r, f2 = v2.Euc() > r * r;
-		if (f1 && f2) {
-			if (on_seg_weak(v1, v2, m1)) a += r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2;
-			//if (dot(v1, m1, v2) > 0) a += r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2;
-			else a += r * r * ang(v1, v2);
-		}
-		else if (f1) a += r * r * ang(v1, m1) + m1 / v2;
-		else if (f2) a += v1 / m2 + r * r * ang(m2, v2);
-		else a += v1 / v2;
+		//bool f1 = v1.Euc() > r * r, f2 = v2.Euc() > r * r;
+		//if (f1 && f2) {
+		//	//if (on_seg_weak(v1, v2, m1)) a += r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2;
+		//	if (dot(v1, m1, v2) > 0) a += r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2;
+		//	else a += r * r * ang(v1, v2);
+		//}
+		//else if (f1) a += r * r * ang(v1, m1) + m1 / v2;
+		//else if (f2) a += v1 / m2 + r * r * ang(m2, v2);
+		//else a += v1 / v2;
+
+		ld d1 = dot(m1, v1, m2), d2 = dot(m1, v2, m2);
+		if (d1 >= 0 && d2 >= 0) a += (v1 / v2) * .5;
+		else if (d1 >= 0) a += (v1 / m2 + r * r * ang(m2, v2)) * .5;
+		else if (d2 >= 0) a += (r * r * ang(v1, m1) + m1 / v2) * .5;
+		else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0) a += (r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2) * .5;
+		else a += (r * r * ang(v1, v2)) * .5;
 	}
-	return a * .5;
+	return a;
 }
-ld query(ld A, const std::vector<Pos> box) {
+ld query(int w, int h, const std::vector<Pos>& box) {
 	ld a = 0;
 	for (int i = 0; i < N; i++) {
-		int sz = pd[i].size();
-		if (!sz) continue;
-		std::vector<Line> HP;
-		std::vector<Pos> HPI;
-		for (int j = 0; j < 4; j++) HP.push_back(L(box[j], box[(j + 1) % 4]));	
-		for (int j = 0; j < sz; j++) HP.push_back(L(pd[i][j], pd[i][(j + 1) % sz]));
-		if (!half_plane_intersection(HP, HPI)) continue;
-		a += valid_area(disks[i], HPI);
-
-		//std::vector<Pos> HPI = sutherland_hodgman(pd[i], box);
-		//if (HPI.size() < 3) continue;
+		//int sz = pd[i].size();
+		//if (!sz) continue;
+		//std::vector<Line> HP;
+		//std::vector<Pos> HPI;
+		//for (int j = 0; j < 4; j++) HP.push_back(L(box[j], box[(j + 1) % 4]));
+		//for (int j = 0; j < sz; j++) HP.push_back(L(pd[i][j], pd[i][(j + 1) % sz]));
+		//if (!half_plane_intersection(HP, HPI)) continue;
 		//a += valid_area(disks[i], HPI);
+
+		std::vector<Pos> HPI = sutherland_hodgman(pd[i], box);
+		if (HPI.size() < 3) continue;
+		a += valid_area(disks[i], HPI);
 	}
-	return a * 100. / A;
+	//a = std::min(std::max(a, 0.), 100.);
+	return a * 100 / w / h;
 }
 void solve() {
 	init();
-	ld x, y, w, h;
+	int x, y, w, h;
 	std::vector<Pos> box;
 	while (Q--) {
 		std::cin >> x >> y >> w >> h;
-		ld A = w * h;
 		box = { Pos(x, y), Pos(x + w, y), Pos(x + w, y + h), Pos(x, y + h) };
-		std::cout << query(A, box) << "\n";
+		std::cout << query(w, h, box) << "\n";
 	}
 	return;
 }
@@ -424,3 +442,53 @@ int main() { solve(); return 0; }//boj22923 NAC 2021 B Apple Orchard
 //}
 
 //if (on_seg_strong(v1, v2, m1)) a += r * r * (ang(v1, m1) + ang(m2, v2)) + m1 / m2;
+
+/*
+
+93.0216098450
+99.0347678878
+98.0517213941
+97.1141178396
+97.2310482882
+92.1962759683
+95.8852298981
+96.1504252260
+93.7838249921
+95.7376452171
+106.8157602188
+103.3882783087
+97.6830058802
+96.9228712621
+96.5891968801
+100.9312461499
+95.7106543194
+95.7627087341
+94.6201497646
+96.4659366881
+101.9503937539
+95...
+
+93.0216098450
+101.5545789562
+97.9422431718
+96.9868546837
+95.9567708374
+91.1910439720
+98.1410910087
+98.3534323184
+93.6850233553
+96.8253149365
+106.9552888648
+93.3988484846
+95.4725319279
+97.8036806201
+91.0190976694
+95.7176134016
+98.7832375536
+98.5479898435
+94.2141951156
+96.7124489663
+101.8262512597
+92....
+
+*/
