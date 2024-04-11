@@ -220,7 +220,8 @@ std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bu
 	while (dq.size() > 2 && !check(dq[dq.size() - 2], dq[dq.size() - 1], dq[0])) dq.pop_back();
 	while (dq.size() > 2 && !check(dq[1], dq[0], dq[dq.size() - 1])) dq.pop_front();
 	std::vector<Pos> HPI;
-	for (int i = 0; i < (int)dq.size(); ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % dq.size()]));
+	sz = dq.size();
+	for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
 	return HPI;
 }
 struct Circle {
