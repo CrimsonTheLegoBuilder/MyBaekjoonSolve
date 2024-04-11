@@ -28,8 +28,8 @@ typedef double db;
 const db EPS = 1e-9;
 //inline int sign(db a) { return a < -EPS ? -1 : a > EPS; }
 inline int cmp(db a, db b) { return sign(a - b); }
-//refer to bulijiojiodibuliduo
-//O(n^2logN + 6QN) power-diagram
+//half plane intersection - refer to bulijiojiodibuliduo
+//O(n^2logN + 6QN) power-diagram query
 ///=========================================================///
 
 struct Pos {
@@ -133,11 +133,9 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 	friend bool parallel(Linear l0, Linear l1) { return zero(l0.dir() / l1.dir()); }
 	friend bool same_dir(Linear l0, Linear l1) { return parallel(l0, l1) && l0.dir() * l1.dir() > 0; }
 };
-//ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d1); }
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
-	//return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 	return sign(ret);
 }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -182,29 +180,17 @@ std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& 
 	Pos m2 = m + vec * ratio / distance;
 	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
 	return { m1, m2 };//p1->p2
-
-	////refer to bulijiojiodibuliduo
-	////if (std::abs(cross(o, p1, p2) / (p1 - p2).mag()) > r) return {};
-	//if (std::abs(dist(p1, p2, o)) > r) return {};
-	//ld x = (p1 - o) * (p2 - p1);
-	//ld y = (p2 - p1).Euc();
-	//ld d = x * x - y * ((p1 - o).Euc() - r * r);
-	//d = std::max(d, 0.);
-	//Pos m = p1 - (p2 - p1) * (x / y);
-	//Pos dr = (p2 - p1) * (sqrt(d) / y);
-	//return { m - dr, m + dr };
 }
-ld area_cut(const ld& r, const Pos& p1, const Pos& p2) {
-	std::vector<Pos> is = circle_line_intersection(O, r, p1, p2);
-	if (is.empty()) return r * r * rad(p1, p2) * .5;
-	bool b1 = p1.Euc() > r * r, b2 = p2.Euc() > r * r;
-	if (b1 && b2) {
-		if ((p1 - is[0]) * (p2 - is[0]) <= 0) return r * r * (rad(p1, is[0]) + rad(is[1], p2)) * .5 + is[0] / is[1] * .5;
-		else return r * r * rad(p1, p2) / 2;
-	}
-	if (b1) return (r * r * rad(p1, is[0]) + is[0] / p2) * .5;
-	if (b2) return (p1 / is[1] + r * r * rad(is[1], p2)) * .5;
-	return p1 / p2 * .5;
+ld area_cut(const ld& r, const Pos& v1, const Pos& v2) {
+	std::vector<Pos> inx = circle_line_intersection(O, r, v1, v2);
+	if (inx.empty()) return r * r * rad(v1, v2) * .5;
+	Pos m1 = inx[0], m2 = inx[1];
+	ld d1 = dot(m1, v1, m2), d2 = dot(m1, v2, m2);
+	if (d1 >= 0 && d2 >= 0) return (v1 / v2) * .5;
+	else if (d1 >= 0) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
+	else if (d2 >= 0) return (r * r * rad(v1, m1) + m1 / v2) * .5;
+	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0) return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
+	else return (r * r * rad(v1, v2)) * .5;
 }
 std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
 	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
@@ -235,7 +221,6 @@ struct Circle {
 	bool operator < (const Circle& q) const {
 		ld dist = (c - q.c).mag();
 		return r <= q.r && dist + r < q.r + TOL;
-		//return r <= q.r && dist + r <= q.r;
 	}
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
@@ -263,9 +248,11 @@ void query() {
 		for (int j = 0; j < sz; j++)
 			ret += area_cut(disks[i].r, rem[j] - disks[i].c, rem[(j + 1) % sz] - disks[i].c);
 	}
-	ret = ret * 100 / w / h;
-	ret = std::min(std::max(ret, 0.), 100.);
-	std::cout << ret << "\n";
+	//ret = ret * 100 / w / h;
+	////ret = std::min(std::max(ret, 0.), 100.);
+	//std::cout << ret << "\n";
+	std::cout << ret * 100 / w / h << "\n";
+	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -275,7 +262,7 @@ void solve() {
 	std::cin >> N >> Q;
 	std::vector<Circle> tmp(N);
 	for (Circle& c : tmp) std::cin >> c;
-	std::sort(tmp.begin(), tmp.end(), cmpr);//sort descending order - by r
+	std::sort(tmp.begin(), tmp.end(), cmpr);//sort descending order by r
 	memset(V, 0, sizeof V);
 	for (int i = 0; i < N; i++) {//remove
 		if (V[i]) continue;
@@ -284,19 +271,8 @@ void solve() {
 			if (tmp[j] < tmp[i]) V[j] = 1;
 		}
 	}
-
-	//memset(V, 0, sizeof V);//refer to bulijiojiodibuliduo
-	//for (int i = 0; i < N; i++) {
-	//	for (int j = 0; j < N; j++) {
-	//		if (i != j && std::make_pair(tmp[i].r, i) <= std::make_pair(tmp[j].r, j))
-	//			if ((tmp[i].c - tmp[j].c).mag() - TOL < (tmp[j].r - tmp[i].r))
-	//				V[i] = 1;
-	//	}
-	//}
-
 	for (int i = 0; i < N; i++) if (!V[i]) disks.push_back(tmp[i]);
 	N = disks.size();
-
 	int bnd = 3e6;
 	for (int i = 0; i < N; i++) {//compose power diagram
 		std::vector<Linear> HP;
@@ -316,155 +292,22 @@ void solve() {
 		}
 		pd[i] = half_plane_intersection(HP);
 	}
-
-	//int bnd = 3e6;//refer to bulijiojiodibuliduo
-	//for (int i = 0; i < N; i++) {//compose power diagram
-	//	std::vector<Linear> HP;
-	//	HP.push_back(Linear(Pos(bnd, bnd), Pos(-bnd, bnd)));
-	//	HP.push_back(Linear(Pos(-bnd, bnd), Pos(-bnd, -bnd)));
-	//	HP.push_back(Linear(Pos(-bnd, -bnd), Pos(bnd, -bnd)));
-	//	HP.push_back(Linear(Pos(bnd, -bnd), Pos(bnd, bnd)));
-	//	for (int j = 0; j < N; j++) {
-	//		if (i == j) continue;
-	//		Pos& ca = disks[i].c, cb = disks[j].c;
-	//		ld ra = disks[i].r, rb = disks[j].r;
-	//		Pos d = (cb - ca) * 2;
-	//		ld v = (cb * cb - rb * rb) - (ca * ca - ra * ra);
-	//		Pos p1(0, 0);
-	//		if (fabs(d.x) > fabs(d.y)) p1 = Pos(v / d.x, 0);
-	//		else p1 = Pos(0, v / d.y);
-	//		Pos p2 = p1 + ~d;
-	//		HP.push_back(Linear(p1, p2));
-	//	}
-	//	pd[i] = half_plane_intersection(HP);
-	//}
-
-	//for (int i = 0; i < N; i++) {
-	//	std::cout << "DEBUG:: pd[" << i << "] : len:: " << pd[i].size() << " ::\n";
-	//	for (Pos& p : pd[i]) std::cout << p << " ";
-	//	std::cout << "\n";
-	//}
 	while (Q--) query();
 	return;
 }
 int main() { solve(); return 0; }//NAC 2021 B Apple Orchard
 //refer to bulijiojiodibuliduo
 
-/*
 
-4 3
--1 -1 3
-1 -1 3
--1 1 3
-1 1 3
-4
--3e+06 0 -3e+06 -3e+06 0 -3e+06 0 0
-4
-0 0 0 -3e+06 3e+06 -3e+06 3e+06 0
-4
--3e+06 3e+06 -3e+06 0 0 0 0 3e+06
-4
-0 3e+06 0 0 3e+06 0 3e+06 3e+06
--4 -4 8 8
-0
--1 -4 2 8
-0
--3 -1 12 3
-0
-
-4 3
--1 -1 3
-1 -1 3
--1 1 3
-1 1 3
-4
--3e+06 0 -3e+06 -3e+06 0 -3e+06 0 0
-4
-0 0 0 -3e+06 3e+06 -3e+06 3e+06 0
-4
--3e+06 3e+06 -3e+06 0 0 -0 0 3e+06
-4
-0 3e+06 -0 0 3e+06 0 3e+06 3e+06
--4 -4 8 8
-87.222142377564509
--1 -4 2 8
-98.586991372916088
--3 -1 12 3
-57.862330457638706
-
-*/
-
-//Pos p[LEN];
-//int r[LEN];
-//void solve_bulijiojiodibuliduo() {
-//	scanf("%d%d", &N, &Q);
-//	for (int i = 0; i < N; i++) {
-//		int x, y;
-//		scanf("%d%d%d", &x, &y, &r[i]);
-//		p[i] = Pos(x, y);
+//ld area_cut(const ld& r, const Pos& p1, const Pos& p2) {
+//	std::vector<Pos> is = circle_line_intersection(O, r, p1, p2);
+//	if (is.empty()) return r * r * rad(p1, p2) * .5;
+//	bool b1 = p1.Euc() > r * r, b2 = p2.Euc() > r * r;
+//	if (b1 && b2) {
+//		if ((p1 - is[0]) * (p2 - is[0]) <= 0) return r * r * (rad(p1, is[0]) + rad(is[1], p2)) * .5 + is[0] / is[1] * .5;
+//		else return r * r * rad(p1, p2) / 2;
 //	}
-//	for (int i = 0; i < N; i++) {
-//		for (int j = 0; j < N; j++) {
-//			if (i != j && std::make_pair(r[i], i) <= std::make_pair(r[j], j))
-//				if ((p[i] - p[j]).mag() - TOL < (r[j] - r[i]))
-//					V[i] = 1;
-//		}
-//	}
-//	int n = 0;
-//	for (int i = 0; i < N; i++) if (!V[i]) {
-//		p[n] = p[i];
-//		r[n] = r[i];
-//		++n;
-//	}
-//	N = n;
-//	int bnd = 3e6;
-//	ld ss = 0;
-//	for (int i = 0; i < N; i++) {
-//		std::vector<Linear> l;
-//		l.push_back(Linear(Pos(bnd, bnd), Pos(-bnd, bnd)));
-//		l.push_back(Linear(Pos(-bnd, bnd), Pos(-bnd, -bnd)));
-//		l.push_back(Linear(Pos(-bnd, -bnd), Pos(bnd, -bnd)));
-//		l.push_back(Linear(Pos(bnd, -bnd), Pos(bnd, bnd)));
-//
-//		for (int j = 0; j < N; j++)
-//			if (i != j) {
-//				Pos d = (p[j] - p[i]) * 2;
-//				ld v = (p[j] * p[j] - 1. * r[j] * r[j]) - (p[i] * p[i] - 1. * r[i] * r[i]);
-//				Pos p1(0, 0);
-//				if (fabs(d.x) > fabs(d.y)) p1 = Pos(v / d.x, 0);
-//				else p1 = Pos(0, v / d.y);
-//				Pos p2 = p1 + ~d;
-//				l.push_back(Linear(p1, p2));
-//			}
-//		pd[i] = half_plane_intersection(l);
-//		//std::cout << pd[i].size() << "\n";
-//		//for (Pos& p : pd[i]) std::cout << p << " ";
-//		//std::cout << "\n";
-//	}
-//	while (Q--) {
-//		int x1, y1, w, h, x2, y2;
-//		scanf("%d%d%d%d", &x1, &y1, &w, &h);
-//		//x2,&y2);
-//		x2 = x1 + w; y2 = y1 + h;
-//		ld ret = 0;
-//		for (int i = 0; i < N; i++) {
-//			std::vector<Pos> box = { Pos(x1, y1),Pos(x2, y1), Pos(x2, y2), Pos(x1, y2) };
-//			//std::vector<Pos> rev = sutherland_hodgman(pd[i], box);
-//			std::vector<Pos> rev = pd[i];
-//			rev = convex_cut(rev, Pos(x1, y1), Pos(x2, y1));
-//			rev = convex_cut(rev, Pos(x2, y1), Pos(x2, y2));
-//			rev = convex_cut(rev, Pos(x2, y2), Pos(x1, y2));
-//			rev = convex_cut(rev, Pos(x1, y2), Pos(x1, y1));
-//			int m = rev.size();
-//			if (m < 3) continue;
-//			for (int j = 0; j < m; j++) ret += area_cut(r[i], rev[j] - p[i], rev[(j + 1) % m] - p[i]);
-//		}
-//		ret = ret * 100 / w / h;
-//		ret = std::min(std::max(ret, 0.), 100.);
-//		printf("%.15f\n", ret);
-//	}
-//	return;
+//	if (b1) return (r * r * rad(p1, is[0]) + is[0] / p2) * .5;
+//	if (b2) return (p1 / is[1] + r * r * rad(is[1], p2)) * .5;
+//	return p1 / p2 * .5;
 //}
-//int main() { solve_bulijiojiodibuliduo(); return 0; }
-//refer to bulijiojiodibuliduo
-
