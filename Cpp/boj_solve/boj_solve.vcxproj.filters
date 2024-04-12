@@ -930,6 +930,9 @@
     <ClCompile Include="boj22923_apple_power_diagram.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj13907_fast.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
