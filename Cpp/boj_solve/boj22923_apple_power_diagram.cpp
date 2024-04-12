@@ -185,11 +185,12 @@ ld area_cut(const ld& r, const Pos& v1, const Pos& v2) {
 	std::vector<Pos> inx = circle_line_intersection(O, r, v1, v2);
 	if (inx.empty()) return r * r * rad(v1, v2) * .5;
 	Pos m1 = inx[0], m2 = inx[1];
-	ld d1 = dot(m1, v1, m2), d2 = dot(m1, v2, m2);
-	if (d1 >= 0 && d2 >= 0) return (v1 / v2) * .5;
-	else if (d1 >= 0) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
-	else if (d2 >= 0) return (r * r * rad(v1, m1) + m1 / v2) * .5;
-	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0) return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
+	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
+	if (d1 && d2) return (v1 / v2) * .5;
+	else if (d1) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
+	else if (d2) return (r * r * rad(v1, m1) + m1 / v2) * .5;
+	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0) 
+		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
 	else return (r * r * rad(v1, v2)) * .5;
 }
 std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
