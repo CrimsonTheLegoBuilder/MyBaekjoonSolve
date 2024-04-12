@@ -311,6 +311,7 @@ void solve() {
 			Pos vec = cb - ca;//vec a -> b
 			ld distance = vec.mag();
 			ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
+			//ld X = (ra * ra - rb * rb + distance * distance) / (2 * distance);
 			Pos m = ca + vec * X / distance;
 			HP.push_back(Linear(m, m + ~vec));
 		}
