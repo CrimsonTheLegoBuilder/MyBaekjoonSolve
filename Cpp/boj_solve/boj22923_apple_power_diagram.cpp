@@ -121,12 +121,12 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
 		return Linear(ps[0] - delta, ps[1] - delta);
 	}
-	bool operator < (const Linear& l0) const {
-		if (zero(this->dir() / l0.dir()) && l0.dir() * this->dir() > 0) return l0.include(ps[0]);
-		else return cmpq(this->dir(), l0.dir());
-	}
 	friend bool parallel(const Linear& l0, const Linear& l1) { return zero(l0.dir() / l1.dir()); }
 	friend bool same_dir(const Linear& l0, const Linear& l1) { return parallel(l0, l1) && l0.dir() * l1.dir() > 0; }
+	bool operator < (const Linear& l0) const {
+		if (same_dir(*this, l0)) return l0.include(ps[0]);
+		else return cmpq(this->dir(), l0.dir());
+	}
 };
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {

@@ -43,6 +43,8 @@ ll powmod(ll a, ll b) {
 }
 struct Info { ll area, l, r; };
 
+//freopen("../../../input_data/triathlon_tests/triath.20", "r", stdin);
+//freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
 //Euler characteristic : v - e + f == 1
 //Pick`s Theorem : A = i + b/2 - 1
 //2D============================================================================//

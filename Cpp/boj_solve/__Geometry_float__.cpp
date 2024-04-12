@@ -48,6 +48,8 @@ ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
 std::vector<Seq> seq;
 
+//freopen("../../../input_data/triathlon_tests/triath.20", "r", stdin);
+//freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
 //Euler characteristic : v - e + f == 1
 //Pick`s Theorem : A = i + b/2 - 1
 //2D============================================================================//

@@ -14,7 +14,7 @@ typedef long double lld;
 const ld INF = 1e18;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
-const int LEN = 1e5 + 5;
+const int LEN = 1e6 + 5;
 int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
@@ -267,6 +267,9 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(10);
+	//freopen("../../../input_data/power/test/02.i.in", "r", stdin);
+	//freopen("../../../input_data/power/test/out.txt", "w", stdout);
+	//std::cout << "02.i.in\n";
 	std::cin >> N;
 	C.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
