@@ -5,12 +5,7 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <queue>
 #include <deque>
-#include <random>
-#include <array>
-#include <tuple>
-#include <complex>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -296,4 +291,4 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//NAC 2021 B Apple Orchard
-//refer to bulijiojiodibuliduo
+//half plane intersection - refer to bulijiojiodibuliduo
