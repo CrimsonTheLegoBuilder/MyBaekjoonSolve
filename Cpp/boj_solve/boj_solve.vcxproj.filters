@@ -909,13 +909,25 @@
     <ClCompile Include="boj7890_kdtree.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj22923_apple_power_diagram.cpp">
+    <ClCompile Include="boj22923_apple_power_diagram_1st.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="solapple.cpp">
+    <ClCompile Include="solapple_not_my_code.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="boj22923_apple_2nd.cpp">
+    <ClCompile Include="boj22923_apple_power_diagram_3rd.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj22923_apple_power_diagram_2nd.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj22923_Apple_Orchard_accepted.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="__arduino_library__.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="boj22923_apple_power_diagram.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

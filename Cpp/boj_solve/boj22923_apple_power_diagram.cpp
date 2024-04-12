@@ -181,18 +181,6 @@ std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& 
 	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
 	return { m1, m2 };//p1->p2
 }
-ld area_cut(const ld& r, const Pos& v1, const Pos& v2) {
-	std::vector<Pos> inx = circle_line_intersection(O, r, v1, v2);
-	if (inx.empty()) return r * r * rad(v1, v2) * .5;
-	Pos m1 = inx[0], m2 = inx[1];
-	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
-	if (d1 && d2) return (v1 / v2) * .5;
-	else if (d1) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
-	else if (d2) return (r * r * rad(v1, m1) + m1 / v2) * .5;
-	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0) 
-		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
-	else return (r * r * rad(v1, v2)) * .5;
-}
 std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
 	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
 		return w.include(intersection(u, v));
@@ -236,6 +224,20 @@ struct Circle {
 bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 std::vector<Pos> pd[LEN];//power diagram (Laguerre-Voronoi diagram)
 std::vector<Circle> disks;
+ld circle_cut(const Circle& c, const Pos& p1, const Pos& p2) {
+	Pos v1 = p1 - c.c, v2 = p2 - c.c;
+	ld r = c.r;
+	std::vector<Pos> inx = circle_line_intersection(O, r, v1, v2);
+	if (inx.empty()) return r * r * rad(v1, v2) * .5;
+	Pos m1 = inx[0], m2 = inx[1];
+	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
+	if (d1 && d2) return (v1 / v2) * .5;
+	else if (d1) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
+	else if (d2) return (r * r * rad(v1, m1) + m1 / v2) * .5;
+	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0)
+		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
+	else return (r * r * rad(v1, v2)) * .5;
+}
 void query() {
 	ll x, y, w, h;
 	std::vector<Pos> box;
@@ -247,7 +249,7 @@ void query() {
 		int sz = rem.size();
 		if (sz < 3) continue;
 		for (int j = 0; j < sz; j++)
-			ret += area_cut(disks[i].r, rem[j] - disks[i].c, rem[(j + 1) % sz] - disks[i].c);
+			ret += circle_cut(disks[i], rem[j], rem[(j + 1) % sz]);
 	}
 	std::cout << ret * 100 / w / h << "\n";
 	return;
