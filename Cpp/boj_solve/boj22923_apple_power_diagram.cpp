@@ -19,10 +19,6 @@ bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 
 ///=========================================================///
-typedef double db;
-const db EPS = 1e-9;
-//inline int sign(db a) { return a < -EPS ? -1 : a > EPS; }
-inline int cmp(db a, db b) { return sign(a - b); }
 //half plane intersection - refer to bulijiojiodibuliduo
 //O(N^2logN + 6QN) power-diagram query
 ///=========================================================///
@@ -45,58 +41,18 @@ struct Pos {
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
+	Pos rot(ld the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
-	//ld mag() const { return hypot(x, y); }
 	ld mag() const { return sqrt(Euc()); }
-	ld ang() const { return atan2(y, x); }
 	Pos unit() const { return *this / mag(); }
-	//int quad() const { return y > 0 || (zero(y) && x > -TOL); }
+	ld rad() const { return atan2(y, x); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
-	Pos rot(ld the) { return { x * cos(the) - y * sin(the),x * sin(the) + y * cos(the) }; }
-	friend bool cmpq(const Pos& a, const Pos& b) {
-		if (a.quad() != b.quad()) return a.quad() < b.quad();
-		else return a / b > 0;
-	}
+	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
-struct Vec {
-	ld vy, vx;
-	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
-	bool operator == (const Vec& v) const { return (zero(vy - v.vy) && zero(vx - v.vx)); }
-	bool operator < (const Vec& v) const { return zero(vy - v.vy) ? vx < v.vx : vy < v.vy; }
-	ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
-	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
-	Vec operator ~ () const { return { -vx, vy }; }
-	Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
-	Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
-	ld mag() const { return hypot(vy, vx); }
-}; const Vec Zero = { 0, 0 };
-struct Line {//ax + by = c
-	Vec s;
-	ld c;
-	Line(Vec V = Vec(0, 0), ld C = 0) : s(V), c(C) {}
-	bool operator < (const Line& l) const {
-		bool f1 = Zero < s;
-		bool f2 = Zero < l.s;
-		if (f1 != f2) return f1;
-		ld CCW = s / l.s;
-		return zero(CCW) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : CCW > 0;
-	}
-	ld operator * (const Line& l) const { return s * l.s; }
-	ld operator / (const Line& l) const { return s / l.s; }
-	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
-	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
-	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
-	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
-	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
-	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
-	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
-	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
-	ld mag() const { return s.mag(); }
-	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
-};
 struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 	Pos ps[2];
 	Pos dir_;
@@ -128,6 +84,7 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 		else return cmpq(this->dir(), l0.dir());
 	}
 };
+//ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
@@ -143,7 +100,6 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
 Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
-ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 Polygon convex_cut(const std::vector<Pos>& ps, const Pos& b1, const Pos& b2) {
 	std::vector<Pos> qs;
 	int n = ps.size();
@@ -294,3 +250,40 @@ void solve() {
 }
 int main() { solve(); return 0; }//NAC 2021 B Apple Orchard
 //half plane intersection - refer to bulijiojiodibuliduo
+
+//struct Vec {
+//	ld vy, vx;
+//	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
+//	bool operator == (const Vec& v) const { return (zero(vy - v.vy) && zero(vx - v.vx)); }
+//	bool operator < (const Vec& v) const { return zero(vy - v.vy) ? vx < v.vx : vy < v.vy; }
+//	ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
+//	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
+//	Vec operator ~ () const { return { -vx, vy }; }
+//	Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
+//	Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
+//	ld mag() const { return hypot(vy, vx); }
+//}; const Vec Zero = { 0, 0 };
+//struct Line {//ax + by = c
+//	Vec s;
+//	ld c;
+//	Line(Vec V = Vec(0, 0), ld C = 0) : s(V), c(C) {}
+//	bool operator < (const Line& l) const {
+//		bool f1 = Zero < s;
+//		bool f2 = Zero < l.s;
+//		if (f1 != f2) return f1;
+//		ld CCW = s / l.s;
+//		return zero(CCW) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : CCW > 0;
+//	}
+//	ld operator * (const Line& l) const { return s * l.s; }
+//	ld operator / (const Line& l) const { return s / l.s; }
+//	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
+//	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
+//	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
+//	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
+//	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
+//	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
+//	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
+//	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
+//	ld mag() const { return s.mag(); }
+//	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
+//};

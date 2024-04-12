@@ -72,7 +72,12 @@ struct Pos {
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
-	ld ang() const { return atan2(y, x); }
+	ld rad() const { return atan2(y, x); }
+	int quad() const { return y > 0 || y == 0 && x >= 0; }
+	friend bool cmpq(const Pos& a, const Pos& b) {
+		if (a.quad() != b.quad()) return a.quad() < b.quad();
+		else return a / b > 0;
+	}
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
