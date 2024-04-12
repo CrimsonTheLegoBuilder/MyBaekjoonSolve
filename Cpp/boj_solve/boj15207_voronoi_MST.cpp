@@ -267,8 +267,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(10);
-	ld w, h;
-	std::cin >> N >> w >> h;
+	std::cin >> N;
 	C.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
 	Voronoi_diagram(C, 1);

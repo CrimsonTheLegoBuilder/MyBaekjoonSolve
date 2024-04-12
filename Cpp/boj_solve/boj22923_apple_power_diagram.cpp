@@ -24,7 +24,7 @@ const db EPS = 1e-9;
 //inline int sign(db a) { return a < -EPS ? -1 : a > EPS; }
 inline int cmp(db a, db b) { return sign(a - b); }
 //half plane intersection - refer to bulijiojiodibuliduo
-//O(n^2logN + 6QN) power-diagram query
+//O(N^2logN + 6QN) power-diagram query
 ///=========================================================///
 
 struct Pos {
