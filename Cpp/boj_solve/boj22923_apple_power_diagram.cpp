@@ -191,8 +191,9 @@ std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bu
 	}
 	while (dq.size() > 2 && !check(dq[dq.size() - 2], dq[dq.size() - 1], dq[0])) dq.pop_back();
 	while (dq.size() > 2 && !check(dq[1], dq[0], dq[dq.size() - 1])) dq.pop_front();
-	std::vector<Pos> HPI;
 	sz = dq.size();
+	if (sz < 3) return {};
+	std::vector<Pos> HPI;
 	for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
 	return HPI;
 }
@@ -240,6 +241,7 @@ void query() {
 	box = { Pos(x, y), Pos(x + w, y), Pos(x + w, y + h), Pos(x, y + h) };
 	ld ret = 0;
 	for (int i = 0; i < N; i++) {
+		if (pd[i].empty()) continue;
 		std::vector<Pos> rem = sutherland_hodgman(pd[i], box);
 		int sz = rem.size();
 		if (sz < 3) continue;
