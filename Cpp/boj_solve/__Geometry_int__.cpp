@@ -80,37 +80,41 @@ struct Pos {
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
-typedef std::vector<Pos> Polygon;
-//struct Pos {
-//	int x, y, i;
-//	Pos(int X = 0, int Y = 0, int I = 0) : x(X), y(Y), i(I) {}
-//	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
-//	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
-//	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-//	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
-//	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
-//	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-//	Pos operator * (const int& n) const { return { x * n, y * n }; }
-//	Pos operator / (const int& n) const { return { x / n, y / n }; }
-//	ll operator * (const Pos& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
-//	ll operator / (const Pos& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-//	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-//	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-//	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-//	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-//	Pos operator ~ () const { return { -y, x }; }
-//	ll operator ! () const { return (ll)x * y; }
-//	ll Euc() const { return (ll)x * x + (ll)y * y; }
-//	ll Man() const { return std::abs(x) + std::abs(y); }
-//	ld mag() const { return hypot(x, y); }
-//	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
-//	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-//}; const Pos O = Pos(0, 0);
-//bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
-//bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
+struct Pos {
+	int x, y;
+	ll c;
+	Pos(int X = 0, int Y = 0, ll C = 0) : x(X), y(Y), c(C) {}
+	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
+	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
+	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
+	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	Pos operator * (const int& n) const { return { x * n, y * n }; }
+	Pos operator / (const int& n) const { return { x / n, y / n }; }
+	ll operator * (const Pos& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
+	ll operator / (const Pos& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
+	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
+	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pos operator ~ () const { return { -y, x }; }
+	Pos operator ! () const { return { -x, -y }; }
+	ll xy() const { return (ll)x * y; }
+	ll Euc() const { return (ll)x * x + (ll)y * y; }
+	int Man() const { return std::abs(x) + std::abs(y); }
+	ld mag() const { return hypot(x, y); }
+	ld rad() const { return atan2(y, x); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+	int quad() const { return y > 0 || y == 0 && x >= 0; }
+	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
+	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
+}; const Pos O = Pos(0, 0);
+bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
+bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 //bool cmpi(const Pos& p, const Pos& q) { return p.i < q.i; }
-//typedef std::vector<Pos> Polygon;
-std::vector<Pos> C, H;
+typedef std::vector<Pos> Polygon;
 std::vector<Pos> C, H;
 struct Vec {
 	ll vy, vx;
