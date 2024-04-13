@@ -68,16 +68,15 @@ struct Pos {
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
 	Pos operator ~ () const { return { -y, x }; }
-	ll operator ! () const { return x * y; }
+	Pos operator ! () const { return { -x, -y }; }
+	ld xy() const { return x * y; }
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
 	ld rad() const { return atan2(y, x); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return y > 0 || y == 0 && x >= 0; }
-	friend bool cmpq(const Pos& a, const Pos& b) {
-		if (a.quad() != b.quad()) return a.quad() < b.quad();
-		else return a / b > 0;
-	}
+	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
