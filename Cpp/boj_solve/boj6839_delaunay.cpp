@@ -25,8 +25,8 @@ ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 //O(N log N) Delaunay_triangulation && Voronoi_diagram solver
 //https://cp-algorithms.com/geometry/delaunay.html
 struct Pii {
-	int x, y, i;
-	Pii(int X = 0, int Y = 0, int I = 0) : x(X), y(Y), i(I) {}
+	int x, y;
+	Pii(int X = 0, int Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
