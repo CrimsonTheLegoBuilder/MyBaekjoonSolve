@@ -359,7 +359,7 @@ Pdd intersection(const Pdd& p1, const Pdd& p2, const Pdd& q1, const Pdd& q2) {
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
 Pdd intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
-ld rad(const Pdd& p1, const Pdd& p2) { return atan2l(p1 / p2, p1 * p2); }
+//ld rad(const Pdd& p1, const Pdd& p2) { return atan2l(p1 / p2, p1 * p2); }
 std::vector<Pdd> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
 	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
 		return w.include(intersection(u, v));
@@ -435,6 +435,7 @@ Circle enclose_circle(const Pdd& u, const Pdd& v, const Pdd& w) {
 	return Circle(c, r);
 }
 ld enclose_circle(const Pii& u, const Pii& v, const Pii& w) {
+	if (!ccw(u, v, w)) return 109.;
 	Pdd p = P(u), q = P(v), r = P(w);
 	Pdd m1 = (p + q) * .5, v1 = ~(q - p);
 	Pdd m2 = (p + r) * .5, v2 = ~(r - p);
@@ -462,7 +463,6 @@ ld enclose_circle(std::vector<Pii> C) {
 			ret = std::max(ret, enclose_circle(a, b, c));
 		}
 	}
-
 	return ret;
 }
 void solve() {
@@ -470,7 +470,10 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(10);
-
+	std::cin >> N;
+	std::vector<Pii> C(N);
+	for (Pii& p : C) std::cin >> p;
+	std::cout << enclose_circle(C) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj6839
