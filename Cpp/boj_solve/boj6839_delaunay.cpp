@@ -440,7 +440,7 @@ ld enclose_circle(const Pii& u, const Pii& v, const Pii& w) {
 	Pdd m1 = (p + q) * .5, v1 = ~(q - p);
 	Pdd m2 = (p + r) * .5, v2 = ~(r - p);
 	Pdd c = intersection(m1, m1 + v1, m2, m2 + v2);
-	return std::min(109., (p - c).mag());
+	return (p - c).mag();
 }
 std::vector<Pii> C;
 std::vector<Pdd> poly, vd[LEN];
