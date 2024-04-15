@@ -12,8 +12,7 @@ int N, M;
 
 struct Pos {
 	int x, y;
-	ll c;
-	Pos(int X = 0, int Y = 0, ll C = 0) : x(X), y(Y), c(C) {}
+	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
