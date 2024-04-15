@@ -110,7 +110,7 @@ bool left_of(Pii p, QuadEdge* e) { return cross(p, e->origin, e->dest()) > 0; }
 bool right_of(Pii p, QuadEdge* e) { return cross(p, e->origin, e->dest()) < 0; }
 template <class T> T det3(T a1, T a2, T a3, T b1, T b2, T b3, T c1, T c2, T c3) {
 	return a1 * (b2 * c3 - c2 * b3)
-		- a2 * (b1 * c3 - c1 * b3) 
+		- a2 * (b1 * c3 - c1 * b3)
 		+ a3 * (b1 * c2 - c1 * b2);
 }
 bool in_circle(Pii a, Pii b, Pii c, Pii d) {
@@ -444,53 +444,25 @@ ld enclose_circle(const Pii& u, const Pii& v, const Pii& w) {
 std::vector<Pii> C;
 std::vector<Pdd> poly, vd[LEN];
 std::vector<int> seed[LEN];
-ld voronoi_diagram(const ld& wl, const ld& wr, const ld& hd, const ld& hu, std::vector<Pii> C) {
+ld enclose_circle(std::vector<Pii> C) {
 	int sz = C.size();
-	poly.resize(sz);
-	for (int i = 0; i < sz; i++) poly[i] = P(C[i]);
-	assert(sz);
+	ld ret = 0;
+	assert(sz > 2);
 	if (sz == 1) {}
 	else if (sz == 2) {
-		seed[0].push_back(1);
-		seed[1].push_back(0);
+		//seed[0].push_back(1);
+		//seed[1].push_back(0);
 	}
 	else {
 		std::vector<std::tuple<Pii, Pii, Pii>> dt = delaunay_triangulation(C);
 		for (const std::tuple<Pii, Pii, Pii>& tri : dt) {
-			int a = std::get<0>(tri).i;
-			int b = std::get<1>(tri).i;
-			int c = std::get<2>(tri).i;
-			seed[a].push_back(b);
-			seed[a].push_back(c);
-			seed[b].push_back(a);
-			seed[b].push_back(c);
-			seed[c].push_back(a);
-			seed[c].push_back(b);
+			Pii a = std::get<0>(tri);
+			Pii b = std::get<1>(tri);
+			Pii c = std::get<2>(tri);
+			ret = std::max(ret, enclose_circle(a, b, c));
 		}
 	}
-	ld ret = 0;
-	for (int i = 0; i < N; i++) {
-		std::sort(seed[i].begin(), seed[i].end());
-		//seed[i].erase(unique(seed[i].begin(), seed[i].end()), seed[i].end());
-		seed[i].resize(unique(seed[i].begin(), seed[i].end()) - seed[i].begin());
-		std::vector<Line> HP;
-		for (const int& j : seed[i]) {
-			//Line hp = rotate90(L(poly[i], poly[j]), (poly[i] + poly[j]) * .5);
-			Line hp = L(~L(poly[i], poly[j]).s, (poly[i] + poly[j]) * .5);
-			HP.push_back(hp);
-		}
-		HP.push_back(Line(Vec(0, 1), hu));
-		HP.push_back(Line(Vec(0, -1), -hd));
-		HP.push_back(Line(Vec(1, 0), wr));
-		HP.push_back(Line(Vec(-1, 0), -wl));
-		std::vector<Pdd> HPI = {};
-		if (!half_plane_intersection(HP, HPI)) continue;
-		//vd[i] = HPI;
-		for (int j = 0; j < HPI.size(); j++) {
-			ld dist = (HPI[j] - poly[i]).mag();
-			ret = std::max(ret, dist);
-		}
-	}
+
 	return ret;
 }
 void solve() {
@@ -498,11 +470,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(10);
-	ld w, h;
-	std::cin >> N >> w >> h;
-	C.resize(N);
-	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
-	std::cout << voronoi_diagram(0, w, 0, h, C) << "\n";
+
 	return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj6839
