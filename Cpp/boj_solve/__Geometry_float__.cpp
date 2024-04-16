@@ -66,6 +66,7 @@ struct Pos {
 	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
 	ld operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
+	ld operator ^ (const Pos& p) const { return { x * p.y - y * p.x }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { -x, -y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
@@ -81,6 +82,7 @@ struct Pos {
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
+	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
@@ -649,13 +651,20 @@ Circle enclose_circle(const Pos& u, const Pos& v) {
 	Pos c = (u + v) * .5;
 	return Circle(c, (c - u).mag());
 }
+//Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
+//	Line l1 = rotate90(L(u, v), (u + v) * .5);
+//	Line l2 = rotate90(L(v, w), (v + w) * .5);
+//	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
+//	Pos c = intersection(l1, l2);
+//	ld r = (c - u).mag();
+//	return Circle(c, r);
+//}
 Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
-	Line l1 = rotate90(L(u, v), (u + v) * .5);
-	Line l2 = rotate90(L(v, w), (v + w) * .5);
-	if (zero(l1 / l2)) return { { 0, 0 }, -1 };
-	Pos c = intersection(l1, l2);
-	ld r = (c - u).mag();
-	return Circle(c, r);
+	if (!ccw(u, v, w)) return INVAL;
+	Pos m1 = (u + v) * .5, v1 = ~(v - u);
+	Pos m2 = (u + w) * .5, v2 = ~(w - u);
+	Pos c = intersection(m1, m1 + v1, m2, m2 + v2);
+	return Circle(c, (u - c).mag());
 }
 Circle enclose_circle(std::vector<Pos> R) {
 	if (R.size() == 0) return Circle(O, -1);
