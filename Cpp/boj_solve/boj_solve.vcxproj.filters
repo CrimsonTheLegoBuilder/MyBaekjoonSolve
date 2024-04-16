@@ -939,6 +939,12 @@
     <ClCompile Include="boj18436_evenodd.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
+    <ClCompile Include="__fast_delaunay__.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj29995_voronoi.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
