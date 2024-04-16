@@ -301,7 +301,7 @@ struct Line {//ax + by = c
 };
 const Line Xaxis = { { 0, -1 }, 0 };
 const Line Yaxis = { { 1, 0 }, 0 };
-struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
+struct Linear {//ps[0] -> ps[1]
 	Pdd ps[2];
 	Pdd dir_;
 	Pdd& operator[](int i) { return ps[i]; }
@@ -370,19 +370,12 @@ int ccw(const Pdd& d1, const Pdd& d2, const Pdd& d3) {
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
 ld dot(const Pdd& d1, const Pdd& d2, const Pdd& d3) { return (d2 - d1) * (d3 - d2); }
-//bool cw(const Line& l1, const Line& l2, const Line& target) {
-//	if (l1.s / l2.s < TOL) return 0;
-//	Pdd p = intersection(l1, l2);
-//	//return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
-//	return target.above(p) > -TOL;
-//}
 Pdd intersection(const Pdd& p1, const Pdd& p2, const Pdd& q1, const Pdd& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
 Pdd intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
-//ld rad(const Pdd& p1, const Pdd& p2) { return atan2l(p1 / p2, p1 * p2); }
-std::vector<Pdd> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
+std::vector<Pdd> half_plane_intersection(std::vector<Linear>& HP) {
 	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
 		return w.include(intersection(u, v));
 		};
