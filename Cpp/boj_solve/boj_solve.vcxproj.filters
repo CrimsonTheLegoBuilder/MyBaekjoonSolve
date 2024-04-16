@@ -945,6 +945,9 @@
     <ClCompile Include="boj29995_voronoi.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="simple_tester.cpp">
+      <Filter>소스 파일\_test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
