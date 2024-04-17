@@ -15,8 +15,8 @@
 typedef long long ll;
 typedef double db;
 typedef long double ld;
-//const db INF = 1e18;
-const db TOL = 1e-15;
+const db INF = 1e18;
+const db TOL = 1e-7;
 const db PI = acos(-1);
 const int LEN = 1e5 + 5;
 int N, M, T, Q;
@@ -69,6 +69,18 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	db ret = cross(d1, d2, d3);
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
+bool counterclockwise(const Pos& p, const Pos& q, const Pos& r) {
+    return ccw(p, q, r) == 1;
+}
+bool clockwise(const Pos& p, const Pos& q, const Pos& r) {
+    return ccw(p, q, r) == -1;
+}
+bool collinear(const Pos& p, const Pos& q, const Pos& r) {
+    return !ccw(p, q, r);
+}
+bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
+}
 db dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 db dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
@@ -80,15 +92,40 @@ bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && ret > 0;
 }
 db projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
-bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
-}
 db dist(const Pos& d1, const Pos& d2, const Pos& t) {
 	return cross(d1, d2, t) / (d1 - d2).mag();
 }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	db a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
+}
+db circumradius(const Pos& p1, const Pos& p2, const Pos& p3) {
+    Pos d = p2 - p1;
+    Pos e = p3 - p1;
+
+    const db bl = d.Euc();
+    const db cl = e.Euc();
+    const db det = d / e;
+
+    Pos radius((e.y * bl - d.y * cl) * 0.5 / det,
+        (d.x * cl - e.x * bl) * 0.5 / det);
+
+    if ((bl > 0.0 || bl < 0.0) && (cl > 0.0 || cl < 0.0) &&
+        (det > 0.0 || det < 0.0))
+        return radius.Euc();
+    return (std::numeric_limits<double>::max)();
+}
+Pos circumcenter(const Pos& p1, const Pos& p2, const Pos& p3) {
+    Pos d = p2 - p1;
+    Pos e = p3 - p1;
+
+    const db bl = d.Euc();
+    const db cl = e.Euc();
+    const db det = d / e;
+
+    Pos radius((e.y * bl - d.y * cl) * 0.5 / det,
+        (d.x * cl - e.x * bl) * 0.5 / det);
+    return p1 + radius;
 }
 struct Circle {
 	Pos c;
@@ -97,7 +134,7 @@ struct Circle {
 	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
-		ld dist = (c - q.c).mag();
+		db dist = (c - q.c).mag();
 		return r < q.r && dist + r < q.r + TOL;
 	}
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
@@ -105,8 +142,8 @@ struct Circle {
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
-	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
-	ld A() const { return 1. * r * r * PI; }
+	db H(const db& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
+	db A() const { return 1. * r * r * PI; }
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 } INVAL = { { 0, 0 }, (std::numeric_limits<db>::max)() };
@@ -115,9 +152,28 @@ Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
 	Pos m1 = (u + v) * .5, v1 = ~(v - u);
 	Pos m2 = (u + w) * .5, v2 = ~(w - u);
 	Pos c = intersection(m1, m1 + v1, m2, m2 + v2);
-	return Circle(c, (u - c).Euc());
+	return Circle(c, (u - c).mag());
 }
+Circle circumcircle(const Pos& p1, const Pos& p2, const Pos& p3) {
+    Pos d = p2 - p1;
+    Pos e = p3 - p1;
 
+    const db bl = d.Euc();
+    const db cl = e.Euc();
+    const db det = d / e;
+
+    Pos radius((e.y * bl - d.y * cl) * 0.5 / det,
+        (d.x * cl - e.x * bl) * 0.5 / det);
+
+    Pos c;
+    db r;
+    if ((bl > 0.0 || bl < 0.0) && (cl > 0.0 || cl < 0.0) &&
+        (det > 0.0 || det < 0.0))
+        c = p1 + radius, r = radius.Euc();
+    else c = Pos(INF, INF), r = std::numeric_limits<db>::max();
+
+    return Circle(c, r);
+}
 using namespace std;
 
 class Vec2 {
