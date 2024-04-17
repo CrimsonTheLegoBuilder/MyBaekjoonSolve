@@ -34,6 +34,21 @@ I'm : stupid
 
 */
 
+struct Info {
+    int i;
+    db c;
+    Info(int I = 0, db C = 0) : i(I), c(C) {}
+    bool operator < (const Info& x) const { return c < x.c; }
+};
+std::vector<Info> G[LEN << 3];
+std::priority_queue<Info> PQ;
+db COST[LEN << 3];
+ll dijkstra(int v = 0, int t = 1) {
+    memset(COST, 0, sizeof COST);
+    COST[v] = 0;
+    PQ.push(Info(v, 0));
+}
+
 struct Pii {
     int x, y, i;
     Pii(int X = 0, int Y = 0, int I = 0) : x(X), y(Y), i(I) {}
@@ -257,7 +272,7 @@ public:
     const Pos& topRight() const { return top_right_; }
     const Pos& center() const { return center_; }
     const double& span() const { return span_; }
-}; 
+};
 class Delaunator {
 public:
     constexpr static auto INF = std::numeric_limits<double>::max();
