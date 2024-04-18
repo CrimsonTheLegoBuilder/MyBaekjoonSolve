@@ -6,6 +6,12 @@
 #include <cassert>
 #include <vector>
 #include <queue>
+#include <deque>
+#include <random>
+#include <array>
+#include <tuple>
+#include <complex>
+#include <queue>
 #include <numeric>
 #include <map>
 typedef long long ll;
@@ -22,15 +28,7 @@ bool zero(const db& x) { return std::abs(x) < TOL; }
 int sign(const db& x) { return x < -TOL ? -1 : x > TOL; }
 db sqr(const db& x) { return x * x; }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-
-/*
-
-tested in range -1e5 < x, y < 1e5;
-Delaunator - https://github.com/abellgithub/delaunator-cpp/blob/master/include/delaunator.cpp
-modify : jinhwanlazy
-I'm : stupid
-
-*/
+db sqr(db x) { return x * x; }
 
 struct Info {
     int u, v;
@@ -259,405 +257,204 @@ bool in_circle(const Pos& a, const Pos& b, const Pos& c, const Pos& p) {
 
     return d / (e * cp - f * bp) + ap * (e / f) < 0.0;
 }
-class BBox2 {//jinhwanlazy
-    constexpr static auto INF = std::numeric_limits<double>::max();
-private:
-    Pos bottom_left_;
-    Pos top_right_;
-    Pos center_;
-    double span_;
 
-public:
-    BBox2(const std::vector<Pos>& points) {
-        top_right_ = Pos(-INF, -INF);
-        bottom_left_ = Pos(INF, INF);
-        for (const Pos& p : points) {
-            bottom_left_.x = std::min(bottom_left_.x, p.x);
-            bottom_left_.y = std::min(bottom_left_.y, p.y);
-            top_right_.x = std::max(top_right_.x, p.x);
-            top_right_.y = std::max(top_right_.y, p.y);
-        }
-        center_ = (bottom_left_ + top_right_) / 2;
-        span_ = (bottom_left_ - top_right_).Euc();
-    }
+//fast_delaunay / 
+inline double sqr(double x) { return x * x; }
 
-    const Pos& bottomLeft() const { return bottom_left_; }
-    const Pos& topRight() const { return top_right_; }
-    const Pos& center() const { return center_; }
-    const double& span() const { return span_; }
+double dist_sqr(Pos const& a, Pos const& b) {
+    return sqr(a.x - b.x) + sqr(a.y - b.y);
+}
+
+bool in_circumcircle(Point const& p1, Point const& p2, Point const& p3, Point const& p4) {
+    double u11 = p1.x - p4.x;
+    double u21 = p2.x - p4.x;
+    double u31 = p3.x - p4.x;
+    double u12 = p1.y - p4.y;
+    double u22 = p2.y - p4.y;
+    double u32 = p3.y - p4.y;
+    double u13 = sqr(p1.x) - sqr(p4.x) + sqr(p1.y) - sqr(p4.y);
+    double u23 = sqr(p2.x) - sqr(p4.x) + sqr(p2.y) - sqr(p4.y);
+    double u33 = sqr(p3.x) - sqr(p4.x) + sqr(p3.y) - sqr(p4.y);
+    double det = -u13 * u22 * u31 + u12 * u23 * u31 + u13 * u21 * u32 - u11 * u23 * u32 - u12 * u21 * u33 + u11 * u22 * u33;
+    return det > EPSILON;
+}
+double side(Point const& a, Point const& b, Point const& p) {
+    return (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
+}
+
+
+std::vector<Point> points;
+
+
+typedef int SideRef;
+struct Triangle;
+typedef Triangle* TriangleRef;
+
+struct Edge {
+    TriangleRef tri;
+    SideRef     side;
+
+    Edge() : tri(0), side(0) {}
+    Edge(TriangleRef tri, SideRef side) : tri(tri), side(side) {}
 };
-class Delaunator {
+
+struct Triangle {
+    Point p[3];
+    Edge  edge[3];
+    TriangleRef children[3];
+
+    Triangle() {}
+    Triangle(Point const& p0, Point const& p1, Point const& p2) {
+        p[0] = p0; p[1] = p1; p[2] = p2;
+        children[0] = children[1] = children[2] = 0;
+    }
+
+    bool has_children() const {
+        return children[0] != 0;
+    }
+    int num_children() const {
+        return children[0] == 0 ? 0
+            : children[1] == 0 ? 1
+            : children[2] == 0 ? 2 : 3;
+    }
+
+    bool contains(Point const& q) const {
+        double a = side(p[0], p[1], q);
+        double b = side(p[1], p[2], q);
+        double c = side(p[2], p[0], q);
+        return a >= -EPSILON && b >= -EPSILON && c >= -EPSILON;
+    }
+};
+
+void set_edge(Edge a, Edge b) {
+    if (a.tri) a.tri->edge[a.side] = b;
+    if (b.tri) b.tri->edge[b.side] = a;
+    if (a.tri && b.tri) {
+        assert(a.tri->p[(a.side + 1) % 3] == b.tri->p[(b.side + 2) % 3]);
+        assert(a.tri->p[(a.side + 2) % 3] == b.tri->p[(b.side + 1) % 3]);
+    }
+}
+
+class Triangulation {
 public:
-    constexpr static auto INF = std::numeric_limits<double>::max();
-
-    std::vector<Pos> points_;
-    std::vector<std::size_t> triangles_;
-    std::vector<std::size_t> halfedges_;
-    std::vector<std::size_t> hull_prev_;
-    std::vector<std::size_t> hull_next_;
-    std::vector<std::size_t> hull_tri_;
-    std::size_t hull_start_;
-
-private:
-    static constexpr std::size_t INVALID_INDEX = -1;
-
-    std::vector<std::size_t> hull_hash_;
-    Pos center_;
-    std::size_t hash_size_;
-
-public:
-    Delaunator(std::vector<Pos> const& points) : points_(points) {
-        std::size_t n = points.size();
-
-        BBox2 bbox(points_);
-        Pos center = bbox.center();
-
-        std::size_t i0 = INVALID_INDEX;
-        std::size_t i1 = INVALID_INDEX;
-        std::size_t i2 = INVALID_INDEX;
-
-        double min_dist = INF;
-        for (size_t i = 0; i < points_.size(); ++i)
-        {
-            const Pos& p = points_[i];
-            const double d = (p - center).Euc();
-            if (d < min_dist) {
-                i0 = i;
-                min_dist = d;
-            }
-        }
-        Pos p0 = points_[i0];
-
-        min_dist = (std::numeric_limits<double>::max)();
-        for (std::size_t i = 0; i < n; i++) {
-            if (i == i0) continue;
-            const double d = (p0 - points_[i]).Euc();
-            if (d < min_dist && d > 0.0) {
-                i1 = i;
-                min_dist = d;
-            }
-        }
-        Pos p1 = points_[i1];
-
-        double min_radius = INF;
-        for (std::size_t i = 0; i < n; i++) {
-            if (i == i0 || i == i1)
-                continue;
-            const double r = circumradius(p0, p1, points_[i]);
-            if (r < min_radius) {
-                i2 = i;
-                min_radius = r;
-            }
-        }
-        Pos p2 = points_[i2];
-
-        if (!(min_radius < INF)) {
-            throw std::runtime_error("not triangulation");
-        }
-
-        if (counterclockwise(p0, p1, p2)) {
-            std::swap(i1, i2);
-            std::swap(p1, p2);
-        }
-
-        center_ = circumcenter(p0, p1, p2);
-
-        std::vector<double> dists;
-        dists.reserve(points_.size());
-        for (const auto& p : points_)
-            dists.push_back((p - center_).Euc());
-
-        // sort the points by distance from the seed triangle circumcenter
-        std::vector<std::size_t> ids(n);
-        std::iota(ids.begin(), ids.end(), 0);
-        std::sort(ids.begin(), ids.end(),
-            [&dists](std::size_t i, std::size_t j) { return dists[i] < dists[j]; });
-
-        // initialize a hash table for storing edges of the advancing convex hull
-        hash_size_ = static_cast<std::size_t>(std::ceil(std::sqrt(n)));
-        hull_hash_.resize(hash_size_, INVALID_INDEX);
-
-        // initialize arrays for tracking the edges of the advancing convex hull
-        hull_prev_.resize(n);
-        hull_next_.resize(n);
-        hull_tri_.resize(n);
-
-        hull_start_ = i0;
-
-        size_t hull_size = 3;
-
-        hull_next_[i0] = hull_prev_[i2] = i1;
-        hull_next_[i1] = hull_prev_[i0] = i2;
-        hull_next_[i2] = hull_prev_[i1] = i0;
-
-        hull_tri_[i0] = 0;
-        hull_tri_[i1] = 1;
-        hull_tri_[i2] = 2;
-
-        hull_hash_[hash_key(p0)] = i0;
-        hull_hash_[hash_key(p1)] = i1;
-        hull_hash_[hash_key(p2)] = i2;
-
-        std::size_t max_triangles_ = n < 3 ? 1 : 2 * n - 5;
-        triangles_.reserve(max_triangles_ * 3);
-        halfedges_.reserve(max_triangles_ * 3);
-        add_triangle(i0, i1, i2, INVALID_INDEX, INVALID_INDEX, INVALID_INDEX);
-        Pos pPrev{ std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN() };
-
-        // Go through points based on distance from the center.
-        for (std::size_t k = 0; k < n; k++) {
-            const std::size_t i = ids[k];
-            const Pos p = points_[i];
-
-            // skip near-duplicate points
-            if (k > 0 && p == pPrev)
-                continue;
-            pPrev = p;
-
-            if (p == p0 || p == p1 || p == p2) {
-                continue;
-            }
-
-            // find a visible edge on the convex hull using edge hash
-            std::size_t start = 0;
-
-            size_t key = hash_key(p);
-            for (size_t j = 0; j < hash_size_; j++) {
-                start = hull_hash_[(key + j) % hash_size_];
-                if (start != INVALID_INDEX && start != hull_next_[start])
-                    break;
-            }
-
-            assert(hull_prev_[start] != start);
-            assert(hull_prev_[start] != INVALID_INDEX);
-
-            start = hull_prev_[start];
-            size_t e = start;
-            size_t q;
-
-            // Advance until we find a place in the hull where our current point can be added.
-            while (true) {
-                q = hull_next_[e];
-                if (p.close(points_[e], bbox.span()) || p.close(points_[q], bbox.span())) {
-                    e = INVALID_INDEX;
-                    break;
-                }
-                if (counterclockwise(p, points_[e], points_[q]))
-                    break;
-                e = q;
-                if (e == start) {
-                    e = INVALID_INDEX;
-                    break;
-                }
-            }
-
-            if (e == INVALID_INDEX)  // likely a near-duplicate point; skip it
-                continue;
-
-            // add the first triangle from the point
-            std::size_t t = add_triangle(e, i, hull_next_[e], INVALID_INDEX, INVALID_INDEX, hull_tri_[e]);
-
-            hull_tri_[i] = legalize(t + 2);  // Legalize the triangle we just added.
-            hull_tri_[e] = t;
-            hull_size++;
-
-            // walk forward through the hull, adding more triangles_ and flipping recursively
-            std::size_t next = hull_next_[e];
-            while (true) {
-                q = hull_next_[next];
-                if (!counterclockwise(p, points_[next], points_[q]))
-                    break;
-                t = add_triangle(next, i, q, hull_tri_[i], INVALID_INDEX, hull_tri_[next]);
-                hull_tri_[i] = legalize(t + 2);
-                hull_next_[next] = next;  // mark as removed
-                hull_size--;
-                next = q;
-            }
-
-            // walk backward from the other side, adding more triangles_ and flipping
-            if (e == start) {
-                while (true) {
-                    q = hull_prev_[e];
-                    if (!counterclockwise(p, points_[q], points_[e]))
-                        break;
-                    t = add_triangle(q, i, e, INVALID_INDEX, hull_tri_[e], hull_tri_[q]);
-                    legalize(t + 2);
-                    hull_tri_[q] = t;
-                    hull_next_[e] = e;  // mark as removed
-                    hull_size--;
-                    e = q;
-                }
-            }
-
-            // update the hull indices
-            hull_prev_[i] = e;
-            hull_start_ = e;
-            hull_prev_[next] = i;
-            hull_next_[e] = i;
-            hull_next_[i] = next;
-
-            hull_hash_[hash_key(p)] = i;
-            hull_hash_[hash_key(points_[e])] = e;
-        }
+    Triangulation() {
+        num_tris = 0;
+        block = new Block(0);
+        const double LOTS = 1e6;
+        the_root = new_triangle(Point(-LOTS, -LOTS), Point(+LOTS, -LOTS), Point(0, +LOTS));
+    }
+    ~Triangulation() {
+        delete block;
+    }
+    TriangleRef find(Point p) const {
+        return find(the_root, p);
+    }
+    void add_point(Point const& p) {
+        add_point(find(the_root, p), p);
+    }
+    int size() const {
+        return num_tris;
     }
 
 private:
-    std::size_t legalize(std::size_t a) {
-        std::size_t i = 0;
-        std::size_t ar = 0;
-        std::vector<std::size_t> edgesStack;
+    TriangleRef the_root;
 
-        // recursion eliminated with a fixed-size stack
-        while (true) {
-            const size_t b = halfedges_[a];
+    static const int BLOCK_SIZE = 1000;
+    int num_tris;
+    struct Block {
+        Block* prev;
+        Triangle* triangles;
 
-            /* if the pair of triangles_ doesn't satisfy the Delaunay condition
-             * (p1 is inside the circumcircle of [p0, pl, pr]), flip them,
-             * then do the same check/flip recursively for the new pair of triangles_
-             *
-             *           pl                    pl
-             *          /||\                  /  \
-             *       al/ || \bl            al/    \a
-             *        /  ||  \              /      \
-             *       /  a||b  \    flip    /___ar___\
-             *     p0\   ||   /p1   =>   p0\---bl---/p1
-             *        \  ||  /              \      /
-             *       ar\ || /br             b\    /br
-             *          \||/                  \  /
-             *           pr                    pr
-             */
-            const size_t a0 = 3 * (a / 3);
-            ar = a0 + (a + 2) % 3;
-
-            if (b == INVALID_INDEX) {
-                if (i > 0) {
-                    i--;
-                    a = edgesStack[i];
-                    continue;
-                }
-                else {
-                    // i = INVALID_INDEX;
-                    break;
-                }
-            }
-
-            const size_t b0 = 3 * (b / 3);
-            const size_t al = a0 + (a + 1) % 3;
-            const size_t bl = b0 + (b + 2) % 3;
-
-            const std::size_t p0 = triangles_[ar];
-            const std::size_t pr = triangles_[a];
-            const std::size_t pl = triangles_[al];
-            const std::size_t p1 = triangles_[bl];
-
-            const bool illegal = in_circle(points_[p0], points_[pr], points_[pl], points_[p1]);
-
-            if (illegal) {
-                triangles_[a] = p1;
-                triangles_[b] = p0;
-
-                auto hbl = halfedges_[bl];
-
-                // Edge swapped on the other side of the hull (rare).
-                // Fix the halfedge reference
-                if (hbl == INVALID_INDEX) {
-                    std::size_t e = hull_start_;
-                    do {
-                        if (hull_tri_[e] == bl) {
-                            hull_tri_[e] = a;
-                            break;
-                        }
-                        e = hull_prev_[e];
-                    } while (e != hull_start_);
-                }
-                link(a, hbl);
-                link(b, halfedges_[ar]);
-                link(ar, bl);
-                std::size_t br = b0 + (b + 1) % 3;
-
-                if (i < edgesStack.size()) {
-                    edgesStack[i] = br;
-                }
-                else {
-                    edgesStack.push_back(br);
-                }
-                i++;
-
-            }
-            else {
-                if (i > 0) {
-                    i--;
-                    a = edgesStack[i];
-                    continue;
-                }
-                else {
-                    break;
-                }
-            }
+        Block(Block* prev) : prev(prev) {
+            triangles = new Triangle[BLOCK_SIZE];
         }
-        return ar;
-    };
+        ~Block() {
+            delete prev;
+            delete[] triangles;
+        }
+    } *block;
 
-    // monotonically increases with real angle, but doesn't need expensive trigonometry
-    static inline double pseudo_angle(const double dx, const double dy) {
-        const double p = dx / (std::abs(dx) + std::abs(dy));
-        return (dy > 0.0 ? 3.0 - p : 1.0 + p) / 4.0;  // [0..1)
+    TriangleRef new_triangle(Point const& p0, Point const& p1, Point const& p2) {
+        if (num_tris == BLOCK_SIZE) {
+            block = new Block(block);
+            num_tris = 0;
+        }
+        TriangleRef tri = &block->triangles[num_tris++];
+        *tri = Triangle(p0, p1, p2);
+        return tri;
     }
 
-    std::size_t hash_key(double x, double y) const {
-        const double dx = x - center_.x;
-        const double dy = y - center_.y;
-        size_t key = std::llround(std::floor(pseudo_angle(dx, dy) * static_cast<double>(hash_size_)));
-        return key % hash_size_;
-    };
-
-    std::size_t hash_key(const Pos& p) const {
-        const Pos v = p - center_;
-        size_t key = std::llround(std::floor(pseudo_angle(v.x, v.y) * static_cast<double>(hash_size_)));
-        return key % hash_size_;
-    };
-
-    std::size_t add_triangle(std::size_t i0,
-        std::size_t i1,
-        std::size_t i2,
-        std::size_t a,
-        std::size_t b,
-        std::size_t c) {
-        std::size_t t = triangles_.size();
-        triangles_.push_back(i0);
-        triangles_.push_back(i1);
-        triangles_.push_back(i2);
-        link(t, a);
-        link(t + 1, b);
-        link(t + 2, c);
-        return t;
-    }
-
-    void link(std::size_t a, std::size_t b) {
-        std::size_t s = halfedges_.size();
-        if (a == s) {
-            halfedges_.push_back(b);
-        }
-        else if (a < s) {
-            halfedges_[a] = b;
+    static TriangleRef find(TriangleRef root, Point const& p) {
+    again: {
+        assert(root->contains(p));
+        if (!root->has_children()) {
+            return root;
         }
         else {
-            throw std::runtime_error("Cannot link edge");
+            for (int i = 0; i < 3 && root->children[i]; ++i) {
+                if (root->children[i]->contains(p)) {
+                    root = root->children[i];
+                    goto again;
+                }
+            }
+            assert(false && "point not found");
         }
-        if (b != INVALID_INDEX) {
-            std::size_t s2 = halfedges_.size();
-            if (b == s2) {
-                halfedges_.push_back(a);
-            }
-            else if (b < s2) {
-                halfedges_[b] = a;
-            }
-            else {
-                throw std::runtime_error("Cannot link edge");
-            }
         }
     }
+
+    void add_point(TriangleRef root, Point const& p) {
+        TriangleRef tab, tbc, tca;
+
+        /* split it into three triangles */
+        tab = new_triangle(root->p[0], root->p[1], p);
+        tbc = new_triangle(root->p[1], root->p[2], p);
+        tca = new_triangle(root->p[2], root->p[0], p);
+
+        set_edge(Edge(tab, 0), Edge(tbc, 1));
+        set_edge(Edge(tbc, 0), Edge(tca, 1));
+        set_edge(Edge(tca, 0), Edge(tab, 1));
+        set_edge(Edge(tab, 2), root->edge[2]);
+        set_edge(Edge(tbc, 2), root->edge[0]);
+        set_edge(Edge(tca, 2), root->edge[1]);
+
+        root->children[0] = tab;
+        root->children[1] = tbc;
+        root->children[2] = tca;
+
+        flip(tab, 2);
+        flip(tbc, 2);
+        flip(tca, 2);
+    }
+
+    void flip(TriangleRef tri, SideRef pi) {
+        TriangleRef trj = tri->edge[pi].tri;
+        int pj = tri->edge[pi].side;
+
+        if (!trj) return;
+        if (!in_circumcircle(tri->p[0], tri->p[1], tri->p[2], trj->p[pj])) return;
+        assert(tri->p[(pi + 2) % 3] == trj->p[(pj + 1) % 3]);
+        assert(tri->p[(pi + 1) % 3] == trj->p[(pj + 2) % 3]);
+
+        TriangleRef trk = new_triangle(tri->p[(pi + 1) % 3], trj->p[pj], tri->p[pi]);
+        TriangleRef trl = new_triangle(trj->p[(pj + 1) % 3], tri->p[pi], trj->p[pj]);
+
+        set_edge(Edge(trk, 0), Edge(trl, 0));
+        set_edge(Edge(trk, 1), tri->edge[(pi + 2) % 3]);
+        set_edge(Edge(trk, 2), trj->edge[(pj + 1) % 3]);
+        set_edge(Edge(trl, 1), trj->edge[(pj + 2) % 3]);
+        set_edge(Edge(trl, 2), tri->edge[(pi + 1) % 3]);
+
+        tri->children[0] = trk; tri->children[1] = trl; tri->children[2] = 0;
+        trj->children[0] = trk; trj->children[1] = trl; trj->children[2] = 0;
+
+        flip(trk, 1);
+        flip(trk, 2);
+        flip(trl, 1);
+        flip(trl, 2);
+    }
 };
+
+
 struct Face {
     Pos a, b, c;
     Face(Pos a = Pos(0, 0), Pos b = Pos(0, 0), Pos c = Pos(0, 0)) :
@@ -676,7 +473,7 @@ void query() {
     //std::cout << N << "\n"; return;
     std::vector<Pos> C(N);
     for (int i = 0; i < N; ++i) std::cin >> C[i], C[i].i = i;
-    
+
     db ret = INF;
     for (Pos& p : C) ret = std::min(ret, (O - p).mag());
 
@@ -713,7 +510,7 @@ void query() {
     if (s == -1) { std::cout << answer(ret) << "\n"; return; }
 
     std::vector<Info> info;
-    for (Pii& p: seg) {
+    for (Pii& p : seg) {
         if (MAP.find(!p) == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag() * .5));
         else info.push_back(Info(MAP[!p], p.i, (C[p.x] - C[p.y]).mag() * .5));
     }
@@ -744,7 +541,7 @@ void solve() {
     return;
 }
 int main() { solve(); return 0; }//BAPC 2009 C Escape from the Minefield   boj5401
-//refer to JusticeHui
+//refer to JusticeHui(boj), a.bahr(codeforce)
 
 /*
 
