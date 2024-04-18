@@ -92,7 +92,6 @@ struct Pii {
 };
 const Pii Oii = { 0, 0 };
 const Pii INF_PT = { (int)INF, (int)INF };
-std::map<Pii, int> MAP;
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
@@ -680,6 +679,12 @@ void query() {
     for (Pos& p : C) ret = std::min(ret, (O - p).mag());
 
     if (N < 3) {
+        //std::cout << "DEBUG:: 1 " << ret << "\n";
+        if (ret < 2 + TOL) {
+            std::cout << "0\n";
+            return;
+        }
+        ret *= .5;
         ll ans = sqr(ret - 2) * PI + TOL;
         std::cout << ans << "\n";
         return;
@@ -698,19 +703,26 @@ void query() {
 
     int s = -1, e = face.size();
     std::vector<Pii> seg;
+    std::map<Pii, int> MAP;
     int sz = face.size();
     for (int i = 0; i < sz; i++) {
         Face& F = face[i];
         if (inner_check(F, O)) s = i;
-        MAP[Pii(F.a.i, F.b.i)] = i;
-        MAP[Pii(F.b.i, F.c.i)] = i;
-        MAP[Pii(F.c.i, F.a.i)] = i;
+        MAP[Pii(F.a.i, F.b.i, 0)] = i;
+        MAP[Pii(F.b.i, F.c.i, 0)] = i;
+        MAP[Pii(F.c.i, F.a.i, 0)] = i;
         seg.push_back(Pii(F.a.i, F.b.i, i));
         seg.push_back(Pii(F.b.i, F.c.i, i));
         seg.push_back(Pii(F.c.i, F.a.i, i));
     }
 
     if (s == -1) {//soldiers are out of range
+        //std::cout << "DEBUG:: 2 " << ret << "\n";
+        if (ret < 2 + TOL) {
+            std::cout << "0\n";
+            return;
+        }
+        ret *= .5;
         ll ans = sqr(ret - 2) * PI + TOL;
         std::cout << ans << "\n";
         return;
@@ -724,13 +736,21 @@ void query() {
         else info.push_back(Info(MAP[!p], p.i, (C[p.x] - C[p.y]).mag()));
     }
 
+    ret = INF;
     std::sort(info.begin(), info.end());
+    //for (Info& i : info) std::cout << i.c << "\n";
     for (const Info& i : info) {
-        if (find(s) == find(e)) break;
         join(i.u, i.v);
         ret = std::min(ret, i.c);
+        if (find(s) == find(e)) break;
     }
 
+    //std::cout << "DEBUG:: 3 " << ret << "\n";
+    if (ret < 4 + TOL) {
+        std::cout << "0\n";
+        return;
+    }
+    ret *= .5;
     ll ans = sqr(ret - 2) * PI + TOL;
     std::cout << ans << "\n";
     return;
@@ -744,4 +764,4 @@ void solve() {
     while (T--) query();
     return;
 }
-int main() { solve(); return 0; }//In case of failure
+int main() { solve(); return 0; }//boj5401
