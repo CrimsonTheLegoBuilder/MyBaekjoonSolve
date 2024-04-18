@@ -8,6 +8,7 @@
 #include <queue>
 #include <numeric>
 #include <map>
+#include <unordered_map>
 typedef long long ll;
 typedef double db;
 typedef long double ld;
@@ -18,9 +19,9 @@ const int LEN = 1e5 + 5;
 int N, M, T, Q;
 ll V[LEN];
 int P[LEN << 3];
-bool zero(const db& x) { return std::abs(x) < TOL; }
-int sign(const db& x) { return x < -TOL ? -1 : x > TOL; }
-db sqr(const db& x) { return x * x; }
+inline bool zero(const db& x) { return std::abs(x) < TOL; }
+inline int sign(const db& x) { return x < -TOL ? -1 : x > TOL; }
+inline db sqr(const db& x) { return x * x; }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
 /*
@@ -77,7 +78,7 @@ struct Pii {
     Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
     Pii operator - () const { return { -x, -y }; }
     Pii operator ~ () const { return { -y, x }; }
-    Pii operator ! () const { return { y, x, 0 }; }
+    inline Pii operator ! () const { return { y, x, 0 }; }
     ll xy() const { return (ll)x * y; }
     ll Euc() const { return (ll)x * x + (ll)y * y; }
     int Man() const { return std::abs(x) + std::abs(y); }
@@ -95,6 +96,16 @@ int ccw(const Pii& d1, const Pii& d2, const Pii& d3) {
     ll ret = cross(d1, d2, d3);
     return !ret ? 0 : ret > 0 ? 1 : -1;
 }
+namespace std {
+    template<>
+    struct hash<Pii> {
+        std::size_t operator()(const Pii& p) const {
+            std::size_t h1 = std::hash<int>()(p.x);
+            std::size_t h2 = std::hash<int>()(p.y);
+            return h1 ^ (h2 << 1);
+        }
+    };
+}
 struct Pos {
     db x, y, i;
     Pos(db X = 0, db Y = 0, int I = 0) : x(X), y(Y), i(I) {}
@@ -106,19 +117,19 @@ struct Pos {
     Pos operator * (const db& scalar) const { return { x * scalar, y * scalar }; }
     Pos operator / (const db& scalar) const { return { x / scalar, y / scalar }; }
     db operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
-    db operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
+    inline db operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
     db operator ^ (const Pos& p) const { return { x * p.y - y * p.x }; }
     Pos operator - () const { return Pos(-x, -y); }
     Pos operator ~ () const { return { -y, x }; }
-    Pos operator ! () const { return { -x, -y }; }
+    Pos operator ! () const { return { y, x }; }
     Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
     Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
     Pos& operator *= (const db& scale) { x *= scale; y *= scale; return *this; }
     Pos& operator /= (const db& scale) { x /= scale; y /= scale; return *this; }
     db xy() const { return x * y; }
     Pos rot(db the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
-    db Euc() const { return x * x + y * y; }
-    db mag() const { return sqrt(Euc()); }
+    inline db Euc() const { return x * x + y * y; }
+    inline db mag() const { return sqrt(Euc()); }
     Pos unit() const { return *this / mag(); }
     db rad() const { return atan2(y, x); }
     friend db rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
@@ -134,26 +145,26 @@ struct Pos {
     friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
-db cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-db cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline db cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline db cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
+inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
     db ret = cross(d1, d2, d3);
     return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-bool counterclockwise(const Pos& p, const Pos& q, const Pos& r) {
+inline bool counterclockwise(const Pos& p, const Pos& q, const Pos& r) {
     return ccw(p, q, r) == 1;
 }
-bool clockwise(const Pos& p, const Pos& q, const Pos& r) {
+inline bool clockwise(const Pos& p, const Pos& q, const Pos& r) {
     return ccw(p, q, r) == -1;
 }
-bool collinear(const Pos& p, const Pos& q, const Pos& r) {
+inline bool collinear(const Pos& p, const Pos& q, const Pos& r) {
     return !ccw(p, q, r);
 }
-bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+inline bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
     return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
 }
-db dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-db dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
+inline db dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+inline db dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
     db ret = dot(d1, d3, d2);
     return !ccw(d1, d2, d3) && (ret > 0 || zero(ret));
@@ -170,10 +181,10 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
     db a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
     return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-bool inner_check(const Pos& a, const Pos& b, const Pos& c, const Pos& t) {
+inline bool inner_check(const Pos& a, const Pos& b, const Pos& c, const Pos& t) {
     return ccw(a, b, t) > -1 && ccw(b, c, t) > -1 && ccw(c, a, t) > -1;
 }
-db circumradius(const Pos& p1, const Pos& p2, const Pos& p3) {
+inline db circumradius(const Pos& p1, const Pos& p2, const Pos& p3) {
     Pos d = p2 - p1;
     Pos e = p3 - p1;
 
@@ -189,7 +200,7 @@ db circumradius(const Pos& p1, const Pos& p2, const Pos& p3) {
         return radius.Euc();
     return (std::numeric_limits<double>::max)();
 }
-Pos circumcenter(const Pos& p1, const Pos& p2, const Pos& p3) {
+inline Pos circumcenter(const Pos& p1, const Pos& p2, const Pos& p3) {
     Pos d = p2 - p1;
     Pos e = p3 - p1;
 
@@ -248,7 +259,7 @@ Circle circumcircle(const Pos& p1, const Pos& p2, const Pos& p3) {
 
     return Circle(c, r);
 }
-bool in_circle(const Pos& a, const Pos& b, const Pos& c, const Pos& p) {
+inline bool in_circle(const Pos& a, const Pos& b, const Pos& c, const Pos& p) {
     const Pos d = a - p;
     const Pos e = b - p;
     const Pos f = c - p;
@@ -663,7 +674,7 @@ struct Face {
     Face(Pos a = Pos(0, 0), Pos b = Pos(0, 0), Pos c = Pos(0, 0)) :
         a(a), b(b), c(c) {}
 };
-bool inner_check(const Face& F, const Pos& p) { return inner_check(F.a, F.b, F.c, p); }
+inline bool inner_check(const Face& F, const Pos& p) { return inner_check(F.a, F.b, F.c, p); }
 void query() {
     auto answer = [&](const db& r) -> ll {
         if (r < 2 + TOL) return 0;
@@ -678,7 +689,7 @@ void query() {
     for (int i = 0; i < N; ++i) std::cin >> C[i], C[i].i = i;
     
     db ret = INF;
-    for (Pos& p : C) ret = std::min(ret, (O - p).mag());
+    for (const Pos& p : C) ret = std::min(ret, (O - p).mag());
 
     //soldiers are out of mines' convex
     if (N < 3) { std::cout << answer(ret) << "\n"; return; }
@@ -696,7 +707,8 @@ void query() {
 
     int s = -1, e = face.size();
     std::vector<Pii> seg;
-    std::map<Pii, int> MAP;
+    //std::map<Pii, int> MAP;
+    std::unordered_map<Pii, int> MAP;
     int sz = face.size();
     for (int i = 0; i < sz; i++) {
         Face& F = face[i];
@@ -713,9 +725,14 @@ void query() {
     if (s == -1) { std::cout << answer(ret) << "\n"; return; }
 
     std::vector<Info> info;
-    for (Pii& p: seg) {
-        if (MAP.find(!p) == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag() * .5));
-        else info.push_back(Info(MAP[!p], p.i, (C[p.x] - C[p.y]).mag() * .5));
+    //for (Pii& p: seg) {
+    //    if (MAP.find(!p) == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag() * .5));
+    //    else info.push_back(Info(MAP[!p], p.i, (C[p.x] - C[p.y]).mag() * .5));
+    //}
+    for (const Pii& p : seg) {
+        auto it = MAP.find(!p);
+        if (it == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag() * .5));
+        else info.push_back(Info(it->second, p.i, (C[p.x] - C[p.y]).mag() * .5));
     }
 
     std::sort(info.begin(), info.end());
