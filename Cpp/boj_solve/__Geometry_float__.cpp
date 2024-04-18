@@ -67,8 +67,9 @@ struct Pos {
 	ld operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
 	ld operator ^ (const Pos& p) const { return { x * p.y - y * p.x }; }
+	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { -x, -y }; }
+	Pos operator ! () const { return { y, x }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }

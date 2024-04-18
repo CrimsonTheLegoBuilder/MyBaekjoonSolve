@@ -51,8 +51,9 @@ struct Pii {
     Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
     Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
     Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+    Pii operator - () const { return { -x, -y }; }
     Pii operator ~ () const { return { -y, x }; }
-    Pii operator ! () const { return { -x, -y }; }
+    Pii operator ! () const { return { y, x }; }
     ll xy() const { return (ll)x * y; }
     ll Euc() const { return (ll)x * x + (ll)y * y; }
     int Man() const { return std::abs(x) + std::abs(y); }

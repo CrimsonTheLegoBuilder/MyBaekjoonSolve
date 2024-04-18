@@ -12,6 +12,7 @@
 #include <tuple>
 #include <complex>
 #include <numeric>
+#include <map>
 typedef long long ll;
 typedef double db;
 typedef long double ld;
@@ -21,8 +22,10 @@ const db PI = acos(-1);
 const int LEN = 1e5 + 5;
 int N, M, T, Q;
 ll V[LEN];
+int P[LEN << 3];
 bool zero(const db& x) { return std::abs(x) < TOL; }
 int sign(const db& x) { return x < -TOL ? -1 : x > TOL; }
+db sqr(const db& x) { return x * x; }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
 /*
@@ -35,20 +38,31 @@ I'm : stupid
 */
 
 struct Info {
-    int i;
+    int u, v;
     db c;
-    Info(int I = 0, db C = 0) : i(I), c(C) {}
-    bool operator < (const Info& x) const { return c < x.c; }
+    Info(int u = 0, int v = 0, db c = 0) : u(u), v(v), c(c) {}
+    bool operator < (const Info& x) const { return c > x.c; }
 };
-std::vector<Info> G[LEN << 3];
-std::priority_queue<Info> PQ;
-db COST[LEN << 3];
-ll dijkstra(int v = 0, int t = 1) {
-    memset(COST, 0, sizeof COST);
-    COST[v] = 0;
-    PQ.push(Info(v, 0));
+int find(int v) {
+    if (P[v] < 0) return v;
+    int p = find(P[v]);
+    return P[v] = p;
 }
-
+int join(int u, int v) {
+    int i, j;
+    i = find(u);
+    j = find(v);
+    if (i == j) return 0;
+    if (P[i] < P[j]) {
+        P[i] += P[j];
+        P[j] = i;
+    }
+    else {
+        P[j] += P[i];
+        P[i] = j;
+    }
+    return 1;
+}
 struct Pii {
     int x, y, i;
     Pii(int X = 0, int Y = 0, int I = 0) : x(X), y(Y), i(I) {}
@@ -66,8 +80,9 @@ struct Pii {
     Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
     Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
     Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+    Pii operator - () const { return { -x, -y }; }
     Pii operator ~ () const { return { -y, x }; }
-    Pii operator ! () const { return { -x, -y }; }
+    Pii operator ! () const { return { y, x, 0 }; }
     ll xy() const { return (ll)x * y; }
     ll Euc() const { return (ll)x * x + (ll)y * y; }
     int Man() const { return std::abs(x) + std::abs(y); }
@@ -77,6 +92,7 @@ struct Pii {
 };
 const Pii Oii = { 0, 0 };
 const Pii INF_PT = { (int)INF, (int)INF };
+std::map<Pii, int> MAP;
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
@@ -159,6 +175,9 @@ db dist(const Pos& d1, const Pos& d2, const Pos& t) {
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
     db a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
     return (p1 * a2 + p2 * a1) / (a1 + a2);
+}
+bool inner_check(const Pos& a, const Pos& b, const Pos& c, const Pos& t) {
+    return ccw(a, b, t) > -1 && ccw(b, c, t) > -1 && ccw(c, a, t) > -1;
 }
 db circumradius(const Pos& p1, const Pos& p2, const Pos& p3) {
     Pos d = p2 - p1;
@@ -645,31 +664,75 @@ private:
         }
     }
 };
+struct Face {
+    Pos a, b, c;
+    Face(Pos a = Pos(0, 0), Pos b = Pos(0, 0), Pos c = Pos(0, 0)) :
+        a(a), b(b), c(c) {}
+};
+bool inner_check(const Face& F, const Pos& p) { return inner_check(F.a, F.b, F.c, p); }
 void query() {
+    memset(P, -1, sizeof P);
     std::cin >> N;
-    std::vector<Pii> tmp(N);
     std::vector<Pos> C(N);
-    for (int i = 0; i < N; ++i) {
-        std::cin >> tmp[i];
-        tmp[i].i = i;
-        C[i] = Pos(tmp[i].x, tmp[i].y, i);
-        V[i] = (ll)INF;
-    }
-    if (N == 2) {
-        ll D = (tmp[0] - tmp[1]).Euc();
-        std::cout << D << "\n" << D << "\n";
+    for (int i = 0; i < N; ++i) std::cin >> C[i], C[i].i = i;
+    
+    db ret = INF;
+    for (Pos& p : C) ret = std::min(ret, (O - p).mag());
+
+    if (N < 3) {
+        ll ans = sqr(ret - 2) * PI + TOL;
+        std::cout << ans << "\n";
         return;
     }
+
     Delaunator d(C);
+
+    std::vector<Face> face;
     for (int i = 0; i < d.triangles_.size(); i += 3) {
-        const Pii& a = tmp[d.points_[d.triangles_[i]].i];
-        const Pii& b = tmp[d.points_[d.triangles_[i + 1]].i];
-        const Pii& c = tmp[d.points_[d.triangles_[i + 2]].i];
-        V[a.i] = std::min({ V[a.i], (a - b).Euc(), (a - c).Euc() });
-        V[b.i] = std::min({ V[b.i], (b - a).Euc(), (b - c).Euc() });
-        V[c.i] = std::min({ V[c.i], (c - a).Euc(), (c - b).Euc() });
+        Pos a = d.points_[d.triangles_[i]];
+        Pos b = d.points_[d.triangles_[i + 1]];
+        Pos c = d.points_[d.triangles_[i + 2]];
+        if (ccw(a, b, c) < 0) std::swap(b, c);//norm ccw
+        face.push_back(Face(a, b, c));
     }
-    for (int i = 0; i < N; i++) std::cout << V[i] << "\n";
+
+    int s = -1, e = face.size();
+    std::vector<Pii> seg;
+    int sz = face.size();
+    for (int i = 0; i < sz; i++) {
+        Face& F = face[i];
+        if (inner_check(F, O)) s = i;
+        MAP[Pii(F.a.i, F.b.i)] = i;
+        MAP[Pii(F.b.i, F.c.i)] = i;
+        MAP[Pii(F.c.i, F.a.i)] = i;
+        seg.push_back(Pii(F.a.i, F.b.i, i));
+        seg.push_back(Pii(F.b.i, F.c.i, i));
+        seg.push_back(Pii(F.c.i, F.a.i, i));
+    }
+
+    if (s == -1) {//soldiers are out of range
+        ll ans = sqr(ret - 2) * PI + TOL;
+        std::cout << ans << "\n";
+        return;
+    }
+
+    //Pii key;
+    std::vector<Info> info;
+    for (Pii& p: seg) {
+        //key = Pii(p.x, p.y, 0);
+        if (MAP.find(!p) == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag()));
+        else info.push_back(Info(MAP[!p], p.i, (C[p.x] - C[p.y]).mag()));
+    }
+
+    std::sort(info.begin(), info.end());
+    for (const Info& i : info) {
+        if (find(s) == find(e)) break;
+        join(i.u, i.v);
+        ret = std::min(ret, i.c);
+    }
+
+    ll ans = sqr(ret - 2) * PI + TOL;
+    std::cout << ans << "\n";
     return;
 }
 void solve() {
