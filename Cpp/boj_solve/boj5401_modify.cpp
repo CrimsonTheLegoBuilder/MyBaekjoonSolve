@@ -141,7 +141,7 @@ struct Pos {
         const db tol = 1e-20) const {
         return ((*this - rhs).Euc() / span) < tol;
     }
-    friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+    inline friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
     friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
@@ -183,6 +183,10 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 }
 inline bool inner_check(const Pos& a, const Pos& b, const Pos& c, const Pos& t) {
     return ccw(a, b, t) > -1 && ccw(b, c, t) > -1 && ccw(c, a, t) > -1;
+}
+inline bool in_triangle(Pos a, Pos b, Pos c, const Pos& t) {
+    if (ccw(a, b, c) < 0) std::swap(b, c);
+    return inner_check(a, b, c, t);
 }
 inline db circumradius(const Pos& p1, const Pos& p2, const Pos& p3) {
     Pos d = p2 - p1;
@@ -681,66 +685,53 @@ void query() {
         ll ans = sqr(r - 2) * PI + TOL;
         return ans;
         };
-
     memset(P, -1, sizeof P);
     std::cin >> N;
-    //std::cout << N << "\n"; return;
     std::vector<Pos> C(N);
     db ret = INF;
     for (int i = 0; i < N; ++i) std::cin >> C[i], C[i].i = i, ret = std::min(ret, (O - C[i]).mag());
-    
-    //for (const Pos& p : C) ret = std::min(ret, (O - p).mag());
 
     //soldiers are out of mines' convex
     if (N < 3) { std::cout << answer(ret) << "\n"; return; }
 
     Delaunator d(C);
 
-    std::vector<Face> face;
-    for (int i = 0; i < d.triangles_.size(); i += 3) {
-        Pos a = d.points_[d.triangles_[i]];
-        Pos b = d.points_[d.triangles_[i + 1]];
-        Pos c = d.points_[d.triangles_[i + 2]];
-        if (ccw(a, b, c) < 0) std::swap(b, c);//norm ccw
-        face.push_back(Face(a, b, c));
-    }
-
-    int s = -1, e = face.size();
-    std::vector<Pii> seg;
-    //std::map<Pii, int> MAP;
-    std::unordered_map<Pii, int> MAP;
-    int sz = face.size();
-    for (int i = 0; i < sz; i++) {
-        Face& F = face[i];
-        if (inner_check(F, O)) s = i;
-        MAP[Pii(F.a.i, F.b.i, 0)] = i;
-        MAP[Pii(F.b.i, F.c.i, 0)] = i;
-        MAP[Pii(F.c.i, F.a.i, 0)] = i;
-        seg.push_back(Pii(F.a.i, F.b.i, i));
-        seg.push_back(Pii(F.b.i, F.c.i, i));
-        seg.push_back(Pii(F.c.i, F.a.i, i));
-    }
-
-    //soldiers are out of mines' convex
-    if (s == -1) { std::cout << answer(ret) << "\n"; return; }
-
+    int s = -1, e = d.triangles_.size() / 3;
     std::vector<Info> info;
-    //for (Pii& p: seg) {
-    //    if (MAP.find(!p) == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag() * .5));
-    //    else info.push_back(Info(MAP[!p], p.i, (C[p.x] - C[p.y]).mag() * .5));
-    //}
-    for (const Pii& p : seg) {
-        auto it = MAP.find(!p);
-        if (it == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag() * .5));
-        else info.push_back(Info(it->second, p.i, (C[p.x] - C[p.y]).mag() * .5));
+    std::unordered_map<Pii, int> MAP;
+    for (int i = 0, j = 0; i < d.triangles_.size(); i += 3, j++) {
+        int a = d.triangles_[i];
+        int b = d.triangles_[i + 1];
+        int c = d.triangles_[i + 2];
+        if (a > b) std::swap(a, b);
+        if (b > c) std::swap(b, c);
+        if (a > b) std::swap(a, b);
+        Pii e1 = Pii(a, b), e2 = Pii(a, c), e3 = Pii(b, c);
+        auto edge = { e1, e2, e3 };
+        //for (const Pii& E : edge) {
+        //    if (MAP.count(E)) {
+        //        int u = MAP[E], v = j;
+        //        info.push_back(Info(u, v, (C[E.x] - C[E.y]).mag() * .5));
+        //        MAP.erase(E);
+        //    }
+        //    else MAP[E] = j;
+        //}
+        for (const Pii& E : edge) {
+            auto it = MAP.find(E);
+            if (it != MAP.end()) {
+                int u = it->second, v = j;
+                info.push_back(Info(u, v, (C[E.x] - C[E.y]).mag() * .5));
+                MAP.erase(it);
+            }
+            else MAP[E] = j;
+        }
+        if (in_triangle(C[a], C[b], C[c], Pos(0, 0))) s = j;
     }
+    if (s == -1) { std::cout << answer(ret) << "\n"; return; }
+    for (auto& i : MAP) info.push_back(Info(e, i.second, (C[i.first.x] - C[i.first.y]).mag() * .5));
 
     std::sort(info.begin(), info.end());
-
-    //for (Info& i : info) std::cout << i.c << "\n";
-
     for (const Info& i : info) {
-        //std::cout << i.c << "\n";
         if (find(s) == find(e)) break;
         join(i.u, i.v);
         ret = std::min(ret, i.c);
@@ -760,19 +751,5 @@ void solve() {
     while (T--) query();
     return;
 }
-int main() { solve(); return 0; }//BAPC 2009 C Escape from the Minefield   boj5401
-//refer to JusticeHui
-
-/*
-
-1
-7
--10 -1
--4 3
--4 -4
--1 -6
-2 4
-3 -4
-7 0
-
-*/
+int main() { solve(); return 0; }//BAPC 2009 C Escape from the Minefield boj5401
+//refer to jinhwanlazy, JusticeHui, koosaga
