@@ -82,7 +82,8 @@ struct Pii {
     ll xy() const { return (ll)x * y; }
     ll Euc() const { return (ll)x * x + (ll)y * y; }
     int Man() const { return std::abs(x) + std::abs(y); }
-    ld mag() const { return hypot(x, y); }
+    //ld mag() const { return hypot(x, y); }
+    ld mag() const { return sqrt(Euc()); }
     friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
     friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
 };
