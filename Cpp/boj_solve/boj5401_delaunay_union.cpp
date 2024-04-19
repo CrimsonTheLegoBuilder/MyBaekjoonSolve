@@ -684,12 +684,9 @@ void query() {
 
     memset(P, -1, sizeof P);
     std::cin >> N;
-    //std::cout << N << "\n"; return;
     std::vector<Pos> C(N);
     db ret = INF;
     for (int i = 0; i < N; ++i) std::cin >> C[i], C[i].i = i, ret = std::min(ret, (O - C[i]).mag());
-    
-    //for (const Pos& p : C) ret = std::min(ret, (O - p).mag());
 
     //soldiers are out of mines' convex
     if (N < 3) { std::cout << answer(ret) << "\n"; return; }
@@ -707,7 +704,6 @@ void query() {
 
     int s = -1, e = face.size();
     std::vector<Pii> seg;
-    //std::map<Pii, int> MAP;
     std::unordered_map<Pii, int> MAP;
     int sz = face.size();
     for (int i = 0; i < sz; i++) {
@@ -725,10 +721,6 @@ void query() {
     if (s == -1) { std::cout << answer(ret) << "\n"; return; }
 
     std::vector<Info> info;
-    //for (Pii& p: seg) {
-    //    if (MAP.find(!p) == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag() * .5));
-    //    else info.push_back(Info(MAP[!p], p.i, (C[p.x] - C[p.y]).mag() * .5));
-    //}
     for (const Pii& p : seg) {
         auto it = MAP.find(!p);
         if (it == MAP.end()) info.push_back(Info(e, p.i, (C[p.x] - C[p.y]).mag() * .5));

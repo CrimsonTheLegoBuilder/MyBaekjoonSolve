@@ -7,7 +7,6 @@
 #include <vector>
 #include <queue>
 #include <numeric>
-#include <map>
 #include <unordered_map>
 typedef long long ll;
 typedef double db;
@@ -674,16 +673,10 @@ private:
         }
     }
 };
-struct Face {
-    Pos a, b, c;
-    Face(Pos a = Pos(0, 0), Pos b = Pos(0, 0), Pos c = Pos(0, 0)) :
-        a(a), b(b), c(c) {}
-};
-inline bool inner_check(const Face& F, const Pos& p) { return inner_check(F.a, F.b, F.c, p); }
 void query() {
     auto answer = [&](const db& r) -> ll {
         if (r < 2 + TOL) return 0;
-        ll ans = sqr(r - 2) * PI + TOL;
+        ll ans = sqr(r - 2) * PI;// +TOL;
         return ans;
         };
     memset(P, -1, sizeof P);
@@ -709,14 +702,6 @@ void query() {
         if (a > b) std::swap(a, b);
         Pii e1 = Pii(a, b), e2 = Pii(a, c), e3 = Pii(b, c);
         auto edge = { e1, e2, e3 };
-        //for (const Pii& E : edge) {
-        //    if (MAP.count(E)) {
-        //        int u = MAP[E], v = j;
-        //        info.push_back(Info(u, v, (C[E.x] - C[E.y]).mag() * .5));
-        //        MAP.erase(E);
-        //    }
-        //    else MAP[E] = j;
-        //}
         for (const Pii& E : edge) {
             auto it = MAP.find(E);
             if (it != MAP.end()) {
@@ -744,8 +729,6 @@ void query() {
 void solve() {
     std::cin.tie(0)->sync_with_stdio(0);
     std::cout.tie(0);
-    //std::cout << std::fixed;
-    //std::cout.precision(10);
     //freopen("../../../input_data/mine_tests/01.in", "r", stdin);
     //freopen("../../../input_data/mine_tests/out.txt", "w", stdout);
     std::cin >> T;
