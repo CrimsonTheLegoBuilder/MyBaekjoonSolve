@@ -685,7 +685,7 @@ void query() {
     db ret = INF;
     for (int i = 0; i < N; ++i) std::cin >> C[i], C[i].i = i, ret = std::min(ret, (O - C[i]).mag());
 
-    //soldiers are out of mines' convex
+    //soldiers are out of mines' convex hull
     if (N < 3) { std::cout << answer(ret) << "\n"; return; }
 
     Delaunator d(C);
@@ -713,7 +713,10 @@ void query() {
         }
         if (in_triangle(C[a], C[b], C[c], Pos(0, 0))) s = j;
     }
+
+    //soldiers are out of mines' convex hull
     if (s == -1) { std::cout << answer(ret) << "\n"; return; }
+
     for (auto& i : MAP) info.push_back(Info(e, i.second, (C[i.first.x] - C[i.first.y]).mag() * .5));
 
     std::sort(info.begin(), info.end());
