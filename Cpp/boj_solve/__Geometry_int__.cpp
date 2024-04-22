@@ -99,8 +99,9 @@ struct Pos {
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { -x, -y }; }
+	Pos operator ! () const { return { y, x }; }
 	ll xy() const { return (ll)x * y; }
 	ll Euc() const { return (ll)x * x + (ll)y * y; }
 	int Man() const { return std::abs(x) + std::abs(y); }

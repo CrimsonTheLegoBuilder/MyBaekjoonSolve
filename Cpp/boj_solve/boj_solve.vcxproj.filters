@@ -975,7 +975,7 @@
     <ClCompile Include="ABC350C.cpp">
       <Filter>소스 파일\AtCoder</Filter>
     </ClCompile>
-    <ClCompile Include="boj26179.cpp">
+    <ClCompile Include="boj26179_minkow.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
