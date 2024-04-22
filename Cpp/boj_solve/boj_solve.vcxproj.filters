@@ -948,6 +948,36 @@
     <ClCompile Include="simple_tester.cpp">
       <Filter>소스 파일\_test</Filter>
     </ClCompile>
+    <ClCompile Include="jinhwanlazy_fast_delaunay.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="jhnah_boj6839.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="__fast_delaunay_codeforce__.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj5401_fast_delaunay_union.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj5401_delaunay_union.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC350D.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC350A.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC350B.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC350C.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="boj26179.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
