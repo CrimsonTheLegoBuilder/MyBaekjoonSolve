@@ -61,6 +61,9 @@
     <Filter Include="소스 파일\stack">
       <UniqueIdentifier>{8c518765-eb29-4134-b2a2-5c0386b53d5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\sparse_table">
+      <UniqueIdentifier>{111b50a3-ab8c-4844-9c11-076090c98a26}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="boj28401_cnvxhull.cpp">
@@ -977,6 +980,9 @@
     </ClCompile>
     <ClCompile Include="boj26179_convex_inner.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj17435_sparse_table.cpp">
+      <Filter>소스 파일\sparse_table</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
