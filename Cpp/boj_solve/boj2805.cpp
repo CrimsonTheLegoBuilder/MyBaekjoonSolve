@@ -30,7 +30,7 @@ ll bi_search(int N, int M) {
 		ll t = sum(m);
 		if (t == M) return m;
 		else if (t > M) s = m + 1;
-		else e = m;
+		else e = m - 1;
 	}
 	//std::cout << s << " " << e << "\n";
 	if (sum(s) < M) s -= 1;
