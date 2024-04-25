@@ -984,6 +984,9 @@
     <ClCompile Include="boj17435_sparse_table.cpp">
       <Filter>소스 파일\sparse_table</Filter>
     </ClCompile>
+    <ClCompile Include="boj25250_flappy_bird.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
