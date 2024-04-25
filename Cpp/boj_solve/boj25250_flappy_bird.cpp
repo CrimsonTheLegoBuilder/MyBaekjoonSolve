@@ -9,9 +9,8 @@
 typedef long long ll;
 typedef double ld;
 const ll INF = 1e17;
-const int LEN = 1e5 + 1;
+const int LEN = 1e6 + 1;
 const ld TOL = 1e-7;
-const ll MOD = 1'000'000'007;
 int N, M, Q, T;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -26,16 +25,16 @@ struct Pos {
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
-	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	ll operator * (const Pos& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
-	ll operator / (const Pos& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
+	inline Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	inline Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	inline ll operator * (const Pos& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
+	inline ll operator / (const Pos& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
+	inline friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+	inline friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
-ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return ret < 0 ? -1 : !!ret;
 }
@@ -43,12 +42,13 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 #ifdef TEST
-	freopen("../../../input_data/flappy/", "r", stdin);
-	freopen("../../../input_data/flappy/flappy_out.txt", "w", stdout);
+	freopen("../../../input_data/flappy/data/secret/31-max-convex.in", "r", stdin);
+	freopen("../../../input_data/flappy/data/secret/flappy_out.txt", "w", stdout);
 #endif
 	int x, yd, yu;
 	Pos s, e;
 	std::cin >> s >> e >> N;
+	if (!N) { std::cout << s << "\n" << e << "\n"; return; }
 	std::vector<Pos> U(N), D(N);
 	for (int i = 0; i < N; i++) {
 		std::cin >> x >> yd >> yu;
@@ -56,10 +56,9 @@ void solve() {
 		U[i] = Pos(x, yu);
 	}
 #ifdef ASSERT
-	for (int i = 0; i < N - 1; i++) {
-		assert(D[i] < U[i]);
-		assert(D[i] < D[i + 1]);
-	}
+	for (int i = 0; i < N - 1; i++)
+		assert(D[i] < U[i]), assert(D[i] < D[i + 1]);
+	if (N > 0) assert(D[N - 1] < U[N - 1]);
 #endif
 	std::deque<Pos> HU, HD;
 	HU.push_back(s); HU.push_back(U[0]);
@@ -89,7 +88,7 @@ void solve() {
 		}
 	}
 	ret.push_back(e);
-	std::sort(ret.begin(), ret.end());
+	//std::sort(ret.begin(), ret.end());
 	ret.erase(unique(ret.begin(), ret.end()), ret.end());
 	for (const Pos& p : ret) std::cout << p << "\n";
 	return;
