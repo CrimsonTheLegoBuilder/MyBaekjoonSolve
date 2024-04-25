@@ -17,6 +17,9 @@ bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
+//#define TEST
+//#define ASSERT
+
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -39,17 +42,28 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+#ifdef TEST
+	freopen("../../../input_data/flappy/", "r", stdin);
+	freopen("../../../input_data/flappy/flappy_out.txt", "w", stdout);
+#endif
 	int x, yd, yu;
 	Pos s, e;
 	std::cin >> s >> e >> N;
 	std::vector<Pos> U(N), D(N);
 	for (int i = 0; i < N; i++) {
 		std::cin >> x >> yd >> yu;
+#ifdef ASSERT
 		assert(yd < yu);
+#endif
 		D[i] = Pos(x, yd);
 		U[i] = Pos(x, yu);
 	}
-
+#ifdef ASSERT
+	for (int i = 0; i < N - 1; i++) {
+		assert(D[i] < U[i]);
+		assert(D[i] < D[i + 1]);
+	}
+#endif
 	std::deque<Pos> HU, HD;
 	HU.push_back(s); HU.push_back(U[0]);
 	U.push_back(e);
