@@ -52,9 +52,6 @@ void solve() {
 	std::vector<Pos> U(N), D(N);
 	for (int i = 0; i < N; i++) {
 		std::cin >> x >> yd >> yu;
-#ifdef ASSERT
-		assert(yd < yu);
-#endif
 		D[i] = Pos(x, yd);
 		U[i] = Pos(x, yu);
 	}
