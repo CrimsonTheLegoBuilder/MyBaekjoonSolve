@@ -17,6 +17,9 @@ bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
+//#define DEBUG
+//#define TEST
+
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -39,6 +42,10 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+#ifdef TEST
+	freopen("../../../input_data/flappy/", "r", stdin);
+	freopen("../../../input_data/flappy/flappy_out.txt", "w", stdout);
+#endif
 	int x, yd, yu;
 	Pos s, e;
 	std::cin >> s >> e >> N;
@@ -49,6 +56,13 @@ void solve() {
 		D[i] = Pos(x, yd);
 		U[i] = Pos(x, yu);
 	}
+
+#ifdef DEBUG
+	for (int i = 0; i < N - 1; i++) {
+		assert(D[i] < U[i]);
+		assert(D[i] < D[i + 1]);
+	}
+#endif
 
 	std::deque<Pos> HU, HD;
 	HU.push_back(s); HU.push_back(U[0]);
@@ -67,24 +81,32 @@ void solve() {
 		ptr = 1;
 		if (HU.size() <= 2 && HD.size() <= 2) continue;
 		else if (HU.size() == 2) {
-			//std::cout << "DEBUG::\n";
+#ifdef DEBUG
+			std::cout << "DEBUG::\n";
+#endif
 			if (ccw(HU[0], HU[1], HD[1]) <= 0) continue;
 			while (ptr < HD.size() && ccw(HU[0], HU[1], HD[ptr]) > 0) ptr++;
 			ptr--;
 			while (ptr--) ret.push_back(HD[0]), HD.pop_front();
 			ret.push_back(HD[0]);
 			HU[0] = HD[0];
-			//std::cout << "DEBUG:: " << HU[0] << "\n";
+#ifdef DEBUG
+			std::cout << "DEBUG:: " << HU[0] << "\n";
+#endif
 		}
 		else if (HD.size() == 2) {
-			//std::cout << "DEBUG::\n";
+#ifdef DEBUG
+			std::cout << "DEBUG::\n";
+#endif
 			if (ccw(HD[0], HD[1], HU[1]) >= 0) continue;
 			while (ptr < HU.size() && ccw(HD[0], HD[1], HU[ptr]) < 0) ptr++;
 			ptr--;
 			while (ptr--) ret.push_back(HU[0]), HU.pop_front();
 			ret.push_back(HU[0]);
 			HD[0] = HU[0];
-			//std::cout << "DEBUG:: " << HD[0] << "\n";
+#ifdef DEBUG
+			std::cout << "DEBUG:: " << HD[0] << "\n";
+#endif
 		}
 	}
 	ret.push_back(e);
@@ -95,6 +117,8 @@ void solve() {
 }
 int main() { solve(); return 0; }//GCPC 2021 F Flappy Bird boj25250
 
+
+
 /*
 
 0 0 10 0
@@ -103,5 +127,34 @@ int main() { solve(); return 0; }//GCPC 2021 F Flappy Bird boj25250
 4 2 3
 7 0 2
 9 -2 -1
+
+0 0 20 0
+19
+1 1 2
+2 -2 -1
+3 1 2
+4 -2 -1
+5 1 2
+6 -2 -1
+7 1 2
+8 -2 -1
+9 1 2
+10 -2 -1
+11 1 2
+12 -2 -1
+13 1 2
+14 -2 -1
+15 1 2
+16 -2 -1
+17 1 2
+18 -2 -1
+19 1 2
+
+0 0 10 0
+4
+1 -1 1
+2 -2 2
+3 -1 1
+4 -2 2
 
 */
