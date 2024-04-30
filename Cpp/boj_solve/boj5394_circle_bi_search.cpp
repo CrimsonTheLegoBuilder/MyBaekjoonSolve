@@ -16,6 +16,9 @@ inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline ld sqr(const ld& x) { return x * x; }
 
+//#define TEST
+//#define ASSERT
+
 int N, M, T, Q, c;
 ld W, H;
 struct Pos {
@@ -146,7 +149,6 @@ bool F(const ld& m) {
 				return 1;
 		}
 		for (int j = i + 1; j < c; j++) {
-			//if (C[i].r + C[j].r + m * 2 < (C[i].c - C[j].c).mag()) continue;
 			auto nc = enclose_circle(i, j, m);
 			if (!nc.size()) continue;
 			if (check(nc[0], i, j) || check(nc[1], i, j)) return 1;
@@ -164,6 +166,7 @@ ld bi_search() {
 	}
 	return s;
 }
+#ifndef TEST
 void query() {
 	std::cin >> W >> H >> c;
 	for (int i = 0; i < c; i++) std::cin >> C[i];
@@ -174,9 +177,40 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(15);
+	std::cout.precision(6);
 	std::cin >> Q;
 	while (Q--) query();
 	return;
 }
 int main() { solve(); return 0; }//BAPC 2010 E clock boj5394
+#else
+ld ret[LEN];
+int t = 0;
+void query() {
+	std::cin >> W >> H >> c;
+	for (int i = 0; i < c; i++) std::cin >> C[i];
+	ret[t++] = bi_search();
+	return;
+}
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(6);
+	freopen("E.in", "r", stdin);
+	std::cin >> Q;
+	while (Q--) query();
+	return;
+}
+int main() {
+	solve();
+	ld ans;
+	freopen("E.out", "r", stdin);
+	for (int i = 0; i < t; i++) {
+		std::cin >> ans;
+		std::cout << (std::abs(ans - ret[i]) < 1e-6 ? "Accepted\n" : "Wrong answer\n");
+		//std::cout << ret[i] << " " << ans << "\n";
+	}
+	return 0;
+}//BAPC 2010 E clock boj5394
+#endif
