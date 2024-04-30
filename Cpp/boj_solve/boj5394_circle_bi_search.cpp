@@ -109,6 +109,10 @@ bool check(const Circle& nc, const int& i = -1, const int& j = -1) {
 	return 1;
 }
 bool F(const ld& m) {
+	if (check(Circle(Pos(m, m), m))) return 1;
+	if (check(Circle(Pos(W - m, m), m))) return 1;
+	if (check(Circle(Pos(m, H - m), m))) return 1;
+	if (check(Circle(Pos(W - m, H - m), m))) return 1;
 	for (int i = 0; i < C; i++) {
 		for (int j = i + 1; j < C; j++) {
 			//if (clock[i].r + clock[j].r + m * 2 < (clock[i].c - clock[j].c).mag())
@@ -149,10 +153,6 @@ bool F(const ld& m) {
 				return 1;
 		}
 	}
-	if (check(Circle(Pos(m, m), m))) return 1;
-	if (check(Circle(Pos(W - m, m), m))) return 1;
-	if (check(Circle(Pos(m, H - m), m))) return 1;
-	if (check(Circle(Pos(W - m, H - m), m))) return 1;
 	return 0;
 }
 ld bi_search() {
