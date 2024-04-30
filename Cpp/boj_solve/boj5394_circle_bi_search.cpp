@@ -91,10 +91,11 @@ std::vector<Circle> enclose_circle(const int& i, const int& j, const ld& r) {
 	Pos vec = cb - ca;//vec a -> b
 	ld distance = vec.mag();
 	ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
-	Pos m = ca + vec * X / distance;
-	ld len = sqrt(ra * ra - X * X);
-	Pos h = ~(cb - ca).unit() * len;
-	return { Circle(m + h, r), Circle(m - h, r) };
+	if (X > ra) return {};
+	Pos w = ca + vec * X / distance;
+	ld Y = sqrt(ra * ra - X * X);
+	Pos h = ~vec.unit() * Y;
+	return { Circle(w + h, r), Circle(w - h, r) };
 }
 bool check(const Circle& nc, const int& i = -1, const int& j = -1) {
 	if (nc.c.x < nc.r) return 0;
@@ -107,10 +108,13 @@ bool check(const Circle& nc, const int& i = -1, const int& j = -1) {
 	}
 	return 1;
 }
-bool F(ld m) {
+bool F(const ld& m) {
 	for (int i = 0; i < C; i++) {
-		for (int j = 0; j < C; j++) {
+		for (int j = i + 1; j < C; j++) {
+			//if (clock[i].r + clock[j].r + m * 2 < (clock[i].c - clock[j].c).mag())
+			//	continue;
 			auto nc = enclose_circle(i, j, m);
+			if (!nc.size()) continue;
 			if (check(nc[0], i, j) || check(nc[1], i, j)) return 1;
 		}
 		ld x, y;
