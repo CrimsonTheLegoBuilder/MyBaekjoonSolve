@@ -16,7 +16,7 @@ inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline ld sqr(const ld& x) { return x * x; }
 
-int N, M, T, Q, C;
+int N, M, T, Q, c;
 ld W, H;
 struct Pos {
 	ld x, y;
@@ -65,8 +65,8 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 }
 struct Circle {
 	Pos c;
-	int r;
-	Circle(Pos C = Pos(0, 0), int R = 0) : c(C), r(R) {}
+	ld r;
+	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
@@ -84,10 +84,10 @@ struct Circle {
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 } INVAL = { { 0, 0 }, -1 };
 bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
-Circle clock[LEN];
+Circle C[LEN];
 std::vector<Circle> enclose_circle(const int& i, const int& j, const ld& r) {
-	Pos& ca = clock[i].c, cb = clock[j].c;
-	ld ra = clock[i].r + r, rb = clock[j].r + r;
+	Pos& ca = C[i].c, cb = C[j].c;
+	ld ra = C[i].r + r, rb = C[j].r + r;
 	Pos vec = cb - ca;//vec a -> b
 	ld distance = vec.mag();
 	ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
@@ -102,9 +102,9 @@ bool check(const Circle& nc, const int& i = -1, const int& j = -1) {
 	if (W - nc.c.x < nc.r) return 0;
 	if (nc.c.y < nc.r) return 0;
 	if (H - nc.c.y < nc.r) return 0;
-	for (int k = 0; k < C; k++) {
+	for (int k = 0; k < c; k++) {
 		if (k == i || k == j) continue;
-		if (clock[k].r + nc.r > (clock[k].c - nc.c).mag()) return 0;
+		if (C[k].r + nc.r > (C[k].c - nc.c).mag()) return 0;
 	}
 	return 1;
 }
@@ -113,16 +113,9 @@ bool F(const ld& m) {
 	if (check(Circle(Pos(W - m, m), m))) return 1;
 	if (check(Circle(Pos(m, H - m), m))) return 1;
 	if (check(Circle(Pos(W - m, H - m), m))) return 1;
-	for (int i = 0; i < C; i++) {
-		for (int j = i + 1; j < C; j++) {
-			//if (clock[i].r + clock[j].r + m * 2 < (clock[i].c - clock[j].c).mag())
-			//	continue;
-			auto nc = enclose_circle(i, j, m);
-			if (!nc.size()) continue;
-			if (check(nc[0], i, j) || check(nc[1], i, j)) return 1;
-		}
+	for (int i = 0; i < c; i++) {
 		ld x, y;
-		Circle& p = clock[i];
+		Circle& p = C[i];
 		ld r = m + p.r;
 		if (p.c.x - p.r < m * 2 + TOL) {
 			x = p.c.x - m;
@@ -152,6 +145,12 @@ bool F(const ld& m) {
 				check(Circle(Pos(p.c.x - x, H - m), m), i))
 				return 1;
 		}
+		for (int j = i + 1; j < c; j++) {
+			//if (C[i].r + C[j].r + m * 2 < (C[i].c - C[j].c).mag()) continue;
+			auto nc = enclose_circle(i, j, m);
+			if (!nc.size()) continue;
+			if (check(nc[0], i, j) || check(nc[1], i, j)) return 1;
+		}
 	}
 	return 0;
 }
@@ -166,8 +165,8 @@ ld bi_search() {
 	return s;
 }
 void query() {
-	std::cin >> W >> H >> C;
-	for (int i = 0; i < C; i++) std::cin >> clock[i];
+	std::cin >> W >> H >> c;
+	for (int i = 0; i < c; i++) std::cin >> C[i];
 	std::cout << bi_search() << "\n";
 	return;
 }
