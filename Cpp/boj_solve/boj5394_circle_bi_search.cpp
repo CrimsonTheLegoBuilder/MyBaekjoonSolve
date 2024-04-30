@@ -97,22 +97,21 @@ std::vector<Circle> enclose_circle(const int& i, const int& j, const ld& r) {
 	return { Circle(m + h, r), Circle(m - h, r) };
 }
 bool check(const Circle& nc, const int& i = -1, const int& j = -1) {
-	for (int k = 0; k < C; k++) {
-		if (k == i || k == j) continue;
-		if (clock[k].r + nc.r > (clock[k].c + nc.c).mag()) return 0;
-	}
 	if (nc.c.x < nc.r) return 0;
 	if (W - nc.c.x < nc.r) return 0;
 	if (nc.c.y < nc.r) return 0;
-	if (H - nc.c.x < nc.r) return 0;
+	if (H - nc.c.y < nc.r) return 0;
+	for (int k = 0; k < C; k++) {
+		if (k == i || k == j) continue;
+		if (clock[k].r + nc.r > (clock[k].c - nc.c).mag()) return 0;
+	}
 	return 1;
 }
 bool F(ld m) {
-	Circle nc;
 	for (int i = 0; i < C; i++) {
 		for (int j = 0; j < C; j++) {
-			auto ncs = enclose_circle(i, j, m);
-			if (check(ncs[0], i, j) || check(ncs[1], i, j)) return 1;
+			auto nc = enclose_circle(i, j, m);
+			if (check(nc[0], i, j) || check(nc[1], i, j)) return 1;
 		}
 		ld x, y;
 		Circle& p = clock[i];
@@ -120,25 +119,29 @@ bool F(ld m) {
 		if (p.c.x - p.r < m * 2 + TOL) {
 			x = p.c.x - m;
 			y = sqrt(r * r - x * x);
-			if (check(Circle(Pos(m, p.c.y + y), m)) || check(Circle(Pos(m, p.c.y - y), m)))
+			if (check(Circle(Pos(m, p.c.y + y), m), i) ||
+				check(Circle(Pos(m, p.c.y - y), m), i))
 				return 1;
 		}
 		if ((W - p.c.x) - p.r < m * 2 + TOL) {
 			x = (W - p.c.x) - m;
 			y = sqrt(r * r - x * x);
-			if (check(Circle(Pos(W - m, p.c.y + y), m)) || check(Circle(Pos(W - m, p.c.y - y), m)))
+			if (check(Circle(Pos(W - m, p.c.y + y), m), i) ||
+				check(Circle(Pos(W - m, p.c.y - y), m), i))
 				return 1;
 		}
 		if (p.c.y - p.r < m * 2 + TOL) {
 			y = p.c.y - m;
 			x = sqrt(r * r - y * y);
-			if (check(Circle(Pos(p.c.x + x, m), m)) || check(Circle(Pos(p.c.x - x), m)))
+			if (check(Circle(Pos(p.c.x + x, m), m), i) ||
+				check(Circle(Pos(p.c.x - x, m), m), i))
 				return 1;
 		}
 		if ((H - p.c.y) - p.r < m * 2 + TOL) {
 			y = (H - p.c.y) - m;
 			x = sqrt(r * r - y * y);
-			if (check(Circle(Pos(p.c.x + x, m), H - m)) || check(Circle(Pos(p.c.x - x), H - m)))
+			if (check(Circle(Pos(p.c.x + x, H - m), m), i) ||
+				check(Circle(Pos(p.c.x - x, H - m), m), i))
 				return 1;
 		}
 	}
