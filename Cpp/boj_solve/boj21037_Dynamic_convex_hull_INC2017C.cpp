@@ -212,7 +212,7 @@ private:
 public:
 	DynamicHull(bool lo) : is_low(lo) { idx_.resize(OFFSET + 5, 0); };
 
-	inline void insert(Pos p) {
+	void insert(Pos p) {
 		p = transform(p);
 
 		if (hull.size() <= 1) {
@@ -228,17 +228,17 @@ public:
 		return;
 	}
 
-	inline friend int idx(DynamicHull& LH, DynamicHull& UH, const Pos& p) {
+	friend int idx(DynamicHull& LH, DynamicHull& UH, const Pos& p) {
 		if (LH.exist(p)) return LH.len(p) - 1;
 		else if (UH.exist(p)) return LH.size() + UH.len(p) - 2;
 		else return -1;
 	}
 
-	inline friend int size(DynamicHull& LH, DynamicHull& UH) {
+	friend int size(DynamicHull& LH, DynamicHull& UH) {
 		return LH.size() + UH.size() - 2;
 	}
 
-	inline friend ll area(DynamicHull& LH, DynamicHull& UH) {
+	friend ll area(DynamicHull& LH, DynamicHull& UH) {
 		return LH.area() + UH.area();
 	}
 };
