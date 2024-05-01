@@ -17,7 +17,6 @@ inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline ld sqr(const ld& x) { return x * x; }
 
 //#define TEST
-//#define ASSERT
 
 int N, M, T, Q, c;
 ld W, H;
@@ -88,7 +87,7 @@ struct Circle {
 } INVAL = { { 0, 0 }, -1 };
 bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 Circle C[LEN];
-std::vector<Circle> enclose_circle(const int& i, const int& j, const ld& r) {
+std::vector<Circle> close_circle(const int& i, const int& j, const ld& r) {
 	Pos& ca = C[i].c, cb = C[j].c;
 	ld ra = C[i].r + r, rb = C[j].r + r;
 	Pos vec = cb - ca;//vec a -> b
@@ -149,7 +148,7 @@ bool F(const ld& m) {
 				return 1;
 		}
 		for (int j = i + 1; j < c; j++) {
-			auto nc = enclose_circle(i, j, m);
+			auto nc = close_circle(i, j, m);
 			if (!nc.size()) continue;
 			if (check(nc[0], i, j) || check(nc[1], i, j)) return 1;
 		}
@@ -157,9 +156,10 @@ bool F(const ld& m) {
 	return 0;
 }
 ld bi_search() {
-	ld s = 0, e = std::min(W, H);
+	ld s = 0, e = std::min(W, H) * .5;
 	int cnt = 50;
-	while (cnt--) {
+	//while (cnt--) {
+	while (std::abs(e - s) > 1e-6) {
 		ld m = (s + e) * .5;
 		if (F(m)) s = m;
 		else e = m;
