@@ -30,18 +30,18 @@ struct Pos {
 	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator < (const Pos& p) const { return x < p.x; }
 	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
-	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	inline Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	inline Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const int& n) const { return { x * n, y * n }; }
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
-	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	inline ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator - () const { return { -x, -y }; }
+	inline Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
 	ll xy() const { return (ll)x * y; }
@@ -59,14 +59,12 @@ bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.
 bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 //bool cmpi(const Pos& p, const Pos& q) { return p.i < q.i; }
 typedef std::vector<Pos> Polygon;
-ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
+#ifdef TEST
 std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 	std::vector<Pos> H;
 	if (C.size() < 3) {
@@ -98,7 +96,8 @@ ll area(std::vector<Pos>& H) {
 	}
 	return ret;
 }
-//condition that must be observed : all coord's x or y with no same value
+#endif
+//condition that must be observed : all coord's x and y with no same value
 //
 //to calculate time comlpexity:
 //when inserting pos, another pos is popped from hull.
