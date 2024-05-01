@@ -153,6 +153,7 @@ private:
 			}
 			else break;
 		}
+		return;
 	}
 
 	bool able_to_go_right(const Pos& p) {
@@ -173,6 +174,7 @@ private:
 			}
 			else break;
 		}
+		return;
 	}
 
 	bool inner_check(const Pos& p) {
