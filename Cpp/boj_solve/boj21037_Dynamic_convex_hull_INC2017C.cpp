@@ -251,7 +251,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 #ifdef TEST
-	freopen("../../../input_data/polygonal/polygonal_6.in", "r", stdin);
+	freopen("../../../input_data/polygonal/polygonal_5.in", "r", stdin);
 	freopen("../../../input_data/polygonal/polygonal_out.txt", "w", stdout);
 	std::vector<bool> ret;
 	std::vector<Pos> V;
@@ -289,25 +289,25 @@ void solve() {
 			assert(t >= 3);
 			assert(a > -1 && b > -1);
 #endif
-			int diff = b - a;
-			if (diff < 0) diff += size(LH, UH);
+			int diff = b - a, sz = size(LH, UH);
+			if (diff < 0) diff += sz;
 #ifndef TEST
-			if (diff * 2 > size(LH, UH)) std::cout << "CCW\n";
+			if (diff * 2 > sz) std::cout << "CCW\n";
 			else std::cout << "CW\n";
 #else
-			ret.push_back(diff * 2 > size(LH, UH));
+			ret.push_back(diff * 2 > sz);
 #endif
 		}
 	}
 #ifdef TEST
-	freopen("../../../input_data/polygonal/polygonal_6.out", "r", stdin);
+	freopen("../../../input_data/polygonal/polygonal_5.out", "r", stdin);
 	int sz = ret.size();
 	T = sz;
 	for (int i = 0; i < sz; i++) {
 		std::string ans;
 		std::cin >> ans;
-		bool f = ans != "CCW";
-		T -= f != ret[i];
+		bool f = ans == "CCW";
+		T -= f == ret[i];
 	}
 	std::cout << sz << " " << T << "\n";
 	std::cout << area(LH, UH) << "\n";
