@@ -130,8 +130,7 @@ private:
 	bool able_to_go_left(const Pos& p) {
 		std::set<Pos>::iterator it = hull.find(p);
 		if (it == hull.begin()) return 0;
-		it--;
-		if (it == hull.begin()) return 0;
+		if (--it == hull.begin()) return 0;
 		return 1;
 	}
 	void update_left(const Pos& p0) {
@@ -150,10 +149,8 @@ private:
 
 	bool able_to_go_right(const Pos& p) {
 		std::set<Pos>::iterator it = hull.find(p);
-		it++;
-		if (it == hull.end()) return 0;
-		it++;
-		if (it == hull.end()) return 0;
+		if (++it == hull.end()) return 0;
+		if (++it == hull.end()) return 0;
 		return 1;
 	}
 	void update_right(const Pos& p0) {
