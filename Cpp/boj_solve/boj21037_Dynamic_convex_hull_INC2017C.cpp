@@ -99,6 +99,15 @@ ll area(std::vector<Pos>& H) {
 	return ret;
 }
 //condition that must be observed : all coord's x or y with no same value
+//
+//to calculate time comlpexity:
+//when inserting pos, another pos is popped from hull.
+//when a pos is popped, then color it red.
+//after all, how many red pos exists?
+//at most N - 3.
+//all query below seems nested O(N^2),
+//but actually O(NlogN).
+//
 //https://github.com/jonathanirvings/inc-2017/blob/master/polygonal/solution.cpp
 //Solution by William Gozali
 class DynamicHull {
@@ -110,7 +119,7 @@ private:
 
 	inline Pos transform(const Pos& p) {
 		if (is_low) return p + Pos(1, 1);//make non zero
-		else return -p + Pos(OFFSET, OFFSET);//for make upper hull && make non zero
+		else return -p + Pos(OFFSET, OFFSET);//make upper hull && make non zero
 	}
 	inline Pos restore(const Pos& t) {
 		if (is_low) return t - Pos(1, 1);
