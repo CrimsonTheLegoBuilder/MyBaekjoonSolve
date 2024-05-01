@@ -232,7 +232,7 @@ public:
 		else return -1;
 	}
 
-	inline friend int total_len(DynamicHull& LH, DynamicHull& UH) {
+	inline friend int size(DynamicHull& LH, DynamicHull& UH) {
 		return LH.size() + UH.size() - 2;
 	}
 
@@ -280,21 +280,22 @@ void solve() {
 #endif
 		}
 		else {
-#ifdef ASSERT
-			assert(t >= 3);
-#endif
 			Pos p, q;
 			std::cin >> p >> q;
 			int a, b;
 			a = idx(LH, UH, p);
 			b = idx(LH, UH, q);
+#ifdef ASSERT
+			assert(t >= 3);
+			assert(a > -1 && b > -1);
+#endif
 			int diff = b - a;
-			if (diff < 0) diff += total_len(LH, UH);
+			if (diff < 0) diff += size(LH, UH);
 #ifndef TEST
-			if (diff * 2 > total_len(LH, UH)) std::cout << "CCW\n";
+			if (diff * 2 > size(LH, UH)) std::cout << "CCW\n";
 			else std::cout << "CW\n";
 #else
-			ret.push_back(diff * 2 > total_len(LH, UH));
+			ret.push_back(diff * 2 > size(LH, UH));
 #endif
 		}
 	}
