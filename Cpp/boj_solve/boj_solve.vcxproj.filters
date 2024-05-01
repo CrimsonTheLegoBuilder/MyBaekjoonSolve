@@ -1020,6 +1020,9 @@
     <ClCompile Include="boj5394_circle_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj21037_Dynamic_convex_hull_INC2017C.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
