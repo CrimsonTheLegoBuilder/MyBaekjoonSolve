@@ -1,67 +1,37 @@
-from collections import deque
 import sys
-input = sys.stdin.readline
-dx, dy = [0, 0, 1, -1], [1, -1, 0, 0]
+from math import hypot
+TOL = 1e-7
 
-def dfs(q, visited, goal):
-    while q:
-        x, y, cnt = q.popleft()
-        for i in range(4):
-            nx, ny = x + dx[i], y + dy[i]
-            if 0 <= nx < r and 0 <= ny < c and not visited[nx][ny] and (graph[nx][ny] == '.' or graph[nx][ny] == 'J'):
-                visited[nx][ny] = 1
-                q.append([nx, ny, cnt + 1])
-                if nx == r - 1 or ny == c - 1 or nx == 0 or ny == 0:
-                    goal.append([cnt + 1, nx, ny])
-    return -1
 
-r, c = map(int, input().rstrip().split())
-graph = list(list(input().rstrip()) for _ in range(r))
-result = 0
+class Pos:
+    def __init__(self, x_: float, y_: float):
+        self.x = x_
+        self.y = y_
 
-fvisited = list(([0] * c) for _ in range(r))
-fq = deque()
-fgoal = list() #각 가장자리 지점들에 도달하는 경우
+    def __sub__(self, p: 'Pos') -> 'Pos':
+        return Pos(self.x - p.x, self.y - p.y)
 
-hvisited = list(([0] * c) for _ in range(r))
-hq = deque()
-hgoal = list()
+    def __floordiv__(self, p: 'Pos') -> int or float:
+        return self.x * p.y - self.y * p.x
 
-# 큐 채우기
-for i in range(r):
-    for j in range(c):
-        if graph[i][j] == 'J':
-            hq.append([i, j, 1])
-            hvisited[i][j] = 1
-        elif graph[i][j] == 'F':
-            fq.append([i, j, 1])
+    def __pow__(self, p: 'Pos') -> int or float:
+        return self.x * p.x + self.y * p.y
 
-dfs(hq, hvisited, hgoal)
-dfs(fq, fvisited, fgoal)
+    def mag(self) -> float:
+        return hypot(self.x, self.y)
 
-hgoal.sort()
-fgoal.sort()
+    def euc(self) -> int or float:
+        return self.x * self.x + self.y * self.y
 
-# 각 가장자리 도달하는 경우
-for cnt, x, y in hgoal:
-    for fcnt, fx, fy in fgoal:
-        if fx == x and fy == y and fcnt > cnt:
-            result = cnt
-            break
-    if result == cnt:
-        break
 
-if result:
-    print(result)
-else:
-    print("IMPOSSIBLE")
+def cross(d1: Pos, d2: Pos, d3: Pos) -> int or float:
+    return (d2 - d1) // (d3 - d2)
 
-'''
 
-5 5
-.....
-####.
-..J#F
-####.
-.....
-'''
+p1: Pos = Pos(17, 7)
+p2: Pos = Pos(19, 90)
+vec = p2 - p1
+h = Pos(-vec.y, vec.x)
+l = h.mag()
+h = Pos(h.x / l * 100, h.y / l * 100)
+print(cross(p1, p2, h) / 2)
