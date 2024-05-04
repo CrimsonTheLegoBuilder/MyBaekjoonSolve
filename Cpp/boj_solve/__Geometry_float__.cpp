@@ -88,6 +88,9 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
+bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
+bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
+//bool cmpi(const Pos& p, const Pos& q) { return p.i < q.i; }
 struct Vec {
 	ld vy, vx;
 	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
@@ -221,8 +224,8 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
 ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
 Polygon convex_cut(const std::vector<Pos>& ps, const Pos& b1, const Pos& b2) {
 	std::vector<Pos> qs;
 	int n = ps.size();
