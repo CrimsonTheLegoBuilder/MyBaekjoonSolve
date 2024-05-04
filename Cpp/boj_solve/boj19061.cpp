@@ -69,7 +69,7 @@ struct Pos {
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
 	Pos unit() const { return *this / mag(); }
-	ld rad() const { return atan2(y, x); }
+	ld rad() const { return atan2l(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
@@ -163,8 +163,8 @@ Line L(const Vec& s, const Pos& p) {
 Line rotate(const Line& l, const Pos& p, ld the) {
 	Vec s = l.s;
 	ld x = -s.vx, y = s.vy;
-	ld vx = -(x * cos(the) - y * sin(the));
-	ld vy = x * sin(the) + y * cos(the);
+	ld vx = -(x * cosl(the) - y * sinl(the));
+	ld vy = x * sinl(the) + y * cosl(the);
 	ld c = vy * p.x + vx * p.y;
 	return Line(Vec(vy, vx), c);
 }
@@ -176,10 +176,10 @@ Line rotate90(const Line& l, const Pos& p) {
 Pos intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
 	ld det = v1 / v2;
-	return {
+	return Pos(
 		(l1.c * v2.vx - l2.c * v1.vx) / det,
-		(l2.c * v1.vy - l1.c * v2.vy) / det,
-	};
+		(l2.c * v1.vy - l1.c * v2.vy) / det
+	);
 }
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	auto cw = [&](const Line& l1, const Line& l2, const Line& target) -> bool {
@@ -221,6 +221,36 @@ struct Arc {
 	}
 	ld area() const { return (hi - lo) * r * r; }
 };
+typedef std::vector<Arc> Fan;
+std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
+	ld d = dist(p1, p2, o);
+	if (std::abs(d) > r) return {};
+	Pos vec = p2 - p1;
+	Pos m = intersection(p1, p2, o, o + ~vec);
+	ld distance = vec.mag();
+	ld ratio = sqrt(r * r - d * d);
+	Pos m1 = m - vec * ratio / distance;
+	Pos m2 = m + vec * ratio / distance;
+	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
+	return { m1, m2 };//p1->p2
+}
+ld circle_cut(const Pos& p1, const Pos& p2, const ld& r) {
+	Pos v1 = p1, v2 = p2;
+	std::vector<Pos> inx = circle_line_intersection(O, r, v1, v2);
+	if (inx.empty()) return r * r * rad(v1, v2) * .5;
+	Pos m1 = inx[0], m2 = inx[1];
+	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
+	if (d1 && d2) return (v1 / v2) * .5;
+	else if (d1) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
+	else if (d2) return (r * r * rad(v1, m1) + m1 / v2) * .5;
+	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0)
+		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
+	else return (r * r * rad(v1, v2)) * .5;
+}
+ld sweep(Polygon& H, Fan& F) {
+	ld ret = 0;
+
+}
 ld query() {
 	std::cin >> N >> A;
 	H.resize(N);
@@ -266,7 +296,9 @@ ld query() {
 	std::sort(valid_arcs.begin(), valid_arcs.end());
 	ld area_origin = 0, area_convert = 0, area_hpi = 0, area_arcs = 0;
 	for (Arc& a : valid_arcs) area_arcs += a.area();
-
+	std::sort(H.begin(), H.end(), cmpt);
+	std::sort(V.begin(), V.end(), cmpt);
+	std::sort(HPI.begin(), HPI.end(), cmpt);
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
