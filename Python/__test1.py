@@ -1,5 +1,5 @@
 import sys
-from math import hypot
+from math import hypot, pi
 TOL = 1e-7
 
 
@@ -28,10 +28,12 @@ def cross(d1: Pos, d2: Pos, d3: Pos) -> int or float:
     return (d2 - d1) // (d3 - d2)
 
 
-p1: Pos = Pos(17, 7)
-p2: Pos = Pos(19, 90)
-vec = p2 - p1
-h = Pos(-vec.y, vec.x)
-l = h.mag()
-h = Pos(h.x / l * 100, h.y / l * 100)
-print(cross(p1, p2, h) / 2)
+# p1: Pos = Pos(17, 7)
+# p2: Pos = Pos(19, 90)
+# vec = p2 - p1
+# h = Pos(-vec.y, vec.x)
+# l = h.mag()
+# h = Pos(h.x / l * 100, h.y / l * 100)
+# print(cross(p1, p2, h) / 2)
+
+print((100 + 25) * pi)
