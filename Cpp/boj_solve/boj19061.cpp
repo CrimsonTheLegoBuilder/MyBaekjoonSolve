@@ -11,11 +11,14 @@
 #include <array>
 #include <tuple>
 #include <complex>
+#include <numeric>
+//#include <quadmath.h>
 typedef long long ll;
-typedef long double ld;
 //typedef double ld;
+typedef long double ld;
+//typedef __float128 ld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 int N, M, T, Q;
@@ -27,22 +30,8 @@ ld norm(ld th) {
 	while (th > PI * 2) th -= PI * 2;
 	return th;
 }
-ld flip(ld lat) {
-	if (zero(lat - PI * .5) || zero(lat + PI * .5)) return 0;
-	if (zero(lat)) return PI * .5;
-	if (lat > 0) return PI * .5 - lat;
-	if (lat < 0) return -(PI * .5) - lat;
-	return INF;
-}
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
-//freopen("../../../input_data/triathlon_tests/triath.20", "r", stdin);
-//freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
-//Euler characteristic : v - e + f == 1
-//Pick`s Theorem : A = i + b/2 - 1
-//2D============================================================================//
-//2D============================================================================//
-//2D============================================================================//
 struct Pos {
 	ld x, y;
 	ld t;
@@ -65,18 +54,21 @@ struct Pos {
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	ld xy() const { return x * y; }
-	Pos rot(ld the) { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
+	Pos rot(ld the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
+	//ld mag() const { return hypotl(x, y); }
 	Pos unit() const { return *this / mag(); }
-	ld rad() const { return atan2l(y, x); }
+	ld rad() const { return norm(atan2l(y, x)); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-}; const Pos O = { 0, 0 };
+};
+const Pos O = { 0, 0 };
+const Pos X_norm = { 1000, 0 };
 typedef std::vector<Pos> Polygon;
 Polygon H, V, HPI;//Hull, conVert, HalfPlaneIntersection
 //bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
@@ -148,7 +140,7 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+ld rad(const Pos& p1, const Pos& p2) { return norm(atan2l(p1 / p2, p1 * p2)); }
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
@@ -213,8 +205,7 @@ struct Arc {
 	ld r;
 	Arc(ld LO = 0, ld HI = 0, ld R = 0) : lo(LO), hi(HI), r(R) {}
 	bool operator < (const Arc& a) const {
-		return zero(r - a.r) ?
-			zero(lo - a.lo) ?
+		return !sign(r - a.r) ? !sign(lo - a.lo) ?
 			hi < a.hi :
 			lo < a.lo :
 			r > a.r;
@@ -222,41 +213,100 @@ struct Arc {
 	ld area() const { return (hi - lo) * r * r; }
 };
 typedef std::vector<Arc> Fan;
-std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
-	ld d = dist(p1, p2, o);
-	if (std::abs(d) > r) return {};
+//std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
+//	ld d = dist(p1, p2, o);
+//	if (std::abs(d) > r) return {};
+//	Pos vec = p2 - p1;
+//	Pos m = intersection(p1, p2, o, o + ~vec);
+//	ld distance = vec.mag();
+//	ld ratio = sqrt(r * r - d * d);
+//	Pos m1 = m - vec * ratio / distance;
+//	Pos m2 = m + vec * ratio / distance;
+//	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
+//	return { m1, m2 };//p1->p2
+//}
+//ld circle_cut(const Pos& p1, const Pos& p2, const ld& r) {
+//	Pos v1 = p1, v2 = p2;
+//	std::vector<Pos> inx = circle_line_intersection(O, r, v1, v2);
+//	if (inx.empty()) return r * r * rad(v1, v2) * .5;
+//	Pos m1 = inx[0], m2 = inx[1];
+//	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
+//	if (d1 && d2) return (v1 / v2) * .5;
+//	else if (d1) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
+//	else if (d2) return (r * r * rad(v1, m1) + m1 / v2) * .5;
+//	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0)
+//		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
+//	else return (r * r * rad(v1, v2)) * .5;
+//}
+std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos& p, const ld& r) {
+	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
+	Pos vec = e - s;
+	Pos OM = s - p;
+	ld a = vec * vec;
+	ld b = 2 * (vec * OM);
+	ld c = OM * OM - r * r;
+	ld J = b * b - 4 * a * c;
+	if (J < TOL) return {};
+	ld lo = (-b - sqrt(J)) / (2 * a);
+	ld hi = (-b + sqrt(J)) / (2 * a);
+	//if (hi < lo) std::swap(lo, hi);
+	if (hi < 0 || 1 < lo) return {};
+	return { { lo, hi } };//ratio, ratio
+}
+ld circle_cutting(const Pos& p1, const Pos& p2, const ld& r) {
+	std::vector<Pos> inx = circle_line_intersections(p1, p2, O, r);
+	if (inx.empty()) return cross(O, p1, p2) * .5;
+	ld s = inx[0].x, e = inx[0].y;
 	Pos vec = p2 - p1;
-	Pos m = intersection(p1, p2, o, o + ~vec);
-	ld distance = vec.mag();
-	ld ratio = sqrt(r * r - d * d);
-	Pos m1 = m - vec * ratio / distance;
-	Pos m2 = m + vec * ratio / distance;
-	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
-	return { m1, m2 };//p1->p2
+	if (0 < s && e < 1) {
+		Pos m1 = p1 + vec * s, m2 = p1 + vec * e;
+		return cross(O, p1, p2) * (s + 1 - e) * .5 + r * r * rad(m1, m2);
+	}
+	else if (0 < s) {
+		Pos m = p1 + vec * s;
+		return cross(O, p1, p2) * s * .5 + r * r * rad(m, p2);
+	}
+	else if (e < 1) {
+		Pos m = p1 + vec * e;
+		return cross(O, p1, p2) * (1 - e) * .5 + r * r * rad(p1, m);
+	}
+	else return r * r * rad(p1, p2);
 }
-ld circle_cut(const Pos& p1, const Pos& p2, const ld& r) {
-	Pos v1 = p1, v2 = p2;
-	std::vector<Pos> inx = circle_line_intersection(O, r, v1, v2);
-	if (inx.empty()) return r * r * rad(v1, v2) * .5;
-	Pos m1 = inx[0], m2 = inx[1];
-	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
-	if (d1 && d2) return (v1 / v2) * .5;
-	else if (d1) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
-	else if (d2) return (r * r * rad(v1, m1) + m1 / v2) * .5;
-	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0)
-		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
-	else return (r * r * rad(v1, v2)) * .5;
-}
-ld sweep(Polygon& H, Fan& F) {
+ld sweep(const Polygon& H, const Fan& F) {
 	ld ret = 0;
-
+	int szf = F.size();
+	int szh = H.size();
+	for (int i = 0, j = 0, k; i < szf; i++) {
+		ld lo = F[i].lo, hi = F[i].hi;
+		Pos inx_lo, inx_hi, LO, HI;
+		LO = X_norm.rot(lo);
+		HI = X_norm.rot(hi);
+		while (j < szh && sign(lo - H[j].t) >= 0) j++;
+		k = j;
+		while (k < szh - 1 && sign(hi - H[(k + 1) % szh].t) > 0) k++;
+		if (sign(H[j % szh].t - lo) >= 0 && sign(hi - H[j % szh].t) >= 0) {
+			inx_lo = intersection(O, LO, H[(j - 1 + szh) % szh], H[j % szh]);
+			ret += circle_cutting(inx_lo, H[j % szh], F[i].r);
+			inx_hi = intersection(O, HI, H[k % szh], H[(k + 1) % szh]);
+			ret += circle_cutting(H[k % szh], inx_hi, F[i].r);
+			for (int l = j; l < k; l++) {
+				ret += circle_cutting(H[l], H[(l + 1) % szh], F[i].r);
+			}
+		}
+		else {
+			Pos inx_lo = intersection(O, LO, H[(j - 1 + szh) % szh], H[j % szh]);
+			Pos inx_hi = intersection(O, HI, H[(j - 1 + szh) % szh], H[j % szh]);
+			ret += circle_cutting(inx_lo, inx_hi, F[i].r);
+		}
+	}
+	return ret;
 }
 ld query() {
 	std::cin >> N >> A;
 	H.resize(N);
 	V.resize(N);
 	std::vector<Arc> arcs;
-	std::vector<Arc> valid_arcs;
+	std::vector<Arc> valid_arcs;//stack
 	for (int i = 0; i < N; i++) {
 		Pos p, v;
 		std::cin >> p;
@@ -268,8 +318,8 @@ ld query() {
 			arcs.push_back(a1);
 		}
 		else {
-			a1 = Arc(v.t, PI * 2, p.mag());
-			a2 = Arc(0, p.t, p.mag());
+			a1 = Arc(p.t, PI * 2, p.mag());
+			a2 = Arc(0, v.t, p.mag());
 			arcs.push_back(a1);
 			arcs.push_back(a2);
 		}
@@ -282,23 +332,50 @@ ld query() {
 #endif
 	half_plane_intersection(HP, HPI);
 	std::sort(arcs.begin(), arcs.end());
-	for (Arc& a : arcs) {
-		if (valid_arcs.empty()) { valid_arcs.push_back(a); continue; }
-		while (valid_arcs.size() && valid_arcs.back().lo > a.lo)
-			valid_arcs.pop_back();
-		if (zero(valid_arcs.back().r - a.r))
-			valid_arcs.back().hi = a.hi;
-		else if (valid_arcs.back().r < a.r)
-			valid_arcs.back().hi = a.lo, valid_arcs.push_back(a);
-		else
-			a.lo = valid_arcs.back().hi, valid_arcs.push_back(a);
+	for (Arc& a : arcs) {//sweep circle
+		ld lo = a.lo;
+		ld hi = a.hi;
+		ld r = a.r;
+		while (valid_arcs.size()) {
+			if (sign(valid_arcs.back().hi - a.lo) <= 0) break;
+			else {
+				if (sign(valid_arcs.back().lo - a.lo) >= 0) {
+					if (sign(r - valid_arcs.back().r) >= 0) valid_arcs.pop_back();
+					else {
+						lo = valid_arcs.back().hi;
+						break;
+					}
+				}
+				else {//valid_arcs.back().lo < a.lo;
+					if (sign(r - valid_arcs.back().r) >= 0) valid_arcs.back().hi = lo;
+					else lo = valid_arcs.back().hi;
+					break;
+				}
+			}
+		}
+		if (!sign(lo - hi)) continue;
+		valid_arcs.push_back(Arc(lo, hi, r));
 	}
 	std::sort(valid_arcs.begin(), valid_arcs.end());
+	Fan fan;
+	int sz = valid_arcs.size();
+	for (int i = 0; i < sz; i++) {
+		fan.push_back(valid_arcs[i]);
+		Arc btwn = Arc(valid_arcs[i].hi, valid_arcs[(i + 1) % sz].lo, 0);
+		fan.push_back(btwn);
+	}
 	ld area_origin = 0, area_convert = 0, area_hpi = 0, area_arcs = 0;
-	for (Arc& a : valid_arcs) area_arcs += a.area();
 	std::sort(H.begin(), H.end(), cmpt);
 	std::sort(V.begin(), V.end(), cmpt);
 	std::sort(HPI.begin(), HPI.end(), cmpt);
+	std::sort(fan.begin(), fan.end());
+	for (Arc& a : fan) area_arcs += a.area();
+	area_origin = sweep(H, fan);
+	area_convert = sweep(V, fan);
+	area_hpi = sweep(HPI, fan);
+	ld total = area_origin + area_convert + area_hpi - area_arcs - area_arcs;
+	std::cout << total << "\n";
+	return total;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -309,3 +386,5 @@ void solve() {
 	while (T--) query();
 	return;
 }
+int main() { solve(); return 0; }//boj19061
+//Petrozavodsk Programming Camp Summer 2017 Day 3: Ural Contest G
