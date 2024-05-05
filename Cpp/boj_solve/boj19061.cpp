@@ -260,6 +260,7 @@ std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos
 ld circle_cutting(const Pos& p1, const Pos& p2, const ld& r) {
 	std::vector<Pos> inx = circle_line_intersections(p1, p2, O, r);
 	if (inx.empty()) return cross(O, p1, p2);
+	//std::cout << "not cross\n";
 	ld s = inx[0].x, e = inx[0].y;
 	Pos vec = p2 - p1;
 	if (0 < s && e < 1) {
@@ -325,7 +326,7 @@ ld query() {
 		v = p.rot(A);
 		H[i] = p, V[i] = v;
 		Arc a1, a2;
-		if (p.t < v.t) {
+		if (p.t <= v.t) {
 			a1 = Arc(p.t, v.t, p.mag());
 			arcs.push_back(a1);
 		}
@@ -346,6 +347,7 @@ ld query() {
 	for (int i = 0; i < N; i++) HP.push_back(L(H[i], H[(i + 1) % N]));
 	for (int i = 0; i < N; i++) HP.push_back(L(V[i], V[(i + 1) % N]));
 
+	HPI.clear();
 #ifdef ASSERT
 	assert(half_plane_intersection(HP, HPI));
 #else
@@ -380,7 +382,7 @@ ld query() {
 				}
 			}
 		}
-		if (!sign(lo - hi)) continue;
+		//if (!sign(lo - hi)) continue;
 		valid_arcs.push_back(Arc(lo, hi, r));
 	}
 	std::sort(valid_arcs.begin(), valid_arcs.end());
@@ -399,11 +401,18 @@ ld query() {
 			fan.push_back(btwn);
 		}
 	}
+	std::sort(fan.begin(), fan.end());
+
+#ifdef DEBUG
+	Q = 0;
+	std::cout << "fan\n";
+	for (Arc& a : fan) std::cout << "arcs[" << Q++ << "] : " << a << "\n";
+#endif
+
 	ld area_origin = 0, area_convert = 0, area_hpi = 0, area_arcs = 0;
 	std::sort(H.begin(), H.end(), cmpt);
 	std::sort(V.begin(), V.end(), cmpt);
 	std::sort(HPI.begin(), HPI.end(), cmpt);
-	std::sort(fan.begin(), fan.end());
 	area_origin = sweep(H, fan); 
 	area_convert = sweep(V, fan);
 	area_hpi = sweep(HPI, fan);
@@ -432,6 +441,48 @@ int main() { solve(); return 0; }//boj19061
 //Petrozavodsk Programming Camp Summer 2017 Day 3: Ural Contest G
 
 /*
+
+1
+8 0.95
+-10 -5
+-5 -10
+5 -10
+10 -5
+10 5
+5 10
+-5 10
+-10 5
+
+2
+8 0.39269908169872414
+-10 -5
+-5 -10
+5 -10
+10 -5
+10 5
+5 10
+-5 10
+-10 5
+8 0.39269908169872414
+-1000000 -500000
+-500000 -1000000
+500000 -1000000
+1000000 -500000
+1000000 500000
+500000 1000000
+-500000 1000000
+-1000000 500000
+
+1
+8 0
+-10 -5
+-5 -10
+5 -10
+10 -5
+10 5
+5 10
+-5 10
+-10 5
 
 1
 4 3.14159265
@@ -482,5 +533,73 @@ int main() { solve(); return 0; }//boj19061
 -1000000000 1000000000
 6.283185307179587
 6283185307179585536.000000000000000
+
+10
+8 0.95
+-10 -5
+-5 -10
+5 -10
+10 -5
+10 5
+5 10
+-5 10
+-10 5
+8 0.39269908169872414
+-10 -5
+-5 -10
+5 -10
+10 -5
+10 5
+5 10
+-5 10
+-10 5
+8 0.39269908169872414
+-1000000 -500000
+-500000 -1000000
+500000 -1000000
+1000000 -500000
+1000000 500000
+500000 1000000
+-500000 1000000
+-1000000 500000
+8 0
+-10 -5
+-5 -10
+5 -10
+10 -5
+10 5
+5 10
+-5 10
+-10 5
+4 3.14159265
+-1 -1
+1 -1
+1 1
+-1 1
+4 1.6
+-1 -1
+1 -1
+1 1
+-1 1
+4 3.14159265
+-1000000 -1000000
+1000000 -1000000
+1000000 1000000
+-1000000 1000000
+4 1.6
+-1000000 -1000000
+1000000 -1000000
+1000000 1000000
+-1000000 1000000
+4 3.14159265
+-1000000000 -1000000000
+1000000000 -1000000000
+1000000000 1000000000
+-1000000000 1000000000
+4 1.6
+-1000000000 -1000000000
+1000000000 -1000000000
+1000000000 1000000000
+-1000000000 1000000000
 
 */
