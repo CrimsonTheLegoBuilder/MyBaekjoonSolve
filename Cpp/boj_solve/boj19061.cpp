@@ -338,9 +338,8 @@ ld query() {
 	}
 
 #ifdef DEBUG
-	T = 0;
-	for (Arc& a : arcs) std::cout << "arcs[" << T++ << "] : " << a << "\n";
-	T = 0;
+	Q = 0;
+	for (Arc& a : arcs) std::cout << "arcs[" << Q++ << "] : " << a << "\n";
 #endif
 
 	std::vector<Line> HP;
@@ -356,9 +355,8 @@ ld query() {
 	std::sort(arcs.begin(), arcs.end());
 
 #ifdef DEBUG
-	T = 0;
-	for (Arc& a : arcs) std::cout << "arcs[" << T++ << "] : " << a << "\n";
-	T = 0;
+	Q = 0;
+	for (Arc& a : arcs) std::cout << "arcs[" << Q++ << "] : " << a << "\n";
 #endif
 
 	for (Arc& a : arcs) {//sweep circle
@@ -417,8 +415,8 @@ ld query() {
 #endif
 
 	ld total = area_origin + area_convert - area_hpi;
-	std::cout << "covered area : " << total << "\n";
-	//std::cout << total << "\n";
+	//std::cout << "covered area : " << total << "\n";
+	std::cout << total << "\n";
 	return total;
 }
 void solve() {
