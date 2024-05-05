@@ -32,6 +32,9 @@ ld norm(ld th) {
 }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
+//#define DEBUG
+//#define ASSERT
+
 struct Pos {
 	ld x, y;
 	ld t;
@@ -60,7 +63,7 @@ struct Pos {
 	//ld mag() const { return hypotl(x, y); }
 	Pos unit() const { return *this / mag(); }
 	ld rad() const { return norm(atan2l(y, x)); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return norm(atan2l(p1 / p2, p1 * p2)); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
@@ -140,7 +143,7 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-ld rad(const Pos& p1, const Pos& p2) { return norm(atan2l(p1 / p2, p1 * p2)); }
+//ld rad(const Pos& p1, const Pos& p2) { return norm(atan2l(p1 / p2, p1 * p2)); }
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
@@ -205,12 +208,13 @@ struct Arc {
 	ld r;
 	Arc(ld LO = 0, ld HI = 0, ld R = 0) : lo(LO), hi(HI), r(R) {}
 	bool operator < (const Arc& a) const {
-		return !sign(r - a.r) ? !sign(lo - a.lo) ?
-			hi < a.hi :
+		return !sign(hi - a.hi) ? !sign(lo - a.lo) ?
+			r > a.r :
 			lo < a.lo :
-			r > a.r;
+			hi < a.hi;
 	}
 	ld area() const { return (hi - lo) * r * r; }
+	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi << " " << l.r; return os; }
 };
 typedef std::vector<Arc> Fan;
 //std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
@@ -255,20 +259,20 @@ std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos
 }
 ld circle_cutting(const Pos& p1, const Pos& p2, const ld& r) {
 	std::vector<Pos> inx = circle_line_intersections(p1, p2, O, r);
-	if (inx.empty()) return cross(O, p1, p2) * .5;
+	if (inx.empty()) return cross(O, p1, p2);
 	ld s = inx[0].x, e = inx[0].y;
 	Pos vec = p2 - p1;
 	if (0 < s && e < 1) {
 		Pos m1 = p1 + vec * s, m2 = p1 + vec * e;
-		return cross(O, p1, p2) * (s + 1 - e) * .5 + r * r * rad(m1, m2);
+		return cross(O, p1, p2) * (s + 1 - e) + r * r * rad(m1, m2);
 	}
 	else if (0 < s) {
 		Pos m = p1 + vec * s;
-		return cross(O, p1, p2) * s * .5 + r * r * rad(m, p2);
+		return cross(O, p1, p2) * s + r * r * rad(m, p2);
 	}
 	else if (e < 1) {
 		Pos m = p1 + vec * e;
-		return cross(O, p1, p2) * (1 - e) * .5 + r * r * rad(p1, m);
+		return cross(O, p1, p2) * (1 - e) + r * r * rad(p1, m);
 	}
 	else return r * r * rad(p1, p2);
 }
@@ -298,8 +302,14 @@ ld sweep(const Polygon& H, const Fan& F) {
 			Pos inx_hi = intersection(O, HI, H[(j - 1 + szh) % szh], H[j % szh]);
 			ret += circle_cutting(inx_lo, inx_hi, F[i].r);
 		}
+
+#ifdef DEBUG
+		std::cout << "lo : " << lo << " hi : " << hi << "\n";
+		std::cout << "ret : " << ret << "\n";
+#endif
+
 	}
-	return ret;
+	return ret * .5;
 }
 ld query() {
 	std::cin >> N >> A;
@@ -308,8 +318,10 @@ ld query() {
 	std::vector<Arc> arcs;
 	std::vector<Arc> valid_arcs;//stack
 	for (int i = 0; i < N; i++) {
+		ld x, y;
 		Pos p, v;
-		std::cin >> p;
+		std::cin >> x >> y;
+		p = Pos(x, y);
 		v = p.rot(A);
 		H[i] = p, V[i] = v;
 		Arc a1, a2;
@@ -324,14 +336,31 @@ ld query() {
 			arcs.push_back(a2);
 		}
 	}
+
+#ifdef DEBUG
+	T = 0;
+	for (Arc& a : arcs) std::cout << "arcs[" << T++ << "] : " << a << "\n";
+	T = 0;
+#endif
+
 	std::vector<Line> HP;
 	for (int i = 0; i < N; i++) HP.push_back(L(H[i], H[(i + 1) % N]));
 	for (int i = 0; i < N; i++) HP.push_back(L(V[i], V[(i + 1) % N]));
+
 #ifdef ASSERT
 	assert(half_plane_intersection(HP, HPI));
-#endif
+#else
 	half_plane_intersection(HP, HPI);
+#endif
+
 	std::sort(arcs.begin(), arcs.end());
+
+#ifdef DEBUG
+	T = 0;
+	for (Arc& a : arcs) std::cout << "arcs[" << T++ << "] : " << a << "\n";
+	T = 0;
+#endif
+
 	for (Arc& a : arcs) {//sweep circle
 		ld lo = a.lo;
 		ld hi = a.hi;
@@ -361,30 +390,99 @@ ld query() {
 	int sz = valid_arcs.size();
 	for (int i = 0; i < sz; i++) {
 		fan.push_back(valid_arcs[i]);
-		Arc btwn = Arc(valid_arcs[i].hi, valid_arcs[(i + 1) % sz].lo, 0);
-		fan.push_back(btwn);
+		if (valid_arcs[i].hi > valid_arcs[(i + 1) % sz].lo) {
+			Arc btwn1 = Arc(valid_arcs[i].hi, PI * 2, 0);
+			Arc btwn2 = Arc(0, valid_arcs[(i + 1) % sz].lo, 0);
+			fan.push_back(btwn1);
+			fan.push_back(btwn2);
+		}
+		else {
+			Arc btwn = Arc(valid_arcs[i].hi, valid_arcs[(i + 1) % sz].lo, 0);
+			fan.push_back(btwn);
+		}
 	}
 	ld area_origin = 0, area_convert = 0, area_hpi = 0, area_arcs = 0;
 	std::sort(H.begin(), H.end(), cmpt);
 	std::sort(V.begin(), V.end(), cmpt);
 	std::sort(HPI.begin(), HPI.end(), cmpt);
 	std::sort(fan.begin(), fan.end());
-	for (Arc& a : fan) area_arcs += a.area();
-	area_origin = sweep(H, fan);
+	area_origin = sweep(H, fan); 
 	area_convert = sweep(V, fan);
 	area_hpi = sweep(HPI, fan);
-	ld total = area_origin + area_convert + area_hpi - area_arcs - area_arcs;
-	std::cout << total << "\n";
+
+#ifdef DEBUG
+	std::cout << "origin : " << area_origin << "\n";
+	std::cout << "convert : " << area_convert << "\n";
+	std::cout << "hpi : " << area_hpi << "\n";
+#endif
+
+	ld total = area_origin + area_convert - area_hpi;
+	std::cout << "covered area : " << total << "\n";
+	//std::cout << total << "\n";
 	return total;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(7);
+	std::cout.precision(15);
 	std::cin >> T;
 	while (T--) query();
 	return;
 }
 int main() { solve(); return 0; }//boj19061
 //Petrozavodsk Programming Camp Summer 2017 Day 3: Ural Contest G
+
+/*
+
+1
+4 3.14159265
+-1 -1
+1 -1
+1 1
+-1 1
+6.283185307179588
+
+1
+4 1.6
+-1 -1
+1 -1
+1 1
+-1 1
+6.283185307179587
+
+1
+4 3.14159265
+-1000000 -1000000
+1000000 -1000000
+1000000 1000000
+-1000000 1000000
+6283185307179.58593750000
+
+1
+4 1.6
+-1000000 -1000000
+1000000 -1000000
+1000000 1000000
+-1000000 1000000
+6283185307179.58593750000
+
+1
+4 3.14159265
+-1000000000 -1000000000
+1000000000 -1000000000
+1000000000 1000000000
+-1000000000 1000000000
+6283185307179589632.000000000000000
+
+
+1
+4 1.6
+-1000000000 -1000000000
+1000000000 -1000000000
+1000000000 1000000000
+-1000000000 1000000000
+6.283185307179587
+6283185307179585536.000000000000000
+
+*/
