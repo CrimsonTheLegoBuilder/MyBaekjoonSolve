@@ -5,22 +5,13 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <queue>
 #include <deque>
-#include <random>
-#include <array>
-#include <tuple>
-#include <complex>
-#include <numeric>
-//#include <quadmath.h>
 typedef long long ll;
-//typedef double ld;
-typedef long double ld;
-//typedef __float128 ld;
+typedef double ld;
+//typedef long double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
-const int LEN = 1e3;
 int N, M, T, Q;
 ld A;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
@@ -30,7 +21,6 @@ ld norm(ld th) {
 	while (th > PI * 2) th -= PI * 2;
 	return th;
 }
-ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
 //#define DEBUG
 //#define ASSERT
@@ -74,9 +64,6 @@ const Pos O = { 0, 0 };
 const Pos X_norm = { 1000, 0 };
 typedef std::vector<Pos> Polygon;
 Polygon H, V, HPI;//Hull, conVert, HalfPlaneIntersection
-//bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
-//bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
-//bool cmpi(const Pos& p, const Pos& q) { return p.i < q.i; }
 bool cmpt(const Pos& p, const Pos& q) { return p.t < q.t; }
 struct Vec {
 	ld vy, vx;
@@ -117,56 +104,20 @@ struct Line {//ax + by = c
 const Line Xaxis = { { 0, -1 }, 0 };
 const Line Yaxis = { { 1, 0 }, 0 };
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-}
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = dot(d1, d3, d2);
-	return !ccw(d1, d2, d3) && (ret > 0 || zero(ret));
-}
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = dot(d1, d3, d2);
-	return !ccw(d1, d2, d3) && ret > 0;
-}
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
-bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
-}
-ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
-	return cross(d1, d2, t) / (d1 - d2).mag();
 }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-//ld rad(const Pos& p1, const Pos& p2) { return norm(atan2l(p1 / p2, p1 * p2)); }
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
 	dx = s.x - e.x;
 	c = dy * s.x + dx * s.y;
 	return Line(Vec(dy, dx), c);
-}
-Line L(const Vec& s, const Pos& p) {
-	ld c = s.vy * p.x + s.vx * p.y;
-	return Line(s, c);
-}
-Line rotate(const Line& l, const Pos& p, ld the) {
-	Vec s = l.s;
-	ld x = -s.vx, y = s.vy;
-	ld vx = -(x * cosl(the) - y * sinl(the));
-	ld vy = x * sinl(the) + y * cosl(the);
-	ld c = vy * p.x + vx * p.y;
-	return Line(Vec(vy, vx), c);
-}
-Line rotate90(const Line& l, const Pos& p) {
-	Vec s = ~l.s;
-	ld c = s.vy * p.x + s.vx * p.y;
-	return Line(s, c);
 }
 Pos intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
@@ -180,7 +131,6 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	auto cw = [&](const Line& l1, const Line& l2, const Line& target) -> bool {
 		if (l1.s / l2.s < TOL) return 0;
 		Pos p = intersection(l1, l2);
-		//return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
 		return target.above(p) > -TOL;
 		};
 	std::deque<Line> dq;
@@ -204,7 +154,7 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	return 1;
 }
 struct Arc {
-	ld lo, hi;// [lo, hi] - radian range of arc
+	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
 	ld r;
 	Arc(ld LO = 0, ld HI = 0, ld R = 0) : lo(LO), hi(HI), r(R) {}
 	bool operator < (const Arc& a) const {
@@ -217,31 +167,6 @@ struct Arc {
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi << " " << l.r; return os; }
 };
 typedef std::vector<Arc> Fan;
-//std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
-//	ld d = dist(p1, p2, o);
-//	if (std::abs(d) > r) return {};
-//	Pos vec = p2 - p1;
-//	Pos m = intersection(p1, p2, o, o + ~vec);
-//	ld distance = vec.mag();
-//	ld ratio = sqrt(r * r - d * d);
-//	Pos m1 = m - vec * ratio / distance;
-//	Pos m2 = m + vec * ratio / distance;
-//	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
-//	return { m1, m2 };//p1->p2
-//}
-//ld circle_cut(const Pos& p1, const Pos& p2, const ld& r) {
-//	Pos v1 = p1, v2 = p2;
-//	std::vector<Pos> inx = circle_line_intersection(O, r, v1, v2);
-//	if (inx.empty()) return r * r * rad(v1, v2) * .5;
-//	Pos m1 = inx[0], m2 = inx[1];
-//	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
-//	if (d1 && d2) return (v1 / v2) * .5;
-//	else if (d1) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
-//	else if (d2) return (r * r * rad(v1, m1) + m1 / v2) * .5;
-//	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0)
-//		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
-//	else return (r * r * rad(v1, v2)) * .5;
-//}
 std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos& p, const ld& r) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
 	Pos vec = e - s;
@@ -253,14 +178,12 @@ std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos
 	if (J < TOL) return {};
 	ld lo = (-b - sqrt(J)) / (2 * a);
 	ld hi = (-b + sqrt(J)) / (2 * a);
-	//if (hi < lo) std::swap(lo, hi);
 	if (hi < 0 || 1 < lo) return {};
 	return { { lo, hi } };//ratio, ratio
 }
 ld circle_cutting(const Pos& p1, const Pos& p2, const ld& r) {
 	std::vector<Pos> inx = circle_line_intersections(p1, p2, O, r);
 	if (inx.empty()) return cross(O, p1, p2);
-	//std::cout << "not cross\n";
 	ld s = inx[0].x, e = inx[0].y;
 	Pos vec = p2 - p1;
 	if (0 < s && e < 1) {
@@ -338,20 +261,19 @@ ld query() {
 		}
 	}
 
-#ifdef DEBUG
-	Q = 0;
-	for (Arc& a : arcs) std::cout << "arcs[" << Q++ << "] : " << a << "\n";
-#endif
-
 	std::vector<Line> HP;
 	for (int i = 0; i < N; i++) HP.push_back(L(H[i], H[(i + 1) % N]));
 	for (int i = 0; i < N; i++) HP.push_back(L(V[i], V[(i + 1) % N]));
-
 	HPI.clear();
 #ifdef ASSERT
 	assert(half_plane_intersection(HP, HPI));
 #else
 	half_plane_intersection(HP, HPI);
+#endif
+
+#ifdef DEBUG
+	Q = 0;
+	for (Arc& a : arcs) std::cout << "arcs[" << Q++ << "] : " << a << "\n";
 #endif
 
 	std::sort(arcs.begin(), arcs.end());
@@ -406,7 +328,7 @@ ld query() {
 #ifdef DEBUG
 	Q = 0;
 	std::cout << "fan\n";
-	for (Arc& a : fan) std::cout << "arcs[" << Q++ << "] : " << a << "\n";
+	for (Arc& a : fan) std::cout << "fan[" << Q++ << "] : " << a << "\n";
 #endif
 
 	ld area_origin = 0, area_convert = 0, area_hpi = 0, area_arcs = 0;
@@ -424,7 +346,6 @@ ld query() {
 #endif
 
 	ld total = area_origin + area_convert - area_hpi;
-	//std::cout << "covered area : " << total << "\n";
 	std::cout << total << "\n";
 	return total;
 }
