@@ -63,7 +63,7 @@ struct Pos {
 const Pos O = { 0, 0 };
 const Pos X_norm = { 1000, 0 };
 typedef std::vector<Pos> Polygon;
-Polygon H, V, HPI;//Hull, conVert, HalfPlaneIntersection
+Polygon H, V, HPI;//Hull, reVolve, HalfPlaneIntersection
 bool cmpt(const Pos& p, const Pos& q) { return p.t < q.t; }
 struct Vec {
 	ld vy, vx;
@@ -331,12 +331,12 @@ ld query() {
 	for (Arc& a : fan) std::cout << "fan[" << Q++ << "] : " << a << "\n";
 #endif
 
-	ld area_origin = 0, area_convert = 0, area_hpi = 0, area_arcs = 0;
+	ld area_origin = 0, area_revolve = 0, area_hpi = 0;
 	std::sort(H.begin(), H.end(), cmpt);
 	std::sort(V.begin(), V.end(), cmpt);
 	std::sort(HPI.begin(), HPI.end(), cmpt);
-	area_origin = sweep(H, fan); 
-	area_convert = sweep(V, fan);
+	area_origin = sweep(H, fan);
+	area_revolve = sweep(V, fan);
 	area_hpi = sweep(HPI, fan);
 
 #ifdef DEBUG
@@ -345,7 +345,7 @@ ld query() {
 	std::cout << "hpi : " << area_hpi << "\n";
 #endif
 
-	ld total = area_origin + area_convert - area_hpi;
+	ld total = area_origin + area_revolve - area_hpi;
 	std::cout << total << "\n";
 	return total;
 }
