@@ -341,7 +341,7 @@ ld query() {
 
 #ifdef DEBUG
 	std::cout << "origin : " << area_origin << "\n";
-	std::cout << "convert : " << area_convert << "\n";
+	std::cout << "revolve : " << area_revolve << "\n";
 	std::cout << "hpi : " << area_hpi << "\n";
 #endif
 
