@@ -131,18 +131,69 @@ bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	}
 	return cnt & 1;
 }
+
+struct Pdd { ld x, y; Pdd(ld X = 0, ld Y = 0) : x(X), y(Y) {} };
+Pdd mid(const Pos& p, const Pos& q) { return Pdd((p.x + q.x) * .5, (p.y + q.y) * .5); }
+int ccw(const Pos& d1, const Pos& d2, const Pdd& d3) {
+	ld ret = (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+	return !ret ? 0 : ret > 0 ? 1 : -1;
+}
+ld dot(const Pos& d1, const Pdd& d2, const Pos& d3) {
+	return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
+}
+ll area(std::vector<Pos> H, const int& sz) {
+	ll A = 0;
+	for (int i = 0; i < sz; i++) A += cross(O, H[i], H[(i + 1) % sz]);
+	return A;
+}
+bool on_seg_strong(const Pos& s1, const Pos& s2, const Pdd p) {
+	ld ret = dot(s1, p, s2);
+	return !ccw(s1, s2, p) && (ret > 0 || zero(ret));
+}
+bool inner_check(std::vector<Pos>& H, const Pdd& p) {//concave
+	int cnt = 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (cur.y == nxt.y) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return cnt & 1;
+}
+
+bool block(const Pos& u, const Pos& v, const int& u_idx, const int& v_idx) {
+	if (u_idx == v_idx) {
+		Pdd m = mid(u, v);
+		int sz = H[u_idx].size();
+		for (int i = 0; i < sz; i++) {
+			Pos cur = H[u_idx][i], nxt = H[u_idx][(i + 1) % sz];
+			if (intersect(cur, nxt, u, v)) return 1;
+			if (on_seg_weak(u, v, cur)) return 1;
+		}
+		return !inner_check(H[u_idx], m);
+	}
+	else {
+
+	}
+}
+
 void init() {
 	memset(pos, 0, sizeof pos);
 	while (Q.size()) Q.pop();
 	for (int i = 0; i < 100; i++) std::vector<Pos>().swap(H[i]);
+	for (int i = 0; i < LEN; i++) std::vector<Info>().swap(G[i]);
 	return;
 }
 void query() {
-	Pos s;
+	Pos s, bomb;
+	s = O;
 	init();
 	std::cin >> N;
-	std::cin >> s;
-	s.i = 0;
+	std::cin >> bomb;
+	bomb.i = 1;
 	T = 1;
 	for (int i = 0; i < N; i++) {
 		std::cin >> M;
@@ -153,6 +204,7 @@ void query() {
 			p.i = T;
 		}
 	}
+
 	return;
 }
 void solve() {
