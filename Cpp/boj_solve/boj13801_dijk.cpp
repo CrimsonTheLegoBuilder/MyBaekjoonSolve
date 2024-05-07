@@ -275,3 +275,4 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//JAG Practice Contest 2010 E boj13801
+//wrong code. change Pos to ld
