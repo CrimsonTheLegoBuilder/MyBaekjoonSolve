@@ -35,6 +35,7 @@ ld dijkstra(int v, int g) {
 	while (Q.size()) {
 		Info p = Q.top(); Q.pop();
 		if (p.c > COST[p.i]) continue;
+		if (p.i == g) return COST[g];
 		for (const Info& w : G[p.i]) {
 			ld cost = p.c + w.c;
 			if (COST[w.i] > cost) {
@@ -199,7 +200,7 @@ inline bool norm(std::vector<Pos>& H) {
 	}
 	return 1;
 }
-inline bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+inline int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	int cnt = 0, sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
@@ -246,6 +247,8 @@ inline bool blocked(const Pos& u, const Pos& v, const int& u_idx, const int& v_i
 			if (on_seg_weak(u, v, cur)) return 1;
 		}
 		Pos m = (u + v) * .5;
+		//std::cout << "m :  " << m << "\n";
+		//std::cout << inner_check(H[u_idx], m) << "\n";
 		return inner_check(H[u_idx], m) > 1;
 	}
 	else {
@@ -423,6 +426,8 @@ ld query() {
 			if (i == X) {
 				if (!blocked(s, u, X, i) && !blocked(s, u, -1, -2)) {
 					G[1].push_back(Info(u.i, (u - s).mag()));
+					//std::cout << "fucked\n";
+					//std::cout << u << "\n";
 				}
 			}
 			else {
@@ -451,6 +456,7 @@ ld query() {
 			}
 		}
 	}
+	//std::cout << X << "\n";
 	//for (int i = 0; i < T; i++) {
 	//	for (Info& i : G[i]) std::cout << i.i << " " << i.c << "\n";
 	//	std::cout << "DEBUG\n";
@@ -476,8 +482,38 @@ int main() { solve(); return 0; }//JAG Practice Contest 2010 E boj13801
 /*
 
 1
+1 1
+4 -1 0 -2 -1 -1 -2 0 -1
+1
+0 3
+4 1 1 1 2 -1 2 -1 1
+1
 -6 -6
 6 1 -2 2 -2 2 3 -2 3 -2 1 1 1
+1
+6 4
+6 5 -498 6 2 5 2 5 1 3 1 -999 -498
+1
+-10 0
+4 0 -5 1 -5 1 5 0 5
+1
+-10 0
+4 0 0 2 -2 1 0 2 2
+1
+-10 0
+4 1 0 3 -2 2 0 3 2
+1
+-5 -1
+4 -10 -1 -9 0 -10 1 -11 0
 0
+
+1.0
+0.0
+3.23606798
+4.66227766
+5.0000000000
+2.8284271247
+3.6055512755
+10.0498756211
 
 */
