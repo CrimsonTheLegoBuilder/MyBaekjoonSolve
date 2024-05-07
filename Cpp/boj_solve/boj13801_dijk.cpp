@@ -227,7 +227,10 @@ ld query() {
 		norm(H[i]);
 		for (Pos& p : H[i]) p.i = ++T;
 		int f = inner_check(H[i], s);
-		assert(f == 2);
+#ifdef ASSERT
+		assert(f < 2);
+		assert(!inner_check(H[i], bomb));
+#endif
 		if (f) X = i;
 	}
 	if (blocked(bomb, s, -1, -2)) { std::cout << "0.0000000\n"; return; };
