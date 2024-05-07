@@ -87,7 +87,6 @@ std::vector<Pos> H[105];
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return ret < 0 ? -1 : !!ret;
@@ -101,9 +100,6 @@ bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
-}
-int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
 }
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
@@ -172,13 +168,13 @@ bool inner_check(std::vector<Pos>& H, const Pdd& p) {//concave
 
 bool blocked(const Pos& u, const Pos& v, const int& u_idx, const int& v_idx) {
 	if (u_idx == v_idx) {
-		Pdd m = mid(u, v);
 		int sz = H[u_idx].size();
 		for (int i = 0; i < sz; i++) {
 			Pos cur = H[u_idx][i], nxt = H[u_idx][(i + 1) % sz];
 			if (intersect(u, v, cur, nxt)) return 1;
 			if (on_seg_weak(u, v, cur)) return 1;
 		}
+		Pdd m = mid(u, v);
 		return inner_check(H[u_idx], m);
 	}
 	else {
@@ -222,13 +218,11 @@ void init() {
 	return;
 }
 ld query() {
+	init();
 	int goal = 0;
 	Pos s, bomb;
-	s = O;
-	s.i = 1;
-	init();
-	std::cin >> bomb;
-	bomb.i = -1;
+	s = O; s.i = 1;
+	std::cin >> bomb; bomb.i = -1;
 	T = 1;
 	int X = -1;//if Alice is located at the boundary of a polygon X = polygon.i
 	for (int i = 0; i < N; i++) {
@@ -248,7 +242,7 @@ ld query() {
 			if (covered(bomb, i, j)) G[H[i][j].i].push_back(Info(goal, 0));
 		}
 	}
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < N; i++) {//O(500 * 500 * 100) = O(2500'0000)
 		int szi = H[i].size();
 		for (int j = 0; j < szi; j++) {
 			Pos& u = H[i][j];
