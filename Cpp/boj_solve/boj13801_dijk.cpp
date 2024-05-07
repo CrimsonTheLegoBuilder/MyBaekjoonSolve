@@ -131,7 +131,7 @@ bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 		if (nxt.y <= p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
-	return cnt & 1;
+	return (cnt & 1) * 2;
 }
 
 struct Pdd { ld x, y; Pdd(ld X = 0, ld Y = 0) : x(X), y(Y) {} };
@@ -142,11 +142,6 @@ int ccw(const Pos& d1, const Pos& d2, const Pdd& d3) {
 }
 ld dot(const Pos& d1, const Pdd& d2, const Pos& d3) {
 	return (d2.x - d1.x) * (d3.x - d2.x) + (d2.y - d1.y) * (d3.y - d2.y);
-}
-ll area(std::vector<Pos> H, const int& sz) {
-	ll A = 0;
-	for (int i = 0; i < sz; i++) A += cross(O, H[i], H[(i + 1) % sz]);
-	return A;
 }
 bool on_seg_strong(const Pos& s1, const Pos& s2, const Pdd p) {
 	ld ret = dot(s1, p, s2);
