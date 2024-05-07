@@ -23,6 +23,7 @@ ld COST[LEN];
 struct Info {
 	int i;
 	ld c;
+	Info(int I = 0, ld C = 0) : i(I), c(C) {}
 	bool operator < (const Info& x) const { return c > x.c; }
 };
 std::vector<Info> G[LEN];
@@ -47,7 +48,8 @@ ld dijkstra(int v, int g) {
 struct Pos {
 	int x, y;
 	int i;
-	Pos(int X = 0, int Y = 0, ll I = 0) : x(X), y(Y), i(I) {}
+	bool good;
+	Pos(int X = 0, int Y = 0, int I = 0, bool f = 0) : x(X), y(Y), i(I), good(f) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -88,6 +90,10 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
+	return ret < 0 ? -1 : !!ret;
+}
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	ll ret = cross(d1, d2, d3, d4);
 	return ret < 0 ? -1 : !!ret;
 }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
@@ -161,23 +167,51 @@ bool inner_check(std::vector<Pos>& H, const Pdd& p) {//concave
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
-	return cnt & 1;
+	return (cnt & 1) * 2;
 }
 
-bool block(const Pos& u, const Pos& v, const int& u_idx, const int& v_idx) {
+bool blocked(const Pos& u, const Pos& v, const int& u_idx, const int& v_idx) {
 	if (u_idx == v_idx) {
 		Pdd m = mid(u, v);
 		int sz = H[u_idx].size();
 		for (int i = 0; i < sz; i++) {
 			Pos cur = H[u_idx][i], nxt = H[u_idx][(i + 1) % sz];
-			if (intersect(cur, nxt, u, v)) return 1;
+			if (intersect(u, v, cur, nxt)) return 1;
 			if (on_seg_weak(u, v, cur)) return 1;
 		}
-		return !inner_check(H[u_idx], m);
+		return inner_check(H[u_idx], m);
 	}
 	else {
-
+		for (int i = 0; i < N; i++) {
+			int sz = H[i].size();
+			for (int j = 0; j < sz; j++) {
+				Pos cur = H[i][j], nxt = H[i][(j + 1) % sz];
+				if (intersect(u, v, cur, nxt)) return 1;
+				if (on_seg_weak(u, v, cur)) return 1;
+			}
+		}
+		return 0;
 	}
+}
+bool covered(const Pos& b, const int& h_idx, const int& p_idx) {
+	bool r = 0, l = 0;
+	int sz = H[h_idx].size();
+	if (ccw(b, H[h_idx][p_idx], H[h_idx][(p_idx + 1) % sz]) > 0) return 1;
+	if (ccw(b, H[h_idx][p_idx], H[h_idx][((p_idx - 1 + sz) % sz)]) < 0) return 1;
+	Pos& p = H[h_idx][p_idx];
+	for (int i = 0; i < N; i++) {
+		sz = H[i].size();
+		for (int j = 0; j < sz; j++) {
+			Pos cur = H[i][j], nxt = H[i][(j + 1) % sz];
+			if (intersect(b, p, cur, nxt)) return 1;
+			if (on_seg_weak(b, p, cur) && ccw(b, p, cur, nxt) > 0) l = 1;
+			if (on_seg_weak(b, p, cur) && ccw(b, p, cur, nxt) < 0) r = 1;
+			if (on_seg_weak(b, p, nxt) && ccw(b, p, nxt, cur) > 0) l = 1;
+			if (on_seg_weak(b, p, nxt) && ccw(b, p, nxt, cur) < 0) r = 1;
+			if (l && r) return 1;
+		}
+	}
+	return 0;
 }
 
 void init() {
@@ -187,32 +221,65 @@ void init() {
 	for (int i = 0; i < LEN; i++) std::vector<Info>().swap(G[i]);
 	return;
 }
-void query() {
+ld query() {
+	int goal = 0;
 	Pos s, bomb;
 	s = O;
+	s.i = 1;
 	init();
-	std::cin >> N;
 	std::cin >> bomb;
-	bomb.i = 1;
+	bomb.i = -1;
 	T = 1;
+	int X = -1;//if Alice is located at the boundary of a polygon X = polygon.i
 	for (int i = 0; i < N; i++) {
 		std::cin >> M;
 		H[i].resize(M);
-		for (Pos& p : H[i]) {
-			std::cin >> p;
-			T++;
-			p.i = T;
+		for (Pos& p : H[i]) std::cin >> p;
+		norm(H[i]);
+		for (Pos& p : H[i]) p.i = ++T;
+		int f = inner_check(H[i], s);
+		assert(f == 2);
+		if (f) X = i;
+	}
+	if (blocked(bomb, s, -1, -2)) { std::cout << "0.0000000\n"; return; };
+	for (int i = 0; i < N; i++) {
+		int sz = H[i].size();
+		for (int j = 0; j < sz; j++) {
+			if (covered(bomb, i, j)) G[H[i][j].i].push_back(Info(goal, 0));
 		}
 	}
-
-	return;
+	for (int i = 0; i < N; i++) {
+		int szi = H[i].size();
+		for (int j = 0; j < szi; j++) {
+			Pos& u = H[i][j];
+			if (!blocked(s, u, X, i)) {
+				G[s.i].push_back(Info(u.i, (u - s).mag()));
+			}
+			for (int k = i; k < N; k++) {
+				int szk = H[k].size();
+				for (int l = 0; l < szk; l++) {
+					Pos& v = H[k][l];
+					if (!blocked(u, v, i, k)) {
+						G[u.i].push_back(Info(v.i, (u - v).mag()));
+						G[v.i].push_back(Info(u.i, (u - v).mag()));
+					}
+				}
+			}
+		}
+	}
+	ld cost = dijkstra(s.i, goal);
+	return cost;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(7);
-	while (1) query();
+	while (1) {
+		std::cin >> N;
+		if (!N) break;
+		std::cout << query() << "\n";
+	}
 	return;
 }
 int main() { solve(); return 0; }//JAG Practice Contest 2010 E boj13801
