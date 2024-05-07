@@ -233,7 +233,7 @@ ld query() {
 #endif
 		if (f) X = i;
 	}
-	if (blocked(bomb, s, -1, -2)) { std::cout << "0.0000000\n"; return; };
+	if (blocked(bomb, s, -1, -2)) return 0;
 	for (int i = 0; i < N; i++) {
 		int sz = H[i].size();
 		for (int j = 0; j < sz; j++) {
