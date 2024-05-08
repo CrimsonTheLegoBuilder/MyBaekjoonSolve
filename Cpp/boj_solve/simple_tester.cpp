@@ -1,8 +1,17 @@
 #include <iostream>
+#include <Windows.h>
 typedef long long ll;
 
 void tester() {
-	ll a = 131 | 85;//전혀 규칙성이 없이 무작위한 값이 튀어나옴.
-	std::cout << a << '\n';
+	static int cnt = 0;
+	std::cout << cnt++ << "\n";
 }
-int main() { tester(); return 0; }
+
+void solve() {
+	for (;;) {
+		tester();
+		Sleep(1000);
+	}
+}
+
+int main() { solve(); return 0; }
