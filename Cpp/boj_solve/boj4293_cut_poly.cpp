@@ -130,12 +130,18 @@ void query() {
 		std::cin >> s >> e;
 		if (e < s) std::swap(s, e);
 		for (int i = 0; i < N; i++) {
-			Pos& a = H[i], b = H[(i + 1) % N];
-			if (!ccw(s, e, a, b)) continue;
-			if (ccw(s, e, a) * ccw(s, e, b) <= 0) {
-				Pos inx = intersection(s, e, a, b);
-				if (ccw(s, e, a, b) > 0) inx.i = 1;
+			Pos& pre = H[(i - 1 + N) % N], cur = H[i], nxt = H[(i + 1) % N];
+			if (ccw(s, e, cur) * ccw(s, e, nxt) < 0) {
+				Pos inx = intersection(s, e, cur, nxt);
+				if (ccw(s, e, cur, nxt) < 0) inx.i = 0;
 				else inx.i = 1;
+				tmp.push_back(inx);
+			}
+			else if (!ccw(s, e, cur)) {
+				Pos inx = cur;
+				if (ccw(s, e, pre) * ccw(s, e, nxt) > 0) continue;
+				if (ccw(s, e, pre) > 0 || ccw(s, e, nxt) < 0) inx.i = 0;
+				else if (ccw(s, e, pre) < 0 || ccw(s, e, nxt) > 0) inx.i = 1;
 				tmp.push_back(inx);
 			}
 		}
