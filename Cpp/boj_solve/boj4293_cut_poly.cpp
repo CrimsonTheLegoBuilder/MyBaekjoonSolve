@@ -19,35 +19,10 @@ int N, M, T;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 
-ld COST[LEN];
-struct Info {
-	int i;
-	ld c;
-	Info(int I = 0, ld C = 0) : i(I), c(C) {}
-	bool operator < (const Info& x) const { return c > x.c; }
-};
-std::vector<Info> G[LEN];
-std::priority_queue<Info> Q;
-ld dijkstra(int v, int g) {
-	for (int i = 0; i < LEN; i++) COST[i] = INF;
-	Q.push({ v, 0 });
-	COST[v] = 0;
-	while (Q.size()) {
-		Info p = Q.top(); Q.pop();
-		if (p.c > COST[p.i]) continue;
-		for (const Info& w : G[p.i]) {
-			ld cost = p.c + w.c;
-			if (COST[w.i] > cost) {
-				COST[w.i] = cost;
-				Q.push({ w.i, cost });
-			}
-		}
-	}
-	return COST[g];
-}
 struct Pos {
 	ld x, y;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	bool i;
+	Pos(ld X = 0, ld Y = 0, bool I = 0) : x(X), y(Y), i(I) {}
 	inline bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -79,6 +54,9 @@ struct Pos {
 	inline friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
+bool cmpi(const Pos& p, const Pos& q) {
+	return zero(p.x - q.x) ? zero(p.y - q.y) ? p.i < q.i : p.y < q.y : p.x < q.x;
+}
 typedef std::vector<Pos> Polygon;
 Polygon H;
 inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
@@ -145,24 +123,29 @@ inline int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 void query() {
 	H.resize(N);
 	for (Pos& p : H) std::cin >> p;
+	norm(H);
 	Pos s, e;
 	while (M--) {
 		std::vector<Pos> tmp;
 		std::cin >> s >> e;
+		if (e < s) std::swap(s, e);
 		for (int i = 0; i < N; i++) {
 			Pos& a = H[i], b = H[(i + 1) % N];
 			if (!ccw(s, e, a, b)) continue;
 			if (ccw(s, e, a) * ccw(s, e, b) <= 0) {
-				tmp.push_back(intersection(s, e, a, b));
+				Pos inx = intersection(s, e, a, b);
+				if (ccw(s, e, a, b) > 0) inx.i = 1;
+				else inx.i = 1;
+				tmp.push_back(inx);
 			}
 		}
-		std::sort(tmp.begin(), tmp.end());
+		std::sort(tmp.begin(), tmp.end(), cmpi);
 		int sz = tmp.size();
-		assert(!(sz & 1));
 		ld ret = 0;
-		for (int i = 0, j; i < sz; i += 2) {
-			j = i + 1;
-			ret += (tmp[i] - tmp[j]).mag();
+		for (int i = 0, j = 0; i < sz; i = j) {
+			while (j < sz && tmp[i].i == tmp[j].i) j++;
+			while (j < sz && tmp[i].i != tmp[j].i) j++;
+			ret += (tmp[i] - tmp[j - 1]).mag();
 		}
 		std::cout << ret << "\n";
 	}
@@ -180,7 +163,7 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//JAG Practice Contest 2010 E boj13801
+int main() { solve(); return 0; }//boj4293
 
 
 /*
