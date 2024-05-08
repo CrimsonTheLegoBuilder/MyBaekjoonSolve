@@ -10,8 +10,8 @@ typedef double ld;
 const ll INF = 1e17;
 const ld TOL = 1e-7;
 int N, M, T;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return std::abs(x) < TOL; }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 
 struct Pos {
 	ld x, y;
@@ -48,7 +48,7 @@ struct Pos {
 	inline friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
-bool cmpi(const Pos& p, const Pos& q) {
+inline bool cmpi(const Pos& p, const Pos& q) {
 	return zero(p.x - q.x) ? zero(p.y - q.y) ? p.i > q.i : p.y < q.y : p.x < q.x;
 }
 typedef std::vector<Pos> Polygon;
@@ -64,27 +64,9 @@ inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	ld ret = cross(d1, d2, d3, d4);
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-inline bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = dot(d1, d3, d2);
-	return !ccw(d1, d2, d3) && (ret > 0 || zero(ret));
-}
-inline bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = dot(d1, d3, d2);
-	return !ccw(d1, d2, d3) && ret > 0;
-}
-Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
+inline Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
-}
-inline bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
-	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
-	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	return f1 && f2;
-	bool f3 = on_seg_strong(s1, s2, d1) ||
-		on_seg_strong(s1, s2, d2) ||
-		on_seg_strong(d1, d2, s1) ||
-		on_seg_strong(d1, d2, s2);
-	return (f1 && f2) || f3;
 }
 inline ld area(std::vector<Pos>& H) {
 	ld ret = 0;
@@ -101,18 +83,6 @@ inline bool norm(std::vector<Pos>& H) {
 		return 0;
 	}
 	return 1;
-}
-inline int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
-	int cnt = 0, sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) return 1;
-		if (zero(cur.y - nxt.y)) continue;
-		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
-		cnt += ccw(cur, nxt, p) > 0;
-	}
-	return (cnt & 1) * 2;
 }
 void query() {
 	H.resize(N);
