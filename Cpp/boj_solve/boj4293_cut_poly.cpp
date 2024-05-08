@@ -5,16 +5,10 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <random>
-#include <array>
-#include <tuple>
-#include <queue>
 typedef long long ll;
 typedef double ld;
 const ll INF = 1e17;
-const int LEN = 505;
 const ld TOL = 1e-7;
-const ll MOD = 1'000'000'007;
 int N, M, T;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -55,7 +49,7 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 bool cmpi(const Pos& p, const Pos& q) {
-	return zero(p.x - q.x) ? zero(p.y - q.y) ? p.i < q.i : p.y < q.y : p.x < q.x;
+	return zero(p.x - q.x) ? zero(p.y - q.y) ? p.i > q.i : p.y < q.y : p.x < q.x;
 }
 typedef std::vector<Pos> Polygon;
 Polygon H;
@@ -102,7 +96,7 @@ inline ld area(std::vector<Pos>& H) {
 	return ret;
 }
 inline bool norm(std::vector<Pos>& H) {
-	if (area(H) < TOL) {
+	if (area(H) < 0) {
 		std::reverse(H.begin(), H.end());
 		return 0;
 	}
@@ -143,11 +137,20 @@ void query() {
 				if (ccw(s, e, pre) > 0 || ccw(s, e, nxt) < 0) inx.i = 0;
 				else if (ccw(s, e, pre) < 0 || ccw(s, e, nxt) > 0) inx.i = 1;
 				tmp.push_back(inx);
+				if (inx.i = 1 &&
+					!ccw(s, e, pre) &&
+					ccw(s, e, nxt) > 0 &&
+					ccw(pre, cur, nxt) < 0) inx.i = 0, tmp.push_back(inx);
+				if (inx.i = 1 &&
+					!ccw(s, e, nxt) &&
+					ccw(s, e, pre) < 0 &&
+					ccw(pre, cur, nxt) < 0) inx.i = 0, tmp.push_back(inx);
 			}
 		}
 		std::sort(tmp.begin(), tmp.end(), cmpi);
 		int sz = tmp.size();
 		ld ret = 0;
+		//for (Pos& p : tmp) std::cout << p << " " << p.i << "\n";
 		for (int i = 0, j = 0; i < sz; i = j) {
 			while (j < sz && tmp[i].i == tmp[j].i) j++;
 			while (j < sz && tmp[i].i != tmp[j].i) j++;
@@ -173,5 +176,27 @@ int main() { solve(); return 0; }//boj4293
 
 
 /*
+
+16 2
+0 0
+7 0
+7 2
+6 2
+6 3
+5 3
+5 2
+4 2
+4 3
+3 3
+3 2
+2 2
+2 3
+1 3
+1 2
+0 2
+0 2 7 2
+2 0 2 1
+0 0
+
 
 */
