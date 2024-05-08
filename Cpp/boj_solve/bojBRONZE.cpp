@@ -4,15 +4,15 @@
 #include <vector>
 #include <cmath>
 typedef long long ll;
-typedef long double ld;
-const ld MILE = 1609.344;
-const ld GALLON = 3.785411784;
-ld A;
+int N, A, B, C, D, E;
 
 int main() {
 	std::cout << std::fixed;
 	std::cout.precision(7);
-	std::cin >> A;
-	//std::cout << A * GALLON / MILE * 1000 << "\n";
+	std::cin >> A >> B >> C >> D >> E;
+	N = 0;
+	if (A < 0) N = -A * C + D + B * E;
+	else if (A > 0) N = (B - A) * E;
+	std::cout << N << "\n";
 	return 0;
 }
