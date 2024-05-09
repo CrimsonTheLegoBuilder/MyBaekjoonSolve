@@ -220,7 +220,7 @@ inline int on_seg_check(const Pos& p) {
 			if (on_seg_strong(a, b, p)) return i;
 		}
 	}
-	return -2;
+	return -3;
 }
 inline bool meaningless(const Pos& b, const Pos& p) {
 	bool r = 0, l = 0;
@@ -317,7 +317,7 @@ ld query() {
 	T = 1;
 	Alice.i = 0, Bob.i = 1;
 	int a = -1;//if Alice is located at the boundary of a polygon X = polygon.i
-	int b = -1;//if Bob is located at the boundary of a polygon X = polygon.i
+	int b = -2;//if Bob is located at the boundary of a polygon X = polygon.i
 	int fa, fb;
 	for (int i = 0; i < N; i++) {
 		for (Pos& p : H[i]) p.i = ++T;
@@ -333,6 +333,8 @@ ld query() {
 		if (fa) a = i;
 		if (fb) b = i;
 	}
+
+	if (!blocked(Alice, Bob, a, b)) return 0;
 
 	Pos inx;
 	Line vline, sht, seg;//visible line, short, segment
@@ -357,11 +359,111 @@ ld query() {
 						}
 					}
 				}
+
+				for (int k = 0; k < N; k++) {
+					for (int l = 0; l < 4; l++) {//(O(120 * 120)
+						Pos& v = H[k][l];
+						if (v.good) continue;
+
+						sht = rot90(vline, v);
+						inx = intersection(vline, sht);
+						if (meaningless(Bob, inx)) continue;
+
+						if (on_seg_weak(Bob, inx, p)) {//O(120 * 120 * 120)
+							inx.i = on_seg_check(inx);
+							if (inx.i == k) {
+								if (!blocked(v, inx, -1, k) && !blocked(v, inx, k, inx.i)) {
+									G[v.i].push_back(Info(Bob.i, (v - inx).mag()));
+								}
+							}
+							else {
+								if (!blocked(v, inx, k, inx.i)) {
+									G[v.i].push_back(Info(Bob.i, (v - inx).mag()));
+								}
+							}
+						}
+					}
+				}
+
+				for (int k = 0; k < N; k++) {
+					for (int l = 0; l < 4; l++) {//O(120 * 120)
+						Pos& p1 = H[k][l], p2 = H[k][(l + 1) % 4];
+						seg = L(p1, p2);
+						if (zero(vline / seg)) continue;
+
+						inx = intersection(vline, seg);
+						if (!on_seg_weak(p1, p2, inx)) continue;
+						if (!on_seg_weak(Bob, inx, p)) continue;
+						if (meaningless(Bob, inx)) continue;
+
+						inx.i = on_seg_check(inx);
+						if (inx.i == a) {//O(120 * 120 * 120)
+							if (!blocked(Alice, inx, -1, inx.i) && !blocked(Alice, inx, a, inx.i))
+								G[Alice.i].push_back(Info(Bob.i, (Alice - inx).mag()));
+						}
+						else {
+							if (!blocked(Alice, inx, a, inx.i))
+								G[Alice.i].push_back(Info(Bob.i, (Alice - inx).mag()));
+						}
+						for (int m = 0; m < N; m++) {
+							for (int n = 0; n < 4; n++) {//O(120 * 120 * 120)
+								Pos& v = H[m][n];
+								if (v.good) continue;
+								if (inx.i == m) {//O(120 * 120 * 120 * 120)
+									if (!blocked(v, inx, -1, m) && !blocked(v, inx, m, inx.i)) {
+										G[v.i].push_back(Info(Bob.i, (v - inx).mag()));
+									}
+								}
+								else {
+									if (!blocked(v, inx, m, inx.i)) {
+										G[v.i].push_back(Info(Bob.i, (v - inx).mag()));
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 
-	ld cost = dijkstra(0, 1);
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < 4; j++) {//O(120)
+			Pos& u = H[i][j];
+			if (i == a) {
+				if (!blocked(Alice, u, a, i) && !blocked(Alice, u, -1, -2)) {
+					G[Alice.i].push_back(Info(u.i, (u - Alice).mag()));
+					//std::cout << "fucked\n";
+					//std::cout << u << "\n";
+				}
+			}
+			else {
+				if (!blocked(Alice, u, a, i)) {
+					G[Alice.i].push_back(Info(u.i, (u - Alice).mag()));
+				}
+			}
+			for (int k = i; k < N; k++) {
+				for (int l = 0; l < 4; l++) {//O(120 * 120)
+					Pos& v = H[k][l];
+					if (u.good && v.good) continue;
+					if (i == k) {
+						if (!blocked(u, v, i, k) && !blocked(u, v, -1, -2)) {
+							G[u.i].push_back(Info(v.i, (u - v).mag()));
+							G[v.i].push_back(Info(u.i, (u - v).mag()));
+						}
+					}
+					else {
+						if (!blocked(u, v, i, k)) {
+							G[u.i].push_back(Info(v.i, (u - v).mag()));
+							G[v.i].push_back(Info(u.i, (u - v).mag()));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ld cost = dijkstra(Alice.i, Bob.i);
 	return cost;
 }
 void solve() {
