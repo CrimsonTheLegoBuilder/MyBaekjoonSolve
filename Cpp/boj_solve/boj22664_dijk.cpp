@@ -292,7 +292,6 @@ ld query() {
 
 	init();
 	Pos Alice, Bob;
-	std::cin >> N;
 	for (int i = 0; i < N; i++) {
 		Pos d, u;
 		std::cin >> d >> u;
@@ -324,7 +323,7 @@ ld query() {
 	Pos inx;
 	Line vline, sht, seg;//visible line, short, segment
 	for (int i = 0; i < N; i++) {
-		for (int j = 0; i < 4; j++) {
+		for (int j = 0; j < 4; j++) {
 			Pos& p = H[i][j];
 			if (p.good) {
 				G[p.i].push_back(Info(Bob.i, 0));
@@ -470,6 +469,16 @@ int main() { solve(); return 0; }//JAG Summer Camp 2008 Day 2 C boj22664
 
 /*
 
+2
+2 2 4 4
+1 5 3 6
+0 0 4 6
+0
 
+2
+2 2 4 4
+1 5 3 6
+4 6 0 0
+0
 
 */
