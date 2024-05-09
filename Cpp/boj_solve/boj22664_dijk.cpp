@@ -214,11 +214,7 @@ inline int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 }
 inline int on_seg_check(const Pos& p) {
 	for (int i = 0; i < N; i++) {
-		int sz = H[i].size();
-		for (int j = 0; j < sz; j++) {
-			Pos& a = H[i][j], b = H[i][(j + 1) % sz];
-			if (on_seg_strong(a, b, p)) return i;
-		}
+		if (inner_check(H[i], p)) return i;
 	}
 	return -3;
 }
