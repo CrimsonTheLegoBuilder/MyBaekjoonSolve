@@ -293,6 +293,18 @@ ld query() {
 	auto v_check = [&](const Pos& b, Polygon& B) -> void {
 		int r = 0, l = 0;
 		for (int i = 0; i < 4; i++) {
+			Pos& cur = B[i], nxt = B[(i + 1) % 4];
+			if (on_seg_weak(cur, nxt, b)) {
+				B[(i + 1) % 4].good = 1;
+				B[i].good = 1;
+				return;
+			}
+			if (cur == b) {
+				B[(i + 3) % 4].good = 1;
+				B[(i + 1) % 4].good = 1;
+				B[i].good = 1;
+				return;
+			}
 			if (ccw(b, B[r], B[i]) < 0) r = i;
 			if (ccw(b, B[l], B[i]) > 0) l = i;
 		}
@@ -343,6 +355,7 @@ ld query() {
 			Pos& p = H[i][j];
 			if (p.good) {
 				G[p.i].push_back(Info(Bob.i, 0));
+				if (p == Bob) continue;
 				vline = L(Bob, p);
 				sht = rot90(vline, Alice);
 				inx = intersection(vline, sht);
