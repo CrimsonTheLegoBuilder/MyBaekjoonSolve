@@ -212,27 +212,11 @@ inline int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	}
 	return (cnt & 1) * 2;
 }
-inline int on_seg_check(const Pos& p) {
+inline int in_box_check(const Pos& p) {
 	for (int i = 0; i < N; i++) {
 		if (inner_check(H[i], p)) return i;
 	}
 	return -3;
-}
-inline bool meaningless(const Pos& b, const Pos& p) {
-	bool r = 0, l = 0;
-	for (int i = 0; i < N; i++) {
-		int sz = H[i].size();
-		for (int j = 0; j < sz; j++) {
-			Pos cur = H[i][j], nxt = H[i][(j + 1) % sz];
-			if (intersect(b, p, cur, nxt)) return 1;
-			if (on_seg_weak(b, p, cur) && ccw(b, p, cur, nxt) > 0) l = 1;
-			if (on_seg_weak(b, p, cur) && ccw(b, p, cur, nxt) < 0) r = 1;
-			if (on_seg_weak(b, p, nxt) && ccw(b, p, nxt, cur) > 0) l = 1;
-			if (on_seg_weak(b, p, nxt) && ccw(b, p, nxt, cur) < 0) r = 1;
-			if (r && l) return 1;
-		}
-	}
-	return 0;
 }
 inline bool blocked(const Pos& u, const Pos& v, const int& u_idx, const int& v_idx) {
 	if (u_idx == v_idx) {
@@ -316,8 +300,8 @@ ld query() {
 	std::cin >> Alice >> Bob;
 	T = 1;
 	Alice.i = 0, Bob.i = 1;
-	int a = -1;//if Alice is located at the boundary of a polygon X = polygon.i
-	int b = -2;//if Bob is located at the boundary of a polygon X = polygon.i
+	int a = -1;//if Alice is located at the boundary of a polygon a = polygon.i
+	int b = -2;//if Bob is located at the boundary of a polygon b = polygon.i
 	int fa, fb;
 	for (int i = 0; i < N; i++) {
 		for (Pos& p : H[i]) p.i = ++T;
@@ -349,7 +333,7 @@ ld query() {
 				inx = intersection(vline, sht);
 				if (visible(Bob, inx)) {
 					if (on_seg_weak(Bob, inx, p)) {
-						inx.i = on_seg_check(inx);
+						inx.i = in_box_check(inx);
 						if (inx.i == a) {
 							if (!blocked(Alice, inx, -1, inx.i) && !blocked(Alice, inx, a, inx.i))
 								G[Alice.i].push_back(Info(Bob.i, (Alice - inx).mag()));
@@ -371,7 +355,7 @@ ld query() {
 						if (!visible(Bob, inx)) continue;
 
 						if (on_seg_weak(Bob, inx, p)) {//O(120 * 120 * 120)
-							inx.i = on_seg_check(inx);
+							inx.i = in_box_check(inx);
 							if (inx.i == k) {
 								if (!blocked(v, inx, -1, k) && !blocked(v, inx, k, inx.i)) {
 									G[v.i].push_back(Info(Bob.i, (v - inx).mag()));
@@ -387,6 +371,7 @@ ld query() {
 				}
 
 				for (int k = 0; k < N; k++) {
+					if (k == i) continue;
 					for (int l = 0; l < 4; l++) {//O(120 * 120)
 						Pos& p1 = H[k][l], p2 = H[k][(l + 1) % 4];
 						seg = L(p1, p2);
@@ -397,7 +382,7 @@ ld query() {
 						if (!on_seg_weak(Bob, inx, p)) continue;
 						if (!visible(Bob, inx)) continue;
 
-						inx.i = on_seg_check(inx);
+						inx.i = in_box_check(inx);
 						if (inx.i == a) {//O(120 * 120 * 120)
 							if (!blocked(Alice, inx, -1, inx.i) && !blocked(Alice, inx, a, inx.i))
 								G[Alice.i].push_back(Info(Bob.i, (Alice - inx).mag()));
