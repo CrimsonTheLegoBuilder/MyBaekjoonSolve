@@ -179,6 +179,7 @@ struct Planar {
 		norm = cross(a, b, c).unit();
 		p0 = a;
 	}
+	bool coplanar(const Pos3D p) const { return zero(norm * (p - p0)); }
 	friend std::istream& operator >> (std::istream& is, Planar& P) { is >> P.norm >> P.p0; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Planar& P) { os << P.norm << " " << P.p0; return os; }
 };
@@ -304,7 +305,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(4);
+	std::cout.precision(7);
 	std::cin >> N >> Q;
 	C3D.resize(N);
 	Pos3D p;
@@ -314,7 +315,13 @@ void solve() {
 	}
 	C3D.push_back(O3D);
 	Hull3D = convex_hull_3D(C3D);
-	for ()
+	if (col || cop) { std::cout << "1.0000000\n"; return; }
+	ld suf = 0;
+	for (const Face& F : Hull3D) {
+		if (!F.P(C3D).coplanar(O3D)) suf += F.sph_tri_area(C3D);
+	}
+	if (suf > 2 * PI) std::cout << "0.0000000\n";
+	else std::cout << (1 - suf / (4 * PI)) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj19508 Convex Hull - refer to koosaga, BIGINTEGER
