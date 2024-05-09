@@ -276,7 +276,7 @@ inline void init() {
 }
 ld query() {
 	auto box = [&](const Pos& d, const Pos& u) -> Polygon {
-		return { d, Pos(d.x, u.y), u, Pos(u.x, d.y) };
+		return { d, Pos(u.x, d.y), u, Pos(d.x, u.y) };
 		};
 	auto v_check = [&](const Pos& b, Polygon& B) -> void {
 		int r = 0, l = 0;
