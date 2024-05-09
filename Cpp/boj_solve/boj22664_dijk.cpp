@@ -243,12 +243,13 @@ inline bool blocked(const Pos& u, const Pos& v, const int& u_idx, const int& v_i
 		return 0;
 	}
 }
-inline bool visible(const Pos& p, const Pos& b) {
+inline bool visible(const Pos& b, const Pos& p) {
 	for (int i = 0; i < N; i++) {
+		if (inner_check(H[i], p) > 1) return 0;
 		for (int j = 0; j < 4; j++) {
 			Pos& cur = H[i][j], nxt = H[i][(j + 1) % 4], nnxt = H[i][(j + 2) % 4];
-			if (intersect(p, b, cur, nxt)) return 0;
-			if (intersect(p, b, cur, nnxt)) return 0;
+			if (intersect(b, p, cur, nxt)) return 0;
+			if (intersect(b, p, cur, nnxt)) return 0;
 		}
 	}
 	return 1;
@@ -318,7 +319,7 @@ ld query() {
 		if (fb) b = i;
 	}
 
-	if (visible(Alice, Bob)) return 0;
+	if (visible(Bob, Alice)) return 0;
 
 	Pos inx;
 	Line vline, sht, seg;//visible line, short, segment
