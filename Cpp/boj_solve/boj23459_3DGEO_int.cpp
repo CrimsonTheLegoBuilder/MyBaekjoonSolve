@@ -307,7 +307,7 @@ void solve() {
 	else std::cout << (1 - suf / (4 * PI)) << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj19508 Convex Hull - refer to koosaga, BIGINTEGER
+int main() { solve(); return 0; }//boj23459 - convex_hull_3D refer to koosaga
 
 /*
 
