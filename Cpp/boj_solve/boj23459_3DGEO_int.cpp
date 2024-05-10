@@ -156,7 +156,16 @@ struct Face {
 		ret += PI - atan2l((s3.norm / s1.norm).mag(), s3.norm * s1.norm);
 		return ret;
 	}
+	ll above(const Polyhedron& C, const Pos3D& p) const {
+		return cross(C[v[0]], C[v[1]], C[v[2]]) * (p - C[v[0]]);
+	}
 };
+bool strictly_inner_check(const std::vector<Pos3D>& C, const std::vector<Face>& F, const Pos3D& p) {
+	for (const Face& f : F) {
+		if (f.above(C, p) >= 0) return 0;
+	}
+	return 1;
+}
 std::vector<Face> Hull3D;
 struct Edge {
 	int face_num, edge_num;
@@ -293,8 +302,8 @@ void solve() {
 			suf += a;
 		}
 	}
-	std::cout << suf << "\n" << 2 * PI << "\n";
-	if (suf > 2 * PI) std::cout << "0.0000000\n";
+	//std::cout << suf << "\n" << 2 * PI << "\n";
+	if (strictly_inner_check(C3D, Hull3D, O3D)) std::cout << "0.0000000\n";
 	else std::cout << (1 - suf / (4 * PI)) << "\n";
 	return;
 }
