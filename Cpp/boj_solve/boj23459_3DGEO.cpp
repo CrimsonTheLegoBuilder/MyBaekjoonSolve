@@ -186,7 +186,7 @@ struct Face {
 	int v[3];
 	Face(int a = 0, int b = 0, int c = 0) { v[0] = a; v[1] = b; v[2] = c; }
 	Pos3D norm(std::vector<Pos3D>& C) const { return cross(C[v[0]], C[v[1]], C[v[2]]); }
-	Planar P(const Polyhedron& C) const { return Planar(C[0], C[1], C[2]); }
+	Planar P(const Polyhedron& C) const { return Planar(C[v[0]], C[v[1]], C[v[2]]); }
 	ld sph_tri_area(const Polyhedron& C) const {
 		ld ret = -PI;
 		Planar s1 = Planar(C[v[0]], C[v[1]], O3D);
@@ -324,6 +324,7 @@ void solve() {
 	std::cout << Hull3D.size() << "\n";
 	for (const Face& F : Hull3D) {
 		std::cout << F.v[0] << " " << F.v[1] << " " << F.v[2] << "\n";
+		std::cout << F.P(C3D) << "\n";
 		std::cout << F.P(C3D).coplanar(O3D) << "\n";
 		if (!F.P(C3D).coplanar(O3D)) {
 			ld a = F.sph_tri_area(C3D);
@@ -339,12 +340,10 @@ int main() { solve(); return 0; }//boj19508 Convex Hull - refer to koosaga, BIGI
 
 /*
 
-3 3
-0 0 0
-1 1 0
-1 0 0
-0 0 1 0
-0 0 1 1
-1 1 1 0
+3
+-1000000 1000000 1000000
+1000000 -1000000 1000000
+1000000 1000000 -1000000
+
 
 */
