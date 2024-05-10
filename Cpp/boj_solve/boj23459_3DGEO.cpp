@@ -317,18 +317,18 @@ void solve() {
 	}
 	C3D.push_back(Pos3D(0, 0, 0));
 	Hull3D = convex_hull_3D(C3D);
-	for (Pos3D& p : C3D) std::cout << p << "\n";
+	//for (Pos3D& p : C3D) std::cout << p << "\n";
 	if (col || cop) { std::cout << "1.0000000\n"; return; }
 	ld suf = 0;
-	std::cout << "DEBUG\n";
-	std::cout << Hull3D.size() << "\n";
+	//std::cout << "DEBUG\n";
+	//std::cout << Hull3D.size() << "\n";
 	for (const Face& F : Hull3D) {
-		std::cout << F.v[0] << " " << F.v[1] << " " << F.v[2] << "\n";
-		std::cout << F.P(C3D) << "\n";
-		std::cout << F.P(C3D).coplanar(O3D) << "\n";
+		//std::cout << F.v[0] << " " << F.v[1] << " " << F.v[2] << "\n";
+		//std::cout << F.P(C3D) << "\n";
+		//std::cout << F.P(C3D).coplanar(O3D) << "\n";
 		if (!F.P(C3D).coplanar(O3D)) {
 			ld a = F.sph_tri_area(C3D);
-			std::cout << a << "\n";
+			//std::cout << a << "\n";
 			suf += a;
 		}
 	}
@@ -340,10 +340,12 @@ int main() { solve(); return 0; }//boj19508 Convex Hull - refer to koosaga, BIGI
 
 /*
 
-3
--1000000 1000000 1000000
-1000000 -1000000 1000000
-1000000 1000000 1000000
-
+6
+1000000 0 0
+0 1000000 0
+0 0 1000000
+-1 0 0
+0 -1 0
+1000000 1000000 -1
 
 */
