@@ -16,7 +16,6 @@ const ld TOL = 1e-9;
 const int LEN = 1e3;
 const ld PI = acos(-1);
 int N, M, T, Q;
-struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
 
 //geometry-struct
 bool zero(const ld& x) { return std::abs(x) < TOL; }
@@ -306,7 +305,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(7);
-	std::cin >> N >> Q;
+	std::cin >> N;
 	C3D.resize(N);
 	Pos3D p;
 	for (int i = 0; i < N; i++) {
@@ -315,10 +314,18 @@ void solve() {
 	}
 	C3D.push_back(O3D);
 	Hull3D = convex_hull_3D(C3D);
+	for (Pos3D& p : C3D) std::cout << p << "\n";
 	if (col || cop) { std::cout << "1.0000000\n"; return; }
 	ld suf = 0;
+	std::cout << "DEBUG\n";
+	std::cout << Hull3D.size() << "\n";
 	for (const Face& F : Hull3D) {
-		if (!F.P(C3D).coplanar(O3D)) suf += F.sph_tri_area(C3D);
+		std::cout << F.v[0] << " " << F.v[1] << " " << F.v[2] << "\n";
+		if (!F.P(C3D).coplanar(O3D)) {
+			ld a = F.sph_tri_area(C3D);
+			std::cout << a << "\n";
+			suf += a;
+		}
 	}
 	if (suf > 2 * PI) std::cout << "0.0000000\n";
 	else std::cout << (1 - suf / (4 * PI)) << "\n";

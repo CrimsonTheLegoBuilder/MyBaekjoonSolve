@@ -277,6 +277,8 @@ void solve() {
 	poses.resize(N);
 	for (int i = 0; i < N; i++) std::cin >> poses[i];
 	Hull3D = convex_hull_3D(poses);
+	for (Pos3D& p : poses) std::cout << p << "\n";
+	for (Face& F : Hull3D) std::cout << F[0] << "\n";
 	memset(V, 0, sizeof V);
 	seq.clear();
 	for (int i = 0; i < Hull3D.size(); i++) {
@@ -304,5 +306,11 @@ int main() { solve(); return 0; }//boj19508 Convex Hull - refer to koosaga, BIGI
 0 0 1 0
 0 0 1 1
 1 1 1 0
+
+4 0
+1 0 0
+0 1 0
+0 0 1
+0 0 0
 
 */
