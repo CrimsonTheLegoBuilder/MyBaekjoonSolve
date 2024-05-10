@@ -13,7 +13,7 @@ typedef double ld;
 typedef std::pair<int, int> pi;
 const ld INF = 1e17;
 const ld TOL = 1e-8;
-const int LEN = 1e3;
+const int LEN = 1e6;
 const ld PI = acos(-1);
 int N, M, T, Q;
 
@@ -281,8 +281,11 @@ void solve() {
 		C3D[i] = C3D[i].unit();
 	}
 	C3D.push_back(Pos3D(0, 0, 0));
+	int sz1 = C3D.size();
 	std::sort(C3D.begin(), C3D.end());
 	C3D.erase(unique(C3D.begin(), C3D.end()), C3D.end());
+	int sz2 = C3D.size();
+	assert(sz1 == sz2);
 	Hull3D = convex_hull_3D(C3D);
 	//for (Pos3D& p : C3D) std::cout << p << "\n";
 	if (col || cop) { std::cout << "1.0000000\n"; return; }
