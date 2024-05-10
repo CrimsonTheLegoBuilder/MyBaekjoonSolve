@@ -12,7 +12,7 @@ typedef long long ll;
 typedef double ld;
 typedef std::pair<int, int> pi;
 const ld INF = 1e17;
-const ld TOL = 1e-9;
+const ld TOL = 1e-8;
 const int LEN = 1e3;
 const ld PI = acos(-1);
 int N, M, T, Q;
@@ -101,31 +101,6 @@ inline bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 inline bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
 	ld ret = dot(d1, d3, d2);
 	return zero(cross(d1, d2, d3).mag()) && ret > 0;
-}
-//std::vector<Pos3D> graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
-ld graham_scan(std::vector<Pos3D>& C, const Pos3D& norm) {
-	//if (C.size() < 3) {
-	//	std::sort(C.begin(), C.end());
-	//	return C;
-	// }
-	if (C.size() < 3) return 0;
-	std::vector<Pos3D> H;
-	std::swap(C[0], *min_element(C.begin(), C.end()));
-	std::sort(C.begin() + 1, C.end(), [&](const Pos3D& p, const Pos3D& q) -> bool {
-		int ret = ccw(C[0], p, q, norm);
-		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
-		return ret > 0;
-		}
-	);
-	C.erase(unique(C.begin(), C.end()), C.end());
-	int sz = C.size();
-	for (int i = 0; i < sz; i++) {
-		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i], norm) <= 0)
-			H.pop_back();
-		H.push_back(C[i]);
-	}
-	//return H;
-	return area(H, norm);
 }
 inline Line3D L(const Pos3D& p1, const Pos3D& p2) { return { p2 - p1, p1 }; }
 inline Pos3D intersection(const Plane& S, const Line3D& l) {
@@ -306,6 +281,8 @@ void solve() {
 		C3D[i] = C3D[i].unit();
 	}
 	C3D.push_back(Pos3D(0, 0, 0));
+	std::sort(C3D.begin(), C3D.end());
+	C3D.erase(unique(C3D.begin(), C3D.end()), C3D.end());
 	Hull3D = convex_hull_3D(C3D);
 	//for (Pos3D& p : C3D) std::cout << p << "\n";
 	if (col || cop) { std::cout << "1.0000000\n"; return; }
