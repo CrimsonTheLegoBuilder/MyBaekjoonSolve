@@ -8,11 +8,11 @@
 #include <array>
 #include <tuple>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::pair<int, int> pi;
 const ld INF = 1e17;
-const ld TOL = 1e-8;
+const ld TOL = 1e-15;
 const int LEN = 1e6;
 const ld PI = acos(-1);
 int N, M, T, Q;
@@ -151,9 +151,9 @@ struct Face {
 		Planar s1 = Planar(C[v[0]], C[v[1]], O3Df);
 		Planar s2 = Planar(C[v[1]], C[v[2]], O3Df);
 		Planar s3 = Planar(C[v[2]], C[v[0]], O3Df);
-		ret += PI - atan2((s1.norm / s2.norm).mag(), s1.norm * s2.norm);
-		ret += PI - atan2((s2.norm / s3.norm).mag(), s2.norm * s3.norm);
-		ret += PI - atan2((s3.norm / s1.norm).mag(), s3.norm * s1.norm);
+		ret += PI - atan2l((s1.norm / s2.norm).mag(), s1.norm * s2.norm);
+		ret += PI - atan2l((s2.norm / s3.norm).mag(), s2.norm * s3.norm);
+		ret += PI - atan2l((s3.norm / s1.norm).mag(), s3.norm * s1.norm);
 		return ret;
 	}
 };
@@ -256,7 +256,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(7);
+	std::cout.precision(17);
 	std::cin >> N;
 	C3D.resize(N);
 	C3Df.resize(N + 1);
@@ -275,7 +275,8 @@ void solve() {
 	Pos3Df p;
 	for (int i = 0; i < N + 1; i++) {
 		p = Pos3Df(C3D[i].x, C3D[i].y, C3D[i].z);
-		if (p.mag() > 0) p = p.unit();
+		ld x = p.mag();
+		if (p.mag() > x) p *= 1000, p /= x;
 		C3Df[i] = p;
 	}
 	ld suf = 0;
@@ -292,6 +293,7 @@ void solve() {
 			suf += a;
 		}
 	}
+	std::cout << suf << "\n" << 2 * PI << "\n";
 	if (suf > 2 * PI) std::cout << "0.0000000\n";
 	else std::cout << (1 - suf / (4 * PI)) << "\n";
 	return;
