@@ -231,7 +231,7 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {//incremental const
 	std::vector<std::vector<int>> rvis;//points visible from each face
 	std::vector<std::array<Edge, 3>> other;//other face adjacent to each edge of face
 	auto ad = [&](const int& a, const int& b, const int& c) -> void {//add face
-		faces.push_back({ a, b, c });
+		faces.push_back(Face(a, b, c));
 		active.push_back(1);
 		rvis.emplace_back();
 		other.emplace_back();
@@ -259,7 +259,7 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {//incremental const
 	ad(0, 1, 2), ad(0, 2, 1);
 	if (abv(1, 3)) std::swap(candi[1], candi[2]);
 	for (int i = 0; i < 3; i++) glue({ 0, i }, { 1, 2 - i });
-	for (int i = 3; i < N; i++) visible(abv(1, i), i);//coplanar points go in rvis[0]
+	for (int i = 3; i < sz; i++) visible(abv(1, i), i);//coplanar points go in rvis[0]
 
 	std::vector<int> label(sz, -1);
 	for (int i = 3; i < sz; i++) {//incremental construction
@@ -296,6 +296,9 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {//incremental const
 			if (y == st) break;
 		}
 	}
+	//for (const Face& F : faces) {
+	//	std::cout << F.v[0] << " " << F.v[1] << " " << F.v[2] << " DEBUG\n";
+	//}
 	std::vector<Face> hull3D;
 	for (int i = 0; i < faces.size(); i++) if (active[i]) hull3D.push_back(faces[i]);
 	return hull3D;
@@ -312,7 +315,7 @@ void solve() {
 		std::cin >> C3D[i];
 		C3D[i] = C3D[i].unit();
 	}
-	C3D.push_back(O3D);
+	C3D.push_back(Pos3D(0, 0, 0));
 	Hull3D = convex_hull_3D(C3D);
 	for (Pos3D& p : C3D) std::cout << p << "\n";
 	if (col || cop) { std::cout << "1.0000000\n"; return; }
@@ -321,6 +324,7 @@ void solve() {
 	std::cout << Hull3D.size() << "\n";
 	for (const Face& F : Hull3D) {
 		std::cout << F.v[0] << " " << F.v[1] << " " << F.v[2] << "\n";
+		std::cout << F.P(C3D).coplanar(O3D) << "\n";
 		if (!F.P(C3D).coplanar(O3D)) {
 			ld a = F.sph_tri_area(C3D);
 			std::cout << a << "\n";
