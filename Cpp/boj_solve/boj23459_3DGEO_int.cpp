@@ -26,23 +26,23 @@ struct Pos3D {
 	bool operator == (const Pos3D& p) const { return x == p.x && y == p.y && z == p.z; }
 	bool operator != (const Pos3D& p) const { return x != p.x || y != p.y || z != p.z; }
 	bool operator < (const Pos3D& p) const { return x == p.x ? y == p.y ? z < p.z : y < p.y : x < p.x; }
-	ll operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
-	Pos3D operator / (const Pos3D& p) const {
+	inline ll operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
+	inline Pos3D operator / (const Pos3D& p) const {
 		Pos3D ret;
 		ret.x = y * p.z - z * p.y;
 		ret.y = z * p.x - x * p.z;
 		ret.z = x * p.y - y * p.x;
 		return ret;
 	}
-	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
-	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	Pos3D operator * (const ll& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	Pos3D operator / (const ll& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+	inline Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
+	inline Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
+	inline Pos3D operator * (const ll& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
+	inline Pos3D operator / (const ll& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
 	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
 	Pos3D& operator *= (const ll& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
 	Pos3D& operator /= (const ll& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
-	ll Euc() const { return x * x + y * y + z * z; }
+	inline ll Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrt(Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos3D& p) {
 		is >> p.x >> p.y >> p.z;
@@ -59,18 +59,18 @@ struct Pos3Df {
 	bool operator == (const Pos3Df& p) const { return x == p.x && y == p.y && z == p.z; }
 	bool operator != (const Pos3Df& p) const { return x != p.x || y != p.y || z != p.z; }
 	bool operator < (const Pos3Df& p) const { return x == p.x ? y == p.y ? z < p.z : y < p.y : x < p.x; }
-	ld operator * (const Pos3Df& p) const { return x * p.x + y * p.y + z * p.z; }
-	Pos3Df operator / (const Pos3Df& p) const {
+	inline ld operator * (const Pos3Df& p) const { return x * p.x + y * p.y + z * p.z; }
+	inline Pos3Df operator / (const Pos3Df& p) const {
 		Pos3Df ret;
 		ret.x = y * p.z - z * p.y;
 		ret.y = z * p.x - x * p.z;
 		ret.z = x * p.y - y * p.x;
 		return ret;
 	}
-	Pos3Df operator + (const Pos3Df& p) const { return { x + p.x, y + p.y, z + p.z }; }
-	Pos3Df operator - (const Pos3Df& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	Pos3Df operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	Pos3Df operator / (const ld& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+	inline Pos3Df operator + (const Pos3Df& p) const { return { x + p.x, y + p.y, z + p.z }; }
+	inline Pos3Df operator - (const Pos3Df& p) const { return { x - p.x, y - p.y, z - p.z }; }
+	inline Pos3Df operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
+	inline Pos3Df operator / (const ld& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
 	Pos3Df& operator += (const Pos3Df& p) { x += p.x; y += p.y; z += p.z; return *this; }
 	Pos3Df& operator -= (const Pos3Df& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
 	Pos3Df& operator *= (const ld& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
