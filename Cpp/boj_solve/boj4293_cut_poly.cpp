@@ -107,11 +107,11 @@ void query() {
 				if (ccw(s, e, pre) > 0 || ccw(s, e, nxt) < 0) inx.i = 0;
 				else if (ccw(s, e, pre) < 0 || ccw(s, e, nxt) > 0) inx.i = 1;
 				tmp.push_back(inx);
-				if (inx.i = 1 &&
+				if (inx.i &&
 					!ccw(s, e, pre) &&
 					ccw(s, e, nxt) > 0 &&
 					ccw(pre, cur, nxt) < 0) inx.i = 0, tmp.push_back(inx);
-				if (inx.i = 1 &&
+				if (inx.i &&
 					!ccw(s, e, nxt) &&
 					ccw(s, e, pre) < 0 &&
 					ccw(pre, cur, nxt) < 0) inx.i = 0, tmp.push_back(inx);
