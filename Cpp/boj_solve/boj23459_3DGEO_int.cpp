@@ -21,108 +21,92 @@ int N, M, T, Q;
 inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
 struct Pos3D {
-	ld x, y, z;
-	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
-	bool operator == (const Pos3D& p) const { return zero(x - p.x) && zero(y - p.y) && zero(z - p.z); }
-	bool operator != (const Pos3D& p) const { return !zero(x - p.x) || !zero(y - p.y) || !zero(z - p.z); }
-	bool operator < (const Pos3D& p) const { return zero(x - p.x) ? zero(y - p.y) ? z < p.z : y < p.y : x < p.x; }
-	inline ld operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
-	inline Pos3D operator / (const Pos3D& p) const {
+	ll x, y, z;
+	Pos3D(ll X = 0, ll Y = 0, ll Z = 0) : x(X), y(Y), z(Z) {}
+	bool operator == (const Pos3D& p) const { return x == p.x && y == p.y && z == p.z; }
+	bool operator != (const Pos3D& p) const { return x != p.x || y != p.y || z != p.z; }
+	bool operator < (const Pos3D& p) const { return x == p.x ? y == p.y ? z < p.z : y < p.y : x < p.x; }
+	ll operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
+	Pos3D operator / (const Pos3D& p) const {
 		Pos3D ret;
 		ret.x = y * p.z - z * p.y;
 		ret.y = z * p.x - x * p.z;
 		ret.z = x * p.y - y * p.x;
 		return ret;
 	}
-	inline Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
-	inline Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	inline Pos3D operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	inline Pos3D operator / (const ld& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
+	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
+	Pos3D operator * (const ll& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
+	Pos3D operator / (const ll& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
 	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
-	Pos3D& operator *= (const ld& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
-	Pos3D& operator /= (const ld& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
-	inline ld Euc() const { return x * x + y * y + z * z; }
-	inline ld mag() const { return sqrtl(Euc()); }
-	ld lon() const { return atan2(y, x); }
-	ld lat() const { return atan2(z, sqrtl(x * x + y * y)); }
-	inline Pos3D unit() const { return *this / mag(); }
-	inline Pos3D norm(const Pos3D& p) const { return (*this / p).unit(); }
-	Pos3D rotate(const ld& th, const Pos3D& axis) const {
-		ld SIN = sin(th), COS = cos(th);
-		Pos3D u = axis.unit();
-		return u * (*this * u) * (1 - COS) + (*this * COS) - (*this / u) * SIN;
+	Pos3D& operator *= (const ll& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
+	Pos3D& operator /= (const ll& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
+	ll Euc() const { return x * x + y * y + z * z; }
+	ld mag() const { return sqrt(Euc()); }
+	friend std::istream& operator >> (std::istream& is, Pos3D& p) {
+		is >> p.x >> p.y >> p.z;
+		return is;
 	}
-	inline friend std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z; return os; }
+	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) {
+		os << p.x << " " << p.y << " " << p.z << "\n";
+		return os;
+	}
+} candi[LEN];
+struct Pos3Df {
+	ld x, y, z;
+	Pos3Df(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
+	bool operator == (const Pos3Df& p) const { return x == p.x && y == p.y && z == p.z; }
+	bool operator != (const Pos3Df& p) const { return x != p.x || y != p.y || z != p.z; }
+	bool operator < (const Pos3Df& p) const { return x == p.x ? y == p.y ? z < p.z : y < p.y : x < p.x; }
+	ld operator * (const Pos3Df& p) const { return x * p.x + y * p.y + z * p.z; }
+	Pos3Df operator / (const Pos3Df& p) const {
+		Pos3Df ret;
+		ret.x = y * p.z - z * p.y;
+		ret.y = z * p.x - x * p.z;
+		ret.z = x * p.y - y * p.x;
+		return ret;
+	}
+	Pos3Df operator + (const Pos3Df& p) const { return { x + p.x, y + p.y, z + p.z }; }
+	Pos3Df operator - (const Pos3Df& p) const { return { x - p.x, y - p.y, z - p.z }; }
+	Pos3Df operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
+	Pos3Df operator / (const ld& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+	Pos3Df& operator += (const Pos3Df& p) { x += p.x; y += p.y; z += p.z; return *this; }
+	Pos3Df& operator -= (const Pos3Df& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
+	Pos3Df& operator *= (const ld& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
+	Pos3Df& operator /= (const ld& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
+	inline Pos3Df unit() const { return *this / mag(); }
+	inline Pos3Df norm(const Pos3Df& p) const { return (*this / p).unit(); }
+	ld Euc() const { return x * x + y * y + z * z; }
+	ld mag() const { return sqrtl(Euc()); }
+	friend std::istream& operator >> (std::istream& is, Pos3Df& p) {
+		is >> p.x >> p.y >> p.z;
+		return is;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Pos3Df& p) {
+		os << p.x << " " << p.y << " " << p.z << "\n";
+		return os;
+	}
 };
 typedef std::vector<Pos3D> Polyhedron;
+typedef std::vector<Pos3Df> Polyhedronf;
 const Pos3D O3D = { 0, 0, 0 };
-const Pos3D MAXP3D = { INF, INF, INF };
+const Pos3Df O3Df = { 0, 0, 0 };
+const Pos3D X_axis = { 1, 0, 0 };
+const Pos3D Y_axis = { 0, 1, 0 };
+const Pos3D Z_axis = { 0, 0, 1 };
+//const Pos3D MAXP3D = { INF, INF, INF };
 std::vector<Pos3D> C3D;//3D
-struct Line3D {
-	Pos3D dir, p0;
-	Line3D(Pos3D DIR = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : dir(DIR), p0(P0) {}
-};
-struct Plane {
-	ld a, b, c, d;
-	Plane(ld A = 0, ld B = 0, ld C = 0, ld D = 0) : a(A), b(B), c(C), d(D) {}
-	Pos3D norm() const { return Pos3D(a, b, c); };
-	friend std::istream& operator >> (std::istream& is, Plane& f) { is >> f.a >> f.b >> f.c >> f.d; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Plane& f) { os << f.a << " " << f.b << " " << f.c << " " << f.d << "\n"; return os; }
-};
+std::vector<Pos3Df> C3Df;//3D double
 //fn
-inline int above(const Plane& S, const Pos3D& p) {
-	ld ret = p * S.norm() + S.d;
-	return dcmp(ret);
-}
 inline Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
-inline ld dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
-inline int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
-	Pos3D CCW = cross(d1, d2, d3);
-	ld ret = CCW * norm;
-	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-}
-inline ld area(const std::vector<Pos3D>& H, const Pos3D& norm) {
-	ld ret = 0;
-	if (H.size() < 3) return ret;
-	Pos3D O = H[0];
-	int sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		Pos3D cur = H[i], nxt = H[(i + 1) % sz];
-		ret += cross(O, cur, nxt) * norm / norm.mag();
-	}
-	return std::abs(ret * .5);
-}
-inline bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
-	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3).mag()) && (ret > 0 || zero(ret));
-}
-inline bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) {
-	ld ret = dot(d1, d3, d2);
-	return zero(cross(d1, d2, d3).mag()) && ret > 0;
-}
-inline Line3D L(const Pos3D& p1, const Pos3D& p2) { return { p2 - p1, p1 }; }
-inline Pos3D intersection(const Plane& S, const Line3D& l) {
-	ld det = S.norm() * l.dir;
-	if (zero(det)) return { INF, INF, INF };
-	ld t = -((S.norm() * l.p0 + S.d) / det);
-	return l.p0 + (l.dir * t);
-}
-inline Pos3D intersection(const Plane& S, const Pos3D& p1, const Pos3D& p2) {
-	Line3D l = L(p1, p2);
-	Pos3D inx = intersection(S, l);
-	//if (!on_seg_strong(p1, p2, inx)) return { INF, INF, INF };
-	return inx;
-}
+inline Pos3Df cross(const Pos3Df& d1, const Pos3Df& d2, const Pos3Df& d3) { return (d2 - d1) / (d3 - d2); }
+inline ll dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
 inline bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) {
-	return zero(((b - a) / (c - b)).Euc());
+	return !((b - a) / (c - b)).Euc();
 }
 inline bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {
-	return zero(cross(a, b, c) * (p - a));
-}
-inline bool coplanar(const std::vector<Pos3D> H, const Plane& S) {
-	return zero((cross(H[0], H[1], H[2]) / S.norm()).mag()) * !above(S, H[0]);
+	return !(cross(a, b, c) * (p - a));
 }
 inline bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) {// is p strictly above plane
 	return cross(a, b, c) * (p - a) > 0;
@@ -147,13 +131,13 @@ inline int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
 	return dim;
 }
 struct Planar {
-	Pos3D norm, p0;
+	Pos3Df norm, p0;
 	//Planar(Pos3D NORM = Pos3D(0, 0, 0), Pos3D P0 = Pos3D(0, 0, 0)) : norm(NORM), p0(P0) {}
-	Planar(Pos3D a = Pos3D(0, 0, 0), Pos3D b = Pos3D(0, 0, 0), Pos3D c = Pos3D(0, 0, 0)) {
-		norm = cross(a, b, c).unit();
+	Planar(Pos3Df a = Pos3Df(0, 0, 0), Pos3Df b = Pos3Df(0, 0, 0), Pos3Df c = Pos3Df(0, 0, 0)) {
+		norm = cross(a, b, c);
 		p0 = a;
 	}
-	inline bool coplanar(const Pos3D p) const { return zero(norm * (p - p0)); }
+	inline bool coplanar(const Pos3Df p) const { return zero(norm * (p - p0)); }
 	friend std::istream& operator >> (std::istream& is, Planar& P) { is >> P.norm >> P.p0; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Planar& P) { os << P.norm << " " << P.p0; return os; }
 };
@@ -161,12 +145,12 @@ struct Face {
 	int v[3];
 	Face(int a = 0, int b = 0, int c = 0) { v[0] = a; v[1] = b; v[2] = c; }
 	inline Pos3D norm(std::vector<Pos3D>& C) const { return cross(C[v[0]], C[v[1]], C[v[2]]); }
-	Planar P(const Polyhedron& C) const { return Planar(C[v[0]], C[v[1]], C[v[2]]); }
-	inline ld sph_tri_area(const Polyhedron& C) const {
+	Planar P(const Polyhedronf& C) const { return Planar(C[v[0]], C[v[1]], C[v[2]]); }
+	inline ld sph_tri_area(const Polyhedronf& C) const {
 		ld ret = -PI;
-		Planar s1 = Planar(C[v[0]], C[v[1]], O3D);
-		Planar s2 = Planar(C[v[1]], C[v[2]], O3D);
-		Planar s3 = Planar(C[v[2]], C[v[0]], O3D);
+		Planar s1 = Planar(C[v[0]], C[v[1]], O3Df);
+		Planar s2 = Planar(C[v[1]], C[v[2]], O3Df);
+		Planar s3 = Planar(C[v[2]], C[v[0]], O3Df);
 		ret += PI - atan2((s1.norm / s2.norm).mag(), s1.norm * s2.norm);
 		ret += PI - atan2((s2.norm / s3.norm).mag(), s2.norm * s3.norm);
 		ret += PI - atan2((s3.norm / s1.norm).mag(), s3.norm * s1.norm);
@@ -275,10 +259,9 @@ void solve() {
 	std::cout.precision(7);
 	std::cin >> N;
 	C3D.resize(N);
-	Pos3D p;
+	C3Df.resize(N + 1);
 	for (int i = 0; i < N; i++) {
 		std::cin >> C3D[i];
-		C3D[i] = C3D[i].unit();
 	}
 	C3D.push_back(Pos3D(0, 0, 0));
 	//int sz1 = C3D.size();
@@ -289,15 +272,22 @@ void solve() {
 	Hull3D = convex_hull_3D(C3D);
 	//for (Pos3D& p : C3D) std::cout << p << "\n";
 	if (col || cop) { std::cout << "1.0000000\n"; return; }
+	Pos3Df p;
+	for (int i = 0; i < N + 1; i++) {
+		p = Pos3Df(C3D[i].x, C3D[i].y, C3D[i].z);
+		if (p.mag() > 0) p = p.unit();
+		C3Df[i] = p;
+	}
 	ld suf = 0;
 	//std::cout << "DEBUG\n";
 	//std::cout << Hull3D.size() << "\n";
 	for (const Face& F : Hull3D) {
 		//std::cout << F.v[0] << " " << F.v[1] << " " << F.v[2] << "\n";
-		//std::cout << F.P(C3D) << "\n";
-		//std::cout << F.P(C3D).coplanar(O3D) << "\n";
-		if (!F.P(C3D).coplanar(O3D)) {
-			ld a = F.sph_tri_area(C3D);
+		//std::cout << "a : " << C3Df[F.v[0]] << "\nb : " << C3Df[F.v[1]] << "\nc :  " << C3Df[F.v[2]] << "\n";
+		//std::cout << F.P(C3Df) << "\n";
+		//std::cout << F.P(C3Df).coplanar(O3Df) << "\n";
+		if (!F.P(C3Df).coplanar(O3Df)) {
+			ld a = F.sph_tri_area(C3Df);
 			//std::cout << a << "\n";
 			suf += a;
 		}
