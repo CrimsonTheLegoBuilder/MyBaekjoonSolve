@@ -179,7 +179,7 @@ Line rotate(const Line& l, const Pos& p, ld the) {
 	ld c = vy * p.x + vx * p.y;
 	return Line(Vec(vy, vx), c);
 }
-Line rotate90(const Line& l, const Pos& p) {
+Line rot90(const Line& l, const Pos& p) {
 	Vec s = ~l.s;
 	ld c = s.vy * p.x + s.vx * p.y;
 	return Line(s, c);
@@ -520,7 +520,7 @@ bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
 	}
 	while (dq.size() >= 3 && cw(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
 	while (dq.size() >= 3 && cw(dq.back(), dq.front(), dq[1])) dq.pop_front();
-	for (int i = 0; i < dq.size(); i++) {
+	for (int i = 0; i < (int)dq.size(); i++) {
 		Line cur = dq[i], nxt = dq[(i + 1) % (int)dq.size()];
 		if (cur / nxt < TOL) {
 			hull.clear();
