@@ -106,7 +106,7 @@ Pos ternary_search(const Polygon& H, Pos u, Pos v, bool f = 0) {
 	if (f) std::swap(u, v);
 	int sz = H.size();
 	int s = 0, e = sz - 1, r, l;
-	while (e - s > 3) {
+	while (e - s >= 3) {
 		l = (s + s + e) / 3;
 		r = (s + e + e) / 3;
 		ll LL = cross(u, v, H[l]);
