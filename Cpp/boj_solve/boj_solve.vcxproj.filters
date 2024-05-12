@@ -1041,10 +1041,19 @@
     <ClCompile Include="boj22664_dijk.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj23459_3DGEO.cpp">
+    <ClCompile Include="boj23459_3DGEO_int.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj23459_3DGEO_int.cpp">
+    <ClCompile Include="boj19061_PetrozSumm2017D3UralG.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj6728_HPI.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj1774_prim.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7430_floyd.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>

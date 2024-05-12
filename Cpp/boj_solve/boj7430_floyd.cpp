@@ -123,6 +123,7 @@ Pos ternary_search(const Polygon& H, Pos u, Pos v, bool f = 0) {
 	return ret;
 }
 bool all_pos_on_left(const Polygon& LH, const Polygon& UH, const Pos& u, const Pos& v) {
+	if (!M) return 1;
 	Pos exl = ternary_search(LH, u, v);
 	Pos exu = ternary_search(UH, u, v, 1);
 	return ccw(u, v, exl) > 0 && ccw(u, v, exu) > 0;
@@ -147,7 +148,7 @@ void solve() {
 			G[i][j] = INF;
 
 	for (int i = 0, j; i < N; i++) {
-		for (j = i + 1; j < i + N; j++) {
+		for (j = i + 1; j < i + N - 1; j++) {
 			if (all_pos_on_left(LH, UH, H[i], H[j % N])) {
 				pair.push_back({ i, j % N });
 				G[i][j % N] = (H[i] - H[j % N]).mag();
@@ -167,6 +168,9 @@ void solve() {
 	ld ret = INF;
 	for (const Pos& p : pair) {
 		int s = p.x, e = p.y;
+		if (!sign(G[s][e] - G[e][s]) &&
+			!sign(G[s][e] - (H[s] - H[e]).mag())) 
+			continue;
 		ret = std::min(ret, G[s][e] + G[e][s]);
 	}
 	std::cout << ret << "\n";
