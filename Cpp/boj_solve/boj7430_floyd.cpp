@@ -140,13 +140,12 @@ void solve() {
 
 	if (!M) {
 		ld ret = INF;
-		for (int k = 0; k < N; k++) {//brute
-			for (int i = 0; i < N; i++) {
-				for (int j = 0; j < N; j++) {
-					if (i == k || j == k || i == j) continue;
-					Pos& K = H[k], I = H[i], J = H[j];
-					if (ccw(K, I, J)) {
-						Pos v1 = K - I, v2 = K - J, v3 = I - J;
+		for (int i = 0; i < N; i++) {//brute
+			for (int j = i + 1; j < N; j++) {
+				for (int k = j + 1; k < N; k++) {
+					Pos& I = H[i], J = H[j], K = H[k];
+					if (ccw(I, J, K)) {
+						Pos v1 = I - J, v2 = J - K, v3 = K - I;
 						ld dist = v1.mag() + v2.mag() + v3.mag();
 						ret = std::min(ret, dist);
 					}
@@ -161,12 +160,12 @@ void solve() {
 	for (Pos& p : mon) std::cin >> p;
 	Polygon LH = lower_monotone_chain(mon);
 	Polygon UH = upper_monotone_chain(mon);
-	Polygon pair;
 
 	for (int i = 0; i < N; i++)
 		for (int j = 0; j < N; j++)
 			G[i][j] = INF;
 
+	Polygon pair;
 	for (int i = 0, j; i < N; i++) {
 		for (j = i + 1; j < i + N - 1; j++) {
 			if (all_pos_on_left(LH, UH, H[i], H[j % N])) {
