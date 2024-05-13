@@ -1056,6 +1056,9 @@
     <ClCompile Include="boj7430_floyd.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj10999_lazy.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
