@@ -137,6 +137,26 @@ void solve() {
 	Polygon H(N);
 	for (Pos& p : H) std::cin >> p;
 	norm(H);
+
+	if (!M) {
+		ld ret = INF;
+		for (int k = 0; k < N; k++) {//brute
+			for (int i = 0; i < N; i++) {
+				for (int j = 0; j < N; j++) {
+					if (i == k || j == k || i == j) continue;
+					Pos& K = H[k], I = H[i], J = H[j];
+					if (ccw(K, I, J)) {
+						Pos v1 = K - I, v2 = K - J, v3 = I - J;
+						ld dist = v1.mag() + v2.mag() + v3.mag();
+						ret = std::min(ret, dist);
+					}
+				}
+			}
+		}
+		std::cout << ret << "\n";
+		return;
+	}
+
 	Polygon mon(M);
 	for (Pos& p : mon) std::cin >> p;
 	Polygon LH = lower_monotone_chain(mon);
