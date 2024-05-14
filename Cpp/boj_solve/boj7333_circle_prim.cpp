@@ -26,6 +26,7 @@ ld norm(ld th) {
 //#define DEBUG
 //#define ASSERT
 
+int P[LEN * LEN];
 struct Info {
 	int u, v;
 	ld c;
@@ -240,15 +241,31 @@ struct Seg {
 		os << "Seg[" << S.i + 1 << "] :: Seg.s : " << S.s << " Seg.e : " << S.e;
 		return os;
 	}
-	bool connectable(const Seg& S) const { return s == S.e || e == S.s; }
+	bool connectable(const Seg& S) const {
+		if (s == S.e && e == S.s) return 0;
+		return s == S.e || e == S.s;
+	}
 };
+Seg make_seg(const ld& lo, const ld& hi, const Circle& c, const int& i) {
+	Pos lo = Pos(1, 0).rot(lo) * c.r + c.c;
+	Pos hi = Pos(1, 0).rot(hi) * c.r + c.c;
+	return Seg(lo, hi, i);
+}
+typedef std::vector<Seg> Segs;
+bool make_polygon(Segs& SS) {
+	return 1;
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
+	std::cin >> N;
 
+	Segs segs;
+	T = 0;
 	for (int i = 0; i < N; i++) {
+		Circle& disk = disks[i];
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
 			Pos& ca = disks[i].c, cb = disks[j].c;
@@ -266,12 +283,12 @@ void solve() {
 			ld hi = rad(ca, HI);
 			Arc a1, a2;
 			if (lo <= hi) {
-				a1 = Arc(lo, hi, disks[i]);
+				a1 = Arc(lo, hi, disk);
 				arcs[i].push_back(a1);
 			}
 			else {
-				a1 = Arc(lo, PI * 2, disks[i]);
-				a2 = Arc(0, hi, disks[i]);
+				a1 = Arc(lo, PI * 2, disk);
+				a2 = Arc(0, hi, disk);
 				arcs[i].push_back(a1);
 				arcs[i].push_back(a2);
 			}
@@ -283,25 +300,38 @@ void solve() {
 			while (valid_arcs[i].size()) {
 				if (sign(valid_arcs[i].back().hi - a.lo) <= 0) break;
 				else {
-					if (sign(valid_arcs[i].back().lo - a.lo) >= 0) {
-						if (sign(r - valid_arcs[i].back().r) >= 0) valid_arcs[i].pop_back();
-						else {
-							lo = valid_arcs[i].back().hi;
-							break;
-						}
-					}
-					else {//valid_arcs.back().lo < a.lo;
-						if (sign(r - valid_arcs[i].back().r) >= 0) valid_arcs[i].back().hi = lo;
-						else lo = valid_arcs[i].back().hi;
-						break;
-					}
+					lo = valid_arcs[i].back().hi;
+					break;
 				}
 			}
-			//if (!sign(lo - hi)) continue;
-			valid_arcs[i].push_back(Arc(lo, hi, r));
+			valid_arcs[i].push_back(Arc(lo, hi, disks[i]));
+		}
+		std::sort(valid_arcs[i].begin(), valid_arcs[i].end());
+		int sz = valid_arcs[i].size();
+		for (int k = 0; k < sz; k++) {
+			Arc& cur = valid_arcs[i][k], nxt = valid_arcs[i][(k + 1) % sz];
+			if (!sign(cur.hi - nxt.lo))
+				segs.push_back(make_seg(cur.hi, nxt.lo, disk, T++));
 		}
 	}
 
+	memset(P, -1, sizeof P);
+	int sz = segs.size();
+	for (int i = 0; i < sz; i++) 
+		for (int j = i + 1; j < sz; j++) 
+			if (segs[i].connectable(segs[j])) join(P, i, j);
+
+	std::vector<Segs> V_segs(sz);
+	for (int i = 0; i < sz; i++) {
+		if (P[i] < 0) V_segs[i].push_back(segs[i]);
+		else V_segs[P[i]].push_back(segs[i]);
+	}
+
+	int cnt = 0;
+	for (int i = 0; i < sz; i++) 
+		cnt += make_polygon(V_segs[i]);
+	
+	std::cout << cnt << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj7333
