@@ -341,7 +341,7 @@ void query() {
 		int sz = valid_arcs[i].size();
 		for (int k = 0; k < sz; k++) {
 			Arc& cur = valid_arcs[i][k], nxt = valid_arcs[i][(k + 1) % sz];
-			if (!sign(cur.hi - nxt.lo))
+			if (sign(cur.hi - nxt.lo))
 				segs.push_back(make_seg(cur.hi, nxt.lo, disk, T++));
 		}
 	}
