@@ -252,8 +252,9 @@ Seg make_seg(const ld& lo, const ld& hi, const Circle& c, const int& i) {
 }
 typedef std::vector<Seg> Segs;
 bool polygon_area_check(Segs& SS) {
-	std::deque<Seg> dq;
 	int sz = SS.size();
+	if (sz <= 2) return 0;
+	std::deque<Seg> dq;
 	std::vector<bool> V(sz, 0);
 	for (int j = 0; j < sz; j++) {
 		for (int i = 0; i < sz; i++) {
@@ -263,18 +264,14 @@ bool polygon_area_check(Segs& SS) {
 				V[i] = 1;
 				break;
 			}
-			else if (dq[0].connectable(SS[i])) {
+			else if (dq[0].s == SS[i].e) {
 				V[i] = 1;
-				if (dq[0].s == SS[i].e)
-					dq.push_front(SS[i]);
-				else dq.push_back(SS[i]);
+				dq.push_front(SS[i]);
 				break;
 			}
-			else if (dq.back().connectable(SS[i])) {
+			else if (dq.back().e == SS[i].s) {
 				V[i] = 1;
-				if (dq.back().s == SS[i].e)
-					dq.push_front(SS[i]);
-				else dq.push_back(SS[i]);
+				dq.push_back(SS[i]);
 				break;
 			}
 		}
@@ -282,7 +279,6 @@ bool polygon_area_check(Segs& SS) {
 	int t = 0;
 	for (int i = 0; i < sz; i++) t += V[i];
 	assert(sz == t);
-	if (sz == 1) return 0;
 	if (dq[0].s != dq.back().e) return 0;
 	ld ret = 0;
 	for (Seg& S : dq) ret += cross(O, S.s, S.e);
