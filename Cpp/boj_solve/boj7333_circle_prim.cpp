@@ -246,9 +246,9 @@ struct Seg {
 	}
 };
 Seg make_seg(const ld& lo, const ld& hi, const Circle& c, const int& i) {
-	Pos lo = Pos(1, 0).rot(lo) * c.r + c.c;
-	Pos hi = Pos(1, 0).rot(hi) * c.r + c.c;
-	return Seg(lo, hi, i);
+	Pos LO = Pos(1, 0).rot(lo) * c.r + c.c;
+	Pos HI = Pos(1, 0).rot(hi) * c.r + c.c;
+	return Seg(LO, HI, i);
 }
 typedef std::vector<Seg> Segs;
 bool polygon_area_check(Segs& SS) {
