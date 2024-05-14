@@ -289,6 +289,10 @@ void query() {
 		arcs[i].clear(), valid_arcs[i].clear();
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> disks[i];
+	if (N <= 2) {
+		std::cout << "0\n";
+		return;
+	}
 	Segs segs;
 	T = 0;
 	for (int i = 0; i < N; i++) {
