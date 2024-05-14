@@ -252,7 +252,19 @@ Seg make_seg(const ld& lo, const ld& hi, const Circle& c, const int& i) {
 	return Seg(lo, hi, i);
 }
 typedef std::vector<Seg> Segs;
-bool make_polygon(Segs& SS) {
+bool polygon_area_check(Segs& SS) {
+	std::deque<Seg> dq;
+	int sz = SS.size();
+	std::vector<bool> V(sz, 0);
+	for (int j = 0; j < sz; j++) {
+		for (int i = 0; i < sz; i++) {
+			if (!dq.size()) {
+				dq.push_back(SS[i]);
+				V[i] = 1;
+				break;
+			}
+		}
+	}
 	return 1;
 }
 void solve() {
@@ -329,7 +341,7 @@ void solve() {
 
 	int cnt = 0;
 	for (int i = 0; i < sz; i++) 
-		cnt += make_polygon(V_segs[i]);
+		cnt += polygon_area_check(V_segs[i]);
 	
 	std::cout << cnt << "\n";
 	return;
