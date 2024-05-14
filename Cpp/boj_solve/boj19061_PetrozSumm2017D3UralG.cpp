@@ -17,8 +17,8 @@ ld A;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 ld norm(ld th) {
-	while (th < -TOL) th += PI * 2;
-	while (th > PI * 2) th -= PI * 2;
+	while (th < 0) th += PI * 2;
+	while (th > PI * 2 - TOL) th -= PI * 2;
 	return th;
 }
 
