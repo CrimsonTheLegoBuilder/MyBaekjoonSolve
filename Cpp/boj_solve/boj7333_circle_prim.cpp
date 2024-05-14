@@ -92,7 +92,6 @@ struct Pos {
 const Pos O = { 0, 0 };
 const Pos X_norm = { 1000, 0 };
 typedef std::vector<Pos> Polygon;
-Polygon H, V, HPI;//Hull, reVolve, HalfPlaneIntersection
 bool cmpt(const Pos& p, const Pos& q) { return p.t < q.t; }
 struct Vec {
 	ld vy, vx;
@@ -290,6 +289,8 @@ bool polygon_area_check(Segs& SS) {
 	return sign(ret) < 0;
 }
 void query() {
+	for (int i = 0; i < LEN; i++)
+		arcs[i].clear(), valid_arcs[i].clear();
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> disks[i];
 	Segs segs;
@@ -371,5 +372,6 @@ void solve() {
 	std::cout.precision(15);
 	std::cin >> Q;
 	while (Q--) query();
+	return;
 }
 int main() { solve(); return 0; }//boj7333
