@@ -304,10 +304,10 @@ void query() {
 			Pos vec = cb - ca;//vec a -> b
 			ld distance = vec.mag();
 			ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
-			Pos w = ca + vec * X / distance;
 			if (X > 1) continue;
-			ld ratio = sqrt(ra * ra - X * X);
-			Pos h = ~vec.unit() * X;
+			Pos w = ca + vec * X / distance;
+			ld ratio = sqrt(1 - X * X);
+			Pos h = ~vec.unit() * ratio;
 			Pos LO = ca + w - h;
 			Pos HI = ca + w + h;
 			ld lo = rad(ca, LO);
