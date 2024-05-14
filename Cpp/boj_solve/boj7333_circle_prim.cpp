@@ -306,7 +306,7 @@ void query() {
 			ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
 			if (X > 1) continue;
 			Pos w = ca + vec * X / distance;
-			ld ratio = sqrt(1 - X * X);
+			ld ratio = sqrt(ra * ra - X * X);
 			Pos h = ~vec.unit() * ratio;
 			Pos LO = ca + w - h;
 			Pos HI = ca + w + h;
