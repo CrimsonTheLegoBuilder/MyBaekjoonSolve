@@ -289,13 +289,9 @@ bool polygon_area_check(Segs& SS) {
 	for (Seg& S : dq) ret += cross(O, S.s, S.e);
 	return sign(ret) < 0;
 }
-void solve() {
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-	std::cout << std::fixed;
-	std::cout.precision(15);
+void query() {
 	std::cin >> N;
-
+	for (int i = 0; i < N; i++) std::cin >> disks[i];
 	Segs segs;
 	T = 0;
 	for (int i = 0; i < N; i++) {
@@ -367,5 +363,13 @@ void solve() {
 	
 	std::cout << cnt << "\n";
 	return;
+}
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(15);
+	std::cin >> Q;
+	while (Q--) query();
 }
 int main() { solve(); return 0; }//boj7333
