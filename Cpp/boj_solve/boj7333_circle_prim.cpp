@@ -283,9 +283,11 @@ bool polygon_area_check(Segs& SS) {
 	int t = 0;
 	for (int i = 0; i < sz; i++) t += V[i];
 	assert(sz == t);
+	if (sz == 1) return 0;
+	if (dq[0].s != dq.back().e) return 0;
 	ld ret = 0;
 	for (Seg& S : dq) ret += cross(O, S.s, S.e);
-	return 1;
+	return sign(ret) < 0;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
