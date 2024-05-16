@@ -96,10 +96,10 @@ struct Arc {
 	Circle cen;
 	Arc(ld LO = 0, ld HI = 0, Circle CEN = Circle(Pos(0, 0), 0)) : lo(LO), hi(HI), cen(CEN) {}
 	bool operator < (const Arc& a) const { return !sign(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-	ld area() const { return hi - lo * cen.r * cen.r; }
+	ld area() const { return (hi - lo) * cen.r * cen.r; }
 	ld green() const {
-		Pos LO = -Pos(1, 0).rot(lo) * cen.r;
-		Pos HI = Pos(1, 0).rot(hi) * cen.r;
+		Pos LO = -Pos(1000, 0).rot(lo) * cen.r / 1000;
+		Pos HI = Pos(1000, 0).rot(hi) * cen.r / 1000;
 		return (area() + cen.c / (HI + LO)) * .5;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi << " " << l.cen.r; return os; }
