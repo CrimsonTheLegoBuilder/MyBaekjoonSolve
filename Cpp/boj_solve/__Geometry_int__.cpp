@@ -249,7 +249,7 @@ void get_area_memo(Pos H[], ll memo[], const int& sz) {
 	memo[0] = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		memo[i + 1] = cross(O, cur, nxt) + memo[i];//memo[sz] == convex hull's area
+		memo[i + 1] = cross(Pos(0, 0), cur, nxt) + memo[i];//memo[sz] == convex hull's area
 	}
 	return;
 }
