@@ -14,13 +14,13 @@ const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 25;
 int N, M, T, Q;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
-ll sqr(ll x) { return x * x; }
-ld norm(ld th) {
+inline bool zero(const ld& x) { return std::abs(x) <= TOL; }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline ll sqr(ll x) { return x * x; }
+inline ld norm(ld th) {
 	while (th < 0) th += PI * 2;
-	//while (th > PI * 2 - TOL) th -= PI * 2;
-	while (th >= PI * 2) th -= PI * 2;
+	while (th > PI * 2 - TOL) th -= PI * 2;
+	//while (th >= PI * 2) th -= PI * 2;
 	return th;
 }
 
@@ -55,11 +55,11 @@ struct Pii {
 };
 const Pii Oii = { 0, 0 };
 const Pii INF_PT = { (int)INF, (int)INF };
-ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
-ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
-ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
-ll dot(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) * (d4 - d3); }
-int ccw(const Pii& d1, const Pii& d2, const Pii& d3) {
+inline ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
+inline ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
+inline ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
+inline ll dot(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) * (d4 - d3); }
+inline int ccw(const Pii& d1, const Pii& d2, const Pii& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
@@ -99,8 +99,8 @@ struct Pos {
 };
 const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
@@ -124,22 +124,23 @@ struct Circle {
 	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
-	ld A() const { return r * r * PI; }
+	inline ld A() const { return r * r * PI; }
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 };
-bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
+inline bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 typedef std::vector<Circle> Disks;
 struct Arc {
 	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
 	Circle cen;
 	Arc(ld LO = 0, ld HI = 0, Circle CEN = Circle(Pii(0, 0), 0)) : lo(LO), hi(HI), cen(CEN) {}
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-	ld area() const { return (hi - lo) * cen.r * cen.r; }
-	ld green() const {
+	inline ld area() const { return (hi - lo) * cen.r * cen.r; }
+	inline ld green() const {
 		Pos LO = -Pos(1, 0).rot(lo) * cen.r / 1;
 		Pos HI = Pos(1, 0).rot(hi) * cen.r / 1;
 		Pos vec = Pos(cen.c.x, cen.c.y);
+		//return (area() + vec / (HI + LO)) * .5;
 		int x = cen.c.x, y = cen.c.y, r = cen.r;
 		ld b = x * r * (sin(hi) - sin(lo));
 		ld d = y * r * (cos(lo) - cos(hi));
@@ -167,20 +168,22 @@ std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	if (zero(h)) return {};
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
-ld union_except_x(const int& x, std::vector<Circle>& VC) {
+inline ld union_except_x(const int& x, std::vector<Circle>& VC) {
 	ld union_area = 0;
 	int sz = VC.size();
 	std::vector<bool> V(sz, 0);
 	for (int i = 0; i < sz; i++) {
 		if (i == x || V[i]) continue;
-		Circle disk = VC[i];
-		Arcs arcs;
+		Circle& disk = VC[i];
+		Arcs arcs = {};
 		for (int j = 0; j < sz; j++) {
-			if (j == x || j == i || V[j] == 1) continue;
+			if (j == x || j == i || V[j]) continue;
 			Pii vec = VC[i].c - VC[j].c;
-			ll ra = VC[i].r, rb = VC[j].r;
+			int ra = VC[i].r, rb = VC[j].r;
 			//if (vec.Euc() >= sqr(ra + rb)) continue;
-			if (vec.Euc() <= sqr(ra - rb)) { V[j] = 1; continue; }
+			//if (vec.Euc() <= sqr(ra - rb)) { V[j] = 1; continue; }
+			//if (VC[j] < VC[i]) { V[j] = 1; continue; }
+			if (VC[j] < VC[i] || VC[i] == VC[j]) { V[j] = 1; continue; }
 			auto inx = intersection(VC[i], VC[j]);
 			//std::cout << inx.size() << "\n";
 			if (!inx.size()) continue;
@@ -210,7 +213,6 @@ ld union_except_x(const int& x, std::vector<Circle>& VC) {
 		arcs.push_back(Arc(2 * PI, 2 * PI, disk));
 		ld hi = 0;
 		for (const Arc& a : arcs) {
-			//std::cout << "arc[" << i << "] : " << a << "\n";
 			if (a.lo > hi) union_area += Arc(hi, a.lo, disk).green(), hi = a.hi;
 			else hi = std::max(hi, a.hi);
 		}
@@ -220,30 +222,11 @@ ld union_except_x(const int& x, std::vector<Circle>& VC) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//std::cout << std::fixed;
-	//std::cout.precision(3);
-
 	int ret = 0;
 	std::cin >> N;
-	std::vector<Circle> tmp(N);
-	std::vector<bool> V(N, 0);
-	for (Circle& c : tmp) std::cin >> c;
-	std::sort(tmp.begin(), tmp.end(), cmpr);
-	for (int i = 0; i < N; i++) {//remove
-		if (V[i]) continue;
-		for (int j = 0; j < N; j++) {
-			//if (i < j && tmp[i] == tmp[j]) V[i] = 1;
-			if (tmp[i] < tmp[j]) V[i] = 1;
-			if (tmp[j] < tmp[i]) V[j] = 1;
-		}
-	}
-
-	Disks VC;
-	for (int i = 0; i < N; i++) {
-		if (!V[i]) VC.push_back(tmp[i]);
-		if (V[i]) ret++;
-	}
-
+	Disks VC(N);
+	for (Circle& c : VC) std::cin >> c;
+	std::sort(VC.begin(), VC.end(), cmpr);
 	int sz = VC.size();
 	ld U = union_except_x(-1, VC);
 	for (int x = 0; x < sz; x++) {
