@@ -10,7 +10,7 @@ typedef long long ll;
 typedef double ld;
 //typedef long double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-15;
 const ld PI = acos(-1);
 const int LEN = 25;
 int N, M, T, Q;
@@ -180,7 +180,7 @@ inline ld union_except_x(const int& x, std::vector<Circle>& VC) {
 			if (j == x || j == i || V[j]) continue;
 			Pii vec = VC[i].c - VC[j].c;
 			int ra = VC[i].r, rb = VC[j].r;
-			//if (vec.Euc() >= sqr(ra + rb)) continue;
+			if (vec.Euc() >= sqr(ra + rb)) continue;
 			//if (vec.Euc() <= sqr(ra - rb)) { V[j] = 1; continue; }
 			//if (VC[j] < VC[i]) { V[j] = 1; continue; }
 			if (VC[j] < VC[i] || VC[i] == VC[j]) { V[j] = 1; continue; }
