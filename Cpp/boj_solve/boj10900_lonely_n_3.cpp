@@ -10,7 +10,7 @@ typedef long long ll;
 typedef double ld;
 //typedef long double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-9;
+const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 500;
 int N, M, T, Q;
@@ -19,7 +19,8 @@ inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline ll sq(int x) { return (ll)x * x; }
 inline ld norm(ld th) {
 	while (th < 0) th += PI * 2;
-	while (th > PI * 2 - TOL) th -= PI * 2;
+	//while (th > PI * 2 - TOL) th -= PI * 2;
+	while (th >= PI * 2) th -= PI * 2;
 	return th;
 }
 
@@ -136,21 +137,21 @@ struct Arc {
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
 	inline ld area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
 	inline ld green(const Circle& cen) const {
-		Pos LO = -Pos(1, 0).rot(lo) * cen.r;
-		Pos HI = Pos(1, 0).rot(hi) * cen.r;
-		Pos vec = Pos(cen.c.x, cen.c.y);
-		return (area(cen) + vec / (HI + LO)) * .5;
-		//int x = cen.c.x, y = cen.c.y, r = cen.r;
-		//ld b = 1. * x * r * (sin(hi) - sin(lo));
-		//ld d = 1. * y * r * (cos(lo) - cos(hi));
-		//return (area(cen) + b + d) * .5;
+		//Pos LO = -Pos(1, 0).rot(lo) * cen.r;
+		//Pos HI = Pos(1, 0).rot(hi) * cen.r;
+		//Pos vec = Pos(cen.c.x, cen.c.y);
+		//return (area(cen) + vec / (HI + LO)) * .5;
+		int x = cen.c.x, y = cen.c.y, r = cen.r;
+		ld b = 1. * x * r * (sin(hi) - sin(lo));
+		ld d = 1. * y * r * (cos(lo) - cos(hi));
+		return (area(cen) + b + d) * .5;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
 Arcs VA[LEN];
 bool V[LEN];
-inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
+std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	Pii ca = a.c, cb = b.c;
 	Pii vec = cb - ca;
 	ll ra = a.r, rb = b.r;
@@ -169,7 +170,7 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	if (zero(h)) return {};
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
-inline void arc_init(std::vector<Circle>& VC) {
+void arc_init(std::vector<Circle>& VC) {
 	std::sort(VC.begin(), VC.end(), cmpr);
 	memset(V, 0, sizeof V);
 	int sz = VC.size();
@@ -207,7 +208,7 @@ inline void arc_init(std::vector<Circle>& VC) {
 	}
 	return;
 }
-inline ld union_except_x(const int& x, std::vector<Circle>& VC) {
+ld union_except_x(const int& x, std::vector<Circle>& VC) {
 	ld union_area = 0;
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
@@ -227,7 +228,7 @@ inline ld union_except_x(const int& x, std::vector<Circle>& VC) {
 	}
 	return union_area;
 }
-inline void solve() {
+void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	int ret = 0;
@@ -285,5 +286,19 @@ int main() { solve(); return 0; }//boj10900 lonely mdic
 -1000 -1000 1414
 -1000 1000 1414
 0 0 1
+
+5
+0 0 1
+2 0 1
+4 0 1
+6 0 1
+8 0 1
+
+5
+0 0 1
+1 0 1
+2 0 1
+3 0 1
+4 0 1
 
 */
