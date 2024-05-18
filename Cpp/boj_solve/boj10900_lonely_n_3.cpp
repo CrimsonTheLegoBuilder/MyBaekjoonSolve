@@ -235,10 +235,10 @@ inline void solve() {
 	arc_init(VC);
 	int sz = VC.size();
 	ld U = union_except_x(-1, VC);
-	//std::cout << "U : " << U << "\n";
+	std::cout << "U : " << U << "\n";
 	for (int x = 0; x < sz; x++) {
 		ld A = union_except_x(x, VC);
-		//std::cout << "A : " << A << "\n";
+		std::cout << "A : " << A << "\n";
 		ret += zero(U - A);//no-dabwon
 	}
 	std::cout << ret << "\n";
