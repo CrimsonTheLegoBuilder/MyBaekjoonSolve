@@ -12,15 +12,15 @@ typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
-const int LEN = 500;
+const int LEN = 305;
 int N, M, T, Q;
 inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline ll sq(int x) { return (ll)x * x; }
 inline ld norm(ld th) {
 	while (th < 0) th += PI * 2;
-	//while (th > PI * 2 - TOL) th -= PI * 2;
-	while (th >= PI * 2) th -= PI * 2;
+	while (th > PI * 2 - TOL) th -= PI * 2;
+	//while (th >= PI * 2) th -= PI * 2;
 	return th;
 }
 
@@ -151,6 +151,7 @@ struct Arc {
 typedef std::vector<Arc> Arcs;
 Arcs VA[LEN];
 bool V[LEN];
+bool P[LEN];
 std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	Pii ca = a.c, cb = b.c;
 	Pii vec = cb - ca;
@@ -163,7 +164,6 @@ std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 
 	//2nd hyprblc law of cos
 	ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance * ra);
-	//if (X < -1 + TOL || X > 1 - TOL) return {};
 	if (X < -1) X = -1;
 	if (X > 1) X = 1;
 	ld h = acos(X);
@@ -173,18 +173,22 @@ std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 void arc_init(std::vector<Circle>& VC) {
 	std::sort(VC.begin(), VC.end(), cmpr);
 	memset(V, 0, sizeof V);
+	memset(P, 0, sizeof P);
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
 		if (V[i]) continue;
 		for (int j = 0; j < sz; j++) {
 			if (j == i || V[j]) continue;
-			Pii vec = VC[i].c - VC[j].c;
-			int ra = VC[i].r, rb = VC[j].r;
-			//if (vec.Euc() >= sq(ra + rb)) continue;
-			if (VC[j] < VC[i] || VC[j] == VC[i]) { V[j] = 1; continue; }
-			//if (vec.Euc() <= sq(ra - rb)) { V[j] = 1; continue; }
-			//if (vec.Euc() <= sqr(ra - rb) || VC[j] < VC[i]) { V[j] = 1; continue; }
-			//if (vec.Euc() <= sq(ra - rb) || VC[j] < VC[i] || VC[i] == VC[j]) { V[j] = 1; continue; }
+			if (VC[j] < VC[i]) V[j] = 1;
+			if (VC[j] == VC[i]) P[i] = 1, V[j] = 1;
+		}
+	}
+	for (int i = 0; i < sz; i++) {
+		if (V[i]) continue;
+		for (int j = 0; j < sz; j++) {
+			if (j == i || V[j]) continue;
+			//if (VC[j] < VC[i] || VC[j] == VC[i]) { V[j] = 1; continue; }
+	
 			auto inx = intersection(VC[i], VC[j]);
 			if (!inx.size()) continue;
 			ld lo = inx[0].x;
@@ -208,16 +212,11 @@ void arc_init(std::vector<Circle>& VC) {
 	}
 	return;
 }
-ld union_except_x(const int& x, std::vector<Circle>& VC) {
+ld union_except_x(const std::vector<Circle>& VC, const int& x = -1) {
 	ld union_area = 0;
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
 		if (i == x || V[i]) continue;
-
-		//if (VA[i].size() == 1 && VA[i][0].i == -2) {
-		//	union_area += VC[i].A();
-		//	continue;
-		//}
 
 		ld hi = 0;
 		for (const Arc& a : VA[i]) {
@@ -237,13 +236,15 @@ void solve() {
 	for (Circle& c : VC) std::cin >> c;
 	arc_init(VC);
 	int sz = VC.size();
-	ld U = union_except_x(-1, VC);
+	ld U = union_except_x(VC);
 	//std::cout << "U : " << U << "\n";
 	for (int x = 0; x < sz; x++) {
-		ld A = union_except_x(x, VC);
+		if (V[x]) { ret++; continue; }
+		ld A = union_except_x(VC, x);
 		//std::cout << "A : " << A << "\n";
 		ret += zero(U - A);//no-dabwon
 	}
+	for (int i = 0; i < sz; i++) if (P[i]) ret++;
 	std::cout << ret << "\n";
 }
 int main() { solve(); return 0; }//boj10900 lonely mdic
@@ -300,5 +301,22 @@ int main() { solve(); return 0; }//boj10900 lonely mdic
 2 0 1
 3 0 1
 4 0 1
+
+8
+-1 2 1000
+-2 1 1000
+-2 -1 1000
+-1 -2 1000
+1 -2 1000
+2 -1 1000
+2 1 1000
+1 2 1000
+
+5
+0 0 1
+0 0 1
+0 0 1
+0 0 1
+0 0 1
 
 */
