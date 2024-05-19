@@ -1071,8 +1071,23 @@
     <ClCompile Include="boj10900_lonely.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10900_lonely_int.cpp">
+    <ClCompile Include="boj10900_lonely_n_3.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj17804.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC354D.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC354A.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC354B.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ABC354C.cpp">
+      <Filter>소스 파일\AtCoder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
