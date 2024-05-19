@@ -42,8 +42,9 @@ struct Pii {
 	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
 	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
 	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pii operator - () const { return { -x, -y }; }
 	Pii operator ~ () const { return { -y, x }; }
-	Pii operator ! () const { return { -x, -y }; }
+	Pii operator ! () const { return { y, x }; }
 	ll xy() const { return (ll)x * y; }
 	inline ll Euc() const { return (ll)x * x + (ll)y * y; }
 	inline ld rad() const { return norm(atan2(y, x)); }
@@ -68,6 +69,7 @@ struct Pos {
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	inline Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
@@ -75,13 +77,13 @@ struct Pos {
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	inline ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
-	inline Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
+	inline Pos operator - () const { return { -x, -y }; }
+	Pos operator ~ () const { return { -y, x }; }
+	Pos operator ! () const { return { y, x }; }
 	ld xy() const { return x * y; }
 	inline Pos rot(ld the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
 	inline ld Euc() const { return x * x + y * y; }
