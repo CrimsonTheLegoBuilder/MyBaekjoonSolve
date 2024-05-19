@@ -135,14 +135,14 @@ struct Arc {
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
 	inline ld area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
 	inline ld green(const Circle& cen) const {
-		//Pos LO = -Pos(1, 0).rot(lo) * cen.r / 1;
-		//Pos HI = Pos(1, 0).rot(hi) * cen.r / 1;
-		//Pos vec = Pos(cen.c.x, cen.c.y);
-		//return (area() + vec / (HI + LO)) * .5;
-		int x = cen.c.x, y = cen.c.y, r = cen.r;
-		ld b = x * r * (sin(hi) - sin(lo));
-		ld d = y * r * (cos(lo) - cos(hi));
-		return (area(cen) + b + d) * .5;
+		Pos LO = -Pos(1, 0).rot(lo) * cen.r / 1;
+		Pos HI = Pos(1, 0).rot(hi) * cen.r / 1;
+		Pos vec = Pos(cen.c.x, cen.c.y);
+		return (area(cen) + vec / (HI + LO)) * .5;
+		//int x = cen.c.x, y = cen.c.y, r = cen.r;
+		//ld b = x * r * (sin(hi) - sin(lo));
+		//ld d = y * r * (cos(lo) - cos(hi));
+		//return (area(cen) + b + d) * .5;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi; return os; }
 };

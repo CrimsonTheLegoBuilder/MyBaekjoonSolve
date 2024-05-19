@@ -137,14 +137,14 @@ struct Arc {
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
 	inline ld area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
 	inline ld green(const Circle& cen) const {
-		//Pos LO = -Pos(1, 0).rot(lo) * cen.r;
-		//Pos HI = Pos(1, 0).rot(hi) * cen.r;
-		//Pos vec = Pos(cen.c.x, cen.c.y);
-		//return (area(cen) + vec / (HI + LO)) * .5;
-		int x = cen.c.x, y = cen.c.y, r = cen.r;
-		ld b = 1. * x * r * (sin(hi) - sin(lo));
-		ld d = 1. * y * r * (cos(lo) - cos(hi));
-		return (area(cen) + b + d) * .5;
+		Pos LO = -Pos(1, 0).rot(lo) * cen.r;
+		Pos HI = Pos(1, 0).rot(hi) * cen.r;
+		Pos vec = Pos(cen.c.x, cen.c.y);
+		return (area(cen) + vec / (HI + LO)) * .5;
+		//int x = cen.c.x, y = cen.c.y, r = cen.r;
+		//ld b = 1. * x * r * (sin(hi) - sin(lo));
+		//ld d = 1. * y * r * (cos(lo) - cos(hi));
+		//return (area(cen) + b + d) * .5;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi; return os; }
 };
@@ -170,24 +170,15 @@ std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	if (zero(h)) return {};
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
-void arc_init(std::vector<Circle>& VC) {
+inline void arc_init(std::vector<Circle>& VC) {
 	std::sort(VC.begin(), VC.end(), cmpr);
-	memset(V, 0, sizeof V);
-	memset(P, 0, sizeof P);
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
-		if (V[i]) continue;
 		for (int j = 0; j < sz; j++) {
-			if (j == i || V[j]) continue;
-			if (VC[j] < VC[i]) V[j] = 1;
-			if (VC[j] == VC[i]) P[i] = 1, V[j] = 1;
-		}
-	}
-	for (int i = 0; i < sz; i++) {
-		if (V[i]) continue;
-		for (int j = 0; j < sz; j++) {
-			if (j == i || V[j]) continue;
-			//if (VC[j] < VC[i] || VC[j] == VC[i]) { V[j] = 1; continue; }
+			Pii vec = VC[i].c - VC[j].c;
+			int ra = VC[i].r, rb = VC[j].r;
+			if (vec.Euc() >= sq(ra + rb)) continue;
+			if (vec.Euc() <= sq(ra - rb)) continue;
 	
 			auto inx = intersection(VC[i], VC[j]);
 			if (!inx.size()) continue;
@@ -212,22 +203,29 @@ void arc_init(std::vector<Circle>& VC) {
 	}
 	return;
 }
-ld union_except_x(const std::vector<Circle>& VC, const int& x = -1) {
-	ld union_area = 0;
+inline ld union_except_x(const std::vector<Circle>& VC, const int& x = -1) {
+	memset(V, 0, sizeof V);
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
 		if (i == x || V[i]) continue;
-
+		for (int j = 0; j < sz; j++) {
+			if (j == x || j == i || V[j]) continue;
+			if (VC[j] < VC[i] || VC[j] == VC[i]) { V[j] = 1; continue; }
+		}
+	}
+	ld union_area = 0;
+	for (int i = 0; i < sz; i++) {
+		if (i == x || V[i]) continue;
 		ld hi = 0;
 		for (const Arc& a : VA[i]) {
-			if (a.i == x) continue;
+			if (a.i == x || V[a.i]) continue;
 			if (a.lo > hi) union_area += Arc(hi, a.lo).green(VC[i]), hi = a.hi;
 			else hi = std::max(hi, a.hi);
 		}
 	}
 	return union_area;
 }
-void solve() {
+inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	int ret = 0;
@@ -237,14 +235,11 @@ void solve() {
 	arc_init(VC);
 	int sz = VC.size();
 	ld U = union_except_x(VC);
-	//std::cout << "U : " << U << "\n";
 	for (int x = 0; x < sz; x++) {
 		if (V[x]) { ret++; continue; }
 		ld A = union_except_x(VC, x);
-		//std::cout << "A : " << A << "\n";
 		ret += zero(U - A);//no-dabwon
 	}
-	for (int i = 0; i < sz; i++) if (P[i]) ret++;
 	std::cout << ret << "\n";
 }
 int main() { solve(); return 0; }//boj10900 lonely mdic
