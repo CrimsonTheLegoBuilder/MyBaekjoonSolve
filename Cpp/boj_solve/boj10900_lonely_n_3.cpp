@@ -204,8 +204,8 @@ inline ld union_except_x(const std::vector<Circle>& VC, const int& x = -1) {
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
 		if (i == x || V[i]) continue;
-		for (int j = 0; j < sz; j++) {
-			if (j == x || j == i || V[j]) continue;
+		for (int j = i + 1; j < sz; j++) {
+			if (j == x || V[j]) continue;
 			if (VC[j] < VC[i] || VC[j] == VC[i]) { V[j] = 1; continue; }
 		}
 	}
