@@ -14,5 +14,5 @@ fn main() {
     let C = b * 2 + c * 4;
     let mut ret = min(A, B);
     ret = min(ret, C);
-    println!("{}", ret);
+    //println!("{}", ret);
 }
