@@ -14,8 +14,8 @@ const ld ERAD = 6370;
 const int LEN = 600 + 25;//nC2(25) + 25
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 ld norm(ld& th) {
-	while (th < -TOL) th += PI * 2;
-	while (th > PI * 2) th -= PI * 2;
+	while (th < 0) th += PI * 2;
+	while (th > PI * 2 - TOL) th -= PI * 2;
 	return th;
 }
 
