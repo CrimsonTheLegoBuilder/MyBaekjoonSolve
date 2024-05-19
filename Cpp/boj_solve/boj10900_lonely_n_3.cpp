@@ -1,4 +1,3 @@
-//#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -20,12 +19,12 @@ inline ll sq(int x) { return (ll)x * x; }
 inline ld norm(ld th) {
 	while (th < 0) th += PI * 2;
 	while (th > PI * 2 - TOL) th -= PI * 2;
-	//while (th >= PI * 2) th -= PI * 2;
 	return th;
 }
 
 //#define DEBUG
 //#define ASSERT
+
 struct Pii {
 	int x, y;
 	Pii(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -69,14 +68,14 @@ struct Pos {
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	inline Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
 	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
-	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
+	inline ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
-	Pos operator - () const { return { -x, -y }; }
+	inline Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
@@ -87,7 +86,7 @@ struct Pos {
 	inline Pos rot(ld the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
 	inline ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
-	//ld mag() const { return hypotl(x, y); }
+	//ld mag() const { return hypot(x, y); }
 	Pos unit() const { return *this / mag(); }
 	inline ld rad() const { return norm(atan2(y, x)); }
 	inline friend ld rad(const Pos& p1, const Pos& p2) { return norm(atan2(p1 / p2, p1 * p2)); }
@@ -141,18 +140,13 @@ struct Arc {
 		Pos HI = Pos(1, 0).rot(hi) * cen.r;
 		Pos vec = Pos(cen.c.x, cen.c.y);
 		return (area(cen) + vec / (HI + LO)) * .5;
-		//int x = cen.c.x, y = cen.c.y, r = cen.r;
-		//ld b = 1. * x * r * (sin(hi) - sin(lo));
-		//ld d = 1. * y * r * (cos(lo) - cos(hi));
-		//return (area(cen) + b + d) * .5;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
 Arcs VA[LEN];
 bool V[LEN];
-bool P[LEN];
-std::vector<Pos> intersection(const Circle& a, const Circle& b) {
+inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	Pii ca = a.c, cb = b.c;
 	Pii vec = cb - ca;
 	ll ra = a.r, rb = b.r;
