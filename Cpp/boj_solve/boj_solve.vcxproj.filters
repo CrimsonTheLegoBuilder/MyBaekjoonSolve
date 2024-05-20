@@ -1068,15 +1068,6 @@
     <ClCompile Include="boj7333_circle_wtf.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10900_lonely.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj10900_lonely_n_3.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj17804.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="ABC354D.cpp">
       <Filter>소스 파일\AtCoder</Filter>
     </ClCompile>
@@ -1088,6 +1079,21 @@
     </ClCompile>
     <ClCompile Include="ABC354C.cpp">
       <Filter>소스 파일\AtCoder</Filter>
+    </ClCompile>
+    <ClCompile Include="boj17804_green.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj9598_green.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj10900_green.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj2835_prefix.cpp">
+      <Filter>소스 파일\prefix_sum</Filter>
+    </ClCompile>
+    <ClCompile Include="boj9598_green_modify.cpp">
+      <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

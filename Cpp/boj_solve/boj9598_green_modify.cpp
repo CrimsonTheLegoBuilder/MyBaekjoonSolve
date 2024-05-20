@@ -204,10 +204,10 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
 			if (!VO[i]) {
-				auto inx1 = intersection(OC[i], OC[j]);
-				auto inx2 = intersection(OC[i], IC[j]);
-				if (inx1.size() || inx2.size()) {
-					if (inx1.size() && inx2.size()) {//O && I
+				if (!VO[j] || !VI[j]) {
+					if (!VO[j] && !VI[j]) {//O && I
+						auto inx1 = intersection(OC[i], OC[j]);
+						auto inx2 = intersection(OC[i], IC[j]);
 						ld loo = inx1[0].x;
 						ld hio = inx1[0].y;
 						ld loi = inx2[0].x;
@@ -236,7 +236,8 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 							VAO.push_back(a1);
 						}
 					}//O && I
-					else if (inx1.size()) {//O
+					else if (!VO[j]) {//O
+						auto inx1 = intersection(OC[i], OC[j]);
 						ld lo = inx1[0].x;
 						ld hi = inx1[0].y;
 
@@ -252,7 +253,8 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 							VAO.push_back(a1);
 						}
 					}//O
-					else if (inx2.size()) {//I
+					else if (!VI[j]) {//I
+						auto inx2 = intersection(OC[i], IC[j]);
 						ld lo = inx2[0].x;
 						ld hi = inx2[0].y;
 
@@ -272,10 +274,10 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 			}//OC
 
 			if (!VI[i] && IC[i].r > 0) {
-				auto inx3 = intersection(IC[i], OC[j]);
-				auto inx4 = intersection(IC[i], IC[j]);
-				if (inx3.size() || inx4.size()) {
-					if (inx3.size() && inx4.size()) {//O && I
+				if (!VO[j] || !VI[j]) {
+					if (!VO[j] && !VI[j]) {//O && I
+						auto inx3 = intersection(IC[i], OC[j]);
+						auto inx4 = intersection(IC[i], IC[j]);
 						ld loo = inx3[0].x;
 						ld hio = inx3[0].y;
 						ld loi = inx4[0].x;
@@ -304,7 +306,8 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 							VAI.push_back(a1);
 						}
 					}//O && I
-					else if (inx3.size()) {//O
+					else if (!VO[j]) {//O
+						auto inx3 = intersection(IC[i], OC[j]);
 						ld lo = inx3[0].x;
 						ld hi = inx3[0].y;
 
@@ -320,7 +323,8 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 							VAI.push_back(a1);
 						}
 					}//O
-					else if (inx4.size()) {//I
+					else if (!VI[j]) {//I
+						auto inx4 = intersection(IC[i], IC[j]);
 						ld lo = inx4[0].x;
 						ld hi = inx4[0].y;
 
