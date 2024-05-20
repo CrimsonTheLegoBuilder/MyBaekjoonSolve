@@ -118,8 +118,8 @@ struct Circle {
 	bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
-		ll dist = sq(r - q.r);
-		return r < q.r && dist >= (c - q.c).Euc();
+		ll rsum = sq(r - q.r);
+		return r < q.r && rsum >= (c - q.c).Euc();
 	}
 	bool operator > (const Pii& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pii& p) const { return r + TOL > (c - p).mag(); }
