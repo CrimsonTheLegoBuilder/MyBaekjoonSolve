@@ -240,11 +240,73 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 						VAO.push_back(a1);
 					}
 				}
-
 			}
 
 			auto inx3 = intersection(IC[i], OC[j]);
 			auto inx4 = intersection(IC[i], IC[j]);
+			if (inx3.size() || inx4.size()) {
+				if (inx3.size() && inx4.size()) {
+					ld loo = inx3[0].x;
+					ld hio = inx3[0].y;
+					ld loi = inx4[0].x;
+					ld hii = inx4[0].y;
+
+					Arc a1, a2, a3, a4;
+					if (loo > loi) {
+						a1 = Arc(loo, 2 * PI, j);
+						a2 = Arc(0, loi, j);
+						VAI.push_back(a1);
+						VAI.push_back(a2);
+					}
+					else {
+						a1 = Arc(loo, loi, j);
+						VAI.push_back(a1);
+					}
+
+					if (hio > hii) {
+						a1 = Arc(hii, 2 * PI, j);
+						a2 = Arc(0, hio, j);
+						VAI.push_back(a1);
+						VAI.push_back(a2);
+					}
+					else {
+						a1 = Arc(hii, hio, j);
+						VAI.push_back(a1);
+					}
+				}
+				else if (inx3.size()) {
+					ld lo = inx3[0].x;
+					ld hi = inx3[0].y;
+
+					Arc a1, a2;
+					if (lo > hi) {
+						a1 = Arc(lo, 2 * PI, j);
+						a2 = Arc(0, hi, j);
+						VAI.push_back(a1);
+						VAI.push_back(a2);
+					}
+					else {
+						a1 = Arc(lo, hi, j);
+						VAI.push_back(a1);
+					}
+				}
+				else if (inx4.size()) {
+					ld lo = inx4[0].x;
+					ld hi = inx4[0].y;
+
+					Arc a1, a2;
+					if (hi > lo) {
+						a1 = Arc(hi, 2 * PI, j);
+						a2 = Arc(0, lo, j);
+						VAI.push_back(a1);
+						VAI.push_back(a2);
+					}
+					else {
+						a1 = Arc(hi, lo, j);
+						VAI.push_back(a1);
+					}
+				}
+			}
 
 		}
 
