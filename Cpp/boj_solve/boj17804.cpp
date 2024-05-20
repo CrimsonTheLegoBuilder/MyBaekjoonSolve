@@ -13,7 +13,7 @@ const ld TOL = 1e-8;
 const ld PI = acos(-1);
 const int LEN = 105;
 int N, M, T, Q;
-ld A;
+ld A, MIN;
 inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline ll sq(int x) { return (ll)x * x; }
@@ -220,7 +220,7 @@ inline ld union_area(std::vector<Circle>& VC) {
 	return union_area_;
 }
 inline ld bi_search(const ld& a, std::vector<Circle>& VC) {
-	ld s = 0, e = sqrt((a + 1) / PI), m;
+	ld s = 0, e = sqrt((a + 1) / PI) - MIN, m;
 	//int cnt = 50; while (cnt--) {
 	while (!zero(e - s)) {
 		m = (s + e) * .5;
@@ -239,8 +239,12 @@ inline void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(7);
 	std::cin >> N >> A;
+	MIN = 0;
 	Disks VC(N);
-	for (Circle& c : VC) std::cin >> c, c.r *= -1;
+	for (Circle& c : VC) {
+		std::cin >> c, c.r *= -1;
+		MIN = std::min(MIN, c.r);
+	}
 	std::cout << bi_search(A, VC) << "\n";
 }
 int main() { solve(); return 0; }//boj17804
