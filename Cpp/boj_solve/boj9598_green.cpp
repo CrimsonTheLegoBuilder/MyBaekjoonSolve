@@ -118,7 +118,7 @@ struct Circle {
 	bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
-		int dist = sq(r - q.r);
+		ll dist = sq(r - q.r);
 		return r < q.r && dist >= (c - q.c).Euc();
 	}
 	bool operator > (const Pii& p) const { return r > (c - p).mag(); }
@@ -148,7 +148,7 @@ struct Arc {
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
-bool V[LEN];
+bool VO[LEN], VI[LEN];
 inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	Pii ca = a.c, cb = b.c;
 	Pii vec = cb - ca;
@@ -168,148 +168,180 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
 inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
-	ld union_area_ = 0;
+	memset(VO, 0, sizeof VO);
+	memset(VI, 0, sizeof VI);
 	int sz = OC.size();
 	for (int i = 0; i < sz; i++) {
+		if (OC[i] == IC[i]) VO[i] = 1, VI[i] = 1;
+		for (int j = 0; j < sz; j++) {
+			if (i == j) continue;
+			if (OC[i] == IC[j]) VO[i] = 1, VI[j] = 1;
+			if (OC[j] == IC[i]) VO[j] = 1, VI[i] = 1;
+			if (i < j && OC[i] == OC[j]) VO[j] = 1;
+			if (i < j && IC[i] == IC[j]) VI[j] = 1;
+			if (IC[j] < OC[i] && OC[i] < OC[j]) VO[i] = 1;
+			if (IC[j] < IC[i] && IC[i] < OC[j]) VI[i] = 1;
+			if (IC[i] < OC[j] && OC[j] < OC[i]) VO[j] = 1;
+			if (IC[i] < IC[j] && IC[j] < OC[i]) VI[j] = 1;
+			Pii vec; ll ra, rb;
+			vec = OC[i].c - IC[j].c;
+			ra = OC[i].r, rb = IC[j].r;
+			if (vec.Euc() >= sq(ra + rb) && OC[i] < OC[j]) VO[i] = 1;
+			vec = IC[i].c - IC[j].c;
+			ra = IC[i].r, rb = IC[j].r;
+			if (vec.Euc() >= sq(ra + rb) && IC[i] < OC[j]) VI[i] = 1;
+			vec = OC[j].c - IC[i].c;
+			ra = OC[j].r, rb = IC[i].r;
+			if (vec.Euc() >= sq(ra + rb) && OC[j] < OC[i]) VO[j] = 1;
+			vec = IC[j].c - IC[i].c;
+			ra = IC[j].r, rb = IC[i].r;
+			if (vec.Euc() >= sq(ra + rb) && IC[j] < OC[i]) VI[j] = 1;
+		}
+	}
+	ld union_area_ = 0;
+	for (int i = 0; i < sz; i++) {
+		if (VO[i] && VI[i]) continue;//OUT && IN both swallowed
 		Arcs VAO;
 		Arcs VAI;
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
+			if (VO[j] && VI[j]) continue;//OUT && IN both swallowed
 
-			if (IC[j] < OC[i] && OC[i] < OC[j]) VAO.push_back(Arc(0, 2 * PI));
+			if (!VO[i]) {
+				auto inx1 = intersection(OC[i], OC[j]);
+				auto inx2 = intersection(OC[i], IC[j]);
+				if (inx1.size() || inx2.size()) {
+					if (inx1.size() && inx2.size()) {
+						ld loo = inx1[0].x;
+						ld hio = inx1[0].y;
+						ld loi = inx2[0].x;
+						ld hii = inx2[0].y;
 
-			auto inx1 = intersection(OC[i], OC[j]);
-			auto inx2 = intersection(OC[i], IC[j]);
-			if (inx1.size() || inx2.size()) {
-				if (inx1.size() && inx2.size()) {
-					ld loo = inx1[0].x;
-					ld hio = inx1[0].y;
-					ld loi = inx2[0].x;
-					ld hii = inx2[0].y;
+						Arc a1, a2;
+						if (loo > loi) {
+							a1 = Arc(loo, 2 * PI, j);
+							a2 = Arc(0, loi, j);
+							VAO.push_back(a1);
+							VAO.push_back(a2);
+						}
+						else {
+							a1 = Arc(loo, loi, j);
+							VAO.push_back(a1);
+						}
 
-					Arc a1, a2, a3, a4;
-					if (loo > loi) {
-						a1 = Arc(loo, 2 * PI, j);
-						a2 = Arc(0, loi, j);
-						VAO.push_back(a1);
-						VAO.push_back(a2);
-					}
-					else {
-						a1 = Arc(loo, loi, j);
-						VAO.push_back(a1);
-					}
+						if (hii > hio) {
+							a1 = Arc(hii, 2 * PI, j);
+							a2 = Arc(0, hio, j);
+							VAO.push_back(a1);
+							VAO.push_back(a2);
+						}
+						else {
+							a1 = Arc(hii, hio, j);
+							VAO.push_back(a1);
+						}
+					}//O && I
+					else if (inx1.size()) {
+						ld lo = inx1[0].x;
+						ld hi = inx1[0].y;
 
-					if (hio > hii) {
-						a1 = Arc(hii, 2 * PI, j);
-						a2 = Arc(0, hio, j);
-						VAO.push_back(a1);
-						VAO.push_back(a2);
-					}
-					else {
-						a1 = Arc(hii, hio, j);
-						VAO.push_back(a1);
-					}
+						Arc a1, a2;
+						if (lo > hi) {
+							a1 = Arc(lo, 2 * PI, j);
+							a2 = Arc(0, hi, j);
+							VAO.push_back(a1);
+							VAO.push_back(a2);
+						}
+						else {
+							a1 = Arc(lo, hi, j);
+							VAO.push_back(a1);
+						}
+					}//O
+					else if (inx2.size()) {
+						ld lo = inx2[0].x;
+						ld hi = inx2[0].y;
+
+						Arc a1, a2;
+						if (hi > lo) {
+							a1 = Arc(hi, 2 * PI, j);
+							a2 = Arc(0, lo, j);
+							VAO.push_back(a1);
+							VAO.push_back(a2);
+						}
+						else {
+							a1 = Arc(hi, lo, j);
+							VAO.push_back(a1);
+						}
+					}//I
 				}
-				else if (inx1.size()) {
-					ld lo = inx1[0].x;
-					ld hi = inx1[0].y;
+			}//OC
 
-					Arc a1, a2;
-					if (lo > hi) {
-						a1 = Arc(lo, 2 * PI, j);
-						a2 = Arc(0, hi, j);
-						VAO.push_back(a1);
-						VAO.push_back(a2);
-					}
-					else {
-						a1 = Arc(lo, hi, j);
-						VAO.push_back(a1);
-					}
+			if (!VI[i] && IC[i].r > 0) {
+				auto inx3 = intersection(IC[i], OC[j]);
+				auto inx4 = intersection(IC[i], IC[j]);
+				if (inx3.size() || inx4.size()) {
+					if (inx3.size() && inx4.size()) {
+						ld loo = inx3[0].x;
+						ld hio = inx3[0].y;
+						ld loi = inx4[0].x;
+						ld hii = inx4[0].y;
+
+						Arc a1, a2;
+						if (loo > loi) {
+							a1 = Arc(loo, 2 * PI, j);
+							a2 = Arc(0, loi, j);
+							VAI.push_back(a1);
+							VAI.push_back(a2);
+						}
+						else {
+							a1 = Arc(loo, loi, j);
+							VAI.push_back(a1);
+						}
+
+						if (hii > hio) {
+							a1 = Arc(hii, 2 * PI, j);
+							a2 = Arc(0, hio, j);
+							VAI.push_back(a1);
+							VAI.push_back(a2);
+						}
+						else {
+							a1 = Arc(hii, hio, j);
+							VAI.push_back(a1);
+						}
+					}//O && I
+					else if (inx3.size()) {
+						ld lo = inx3[0].x;
+						ld hi = inx3[0].y;
+
+						Arc a1, a2;
+						if (lo > hi) {
+							a1 = Arc(lo, 2 * PI, j);
+							a2 = Arc(0, hi, j);
+							VAI.push_back(a1);
+							VAI.push_back(a2);
+						}
+						else {
+							a1 = Arc(lo, hi, j);
+							VAI.push_back(a1);
+						}
+					}//O
+					else if (inx4.size()) {
+						ld lo = inx4[0].x;
+						ld hi = inx4[0].y;
+
+						Arc a1, a2;
+						if (hi > lo) {
+							a1 = Arc(hi, 2 * PI, j);
+							a2 = Arc(0, lo, j);
+							VAI.push_back(a1);
+							VAI.push_back(a2);
+						}
+						else {
+							a1 = Arc(hi, lo, j);
+							VAI.push_back(a1);
+						}
+					}//I
 				}
-				else if (inx2.size()) {
-					ld lo = inx2[0].x;
-					ld hi = inx2[0].y;
-
-					Arc a1, a2;
-					if (hi > lo) {
-						a1 = Arc(hi, 2 * PI, j);
-						a2 = Arc(0, lo, j);
-						VAO.push_back(a1);
-						VAO.push_back(a2);
-					}
-					else {
-						a1 = Arc(hi, lo, j);
-						VAO.push_back(a1);
-					}
-				}
-			}
-
-			auto inx3 = intersection(IC[i], OC[j]);
-			auto inx4 = intersection(IC[i], IC[j]);
-			if (inx3.size() || inx4.size()) {
-				if (inx3.size() && inx4.size()) {
-					ld loo = inx3[0].x;
-					ld hio = inx3[0].y;
-					ld loi = inx4[0].x;
-					ld hii = inx4[0].y;
-
-					Arc a1, a2, a3, a4;
-					if (loo > loi) {
-						a1 = Arc(loo, 2 * PI, j);
-						a2 = Arc(0, loi, j);
-						VAI.push_back(a1);
-						VAI.push_back(a2);
-					}
-					else {
-						a1 = Arc(loo, loi, j);
-						VAI.push_back(a1);
-					}
-
-					if (hio > hii) {
-						a1 = Arc(hii, 2 * PI, j);
-						a2 = Arc(0, hio, j);
-						VAI.push_back(a1);
-						VAI.push_back(a2);
-					}
-					else {
-						a1 = Arc(hii, hio, j);
-						VAI.push_back(a1);
-					}
-				}
-				else if (inx3.size()) {
-					ld lo = inx3[0].x;
-					ld hi = inx3[0].y;
-
-					Arc a1, a2;
-					if (lo > hi) {
-						a1 = Arc(lo, 2 * PI, j);
-						a2 = Arc(0, hi, j);
-						VAI.push_back(a1);
-						VAI.push_back(a2);
-					}
-					else {
-						a1 = Arc(lo, hi, j);
-						VAI.push_back(a1);
-					}
-				}
-				else if (inx4.size()) {
-					ld lo = inx4[0].x;
-					ld hi = inx4[0].y;
-
-					Arc a1, a2;
-					if (hi > lo) {
-						a1 = Arc(hi, 2 * PI, j);
-						a2 = Arc(0, lo, j);
-						VAI.push_back(a1);
-						VAI.push_back(a2);
-					}
-					else {
-						a1 = Arc(hi, lo, j);
-						VAI.push_back(a1);
-					}
-				}
-			}
-
+			}//IC
 		}
 
 		std::sort(VAO.begin(), VAO.end());
@@ -318,15 +350,21 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 		VAI.push_back(Arc(2 * PI, 2 * PI, -2));
 
 		ld hi;
-		hi = 0;
-		for (const Arc& a : VAO) {
-			if (a.lo > hi) union_area_ += Arc(hi, a.lo).green(OC[i]), hi = a.hi;
-			else hi = std::max(hi, a.hi);
+		if (!VO[i]) {
+			hi = 0;
+			for (const Arc& a : VAO) {
+				if (VI[a.i]) continue;
+				if (a.lo > hi) union_area_ += Arc(hi, a.lo).green(OC[i]), hi = a.hi;
+				else hi = std::max(hi, a.hi);
+			}
 		}
-		hi = 0;
-		for (const Arc& a : VAI) {
-			if (a.lo > hi) union_area_ -= Arc(hi, a.lo).green(IC[i]), hi = a.hi;
-			else hi = std::max(hi, a.hi);
+		if (!VI[i] && IC[i].r > 0) {
+			hi = 0;
+			for (const Arc& a : VAI) {
+				if (VI[a.i]) continue;
+				if (a.lo > hi) union_area_ -= Arc(hi, a.lo).green(IC[i]), hi = a.hi;
+				else hi = std::max(hi, a.hi);
+			}
 		}
 	}
 	return union_area_;
@@ -347,7 +385,7 @@ inline void solve() {
 			Circle c;
 			std::cin >> c >> d;
 			OC[i] = Circle(c.c, c.r + d);
-			IC[i] = Circle(c.c, c.r - d);
+			IC[i] = Circle(c.c, std::max(0, c.r - d));
 		}
 		std::cout << union_area(OC, IC) << "\n";
 	}
