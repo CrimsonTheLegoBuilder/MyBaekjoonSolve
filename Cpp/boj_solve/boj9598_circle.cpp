@@ -172,12 +172,11 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 	int sz = OC.size();
 	for (int i = 0; i < sz; i++) {
 		Arcs VAO;
+		Arcs VAI;
 		for (int j = 0; j < sz; j++) {
-			if (j == i || V[j]) continue;
-
-
-			auto inx1 = intersection(IC[i], IC[j]);
-			auto inx2 = intersection(IC[i], OC[j]);
+			if (j == i) continue;
+			auto inx1 = intersection(OC[i], IC[j]);
+			auto inx2 = intersection(OC[i], OC[j]);
 			if (!inx1.size() && !inx2.size()) continue;
 			ld lo = inx1[0].x;
 			ld hi = inx1[0].y;
@@ -196,11 +195,19 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 		}
 
 		std::sort(VAO.begin(), VAO.end());
+		std::sort(VAI.begin(), VAI.end());
 		VAO.push_back(Arc(2 * PI, 2 * PI, -2));
+		VAI.push_back(Arc(2 * PI, 2 * PI, -2));
 
-		ld hi = 0;
+		ld hi;
+		hi = 0;
 		for (const Arc& a : VAO) {
 			if (a.lo > hi) union_area_ += Arc(hi, a.lo).green(OC[i]), hi = a.hi;
+			else hi = std::max(hi, a.hi);
+		}
+		hi = 0;
+		for (const Arc& a : VAI) {
+			if (a.lo > hi) union_area_ -= Arc(hi, a.lo).green(IC[i]), hi = a.hi;
 			else hi = std::max(hi, a.hi);
 		}
 	}
