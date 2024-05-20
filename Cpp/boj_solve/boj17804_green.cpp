@@ -27,44 +27,6 @@ inline ld norm(ld th) {
 //#define DEBUG
 //#define ASSERT
 
-struct Pii {
-	int x, y;
-	Pii(int X = 0, int Y = 0) : x(X), y(Y) {}
-	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
-	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
-	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
-	bool operator <= (const Pii& p) const { return x == p.x ? y <= p.y : x <= p.x; }
-	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
-	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
-	Pii operator * (const int& n) const { return { x * n, y * n }; }
-	Pii operator / (const int& n) const { return { x / n, y / n }; }
-	ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
-	ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
-	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
-	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-	Pii operator - () const { return { -x, -y }; }
-	Pii operator ~ () const { return { -y, x }; }
-	Pii operator ! () const { return { y, x }; }
-	ll xy() const { return (ll)x * y; }
-	inline ll Euc() const { return (ll)x * x + (ll)y * y; }
-	inline ld rad() const { return norm(atan2(y, x)); }
-	int Man() const { return std::abs(x) + std::abs(y); }
-	ld mag() const { return hypot(x, y); }
-	inline friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
-};
-const Pii Oii = { 0, 0 };
-const Pii INF_PT = { (int)INF, (int)INF };
-inline ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
-inline ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
-inline ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
-inline ll dot(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) * (d4 - d3); }
-inline int ccw(const Pii& d1, const Pii& d2, const Pii& d3) {
-	ll ret = cross(d1, d2, d3);
-	return !ret ? 0 : ret > 0 ? 1 : -1;
-}
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -101,29 +63,16 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 };
 const Pos O = Pos(0, 0);
-typedef std::vector<Pos> Polygon;
-inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = cross(d1, d2, d3);
-	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-}
-Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
-	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
-	return (p1 * a2 + p2 * a1) / (a1 + a2);
-}
 struct Circle {
-	Pii c;
+	Pos c;
 	ld r;
-	Circle(Pii C = Pii(0, 0), int R = 0) : c(C), r(R) {}
+	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& C) const { return c == C.c && zero(r - C.r); }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
 		ld dist = sqr(r - q.r);
 		return r < q.r && dist >(c - q.c).Euc() - TOL;
 	}
-	bool operator > (const Pii& p) const { return r > (c - p).mag(); }
-	bool operator >= (const Pii& p) const { return r + TOL > (c - p).mag(); }
-	bool operator < (const Pii& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
@@ -150,8 +99,8 @@ struct Arc {
 typedef std::vector<Arc> Arcs;
 bool V[LEN];
 inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
-	Pii ca = a.c, cb = b.c;
-	Pii vec = cb - ca;
+	Pos ca = a.c, cb = b.c;
+	Pos vec = cb - ca;
 	ld ra = a.r, rb = b.r;
 	ld distance = vec.mag();
 	ld rd = vec.rad();
@@ -185,7 +134,7 @@ inline ld union_area(std::vector<Circle>& VC) {
 		Arcs VA;
 		for (int j = 0; j < sz; j++) {
 			if (j == i || V[j]) continue;
-			Pii vec = VC[i].c - VC[j].c;
+			Pos vec = VC[i].c - VC[j].c;
 			ld ra = VC[i].r, rb = VC[j].r;
 			if (vec.Euc() > sqr(ra + rb) - TOL) continue;
 			if (vec.Euc() < sqr(ra - rb) + TOL) continue;

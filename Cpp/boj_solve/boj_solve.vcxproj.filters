@@ -1092,9 +1092,6 @@
     <ClCompile Include="boj2835_prefix.cpp">
       <Filter>소스 파일\prefix_sum</Filter>
     </ClCompile>
-    <ClCompile Include="boj9598_green_modify.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
