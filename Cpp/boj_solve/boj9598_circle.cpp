@@ -113,13 +113,13 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 }
 struct Circle {
 	Pii c;
-	ld r;
+	int r;
 	Circle(Pii C = Pii(0, 0), int R = 0) : c(C), r(R) {}
-	bool operator == (const Circle& C) const { return c == C.c && zero(r - C.r); }
+	bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
-		ld dist = sqr(r - q.r);
-		return r < q.r && dist >(c - q.c).Euc() - TOL;
+		int dist = sq(r - q.r);
+		return r < q.r && dist >= (c - q.c).Euc()
 	}
 	bool operator > (const Pii& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pii& p) const { return r + TOL > (c - p).mag(); }
@@ -152,12 +152,12 @@ bool V[LEN];
 inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	Pii ca = a.c, cb = b.c;
 	Pii vec = cb - ca;
-	ld ra = a.r, rb = b.r;
+	ll ra = a.r, rb = b.r;
 	ld distance = vec.mag();
 	ld rd = vec.rad();
 
-	if (vec.Euc() > sqr(ra + rb) - TOL) return {};
-	if (vec.Euc() < sqr(ra - rb) + TOL) return {};
+	if (vec.Euc() >= sq(ra + rb)) return {};
+	if (vec.Euc() <= sq(ra - rb)) return {};
 
 	//2nd hyprblc law of cos
 	ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance * ra);
@@ -170,7 +170,6 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 inline ld union_area(std::vector<Circle>& VC) {
 	std::sort(VC.begin(), VC.end(), cmpr);
 	memset(V, 0, sizeof V);
-
 	ld union_area_ = 0;
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
@@ -186,9 +185,9 @@ inline ld union_area(std::vector<Circle>& VC) {
 		for (int j = 0; j < sz; j++) {
 			if (j == i || V[j]) continue;
 			Pii vec = VC[i].c - VC[j].c;
-			ld ra = VC[i].r, rb = VC[j].r;
-			if (vec.Euc() > sqr(ra + rb) - TOL) continue;
-			if (vec.Euc() < sqr(ra - rb) + TOL) continue;
+			ll ra = VC[i].r, rb = VC[j].r;
+			if (vec.Euc() >= sq(ra + rb)) continue;
+			if (vec.Euc() <= sq(ra - rb)) continue;
 
 			auto inx = intersection(VC[i], VC[j]);
 			if (!inx.size()) continue;
@@ -219,33 +218,21 @@ inline ld union_area(std::vector<Circle>& VC) {
 	}
 	return union_area_;
 }
-inline ld bi_search(const ld& a, std::vector<Circle>& VC) {
-	ld s = 0, e = sqrt((a + 1) / PI) - MIN, m;
-	//int cnt = 50; while (cnt--) {
-	while (!zero(e - s)) {
-		m = (s + e) * .5;
-		std::vector<Circle> VVC;
-		for (Circle& c : VC)
-			if (c.r + m > 0)
-				VVC.push_back(Circle(c.c, c.r + m));
-		if (union_area(VVC) > a) e = m;
-		else s = m;
-	}
-	return s;
-}
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(7);
-	std::cin >> N >> A;
-	MIN = 0;
-	Disks VC(N);
-	for (Circle& c : VC) {
-		std::cin >> c, c.r *= -1;
-		MIN = std::min(MIN, c.r);
+	std::cin >> T;
+	while (T--) {
+		std::cout << "Case " << ++M << ": ";
+		std::cin >> N;
+		Disks VC(N);
+		int d;
+		for (Circle& c : VC) std::cin >> c >> d;
+		std::cout << union_area(VC) << "\n";
 	}
-	std::cout << bi_search(A, VC) << "\n";
+	return;
 }
 int main() { solve(); return 0; }//boj17804
 
