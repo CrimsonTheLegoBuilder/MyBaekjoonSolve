@@ -176,9 +176,38 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
 
-			auto inx1 = intersection(OC[i], IC[j]);
-			auto inx2 = intersection(OC[i], OC[j]);
+			auto inx1 = intersection(OC[i], OC[j]);
+			auto inx2 = intersection(OC[i], IC[j]);
 			if (inx1.size() || inx2.size()) {
+				if (inx1.size() && inx2.size()) {
+					ld loo = inx1[0].x;
+					ld hio = inx1[0].y;
+					ld loi = inx2[0].x;
+					ld hii = inx2[0].y;
+
+					Arc a1, a2, a3, a4;
+					if (loo > loi) {
+						a1 = Arc(loo, 2 * PI, j);
+						a2 = Arc(0, loi, j);
+						VAO.push_back(a1);
+						VAO.push_back(a2);
+					}
+					else {
+						a1 = Arc(loo, loi, j);
+						VAO.push_back(a1);
+					}
+
+					if (hio > hii) {
+						a1 = Arc(hii, 2 * PI, j);
+						a2 = Arc(0, hio, j);
+						VAO.push_back(a1);
+						VAO.push_back(a2);
+					}
+					else {
+						a1 = Arc(hii, hio, j);
+						VAO.push_back(a1);
+					}
+				}
 				ld lo = inx1[0].x;
 				ld hi = inx1[0].y;
 
@@ -195,8 +224,8 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 				}
 			}
 
-			auto inx3 = intersection(IC[i], IC[j]);
-			auto inx4 = intersection(IC[i], OC[j]);
+			auto inx3 = intersection(IC[i], OC[j]);
+			auto inx4 = intersection(IC[i], IC[j]);
 			if (inx3.size() || inx4.size()) {
 				ld lo = inx1[0].x;
 				ld hi = inx1[0].y;
