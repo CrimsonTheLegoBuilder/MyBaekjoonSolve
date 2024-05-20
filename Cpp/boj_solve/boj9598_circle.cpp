@@ -175,22 +175,43 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 		Arcs VAI;
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
+
 			auto inx1 = intersection(OC[i], IC[j]);
 			auto inx2 = intersection(OC[i], OC[j]);
-			if (!inx1.size() && !inx2.size()) continue;
-			ld lo = inx1[0].x;
-			ld hi = inx1[0].y;
+			if (inx1.size() || inx2.size()) {
+				ld lo = inx1[0].x;
+				ld hi = inx1[0].y;
 
-			Arc a1, a2;
-			if (lo > hi) {
-				a1 = Arc(lo, 2 * PI, j);
-				a2 = Arc(0, hi, j);
-				VAO.push_back(a1);
-				VAO.push_back(a2);
+				Arc a1, a2;
+				if (lo > hi) {
+					a1 = Arc(lo, 2 * PI, j);
+					a2 = Arc(0, hi, j);
+					VAO.push_back(a1);
+					VAO.push_back(a2);
+				}
+				else {
+					a1 = Arc(lo, hi, j);
+					VAO.push_back(a1);
+				}
 			}
-			else {
-				a1 = Arc(lo, hi, j);
-				VAO.push_back(a1);
+
+			auto inx3 = intersection(IC[i], IC[j]);
+			auto inx4 = intersection(IC[i], OC[j]);
+			if (inx3.size() || inx4.size()) {
+				ld lo = inx1[0].x;
+				ld hi = inx1[0].y;
+
+				Arc a1, a2;
+				if (lo > hi) {
+					a1 = Arc(lo, 2 * PI, j);
+					a2 = Arc(0, hi, j);
+					VAO.push_back(a1);
+					VAO.push_back(a2);
+				}
+				else {
+					a1 = Arc(lo, hi, j);
+					VAO.push_back(a1);
+				}
 			}
 		}
 
