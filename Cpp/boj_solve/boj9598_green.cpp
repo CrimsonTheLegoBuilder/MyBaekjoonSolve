@@ -181,13 +181,13 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 			if (i < j && OC[i] == OC[j]) VO[j] = 1;
 			if (i < j && IC[i] == IC[j]) VI[j] = 1;
 			if (OC[i] == IC[j]) VO[i] = 1, VI[j] = 1;
-			if (OC[j] == IC[i]) VO[j] = 1, VI[i] = 1;
-			if (IC[j] < OC[i] && OC[i] < OC[j]) VO[i] = 1;
-			if (IC[j] < IC[i] && IC[i] < OC[j]) VI[i] = 1;
+			//if (OC[j] == IC[i]) VO[j] = 1, VI[i] = 1;
+			//if (IC[j] < OC[i] && OC[i] < OC[j]) VO[i] = 1;
+			//if (IC[j] < IC[i] && IC[i] < OC[j]) VI[i] = 1;
 			if (IC[i] < OC[j] && OC[j] < OC[i]) VO[j] = 1;
 			if (IC[i] < IC[j] && IC[j] < OC[i]) VI[j] = 1;
-			if (IC[j] ^ OC[i] && OC[i] < OC[j]) VO[i] = 1;
-			if (IC[j] ^ IC[i] && IC[i] < OC[j]) VI[i] = 1;
+			//if (IC[j] ^ OC[i] && OC[i] < OC[j]) VO[i] = 1;
+			//if (IC[j] ^ IC[i] && IC[i] < OC[j]) VI[i] = 1;
 			if (IC[i] ^ OC[j] && OC[j] < OC[i]) VO[j] = 1;
 			if (IC[i] ^ IC[j] && IC[j] < OC[i]) VI[j] = 1;
 		}
