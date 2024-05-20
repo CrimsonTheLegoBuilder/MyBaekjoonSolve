@@ -167,20 +167,10 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	if (zero(h)) return {};
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
-inline ld union_area(std::vector<Circle>& VC) {
-	std::sort(VC.begin(), VC.end(), cmpr);
-	memset(V, 0, sizeof V);
+inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 	ld union_area_ = 0;
-	int sz = VC.size();
+	int sz = OC.size();
 	for (int i = 0; i < sz; i++) {
-		if (V[i]) continue;
-		for (int j = i + 1; j < sz; j++) {
-			if (V[j]) continue;
-			if (VC[j] < VC[i] || VC[j] == VC[i]) V[j] = 1;
-		}
-	}
-	for (int i = 0; i < sz; i++) {
-		if (V[i]) continue;
 		Arcs VA;
 		for (int j = 0; j < sz; j++) {
 			if (j == i || V[j]) continue;
@@ -224,13 +214,19 @@ inline void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(7);
 	std::cin >> T;
+	M = 0;
 	while (T--) {
 		std::cout << "Case " << ++M << ": ";
 		std::cin >> N;
-		Disks VC(N);
+		Disks OC(N), IC(N);
 		int d;
-		for (Circle& c : VC) std::cin >> c >> d;
-		std::cout << union_area(VC) << "\n";
+		for (int i = 0; i < N; i++) {
+			Circle c;
+			std::cin >> c >> d;
+			OC[i] = Circle(c.c, c.r + d);
+			IC[i] = Circle(c.c, c.r - d);
+		}
+		std::cout << union_area(OC, IC) << "\n";
 	}
 	return;
 }
