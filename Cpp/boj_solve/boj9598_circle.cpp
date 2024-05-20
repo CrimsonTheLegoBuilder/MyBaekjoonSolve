@@ -171,38 +171,36 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 	ld union_area_ = 0;
 	int sz = OC.size();
 	for (int i = 0; i < sz; i++) {
-		Arcs VA;
+		Arcs VAO;
 		for (int j = 0; j < sz; j++) {
 			if (j == i || V[j]) continue;
-			Pii vec = VC[i].c - VC[j].c;
-			ll ra = VC[i].r, rb = VC[j].r;
-			if (vec.Euc() >= sq(ra + rb)) continue;
-			if (vec.Euc() <= sq(ra - rb)) continue;
 
-			auto inx = intersection(VC[i], VC[j]);
-			if (!inx.size()) continue;
-			ld lo = inx[0].x;
-			ld hi = inx[0].y;
+
+			auto inx1 = intersection(IC[i], IC[j]);
+			auto inx2 = intersection(IC[i], OC[j]);
+			if (!inx1.size() && !inx2.size()) continue;
+			ld lo = inx1[0].x;
+			ld hi = inx1[0].y;
 
 			Arc a1, a2;
 			if (lo > hi) {
 				a1 = Arc(lo, 2 * PI, j);
 				a2 = Arc(0, hi, j);
-				VA.push_back(a1);
-				VA.push_back(a2);
+				VAO.push_back(a1);
+				VAO.push_back(a2);
 			}
 			else {
 				a1 = Arc(lo, hi, j);
-				VA.push_back(a1);
+				VAO.push_back(a1);
 			}
 		}
 
-		std::sort(VA.begin(), VA.end());
-		VA.push_back(Arc(2 * PI, 2 * PI, -2));
+		std::sort(VAO.begin(), VAO.end());
+		VAO.push_back(Arc(2 * PI, 2 * PI, -2));
 
 		ld hi = 0;
-		for (const Arc& a : VA) {
-			if (a.lo > hi) union_area_ += Arc(hi, a.lo).green(VC[i]), hi = a.hi;
+		for (const Arc& a : VAO) {
+			if (a.lo > hi) union_area_ += Arc(hi, a.lo).green(OC[i]), hi = a.hi;
 			else hi = std::max(hi, a.hi);
 		}
 	}
