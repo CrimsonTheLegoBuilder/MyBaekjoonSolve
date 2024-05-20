@@ -231,6 +231,7 @@ inline void solve() {
 	arc_init(VC);
 	int sz = VC.size();
 	ld U = union_except_x(VC);
+	std::cout << U << "\n";
 	for (int x = 0; x < sz; x++) {
 		if (V[x]) { ret++; continue; }
 		ld A = union_except_x(VC, x);

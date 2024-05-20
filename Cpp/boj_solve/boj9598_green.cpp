@@ -117,9 +117,13 @@ struct Circle {
 	Circle(Pii C = Pii(0, 0), int R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
-	bool operator < (const Circle& q) const {
-		ll rsum = sq(r - q.r);
-		return r < q.r && rsum >= (c - q.c).Euc();
+	inline bool operator < (const Circle& q) const {
+		ll rsub = sq(r - q.r);
+		return r < q.r && rsub >= (c - q.c).Euc();
+	}
+	inline bool operator ^ (const Circle& q) const {
+		ll rsum = sq(r + q.r);
+		return rsum <= (c - q.c).Euc();
 	}
 	bool operator > (const Pii& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pii& p) const { return r + TOL > (c - p).mag(); }
@@ -135,8 +139,8 @@ inline bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort d
 typedef std::vector<Circle> Disks;
 struct Arc {
 	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
-	int i;
-	Arc(ld LO = 0, ld HI = 0, int I = -1) : lo(LO), hi(HI), i(I) {}
+	//int i;
+	Arc(ld LO = 0, ld HI = 0) : lo(LO), hi(HI) {}
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
 	inline ld area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
 	inline ld green(const Circle& cen) const {
@@ -172,32 +176,26 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 	memset(VI, 0, sizeof VI);
 	int sz = OC.size();
 	for (int i = 0; i < sz; i++) {
-		if (OC[i] == IC[i]) VO[i] = 1, VI[i] = 1;
 		for (int j = 0; j < sz; j++) {
 			if (i == j) continue;
-			if (OC[i] == IC[j]) VO[i] = 1, VI[j] = 1;
-			if (OC[j] == IC[i]) VO[j] = 1, VI[i] = 1;
 			if (i < j && OC[i] == OC[j]) VO[j] = 1;
 			if (i < j && IC[i] == IC[j]) VI[j] = 1;
+			if (OC[i] == IC[j]) VO[i] = 1, VI[j] = 1;
+			if (OC[j] == IC[i]) VO[j] = 1, VI[i] = 1;
 			if (IC[j] < OC[i] && OC[i] < OC[j]) VO[i] = 1;
 			if (IC[j] < IC[i] && IC[i] < OC[j]) VI[i] = 1;
 			if (IC[i] < OC[j] && OC[j] < OC[i]) VO[j] = 1;
 			if (IC[i] < IC[j] && IC[j] < OC[i]) VI[j] = 1;
-			Pii vec; ll ra, rb;
-			vec = OC[i].c - IC[j].c;
-			ra = OC[i].r, rb = IC[j].r;
-			if (vec.Euc() >= sq(ra + rb) && OC[i] < OC[j]) VO[i] = 1;
-			vec = IC[i].c - IC[j].c;
-			ra = IC[i].r, rb = IC[j].r;
-			if (vec.Euc() >= sq(ra + rb) && IC[i] < OC[j]) VI[i] = 1;
-			vec = OC[j].c - IC[i].c;
-			ra = OC[j].r, rb = IC[i].r;
-			if (vec.Euc() >= sq(ra + rb) && OC[j] < OC[i]) VO[j] = 1;
-			vec = IC[j].c - IC[i].c;
-			ra = IC[j].r, rb = IC[i].r;
-			if (vec.Euc() >= sq(ra + rb) && IC[j] < OC[i]) VI[j] = 1;
+			if (IC[j] ^ OC[i] && OC[i] < OC[j]) VO[i] = 1;
+			if (IC[j] ^ IC[i] && IC[i] < OC[j]) VI[i] = 1;
+			if (IC[i] ^ OC[j] && OC[j] < OC[i]) VO[j] = 1;
+			if (IC[i] ^ IC[j] && IC[j] < OC[i]) VI[j] = 1;
 		}
 	}
+#ifdef DEBUG
+	for (int i = 0; i < sz; i++)
+		std::cout << "V[" << i << "] : " << VO[i] << " " << VI[i] << "\n";
+#endif
 	ld union_area_ = 0;
 	for (int i = 0; i < sz; i++) {
 		if (VO[i] && VI[i]) continue;//OUT && IN both swallowed
@@ -205,13 +203,11 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 		Arcs VAI;
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
-			if (VO[j] && VI[j]) continue;//OUT && IN both swallowed
-
 			if (!VO[i]) {
 				auto inx1 = intersection(OC[i], OC[j]);
 				auto inx2 = intersection(OC[i], IC[j]);
 				if (inx1.size() || inx2.size()) {
-					if (inx1.size() && inx2.size()) {
+					if (inx1.size() && inx2.size()) {//O && I
 						ld loo = inx1[0].x;
 						ld hio = inx1[0].y;
 						ld loi = inx2[0].x;
@@ -219,56 +215,56 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 
 						Arc a1, a2;
 						if (loo > loi) {
-							a1 = Arc(loo, 2 * PI, j);
-							a2 = Arc(0, loi, j);
+							a1 = Arc(loo, 2 * PI);
+							a2 = Arc(0, loi);
 							VAO.push_back(a1);
 							VAO.push_back(a2);
 						}
 						else {
-							a1 = Arc(loo, loi, j);
+							a1 = Arc(loo, loi);
 							VAO.push_back(a1);
 						}
 
 						if (hii > hio) {
-							a1 = Arc(hii, 2 * PI, j);
-							a2 = Arc(0, hio, j);
+							a1 = Arc(hii, 2 * PI);
+							a2 = Arc(0, hio);
 							VAO.push_back(a1);
 							VAO.push_back(a2);
 						}
 						else {
-							a1 = Arc(hii, hio, j);
+							a1 = Arc(hii, hio);
 							VAO.push_back(a1);
 						}
 					}//O && I
-					else if (inx1.size()) {
+					else if (inx1.size()) {//O
 						ld lo = inx1[0].x;
 						ld hi = inx1[0].y;
 
 						Arc a1, a2;
 						if (lo > hi) {
-							a1 = Arc(lo, 2 * PI, j);
-							a2 = Arc(0, hi, j);
+							a1 = Arc(lo, 2 * PI);
+							a2 = Arc(0, hi);
 							VAO.push_back(a1);
 							VAO.push_back(a2);
 						}
 						else {
-							a1 = Arc(lo, hi, j);
+							a1 = Arc(lo, hi);
 							VAO.push_back(a1);
 						}
 					}//O
-					else if (inx2.size()) {
+					else if (inx2.size()) {//I
 						ld lo = inx2[0].x;
 						ld hi = inx2[0].y;
 
 						Arc a1, a2;
 						if (hi > lo) {
-							a1 = Arc(hi, 2 * PI, j);
-							a2 = Arc(0, lo, j);
+							a1 = Arc(hi, 2 * PI);
+							a2 = Arc(0, lo);
 							VAO.push_back(a1);
 							VAO.push_back(a2);
 						}
 						else {
-							a1 = Arc(hi, lo, j);
+							a1 = Arc(hi, lo);
 							VAO.push_back(a1);
 						}
 					}//I
@@ -279,7 +275,7 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 				auto inx3 = intersection(IC[i], OC[j]);
 				auto inx4 = intersection(IC[i], IC[j]);
 				if (inx3.size() || inx4.size()) {
-					if (inx3.size() && inx4.size()) {
+					if (inx3.size() && inx4.size()) {//O && I
 						ld loo = inx3[0].x;
 						ld hio = inx3[0].y;
 						ld loi = inx4[0].x;
@@ -287,56 +283,56 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 
 						Arc a1, a2;
 						if (loo > loi) {
-							a1 = Arc(loo, 2 * PI, j);
-							a2 = Arc(0, loi, j);
+							a1 = Arc(loo, 2 * PI);
+							a2 = Arc(0, loi);
 							VAI.push_back(a1);
 							VAI.push_back(a2);
 						}
 						else {
-							a1 = Arc(loo, loi, j);
+							a1 = Arc(loo, loi);
 							VAI.push_back(a1);
 						}
 
 						if (hii > hio) {
-							a1 = Arc(hii, 2 * PI, j);
-							a2 = Arc(0, hio, j);
+							a1 = Arc(hii, 2 * PI);
+							a2 = Arc(0, hio);
 							VAI.push_back(a1);
 							VAI.push_back(a2);
 						}
 						else {
-							a1 = Arc(hii, hio, j);
+							a1 = Arc(hii, hio);
 							VAI.push_back(a1);
 						}
 					}//O && I
-					else if (inx3.size()) {
+					else if (inx3.size()) {//O
 						ld lo = inx3[0].x;
 						ld hi = inx3[0].y;
 
 						Arc a1, a2;
 						if (lo > hi) {
-							a1 = Arc(lo, 2 * PI, j);
-							a2 = Arc(0, hi, j);
+							a1 = Arc(lo, 2 * PI);
+							a2 = Arc(0, hi);
 							VAI.push_back(a1);
 							VAI.push_back(a2);
 						}
 						else {
-							a1 = Arc(lo, hi, j);
+							a1 = Arc(lo, hi);
 							VAI.push_back(a1);
 						}
 					}//O
-					else if (inx4.size()) {
+					else if (inx4.size()) {//I
 						ld lo = inx4[0].x;
 						ld hi = inx4[0].y;
 
 						Arc a1, a2;
 						if (hi > lo) {
-							a1 = Arc(hi, 2 * PI, j);
-							a2 = Arc(0, lo, j);
+							a1 = Arc(hi, 2 * PI);
+							a2 = Arc(0, lo);
 							VAI.push_back(a1);
 							VAI.push_back(a2);
 						}
 						else {
-							a1 = Arc(hi, lo, j);
+							a1 = Arc(hi, lo);
 							VAI.push_back(a1);
 						}
 					}//I
@@ -346,22 +342,22 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 
 		std::sort(VAO.begin(), VAO.end());
 		std::sort(VAI.begin(), VAI.end());
-		VAO.push_back(Arc(2 * PI, 2 * PI, -2));
-		VAI.push_back(Arc(2 * PI, 2 * PI, -2));
+		VAO.push_back(Arc(2 * PI, 2 * PI));
+		VAI.push_back(Arc(2 * PI, 2 * PI));
 
 		ld hi;
 		if (!VO[i]) {
 			hi = 0;
+			//std::cout << "DEBUG::" << i << "\n";
 			for (const Arc& a : VAO) {
-				if (VI[a.i]) continue;
 				if (a.lo > hi) union_area_ += Arc(hi, a.lo).green(OC[i]), hi = a.hi;
 				else hi = std::max(hi, a.hi);
 			}
 		}
 		if (!VI[i] && IC[i].r > 0) {
 			hi = 0;
+			//std::cout << "DEBUG::" << i << "\n";
 			for (const Arc& a : VAI) {
-				if (VI[a.i]) continue;
 				if (a.lo > hi) union_area_ -= Arc(hi, a.lo).green(IC[i]), hi = a.hi;
 				else hi = std::max(hi, a.hi);
 			}
@@ -377,7 +373,6 @@ inline void solve() {
 	std::cin >> T;
 	M = 0;
 	while (T--) {
-		std::cout << "Case " << ++M << ": ";
 		std::cin >> N;
 		Disks OC(N), IC(N);
 		int d;
@@ -387,9 +382,70 @@ inline void solve() {
 			OC[i] = Circle(c.c, c.r + d);
 			IC[i] = Circle(c.c, std::max(0, c.r - d));
 		}
+		std::cout << "Case " << ++M << ": ";
 		std::cout << union_area(OC, IC) << "\n";
 	}
 	return;
 }
 int main() { solve(); return 0; }//boj17804
 
+/*
+
+2
+1
+0 0 10 1
+2
+0 0 7 1
+13 0 10 1
+
+Case 1: 125.6637061
+Case 2: 205.4749312
+
+1
+3
+0 0 1 1
+0 0 3 1
+0 0 5 1
+
+Case 1: 113.0973355
+
+2
+6
+0 0 1 1
+0 0 3 1
+0 0 5 1
+6 0 1 1
+6 0 3 1
+6 0 5 1
+2
+0 0 3 3
+6 0 3 3
+
+Case 1: 181.9733619
+Case 2: 181.9733619
+
+2
+4
+0 0 3 1
+0 0 5 1
+6 0 3 1
+6 0 5 1
+2
+0 0 4 2
+6 0 4 2
+
+Case 1: 168.5156109
+Case 2: 168.5156109
+
+1
+6
+0 0 1 1
+0 0 4 1
+0 0 7 1
+0 0 10 1
+0 0 13 1
+0 0 16 1
+
+Case 1: 640.8849013
+
+*/
