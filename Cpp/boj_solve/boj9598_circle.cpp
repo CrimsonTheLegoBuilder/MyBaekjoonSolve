@@ -176,6 +176,8 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
 
+			if (IC[j] < OC[i] && OC[i] < OC[j]) VAO.push_back(Arc(0, 2 * PI));
+
 			auto inx1 = intersection(OC[i], OC[j]);
 			auto inx2 = intersection(OC[i], IC[j]);
 			if (inx1.size() || inx2.size()) {
