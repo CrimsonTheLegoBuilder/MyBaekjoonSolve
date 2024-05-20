@@ -208,40 +208,44 @@ inline ld union_area(std::vector<Circle>& OC, std::vector<Circle>& IC) {
 						VAO.push_back(a1);
 					}
 				}
-				ld lo = inx1[0].x;
-				ld hi = inx1[0].y;
+				else if (inx1.size()) {
+					ld lo = inx1[0].x;
+					ld hi = inx1[0].y;
 
-				Arc a1, a2;
-				if (lo > hi) {
-					a1 = Arc(lo, 2 * PI, j);
-					a2 = Arc(0, hi, j);
-					VAO.push_back(a1);
-					VAO.push_back(a2);
+					Arc a1, a2;
+					if (lo > hi) {
+						a1 = Arc(lo, 2 * PI, j);
+						a2 = Arc(0, hi, j);
+						VAO.push_back(a1);
+						VAO.push_back(a2);
+					}
+					else {
+						a1 = Arc(lo, hi, j);
+						VAO.push_back(a1);
+					}
 				}
-				else {
-					a1 = Arc(lo, hi, j);
-					VAO.push_back(a1);
+				else if (inx2.size()) {
+					ld lo = inx2[0].x;
+					ld hi = inx2[0].y;
+
+					Arc a1, a2;
+					if (hi > lo) {
+						a1 = Arc(hi, 2 * PI, j);
+						a2 = Arc(0, lo, j);
+						VAO.push_back(a1);
+						VAO.push_back(a2);
+					}
+					else {
+						a1 = Arc(hi, lo, j);
+						VAO.push_back(a1);
+					}
 				}
+
 			}
 
 			auto inx3 = intersection(IC[i], OC[j]);
 			auto inx4 = intersection(IC[i], IC[j]);
-			if (inx3.size() || inx4.size()) {
-				ld lo = inx1[0].x;
-				ld hi = inx1[0].y;
 
-				Arc a1, a2;
-				if (lo > hi) {
-					a1 = Arc(lo, 2 * PI, j);
-					a2 = Arc(0, hi, j);
-					VAO.push_back(a1);
-					VAO.push_back(a2);
-				}
-				else {
-					a1 = Arc(lo, hi, j);
-					VAO.push_back(a1);
-				}
-			}
 		}
 
 		std::sort(VAO.begin(), VAO.end());
