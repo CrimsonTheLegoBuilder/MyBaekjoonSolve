@@ -12,18 +12,21 @@ int N, M, I, J, K; ll X, Y;
 int a, b, c;
 ll d;
 ll arr[LEN], tree[LEN << 2], lazy[LEN << 2];
-struct Seq {
-	int i, j;
-	ll x, y;
-	Seq(int I = 0, int J = 0, ll X = 0, ll Y = 0) : i(I), j(J), x(X), y(Y) {}
-};
 struct Node {
-	int llen; ll lstep;
-	int rlen; ll rstep;
-	int all; ll astep;
-	Node(int L = 0, ll LS = 0, int R = 0, ll RS = 0, int A = 0, ll AS = 0) : 
-		llen(L), lstep(LS), rlen(R), rstep(RS), all(A), astep(AS) {}
-
+	int llen;
+	int rlen;
+	int all;
+	int lmax;
+	Node(int L = 0, int R = 0, int A = 0, int M = 0) : 
+		llen(L), rlen(R), all(A), lmax(M) {}
+	Node operator + (const Node r) const {
+		return Node(
+			std::max(llen, all + r.llen),
+			std::max(rlen + r.all, r.rlen),
+			all + r.all,
+			std::max(lmax, r.lmax, rlen + r.llen)
+		);
+	}
 };
 void lazy_propagate(int s, int e, int i) {
 	if (lazy[i]) {
