@@ -13,9 +13,11 @@ int a, b, c;
 ll d;
 ll arr[LEN], tree[LEN << 2], lazy[LEN << 2];
 struct Node {
-	int l_len, r_len;
-	bool all;
-	Node(int L = 0, int R = 0, bool A = 0) : l_len(L), r_len(R), all(A) {}
+	int llen; ll lstep;
+	int rlen; ll rstep;
+	int all; ll astep;
+	Node(int L = 0, ll LS = 0, int R = 0, ll RS = 0, int A = 0, ll AS = 0) : 
+		llen(L), lstep(LS), rlen(R), rstep(RS), all(A), astep(AS) {}
 
 };
 void lazy_propagate(int s, int e, int i) {
