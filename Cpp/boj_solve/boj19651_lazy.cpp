@@ -12,22 +12,18 @@ int N, M, I, J, K; ll X, Y;
 int a, b, c;
 ll d;
 ll arr[LEN], tree[LEN << 2], lazy[LEN << 2];
-struct Node {
-	int llen;
-	int rlen;
-	int all;
-	int lmax;
-	Node(int L = 0, int R = 0, int A = 0, int M = 0) : 
-		llen(L), rlen(R), all(A), lmax(M) {}
-	Node operator + (const Node r) const {
-		return Node(
-			std::max(llen, all + r.llen),
-			std::max(rlen + r.all, r.rlen),
-			all + r.all,
-			std::max(lmax, r.lmax, rlen + r.llen)
-		);
+struct LenNode {//segment tree for cal subsequence max len
+	ll max, llen, rlen, all;
+	LenNode(ll M = 0, ll L = 0, ll R = 0, ll A = 0) : max(M), llen(L), rlen(R), all(A) {}
+	LenNode operator + (const LenNode& r) const {
+		return {
+			std::max({max, r.max, rlen + r.llen}),
+			std::max({llen, all + r.llen}),
+			std::max({rlen + r.all, r.rlen}),
+			all + r.all
+		};
 	}
-};
+} seg_len[LEN << 1];
 void lazy_propagate(int s, int e, int i) {
 	if (lazy[i]) {
 		tree[i] += lazy[i] * ((ll)e - s + 1);
