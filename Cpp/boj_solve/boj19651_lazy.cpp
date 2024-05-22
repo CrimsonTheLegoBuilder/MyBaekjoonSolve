@@ -8,10 +8,15 @@ typedef long long ll;
 const int LEN = 1e5 + 5;
 const ll INF = 1e17;
 
-int N, M, K;
+int N, M, I, J, K; ll X, Y;
 int a, b, c;
 ll d;
 ll arr[LEN], tree[LEN << 2], lazy[LEN << 2];
+struct Seq {
+	int i, j;
+	ll x, y;
+	Seq(int I = 0, int J = 0, ll X = 0, ll Y = 0) : i(I), j(J), x(X), y(Y) {}
+};
 struct Node {
 	int llen; ll lstep;
 	int rlen; ll rstep;
@@ -70,15 +75,13 @@ void solve() {
 	init();
 	int cnt = M;
 	while (cnt--) {
-		std::cin >> a;
+		std::cin >> a >> I >> J;
 		if (a == 1) {
-			std::cin >> b >> c >> d;
-			if (c < b) std::swap(b, c);
-			update(b, c, d);
+			std::cin >> X >> Y;
+			update(I, J, X);
 		}
 		else if (a == 2) {
-			std::cin >> b;
-			std::cout << search(b, b) << "\n";
+			std::cout << search(I, J) << "\n";
 		}
 	}
 	return;
