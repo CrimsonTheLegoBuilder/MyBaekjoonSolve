@@ -35,7 +35,7 @@ Node init(int s = 1, int e = N, int i = 1) {
 	int m = s + e >> 1;
 	return len_seg[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
 }
-Node update(const int& idx, const int& v, int s = 0, int e = N - 1, int i = 1) {
+Node update(const int& idx, const int& v, int s = 1, int e = N, int i = 1) {
 	if (e < idx || idx < s) return;
 	if (s == e) return len_seg[i] = node(v);
 	int m = s + e >> 1;
