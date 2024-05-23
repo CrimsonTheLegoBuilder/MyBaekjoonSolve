@@ -21,7 +21,7 @@ struct Node {//segment tree for cal subsequence max len
 	int max, llen, rlen;
 	bool all;
 	Node(int M = 0, int L = 0, int R = 0, bool A = 0) : max(M), llen(L), rlen(R), all(A) {}
-	Node operator + (const Node& r) const {
+	inline Node operator + (const Node& r) const {
 		return {
 			std::max({max, r.max, rlen + r.llen}),
 			all ? max + r.llen : llen,
@@ -49,13 +49,10 @@ inline void update_len(const int& i, const int& j, const ll& x, const ll& y) {
 		Seq(j, -x - y * (j - i + 1)),
 		Seq(j + 1, x + y * (j - i))
 	};
-	//for (const Seq& s : seq) {
-	//	//if (!step[s.i]) update(s.i, 1, 2, N - 1);
-	//	//step[s.i] += s.diff;
-	//	//if (!step[s.i]) update(s.i, 0, 2, N - 1);
-	//}
-	for (const Seq& s : seq)
-		step[s.i] += s.diff, update(s.i, step[s.i], 2, N - 1);
+	for (const Seq& s : seq) {
+		step[s.i] += s.diff;
+		if (s.diff) update(s.i, step[s.i], 2, N - 1);
+	}
 	return;
 }
 Node search(const int& l, const int& r, int s = 1, int e = N, int i = 1) {
