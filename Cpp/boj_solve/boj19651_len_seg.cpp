@@ -9,7 +9,7 @@ const int LEN = 1e5 + 5;
 const ll INF = 1e17;
 
 int N, M, I, J, K; ll X, Y;
-ll arr[LEN], step[LEN];// , tree[LEN << 2], lazy[LEN << 2];
+ll arr[LEN], step[LEN];
 struct Seq {
 	int i;
 	ll diff;
@@ -36,7 +36,7 @@ Node init(int s = 1, int e = N, int i = 1) {
 	return len_seg[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
 }
 Node update(const int& idx, const int& v, int s = 1, int e = N, int i = 1) {
-	if (e < idx || idx < s) return;
+	if (e < idx || idx < s) return len_seg[i];
 	if (s == e) return len_seg[i] = node(v);
 	int m = s + e >> 1;
 	return len_seg[i] = update(idx, v, s, m, i << 1) + update(idx, v, m + 1, e, i << 1 | 1);
