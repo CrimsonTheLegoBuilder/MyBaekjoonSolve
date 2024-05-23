@@ -29,7 +29,7 @@ struct Node {//segment tree for cal subsequence max len
 		};
 	}
 } len_seg[LEN << 1];
-inline Node node(const int& x) { return Node(!x, !x, !x, !x); }
+inline Node node(const ll& x) { return Node(!x, !x, !x, !x); }
 Node init(int s = 1, int e = N, int i = 1) {
 	if (s == e) return len_seg[i] = node(step[s]);
 	int m = s + e >> 1;
