@@ -8,7 +8,8 @@ typedef long long ll;
 const int LEN = 1e5 + 5;
 const ll INF = 1e17;
 
-int N, M, I, J, K; ll X, Y;
+int N, M, Q, I, J, K;
+ll X, Y;
 ll arr[LEN], step[LEN];
 struct Seq {
 	int i;
@@ -25,7 +26,7 @@ struct Node {//segment tree for cal subsequence max len
 			std::max({max, r.max, rlen + r.llen}),
 			all ? max + r.llen : llen,
 			r.all ? rlen + r.max : r.rlen,
-			all & r.all
+			all && r.all
 		};
 	}
 } len_seg[LEN << 1];
@@ -41,18 +42,20 @@ Node update(const int& idx, const ll& v, int s = 1, int e = N, int i = 1) {
 	int m = s + e >> 1;
 	return len_seg[i] = update(idx, v, s, m, i << 1) + update(idx, v, m + 1, e, i << 1 | 1);
 }
-void update_len(const int& i, const int& j, const ll& x, const ll& y) {
+inline void update_len(const int& i, const int& j, const ll& x, const ll& y) {
 	Sequence seq = {
 		Seq(i - 1, x),
 		Seq(i, -x + y),
 		Seq(j, -x - y * (j - i + 1)),
 		Seq(j + 1, x + y * (j - i))
 	};
-	for (const Seq& s : seq) {
-		if (!step[s.i]) update(s.i, 1, 2, N - 1);
-		step[s.i] += s.diff;
-		if (!step[s.i]) update(s.i, 0, 2, N - 1);
-	}
+	//for (const Seq& s : seq) {
+	//	//if (!step[s.i]) update(s.i, 1, 2, N - 1);
+	//	//step[s.i] += s.diff;
+	//	//if (!step[s.i]) update(s.i, 0, 2, N - 1);
+	//}
+	for (const Seq& s : seq)
+		step[s.i] += s.diff, update(s.i, step[s.i], 2, N - 1);
 	return;
 }
 Node search(const int& l, const int& r, int s = 1, int e = N, int i = 1) {
@@ -61,7 +64,7 @@ Node search(const int& l, const int& r, int s = 1, int e = N, int i = 1) {
 	int m = s + e >> 1;
 	return search(l, r, s, m, i << 1) + search(l, r, m + 1, e, i << 1 | 1);
 }
-void solve() {
+inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> N;
@@ -79,11 +82,11 @@ void solve() {
 	 * 
 	 */
 	init(2, N - 1);
-	int cnt = M, a;
-	while (cnt--) {
-		std::cin >> a >> I >> J;
-		if (a == 1)	std::cin >> X >> Y, update_len(I, J, X, Y);
-		else if (a == 2) std::cout << search(I + 1, J - 1, 2, N - 1).max + 2 << "\n";
+	std::cin >> M;
+	while (M--) {
+		std::cin >> Q >> I >> J;
+		if (Q == 1)	std::cin >> X >> Y, update_len(I, J, X, Y);
+		else if (Q == 2) std::cout << search(I + 1, J - 1, 2, N - 1).max + 2 << "\n";
 	}
 	return;
 }
