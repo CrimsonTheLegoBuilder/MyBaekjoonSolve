@@ -55,7 +55,7 @@ void update_len(const int& i, const int& j, const ll& x, const ll& y) {
 	}
 	return;
 }
-Node search(const int& l, const int& r, int s = 0, int e = N - 1, int i = 1) {
+Node search(const int& l, const int& r, int s = 1, int e = N, int i = 1) {
 	if (r < s || e < l) return Node(0, 0, 0, 0);
 	if (l <= s && e <= r) return len_seg[i];
 	int m = s + e >> 1;
@@ -83,7 +83,7 @@ void solve() {
 	while (cnt--) {
 		std::cin >> a >> I >> J;
 		if (a == 1)	std::cin >> X >> Y, update_len(I, J, X, Y);
-		else if (a == 2) std::cout << search(I + 1, J - 1).max + 2 << "\n";
+		else if (a == 2) std::cout << search(I + 1, J - 1, 2, N - 1).max + 2 << "\n";
 	}
 	return;
 }
