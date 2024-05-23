@@ -35,11 +35,11 @@ Node init(int s = 1, int e = N, int i = 1) {
 	int m = s + e >> 1;
 	return len_seg[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
 }
-Node update(const int& idx, const int& v, int s = 0, int e = N - 1, int n = 1) {
+Node update(const int& idx, const int& v, int s = 0, int e = N - 1, int i = 1) {
 	if (e < idx || idx < s) return;
-	if (s == e) return len_seg[n] = node(v);
+	if (s == e) return len_seg[i] = node(v);
 	int m = s + e >> 1;
-	return len_seg[n] = update(idx, v, s, m, n << 1) + update(idx, v, m + 1, e, n << 1 | 1);
+	return len_seg[i] = update(idx, v, s, m, i << 1) + update(idx, v, m + 1, e, i << 1 | 1);
 }
 void update_len(const int& i, const int& j, const ll& x, const ll& y) {
 	Sequence seq = {
@@ -55,11 +55,11 @@ void update_len(const int& i, const int& j, const ll& x, const ll& y) {
 	}
 	return;
 }
-Node search(const int& l, const int& r, int s = 0, int e = N - 1, int n = 1) {
+Node search(const int& l, const int& r, int s = 0, int e = N - 1, int i = 1) {
 	if (r < s || e < l) return Node(0, 0, 0, 0);
-	if (l <= s && e <= r) return len_seg[n];
+	if (l <= s && e <= r) return len_seg[i];
 	int m = s + e >> 1;
-	return search(l, r, s, m, n << 1) + search(l, r, m + 1, e, n << 1 | 1);
+	return search(l, r, s, m, i << 1) + search(l, r, m + 1, e, i << 1 | 1);
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
