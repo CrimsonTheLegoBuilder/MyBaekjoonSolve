@@ -93,6 +93,7 @@ struct Line {//ax + by = c
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	ld mag() const { return s.mag(); }
+	friend inline ld rad(const Line& b, const Line& l) { return atan2(b / l, b * l); }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
 };
 const Line Xaxis = { { 0, -1 }, 0 };
@@ -130,17 +131,13 @@ Pos intersection(const Line& l1, const Line& l2) {
 		(l2.c * v1.vy - l1.c * v2.vy) / det,
 	};
 }
-ld rad(const Line& b, const Line& l) {
-	ld x = (b * l) / b.mag();//dot
-	ld y = (b / l) / b.mag();//cross
-	return atan2(y, x);
-}
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+inline ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -152,6 +149,7 @@ void solve() {
 		Polygon H(N);
 		Lines V(N);
 		for (Pos& p : H) std::cin >> p;
+		for (int i = 0; i < N; i++) V[i] = L(H[1], H[(i + 1) % N]);
 	}
 	return;
 }

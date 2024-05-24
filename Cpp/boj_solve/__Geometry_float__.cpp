@@ -126,6 +126,7 @@ struct Line {//ax + by = c
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	ld mag() const { return s.mag(); }
+	friend inline ld rad(const Line& b, const Line& l) { return atan2(b / l, b * l); }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
 };
 struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
