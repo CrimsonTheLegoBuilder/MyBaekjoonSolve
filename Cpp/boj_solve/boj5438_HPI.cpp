@@ -8,8 +8,8 @@
 #include <queue>
 #include <deque>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-6;
 const ld PI = acos(-1);
@@ -86,72 +86,18 @@ Pos intersection(const Line& l1, const Line& l2) {
 		(l2.c * v1.vy - l1.c * v2.vy) / det
 	};
 }
-//ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-//int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-//	ld ret = cross(d1, d2, d3);
-//	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-//}
-//ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-bool CW(const Line& l1, const Line& l2, const Line& target) {
-	if (l1.s / l2.s < TOL) return 0;
-	Pos p = intersection(l1, l2);
-	return target.s.vy * p.x + target.s.vx * p.y > target.c - TOL;
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = cross(d1, d2, d3);
+	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
-	std::deque<Line> dq;
-	//std::sort(HP.begin(), HP.end());
-	for (const Line& l : HP) {
-		if (!dq.empty() && zero(dq.back() / l)) continue;
-		while (dq.size() >= 2 && CW(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
-		while (dq.size() >= 2 && CW(l, dq.front(), dq[1])) dq.pop_front();
-		dq.push_back(l);
-	}
-	while (dq.size() >= 3 && CW(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
-	while (dq.size() >= 3 && CW(dq.back(), dq.front(), dq[1])) dq.pop_front();
-	for (int i = 0; i < dq.size(); i++) {
-		Line cur = dq[i], nxt = dq[(i + 1) % dq.size()];
-		if (cur / nxt < TOL) {
-			hull.clear();
-			return 0;
-		}
-		hull.push_back(intersection(cur, nxt));
-	}
-	return 1;
-}
-ld bi_search(const std::vector<Line>& HP) {
-	ld s = 0, e = 1e12, m;
-	//int cnt = 100;
-	//while (cnt--) {
-	while (!zero(e - s)) {
-		m = (s + e) * .5;
-		std::vector<Line> tmp;
-		std::vector<Pos> HPI;
-		for (const Line& l : HP) tmp.push_back(l + m);
-		if (half_plane_intersection(tmp, HPI)) e = m;
-		else s = m;
-	}
-	return s;
-}
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(10);
 	std::cin >> N;
-	std::vector<Line> HP(N * 2);
-	int t = 0;
-	ll a, b; ld c;
-	for (int i = 0; i < N; i++) {
-		std::cin >> a >> b >> c;
-		ll _gcd = gcd(std::abs(a), std::abs(b));
-		a /= _gcd, b /= _gcd, c /= (ld)_gcd;
-		Line hp = Line(Vec(a, b), -c);
-		HP[t++] = hp;
-		HP[t++] = hp *= -1;
-	}
-	if (N <= 2) { std::cout << "0.0000000000\n"; return; }
-	std::sort(HP.begin(), HP.end());
-	std::cout << bi_search(HP) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj5438 Secret Island Base
