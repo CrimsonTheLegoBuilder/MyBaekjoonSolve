@@ -17,6 +17,7 @@ const int LEN = 2e4;
 int Q, N;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
+int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 ld norm(ld th) {
 	while (th < 0) th += PI * 2;
 	while (th > PI * 2 - TOL) th -= PI * 2;
@@ -150,6 +151,7 @@ void solve() {
 		std::cin >> N;
 		Polygon H(N);
 		Lines V(N);
+		for (Pos& p : H) std::cin >> p;
 	}
 	return;
 }
