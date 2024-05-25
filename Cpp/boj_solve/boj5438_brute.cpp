@@ -137,7 +137,30 @@ inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
 inline ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+struct Circle {
+	Pos c;
+	ld r;
+	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
+	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
+	bool operator != (const Circle& C) const { return !(*this == C); }
+	bool operator < (const Circle& q) const {
+		ld dist = (c - q.c).mag();
+		return r < q.r && dist + r < q.r + TOL;
+	}
+	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
+	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
+	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
+	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
+	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
+	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
+	ld A() const { return 1. * r * r * PI; }
+	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
+} INVAL = { { 0, 0 }, -1 };
+bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
+inline ld query(Polygon& H, Lines& V) {
 
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
