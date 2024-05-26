@@ -90,8 +90,8 @@ struct Line {//ax + by = c
 	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
-	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
+	ld dist(const Pos& p) const { return above(p) / hypot(s.vy, s.vx); }
 	ld mag() const { return s.mag(); }
 	friend inline ld rad(const Line& b, const Line& l) { return atan2(b / l, b * l); }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
@@ -209,22 +209,43 @@ Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
 	return Circle(c, (u - c).mag());
 }
 Circle inclose_circle(const Line& I, const Line& J, const Line& K) {
-	if (zero(I / J) && zero(I / K)) return INVAL;
+	if (zero(I / J) || zero(I / K)) return INVAL;
 	if (sign(I / J) > 0 && sign(J / K) > 0 && K.above(intersection(I, J)) > 0) {
 		Pos p0 = intersection(I, J), q0 = intersection(J, K);
 		Pos p1 = intersection(I + 1, J + 1), q1 = intersection(J + 1, K + 1);
 		Pos c = intersection(L(p0, p1), L(q0, q1));
-		return Circle(c, I.above(c));
+		return Circle(c, I.dist(c));
 	}
 	else return INVAL;
 }
 Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
-
-	return { };
+	if (I.above(p) > 0 || J.above(p) > 0 || sign(I / J) < 0) return {};
+	if (zero(I / J)) {
+		return {};
+	}
+	else if (sign(I / J) > 0) {
+		return {};
+	}
+	return {};//INVAL
 }
 Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
-
-	return { };
+	if (I.above(p) < TOL && I.above(q) < TOL) {
+		if (zero(L(p, q) * I)) {
+			Pos m = (p + q) * .5;
+			ld r = std::abs(I.dist(m));
+			ld y = (p - q).mag();
+			ld x = sqrt(r * r - y * y);
+			Pos vec = ~(p - q).unit();
+			Pos c1 = m + vec * x, c2 = m - vec * x;
+			return { Circle(c1, r), Circle(c2, r) };
+		}
+		Circle en = enclose_circle(p, q);
+		if (I.above(en.c) < en.r) {
+			return {};
+		}
+		else return {};
+	}
+	else return {};
 }
 inline bool valid_check(const Polygon& H, const Circle& c) {
 	if (c.r < 0) return 0;
