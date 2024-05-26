@@ -132,11 +132,44 @@ Pos intersection(const Line& l1, const Line& l2) {
 	};
 }
 inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
 inline ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+inline ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
+inline bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = dot(d1, d3, d2);
+	return !ccw(d1, d2, d3) && (ret > 0 || zero(ret));
+}
+inline bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = dot(d1, d3, d2);
+	return !ccw(d1, d2, d3) && ret > 0;
+}
+inline ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3) / (d2 - d1).mag(); }
+inline bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
+}
+inline ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
+	return cross(d1, d2, t) / (d1 - d2).mag();
+}
+inline Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
+	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
+	return (p1 * a2 + p2 * a1) / (a1 + a2);
+}
+inline bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+	int cnt = 0, sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (zero(cur.y - nxt.y)) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return cnt & 1;
+}
 struct Circle {
 	Pos c;
 	ld r;
@@ -158,7 +191,19 @@ struct Circle {
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 } INVAL = { { 0, 0 }, -1 };
 bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
+Circle enclose_circle(const Pos& u, const Pos& v) {
+	Pos c = (u + v) * .5;
+	return Circle(c, (c - u).mag());
+}
+Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
+	if (!ccw(u, v, w)) return INVAL;
+	Pos m1 = (u + v) * .5, v1 = ~(v - u);
+	Pos m2 = (u + w) * .5, v2 = ~(w - u);
+	Pos c = intersection(m1, m1 + v1, m2, m2 + v2);
+	return Circle(c, (u - c).mag());
+}
 inline ld query(Polygon& H, Lines& V) {
+
 	return 0;
 }
 void solve() {
