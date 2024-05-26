@@ -281,7 +281,7 @@ std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bu
 	for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
 	return HPI;
 }
-bool inner_check(Pos H[], const int& sz, const Pos& p) {//concave
+int inner_check(Pos H[], const int& sz, const Pos& p) {//concave
 	int cnt = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
@@ -291,9 +291,9 @@ bool inner_check(Pos H[], const int& sz, const Pos& p) {//concave
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
-	return cnt & 1;
+	return (cnt & 1) * 2;
 }
-bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	int cnt = 0, sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
@@ -303,7 +303,7 @@ bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
-	return cnt & 1;
+	return (cnt & 1) * 2;
 }
 int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {//convex
 	if (!sz) return -1;

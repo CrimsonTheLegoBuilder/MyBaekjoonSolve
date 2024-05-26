@@ -147,18 +147,23 @@ inline bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = dot(d1, d3, d2);
 	return !ccw(d1, d2, d3) && ret > 0;
 }
-inline ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3) / (d2 - d1).mag(); }
 inline bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
-}
-inline ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
-	return cross(d1, d2, t) / (d1 - d2).mag();
 }
 inline Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-inline bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+inline ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return (d2 - d1) * (d4 - d3) / (d2 - d1).mag();
+}
+inline ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
+	if (sign(projection(d1, d2, d2, t)) <= 0 && 
+		sign(projection(d2, d1, d1, t)) <= 0) 
+		return cross(d1, d2, t) / (d1 - d2).mag();
+	return std::min((d1 - t).mag(), (d2 - t).mag());
+}
+inline int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	int cnt = 0, sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
@@ -168,7 +173,7 @@ inline bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
-	return cnt & 1;
+	return (cnt & 1) * 2;
 }
 struct Circle {
 	Pos c;
@@ -190,6 +195,7 @@ struct Circle {
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 } INVAL = { { 0, 0 }, -1 };
+typedef std::vector<Circle> Disks;
 bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 Circle enclose_circle(const Pos& u, const Pos& v) {
 	Pos c = (u + v) * .5;
@@ -202,9 +208,66 @@ Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
 	Pos c = intersection(m1, m1 + v1, m2, m2 + v2);
 	return Circle(c, (u - c).mag());
 }
-inline ld query(Polygon& H, Lines& V) {
+Circle inclose_circle(const Line& I, const Line& J, const Line& K) {
+	if (zero(I / J) && zero(I / K)) return INVAL;
+	if (sign(I / J) > 0 && sign(J / K) > 0 && K.above(intersection(I, J)) > 0) {
+		Pos p0 = intersection(I, J), q0 = intersection(J, K);
+		Pos p1 = intersection(I + 1, J + 1), q1 = intersection(J + 1, K + 1);
+		Pos c = intersection(L(p0, p1), L(q0, q1));
+		return Circle(c, I.above(c));
+	}
+	else return INVAL;
+}
+Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 
-	return 0;
+	return { };
+}
+Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
+
+	return { };
+}
+inline bool valid_check(const Polygon& H, const Circle& c) {
+	if (c.r < 0) return 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++)
+		if (dist(H[i], H[(i + 1) % sz], c.c) < c.r)
+			return 0;
+	return inner_check(H, c.c);
+}
+inline ld query(const Polygon& H) {
+	ld ret = 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		for (int j = 0; j < sz; j++) {
+			if (j == i) continue;
+			for (int k = 0; k < sz; k++) {
+				if (k == i || k == j) continue;
+				const Pos& p0 = H[i], q0 = H[j], r0 = H[k];
+				const Pos& p1 = H[(i + 1) % sz];
+				const Pos& q1 = H[(j + 1) % sz];
+				const Pos& r1 = H[(k + 1) % sz];
+				Circle en, in;
+				en = enclose_circle(p0, q0, r0);
+				if (valid_check(H, en)) ret = std::min(ret, en.r);
+				in = inclose_circle(L(p0, p1), L(q0, q1), L(r0, r1));
+				if (valid_check(H, in)) ret = std::min(ret, in.r);
+				Disks ins;
+				ins = inclose_circle(L(q0, q1), L(r0, r1), p0);
+				if (ins.size()) {
+					for (const Circle& c : ins)
+						if (valid_check(H, c))
+							ret = std::min(ret, c.r);
+				}
+				ins = inclose_circle(L(r0, r1), p0, q0);
+				if (ins.size()) {
+					for (const Circle& c : ins)
+						if (valid_check(H, c))
+							ret = std::min(ret, c.r);
+				}
+			}
+		}
+	}
+	return ret;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -218,7 +281,7 @@ void solve() {
 		Lines V(N);
 		for (Pos& p : H) std::cin >> p;
 		for (int i = 0; i < N; i++) V[i] = L(H[1], H[(i + 1) % N]);
-		std::cout << query(H, V) << "\n";
+		std::cout << query(H) << "\n";
 	}
 	return;
 }
