@@ -240,7 +240,7 @@ Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
 			return { Circle(c1, r), Circle(c2, r) };
 		}
 		Circle en = enclose_circle(p, q);
-		if (I.dist(en.c) < en.r) {
+		if (sign(std::abs(I.dist(en.c)) - en.r) >= 0) {
 			return {};
 		}
 		else return {};
