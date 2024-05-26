@@ -159,7 +159,7 @@ struct Circle {
 } INVAL = { { 0, 0 }, -1 };
 bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 inline ld query(Polygon& H, Lines& V) {
-
+	return 0;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -173,6 +173,7 @@ void solve() {
 		Lines V(N);
 		for (Pos& p : H) std::cin >> p;
 		for (int i = 0; i < N; i++) V[i] = L(H[1], H[(i + 1) % N]);
+		std::cout << query(H, V) << "\n";
 	}
 	return;
 }

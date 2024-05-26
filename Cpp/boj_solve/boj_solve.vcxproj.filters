@@ -37,20 +37,8 @@
     <Filter Include="소스 파일\divide_conquer">
       <UniqueIdentifier>{bd0faa58-8c64-40df-8e62-2dab4d28b829}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Kaist 13th">
-      <UniqueIdentifier>{92552a20-a238-476b-b89f-9beb3fe61d88}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\bitmasking">
       <UniqueIdentifier>{30095e83-a6ef-4878-84f5-b8a41970d657}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\AtCoder">
-      <UniqueIdentifier>{fc5d257c-d368-4c83-81a0-549f102848ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\2nd_BORAMAECUP">
-      <UniqueIdentifier>{6d0d34bc-059e-4b3c-8116-43ae674e14ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\PadaengCup">
-      <UniqueIdentifier>{558c579a-b699-493a-acf4-d46ad2765947}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\graph_search">
       <UniqueIdentifier>{fae80ec2-1f94-4776-906b-a57dd6127712}</UniqueIdentifier>
@@ -63,6 +51,21 @@
     </Filter>
     <Filter Include="소스 파일\sparse_table">
       <UniqueIdentifier>{111b50a3-ab8c-4844-9c11-076090c98a26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\_SCPC2024">
+      <UniqueIdentifier>{c7cf3c96-7200-4076-b128-d81306c4e511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\_PadaengCup">
+      <UniqueIdentifier>{558c579a-b699-493a-acf4-d46ad2765947}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\_Kaist13th">
+      <UniqueIdentifier>{92552a20-a238-476b-b89f-9beb3fe61d88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\_AtCoder">
+      <UniqueIdentifier>{fc5d257c-d368-4c83-81a0-549f102848ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\_2nd_BORAMAECUP">
+      <UniqueIdentifier>{6d0d34bc-059e-4b3c-8116-43ae674e14ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -151,10 +154,10 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="2nd_brmcup_B.cpp">
-      <Filter>소스 파일\2nd_BORAMAECUP</Filter>
+      <Filter>소스 파일\_2nd_BORAMAECUP</Filter>
     </ClCompile>
     <ClCompile Include="2nd_brmcup_C.cpp">
-      <Filter>소스 파일\2nd_BORAMAECUP</Filter>
+      <Filter>소스 파일\_2nd_BORAMAECUP</Filter>
     </ClCompile>
     <ClCompile Include="boj3121_Buildozer.cpp">
       <Filter>소스 파일\segment_tree</Filter>
@@ -196,19 +199,19 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="Q_B.cpp">
-      <Filter>소스 파일\Kaist 13th</Filter>
+      <Filter>소스 파일\_Kaist13th</Filter>
     </ClCompile>
     <ClCompile Include="boj1074.cpp">
       <Filter>소스 파일\bitmasking</Filter>
     </ClCompile>
     <ClCompile Include="JPRS2023A.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="JPRS2023B.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="JPRS2023C.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="boj1446_dijkkstra.cpp">
       <Filter>소스 파일\graph_search</Filter>
@@ -328,13 +331,13 @@
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
     <ClCompile Include="ABC326A.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC326C.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC326F.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="boj28098.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -379,13 +382,13 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="ABC327A.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC327B.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC327D.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="boj2268.cpp">
       <Filter>소스 파일\segment_tree</Filter>
@@ -562,10 +565,10 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="PDCUP_A.cpp">
-      <Filter>소스 파일\PadaengCup</Filter>
+      <Filter>소스 파일\_PadaengCup</Filter>
     </ClCompile>
     <ClCompile Include="PDCUP_B.cpp">
-      <Filter>소스 파일\PadaengCup</Filter>
+      <Filter>소스 파일\_PadaengCup</Filter>
     </ClCompile>
     <ClCompile Include="boj5449_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -901,13 +904,13 @@
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
     <ClCompile Include="ABC348C.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC348A.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC348B.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="boj7890_kdtree.cpp">
       <Filter>소스 파일\segment_tree</Filter>
@@ -925,13 +928,13 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="ABC349A.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC349C.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC349B.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="boj6839_delaunay.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -967,16 +970,16 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="ABC350D.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC350A.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC350B.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC350C.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="boj26179_convex_inner.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -1003,19 +1006,19 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="ABC351A.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC351B.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC351C.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC351D.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC351E.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="boj5394_circle_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -1069,16 +1072,16 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="ABC354D.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC354A.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC354B.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="ABC354C.cpp">
-      <Filter>소스 파일\AtCoder</Filter>
+      <Filter>소스 파일\_AtCoder</Filter>
     </ClCompile>
     <ClCompile Include="boj17804_green.cpp">
       <Filter>소스 파일\geometry</Filter>
@@ -1103,6 +1106,15 @@
     </ClCompile>
     <ClCompile Include="boj19651_len_seg.cpp">
       <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj5438_brute.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="SCPC2024D.cpp">
+      <Filter>소스 파일\_SCPC2024</Filter>
+    </ClCompile>
+    <ClCompile Include="SCPC2024B.cpp">
+      <Filter>소스 파일\_SCPC2024</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
