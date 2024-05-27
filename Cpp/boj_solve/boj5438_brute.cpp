@@ -221,10 +221,34 @@ Circle inclose_circle(const Line& I, const Line& J, const Line& K) {
 Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 	if (I.above(p) > 0 || J.above(p) > 0 || sign(I / J) < 0) return {};
 	if (zero(I / J)) {
+
 		return {};
 	}
 	else if (sign(I / J) > 0) {
-		return {};
+		/*  I    a p  J
+		     \---+-*-/perp
+		      \  |bi/
+			   \ | /
+			    \|/
+				 *
+			    inx
+		*/
+		ld the = rad(J, I * -1) * .5;
+		Pos inx = intersection(I, J);
+		Line bi = rotate(J, inx, the);
+		Line perp = rot90(bi, p);
+		Pos a = intersection(bi, perp);
+		ld D = (inx - a).mag();
+		ld h = (p - a).mag();
+		ld A = (1 - (1 / sin(the) / sin(the)));
+		ld B = 2 * D / sin(the);
+		ld C = -(h * h + D * D);
+		ld J = B * B - 4 * A * C;
+		if (J < 0) return {};
+		ld r = (-B - sqrt(J)) * .5 / A;
+		Pos cen = inx + (a - inx).unit() * (r / sin(the));
+		Circle c = Circle(cen, r);
+		return { c };
 	}
 	return {};//INVAL
 }
