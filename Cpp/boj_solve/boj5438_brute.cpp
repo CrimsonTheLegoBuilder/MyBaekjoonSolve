@@ -15,10 +15,10 @@ const ld TOL = 1e-6;
 const ld PI = acos(-1);
 const int LEN = 2e4;
 int Q, N;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
-ld norm(ld th) {
+inline bool zero(const ld& x) { return std::abs(x) < TOL; }
+inline ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline ld norm(ld th) {
 	while (th < 0) th += PI * 2;
 	while (th > PI * 2 - TOL) th -= PI * 2;
 	return th;
@@ -31,26 +31,26 @@ struct Pos {
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
-	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
-	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
-	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
-	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
-	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
+	inline Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	inline Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	inline Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
+	inline Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	inline ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
+	inline ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
+	inline Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
-	ld xy() const { return x * y; }
-	Pos rot(ld the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
-	ld Euc() const { return x * x + y * y; }
-	ld mag() const { return sqrt(Euc()); }
-	Pos unit() const { return *this / mag(); }
-	ld rad() const { return atan2(y, x); }
+	inline Pos operator - () const { return { -x, -y }; }
+	inline Pos operator ~ () const { return { -y, x }; }
+	inline Pos operator ! () const { return { y, x }; }
+	inline ld xy() const { return x * y; }
+	inline Pos rot(ld the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
+	inline ld Euc() const { return x * x + y * y; }
+	inline ld mag() const { return sqrt(Euc()); }
+	inline Pos unit() const { return *this / mag(); }
+	inline ld rad() const { return atan2(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
@@ -64,9 +64,9 @@ struct Vec {
 	Vec(ld Y = 0, ld X = 0) : vy(Y), vx(X) {}
 	bool operator == (const Vec& v) const { return (zero(vy - v.vy) && zero(vx - v.vx)); }
 	bool operator < (const Vec& v) const { return zero(vy - v.vy) ? vx < v.vx : vy < v.vy; }
-	ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
-	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
-	Vec operator ~ () const { return { -vx, vy }; }
+	inline ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
+	inline ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
+	inline Vec operator ~ () const { return { -vx, vy }; }
 	Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
 	Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
 	ld mag() const { return hypot(vy, vx); }
@@ -82,16 +82,16 @@ struct Line {//ax + by = c
 		ld CCW = s / l.s;
 		return zero(CCW) ? c * hypot(l.s.vy, l.s.vx) < l.c * hypot(s.vy, s.vx) : CCW > 0;
 	}
-	ld operator * (const Line& l) const { return s * l.s; }
-	ld operator / (const Line& l) const { return s / l.s; }
-	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
-	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
-	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
+	inline ld operator * (const Line& l) const { return s * l.s; }
+	inline ld operator / (const Line& l) const { return s / l.s; }
+	inline Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
+	inline Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
+	inline Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
 	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
-	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
-	ld dist(const Pos& p) const { return above(p) / hypot(s.vy, s.vx); }
+	inline ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
+	inline ld dist(const Pos& p) const { return above(p) / hypot(s.vy, s.vx); }
 	ld mag() const { return s.mag(); }
 	friend inline ld rad(const Line& b, const Line& l) { return atan2(b / l, b * l); }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
@@ -99,18 +99,18 @@ struct Line {//ax + by = c
 const Line Xaxis = { { 0, -1 }, 0 };
 const Line Yaxis = { { 1, 0 }, 0 };
 typedef std::vector<Line> Lines;
-Line L(const Pos& s, const Pos& e) {
+inline Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
 	dx = s.x - e.x;
 	c = dy * s.x + dx * s.y;
 	return Line(Vec(dy, dx), c);
 }
-Line L(const Vec& s, const Pos& p) {
+inline Line L(const Vec& s, const Pos& p) {
 	ld c = s.vy * p.x + s.vx * p.y;
 	return Line(s, c);
 }
-Line rotate(const Line& l, const Pos& p, ld the) {
+inline Line rotate(const Line& l, const Pos& p, ld the) {
 	Vec s = l.s;
 	ld x = -s.vx, y = s.vy;
 	ld vx = -(x * cos(the) - y * sin(the));
@@ -118,12 +118,12 @@ Line rotate(const Line& l, const Pos& p, ld the) {
 	ld c = vy * p.x + vx * p.y;
 	return Line(Vec(vy, vx), c);
 }
-Line rot90(const Line& l, const Pos& p) {
+inline Line rot90(const Line& l, const Pos& p) {
 	Vec s = ~l.s;
 	ld c = s.vy * p.x + s.vx * p.y;
 	return Line(s, c);
 }
-Pos intersection(const Line& l1, const Line& l2) {
+inline Pos intersection(const Line& l1, const Line& l2) {
 	Vec v1 = l1.s, v2 = l2.s;
 	ld det = v1 / v2;
 	return {
@@ -196,19 +196,19 @@ struct Circle {
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 } INVAL = { { 0, 0 }, -1 };
 typedef std::vector<Circle> Disks;
-bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
-Circle enclose_circle(const Pos& u, const Pos& v) {
+inline bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
+inline Circle enclose_circle(const Pos& u, const Pos& v) {
 	Pos c = (u + v) * .5;
 	return Circle(c, (c - u).mag());
 }
-Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
+inline Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
 	if (!ccw(u, v, w)) return INVAL;
 	Pos m1 = (u + v) * .5, v1 = ~(v - u);
 	Pos m2 = (u + w) * .5, v2 = ~(w - u);
 	Pos c = intersection(m1, m1 + v1, m2, m2 + v2);
 	return Circle(c, (u - c).mag());
 }
-Circle inclose_circle(const Line& I, const Line& J, const Line& K) {
+inline Circle inclose_circle(const Line& I, const Line& J, const Line& K) {
 	if (zero(I / J) || zero(I / K)) return INVAL;
 	if (sign(I / J) > 0 && sign(J / K) > 0 && K.above(intersection(I, J)) > 0) {
 		Pos p0 = intersection(I, J), q0 = intersection(J, K);
@@ -218,23 +218,23 @@ Circle inclose_circle(const Line& I, const Line& J, const Line& K) {
 	}
 	else return INVAL;
 }
-Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
+inline Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 	if (I.above(p) > 0 || J.above(p) > 0 || sign(I / J) < 0) return {};
 	if (zero(I / J) && I * J < 0) {
 		Line b = rot90(I, p);
 		Pos p1 = intersection(I, b);
 		Pos p2 = intersection(J, b);
 		Pos m = (p1 + p2) * .5;
-		Pos vec = (~p1 - p2);
+		Pos vec = ~(p1 - p2);
 		ld r = vec.mag() * .5;
-		ld h = (m - p).mag();
+		ld h = (p - m).mag();
 		ld w = sqrt(r * r - h * h);
 		Pos cen1 = m + vec.unit() * w;
 		Pos cen2 = m - vec.unit() * w;
 		return { Circle(cen1, r), Circle(cen2, r) };
 	}
 	else if (sign(I / J) > 0) {
-		/*  I   a h p J
+		/*  I   m h p J
 		     \---+-*-/perp
 		      \  |bi/
 			   \D| /
@@ -246,9 +246,9 @@ Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		Pos inx = intersection(I, J);
 		Line bi = rotate(J, inx, the);
 		Line perp = rot90(bi, p);
-		Pos a = intersection(bi, perp);
-		ld D = (inx - a).mag();
-		ld h = (p - a).mag();
+		Pos m = intersection(bi, perp);
+		ld D = (inx - m).mag();
+		ld h = (p - m).mag();
 		ld A = (1 - (1 / sin(the) / sin(the)));
 		ld B = 2 * D / sin(the);
 		ld C = -(h * h + D * D);
@@ -256,33 +256,63 @@ Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		if (JD < 0) return {};
 		ld r1 = (-B - sqrt(JD)) * .5 / A;
 		ld r2 = (-B + sqrt(JD)) * .5 / A;
-		Pos cen1 = inx + (a - inx).unit() * (r1 / sin(the));
-		Pos cen2 = inx + (a - inx).unit() * (r2 / sin(the));
+		Pos cen1 = inx + (m - inx).unit() * (r1 / sin(the));
+		Pos cen2 = inx + (m - inx).unit() * (r2 / sin(the));
 		Circle c1 = Circle(cen1, r1);
 		Circle c2 = Circle(cen2, r2);
 		return { c1, c2 };
 	}
 	return {};//INVAL
 }
-Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
-	if (I.above(p) < TOL && I.above(q) < TOL) {
+inline Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
+	ld AP = I.above(p), AQ = I.above(q);
+	if (AP > 0 || AQ > 0) return {};
+	if (zero(AP) && zero(AQ)) return {};
+	if (sign(AP) <= 0 && sign(AQ) <= 0) {
 		if (zero(L(p, q) * I)) {
 			Pos m = (p + q) * .5;
 			ld r = std::abs(I.dist(m));
-			ld y = (p - q).mag();
-			ld x = sqrt(r * r - y * y);
+			ld h = (p - m).mag();
+			ld w = sqrt(r * r - h * h);
 			Pos vec = ~(p - q).unit();
-			Pos c1 = m + vec * x, c2 = m - vec * x;
-			return { Circle(c1, r), Circle(c2, r) };
+			Pos cen1 = m + vec * w;
+			Pos cen2 = m - vec * w;
+			return { Circle(cen1, r), Circle(cen2, r) };
 		}
 		Circle en = enclose_circle(p, q);
-		if (sign(std::abs(I.dist(en.c)) - en.r) >= 0) {
-
-			return {};
+		if (sign(std::abs(I.dist(en.c)) - en.r) > 0) {
+			if (zero(AP - AQ)) {
+				Pos m = (p + q) * .5;
+				Line bi = rot90(L(p, q), m);
+				Pos inx = intersection(I, bi);
+				ld D = std::abs(I.dist(m));
+				ld d = (p - m).mag();
+				ld r = (D * D + d * d) * .5 / D;
+				Pos cen = inx + (m - inx).unit() * r;
+				return { Circle(cen, r) };
+			}
+			Pos m = (p + q) * .5;
+			ld h = (p - m).mag();
+			Line bi = rot90(L(p, q), m);
+			if (I / bi < 0) bi *= -1;
+			Pos inx = intersection(I, bi);
+			ld the = rad(I, bi);
+			ld D = (inx - m).mag();
+			ld A = (1 - (1 / sin(the) / sin(the)));
+			ld B = 2 * D / sin(the);
+			ld C = -(h * h + D * D);
+			ld JD = B * B - 4 * A * C;
+			if (JD < 0) return {};
+			ld r1 = (-B - sqrt(JD)) * .5 / A;
+			ld r2 = (-B + sqrt(JD)) * .5 / A;
+			Pos cen1 = inx + (m - inx).unit() * (r1 / sin(the));
+			Pos cen2 = inx + (m - inx).unit() * (r2 / sin(the));
+			Circle c1 = Circle(cen1, r1);
+			Circle c2 = Circle(cen2, r2);
+			return { c1, c2 };
 		}
-		else return {};
 	}
-	else return {};
+	return {};
 }
 inline bool valid_check(const Polygon& H, const Circle& c) {
 	if (c.r < 0) return 0;
