@@ -228,7 +228,10 @@ Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		Pos vec = (~p1 - p2);
 		ld r = vec.mag() * .5;
 		ld h = (m - p).mag();
-		return {};
+		ld w = sqrt(r * r - h * h);
+		Pos cen1 = m + vec.unit() * w;
+		Pos cen2 = m - vec.unit() * w;
+		return { Circle(cen1, r), Circle(cen2, r) };
 	}
 	else if (sign(I / J) > 0) {
 		/*  I    a p  J
