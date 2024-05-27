@@ -220,8 +220,14 @@ Circle inclose_circle(const Line& I, const Line& J, const Line& K) {
 }
 Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 	if (I.above(p) > 0 || J.above(p) > 0 || sign(I / J) < 0) return {};
-	if (zero(I / J)) {
-
+	if (zero(I / J) && I * J < 0) {
+		Line b = rot90(I, p);
+		Pos p1 = intersection(I, b);
+		Pos p2 = intersection(J, b);
+		Pos m = (p1 + p2) * .5;
+		Pos vec = (~p1 - p2);
+		ld r = vec.mag() * .5;
+		ld h = (m - p).mag();
 		return {};
 	}
 	else if (sign(I / J) > 0) {
