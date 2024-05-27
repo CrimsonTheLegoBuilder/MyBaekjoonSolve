@@ -11,7 +11,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-6;
+const ld TOL = 1e-9;
 const ld PI = acos(-1);
 const int LEN = 2e4;
 int Q, N;
@@ -23,6 +23,8 @@ inline ld norm(ld th) {
 	while (th > PI * 2 - TOL) th -= PI * 2;
 	return th;
 }
+
+//#define DEBUG
 
 struct Pos {
 	ld x, y;
@@ -160,7 +162,7 @@ inline ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4)
 inline ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
 	if (sign(projection(d1, d2, d2, t)) <= 0 && 
 		sign(projection(d2, d1, d1, t)) <= 0) 
-		return cross(d1, d2, t) / (d1 - d2).mag();
+		return std::abs(cross(d1, d2, t)) / (d1 - d2).mag();
 	return std::min((d1 - t).mag(), (d2 - t).mag());
 }
 inline int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
@@ -209,18 +211,23 @@ inline Circle enclose_circle(const Pos& u, const Pos& v, const Pos& w) {
 	return Circle(c, (u - c).mag());
 }
 inline Circle inclose_circle(const Line& I, const Line& J, const Line& K) {
-	if (zero(I / J) || zero(I / K)) return INVAL;
-	if (sign(I / J) > 0 && sign(J / K) > 0 && K.above(intersection(I, J)) > 0) {
+	if (zero(I / J) || zero(J / K)) return INVAL;
+	if (sign(I / J) > 0 && sign(J / K) > 0 && K.above(intersection(I, J)) < 0) {
 		Pos p0 = intersection(I, J), q0 = intersection(J, K);
-		Pos p1 = intersection(I + 1, J + 1), q1 = intersection(J + 1, K + 1);
+		Pos p1 = intersection(I + 69, J + 69), q1 = intersection(J + 74, K + 74);
 		Pos c = intersection(L(p0, p1), L(q0, q1));
-		return Circle(c, I.dist(c));
+		return Circle(c, std::abs(I.dist(c)));
 	}
 	else return INVAL;
 }
 inline Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
-	if (I.above(p) > 0 || J.above(p) > 0 || sign(I / J) < 0) return {};
+	if (I.above(p) > 0 || J.above(p) > 0 || sign(I / J) < 0) return {};//INVAL
 	if (zero(I / J) && I * J < 0) {
+		/*
+		J ____________
+		       * p
+		  ____________ I
+		*/
 		Line b = rot90(I, p);
 		Pos p1 = intersection(I, b);
 		Pos p2 = intersection(J, b);
@@ -234,11 +241,11 @@ inline Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		return { Circle(cen1, r), Circle(cen2, r) };
 	}
 	else if (sign(I / J) > 0) {
-		/*  I   m h p J
+		/*      m h p J
 		     \---+-*-/perp
 		      \  |bi/
 			   \D| /
-			    \|/
+			  I \|/
 				 *
 			    inx
 		*/
@@ -253,23 +260,27 @@ inline Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		ld B = 2 * D / sin(the);
 		ld C = -(h * h + D * D);
 		ld JD = B * B - 4 * A * C;
-		if (JD < 0) return {};
+		if (JD < 0) return {};//INVAL
 		ld r1 = (-B - sqrt(JD)) * .5 / A;
 		ld r2 = (-B + sqrt(JD)) * .5 / A;
 		Pos cen1 = inx + (m - inx).unit() * (r1 / sin(the));
 		Pos cen2 = inx + (m - inx).unit() * (r2 / sin(the));
-		Circle c1 = Circle(cen1, r1);
-		Circle c2 = Circle(cen2, r2);
-		return { c1, c2 };
+		return { Circle(cen1, r1), Circle(cen2, r2) };
 	}
 	return {};//INVAL
 }
 inline Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
 	ld AP = I.above(p), AQ = I.above(q);
-	if (AP > 0 || AQ > 0) return {};
-	if (zero(AP) && zero(AQ)) return {};
+	if (AP > 0 || AQ > 0) return {};//INVAL
+	if (zero(AP) && zero(AQ)) return {};//INVAL
 	if (sign(AP) <= 0 && sign(AQ) <= 0) {
 		if (zero(L(p, q) * I)) {
+			/*
+			      * q
+				  
+				  * p
+			______________ I
+			*/
 			Pos m = (p + q) * .5;
 			ld r = std::abs(I.dist(m));
 			ld h = (p - m).mag();
@@ -282,6 +293,11 @@ inline Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
 		Circle en = enclose_circle(p, q);
 		if (sign(std::abs(I.dist(en.c)) - en.r) > 0) {
 			if (zero(AP - AQ)) {
+				/*
+				    * q   * p
+
+				_______________ I
+				*/
 				Pos m = (p + q) * .5;
 				Line bi = rot90(L(p, q), m);
 				Pos inx = intersection(I, bi);
@@ -291,6 +307,13 @@ inline Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
 				Pos cen = inx + (m - inx).unit() * r;
 				return { Circle(cen, r) };
 			}
+			/*
+			     * q
+		             * m
+					/    * p
+			   inx /bi
+			______*_________ I
+			*/
 			Pos m = (p + q) * .5;
 			ld h = (p - m).mag();
 			Line bi = rot90(L(p, q), m);
@@ -302,25 +325,31 @@ inline Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
 			ld B = 2 * D / sin(the);
 			ld C = -(h * h + D * D);
 			ld JD = B * B - 4 * A * C;
-			if (JD < 0) return {};
+			if (JD < 0) return {};//INVAL
 			ld r1 = (-B - sqrt(JD)) * .5 / A;
 			ld r2 = (-B + sqrt(JD)) * .5 / A;
 			Pos cen1 = inx + (m - inx).unit() * (r1 / sin(the));
 			Pos cen2 = inx + (m - inx).unit() * (r2 / sin(the));
-			Circle c1 = Circle(cen1, r1);
-			Circle c2 = Circle(cen2, r2);
-			return { c1, c2 };
+			return { Circle(cen1, r1), Circle(cen2, r2) };
 		}
 	}
-	return {};
+	return {};//INVAL
 }
 inline bool valid_check(const Polygon& H, const Circle& c) {
 	if (c.r < 0) return 0;
 	int sz = H.size();
-	for (int i = 0; i < sz; i++)
-		if (dist(H[i], H[(i + 1) % sz], c.c) < c.r)
+	for (int i = 0; i < sz; i++) {
+#ifdef DEBUG
+		std::cout << "dist : " << dist(H[i], H[(i + 1) % sz], c.c) << "\n";
+#endif
+		if (sign(dist(H[i], H[(i + 1) % sz], c.c) - c.r) < 0) {
+#ifdef DEBUG
+			std::cout << "out\n";
+#endif
 			return 0;
-	return inner_check(H, c.c);
+		}
+	}
+	return inner_check(H, c.c) > 0;
 }
 inline ld query(const Polygon& H) {
 	ld ret = 0;
@@ -334,24 +363,43 @@ inline ld query(const Polygon& H) {
 				const Pos& p1 = H[(i + 1) % sz];
 				const Pos& q1 = H[(j + 1) % sz];
 				const Pos& r1 = H[(k + 1) % sz];
+
 				Circle en, in;
+				//___________________________________________________//
 				en = enclose_circle(p0, q0, r0);
-				if (valid_check(H, en)) ret = std::min(ret, en.r);
+#ifdef DEBUG
+				std::cout << "en : " << en << "\n";
+#endif
+				if (valid_check(H, en)) ret = std::max(ret, en.r);
+				
+				//___________________________________________________//
 				in = inclose_circle(L(p0, p1), L(q0, q1), L(r0, r1));
-				if (valid_check(H, in)) ret = std::min(ret, in.r);
+#ifdef DEBUG
+				std::cout << "in : " << in << "\n";
+#endif
+				if (valid_check(H, in)) ret = std::max(ret, in.r);
+				
+
 				Disks ins;
+				//___________________________________________________//
 				ins = inclose_circle(L(q0, q1), L(r0, r1), p0);
-				if (ins.size()) {
-					for (const Circle& c : ins)
-						if (valid_check(H, c))
-							ret = std::min(ret, c.r);
-				}
+#ifdef DEBUG
+				std::cout << "ins.size() : " << ins.size() << "\n";
+				for (Circle& c : ins) std::cout << "ins : " << c << "\n";
+#endif
+				for (const Circle& c : ins) 
+					if (valid_check(H, c))
+						ret = std::max(ret, c.r);
+				
+				//___________________________________________________//
 				ins = inclose_circle(L(r0, r1), p0, q0);
-				if (ins.size()) {
-					for (const Circle& c : ins)
-						if (valid_check(H, c))
-							ret = std::min(ret, c.r);
-				}
+#ifdef DEBUG
+				std::cout << "ins.size() : " << ins.size() << "\n";
+				for (Circle& c : ins) std::cout << "ins : " << c << "\n";
+#endif
+				for (const Circle& c : ins) 
+					if (valid_check(H, c))
+						ret = std::max(ret, c.r);
 			}
 		}
 	}
@@ -362,15 +410,50 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(10);
+	//freopen("G.in", "r", stdin);
+	//freopen("G.out", "w", stdout);
 	std::cin >> Q;
 	while (Q--) {
 		std::cin >> N;
 		Polygon H(N);
-		Lines V(N);
 		for (Pos& p : H) std::cin >> p;
-		for (int i = 0; i < N; i++) V[i] = L(H[1], H[(i + 1) % N]);
 		std::cout << query(H) << "\n";
 	}
 	return;
 }
 int main() { solve(); return 0; }//boj5438 Secret Island Base
+
+/*
+
+1
+4
+0 0
+5 0
+5 5
+0 5
+
+1
+10
+15 20
+15 23
+14 23
+14 21
+11 21
+11 24
+15 24
+15 25
+10 25
+10 20
+
+2
+3
+-100 -100
+98 100
+-2 -1
+4
+-99 -100
+100 100
+-100 -99
+99 99
+
+*/
