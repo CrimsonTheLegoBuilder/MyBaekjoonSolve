@@ -254,10 +254,13 @@ Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		ld C = -(h * h + D * D);
 		ld JD = B * B - 4 * A * C;
 		if (JD < 0) return {};
-		ld r = (-B - sqrt(JD)) * .5 / A;
-		Pos cen = inx + (a - inx).unit() * (r / sin(the));
-		Circle c = Circle(cen, r);
-		return { c };
+		ld r1 = (-B - sqrt(JD)) * .5 / A;
+		ld r2 = (-B + sqrt(JD)) * .5 / A;
+		Pos cen1 = inx + (a - inx).unit() * (r1 / sin(the));
+		Pos cen2 = inx + (a - inx).unit() * (r2 / sin(the));
+		Circle c1 = Circle(cen1, r1);
+		Circle c2 = Circle(cen2, r2);
+		return { c1, c2 };
 	}
 	return {};//INVAL
 }
