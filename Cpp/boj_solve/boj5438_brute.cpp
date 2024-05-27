@@ -266,6 +266,9 @@ inline Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		Pos cen1 = inx + (m - inx).unit() * (r1 / sin(the));
 		Pos cen2 = inx + (m - inx).unit() * (r2 / sin(the));
 		return { Circle(cen1, r1), Circle(cen2, r2) };
+		//ld r = std::min(r1, r2);
+		//Pos cen = inx + (m - inx).unit() * (r / sin(the));
+		//return { Circle(cen, r) };
 	}
 	return {};//INVAL
 }
@@ -331,6 +334,9 @@ inline Disks inclose_circle(const Line& I, const Pos& p, const Pos& q) {
 			Pos cen1 = inx + (m - inx).unit() * (r1 / sin(the));
 			Pos cen2 = inx + (m - inx).unit() * (r2 / sin(the));
 			return { Circle(cen1, r1), Circle(cen2, r2) };
+			//ld r = std::min(r1, r2);
+			//Pos cen = inx + (m - inx).unit() * (r / sin(the));
+			//return { Circle(cen, r) };
 		}
 	}
 	return {};//INVAL
