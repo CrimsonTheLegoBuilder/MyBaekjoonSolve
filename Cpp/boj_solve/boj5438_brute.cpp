@@ -234,10 +234,10 @@ Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		return { Circle(cen1, r), Circle(cen2, r) };
 	}
 	else if (sign(I / J) > 0) {
-		/*  I    a p  J
+		/*  I   a h p J
 		     \---+-*-/perp
 		      \  |bi/
-			   \ | /
+			   \D| /
 			    \|/
 				 *
 			    inx
@@ -252,9 +252,9 @@ Disks inclose_circle(const Line& I, const Line& J, const Pos& p) {
 		ld A = (1 - (1 / sin(the) / sin(the)));
 		ld B = 2 * D / sin(the);
 		ld C = -(h * h + D * D);
-		ld J = B * B - 4 * A * C;
-		if (J < 0) return {};
-		ld r = (-B - sqrt(J)) * .5 / A;
+		ld JD = B * B - 4 * A * C;
+		if (JD < 0) return {};
+		ld r = (-B - sqrt(JD)) * .5 / A;
 		Pos cen = inx + (a - inx).unit() * (r / sin(the));
 		Circle c = Circle(cen, r);
 		return { c };
