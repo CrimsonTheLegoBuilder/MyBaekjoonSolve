@@ -106,19 +106,19 @@ inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
+inline Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-Pos P(const Pii& p) { return Pos(p.x, p.y); }
+inline Pos P(const Pii& p) { return Pos(p.x, p.y); }
 struct Seg {
 	Pii s, e;
 	Seg(Pii s = Pii(0, 0), Pii e = Pii(0, 0)) : s(s), e(e) {}
 	Pii S() const { return e - s; }
-	ll operator / (const Seg& p) const { return S() / p.S(); }
-	int ccw(const Pos& p) const { return sign((P(e) - P(s)) / (p - P(e))); }
+	inline ll operator / (const Seg& p) const { return S() / p.S(); }
+	inline int ccw(const Pos& p) const { return sign((P(e) - P(s)) / (p - P(e))); }
 };
-Pos intersection(const Seg& u, const Seg& v) {
+inline Pos intersection(const Seg& u, const Seg& v) {
 	return intersection(P(u.s), P(u.e), P(v.s), P(v.e));
 }
 int G[LEN];
