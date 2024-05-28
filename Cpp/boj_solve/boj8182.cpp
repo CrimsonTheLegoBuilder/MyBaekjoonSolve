@@ -153,13 +153,14 @@ inline void solve() {
 			segs.push_back(Seg(H[s], H[e]));
 			assert(s < e);
 		}
+		if (e == N - 1) break;
 	}
-	for (const Seg& ss : segs) {
+	for (const Seg& seg : segs) {
 		while (VH.size() >= 2
-			&& VH[VH.size() - 2] / ss < 0
-			&& VH.back().ccw(intersection(VH[VH.size() - 2], ss)) <= 0)
+			&& VH[VH.size() - 2] / seg < 0
+			&& VH.back().ccw(intersection(VH[VH.size() - 2], seg)) <= 0)
 			VH.pop_back();
-		VH.push_back(ss);
+		VH.push_back(seg);
 	}
 	Polygon ret;
 	int sz;
