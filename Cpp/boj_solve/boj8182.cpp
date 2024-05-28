@@ -140,7 +140,9 @@ inline void solve() {
 	}
 	e = -1;
 	for (s = 0; s < N - 1; s++) {
-		std::sort(B[s].rbegin(), B[s].rend());
+		std::sort(B[s].begin(), B[s].end(), [&](const int& u, const int& v) -> bool {
+			return u > v;
+			});
 		G[s] = N - 1;
 		for (const int& j : B[s]) {
 			if (G[s] > j) break;
@@ -149,12 +151,13 @@ inline void solve() {
 		if (e < G[s]) {
 			e = G[s];
 			segs.push_back(Seg(H[s], H[e]));
+			assert(s < e);
 		}
 	}
 	for (const Seg& ss : segs) {
 		while (VH.size() >= 2
 			&& VH[VH.size() - 2] / ss < 0
-			&& VH.back().ccw(intersection(VH[VH.size() - 2], ss)) < 0)
+			&& VH.back().ccw(intersection(VH[VH.size() - 2], ss)) <= 0)
 			VH.pop_back();
 		VH.push_back(ss);
 	}
