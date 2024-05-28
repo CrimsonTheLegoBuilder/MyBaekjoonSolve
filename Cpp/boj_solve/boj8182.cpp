@@ -113,7 +113,10 @@ inline Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& 
 }
 inline Pos intersection(const Pii& p1, const Pii& p2, const Pii& q1, const Pii& q2) {
 	ll a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
-	return (P(p1) * a2 + P(p2) * a1) / (a1 + a2);
+	ll x = (ll)p1.x * a2 + (ll)p2.x * a1;
+	ll y = (ll)p1.y * a2 + (ll)p2.y * a1;
+	ll num = a1 + a2;
+	return Pos(1. * x / num, 1. * y / num);
 }
 struct Seg {
 	Pii s, e;
@@ -123,7 +126,6 @@ struct Seg {
 	inline int ccw(const Pos& p) const { return sign((P(e) - P(s)) / (p - P(e))); }
 };
 inline Pos intersection(const Seg& u, const Seg& v) { return intersection(u.s, u.e, v.s, v.e); }
-int G[LEN];
 std::vector<int> B[LEN];//blocked
 std::vector<Seg> segs, VH;
 inline void solve() {
@@ -145,13 +147,13 @@ inline void solve() {
 		std::sort(B[s].begin(), B[s].end(), [&](const int& u, const int& v) -> bool {
 			return u > v;
 			});
-		G[s] = N - 1;
+		int X = N - 1;
 		for (const int& j : B[s]) {
-			if (G[s] > j) break;
-			if (G[s] == j) G[s]--;
+			if (X > j) break;
+			if (X == j) X--;
 		}
-		if (e < G[s]) {
-			e = G[s];
+		if (e < X) {
+			e = X;
 			segs.push_back(Seg(H[s], H[e]));
 			assert(s < e);
 		}
