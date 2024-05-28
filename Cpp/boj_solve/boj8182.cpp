@@ -101,6 +101,7 @@ struct Pos {
 };
 const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
+inline Pos P(const Pii& p) { return Pos(p.x, p.y); }
 inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
@@ -110,7 +111,10 @@ inline Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& 
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-inline Pos P(const Pii& p) { return Pos(p.x, p.y); }
+inline Pos intersection(const Pii& p1, const Pii& p2, const Pii& q1, const Pii& q2) {
+	ll a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
+	return (P(p1) * a2 + P(p2) * a1) / (a1 + a2);
+}
 struct Seg {
 	Pii s, e;
 	Seg(Pii s = Pii(0, 0), Pii e = Pii(0, 0)) : s(s), e(e) {}
@@ -118,9 +122,7 @@ struct Seg {
 	inline ll operator / (const Seg& p) const { return S() / p.S(); }
 	inline int ccw(const Pos& p) const { return sign((P(e) - P(s)) / (p - P(e))); }
 };
-inline Pos intersection(const Seg& u, const Seg& v) {
-	return intersection(P(u.s), P(u.e), P(v.s), P(v.e));
-}
+inline Pos intersection(const Seg& u, const Seg& v) { return intersection(u.s, u.e, v.s, v.e); }
 int G[LEN];
 std::vector<int> B[LEN];//blocked
 std::vector<Seg> segs, VH;
@@ -174,4 +176,4 @@ inline void solve() {
 	std::cout << ans << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj8182 Island
+int main() { solve(); return 0; }//boj8182 Island refer to koosaga
