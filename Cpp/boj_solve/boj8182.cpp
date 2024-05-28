@@ -152,7 +152,7 @@ inline void solve() {
 		}
 	}
 	for (const Seg& ss : segs) {
-		while (VH.size() > 2
+		while (VH.size() >= 2
 			&& VH[VH.size() - 2] / ss < 0
 			&& VH.back().ccw(intersection(VH[VH.size() - 2], ss)) < 0)
 			VH.pop_back();
