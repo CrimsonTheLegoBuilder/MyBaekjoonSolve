@@ -20,8 +20,6 @@ const ld PI = acos(-1);
 const int LEN = 1e3;
 int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
-int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
-int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 ld norm(ld th) {
 	while (th < -TOL) th += PI * 2;
@@ -47,33 +45,27 @@ ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
 std::vector<Seq> seq;
 
-//freopen("../../../input_data/triathlon_tests/triath.20", "r", stdin);
-//freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
-//Euler characteristic : v - e + f == 1
-//Pick`s Theorem : A = i + b/2 - 1
-//2D============================================================================//
-//2D============================================================================//
-//2D============================================================================//
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
 	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
-	ld operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
-	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
-	ld operator ^ (const Pos& p) const { return { x * p.y - y * p.x }; }
-	Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
+	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
+	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
+	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
+	Pos operator - () const { return { -x, -y }; }
+	Pos operator ~ () const { return { -y, x }; }
+	Pos operator ! () const { return { y, x }; }
 	ld xy() const { return x * y; }
 	Pos rot(ld the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
@@ -189,7 +181,7 @@ Pos intersection(const Line& l1, const Line& l2) {
 		(l2.c * v1.vy - l1.c * v2.vy) / det,
 	};
 }
-ld get_theta(const Line& b, const Line& l) {
+ld rad(const Line& b, const Line& l) {
 	ld x = (b * l) / b.mag();//dot
 	ld y = (b / l) / b.mag();//cross
 	return atan2(y, x);
@@ -299,4 +291,11 @@ bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 		cnt += ccw(cur, nxt, p) > 0;
 	}
 	return cnt & 1;
+}
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cin >> N;
+	Polygon A(N);
+	std::cin >> M;
+	Polygon B(M);
 }

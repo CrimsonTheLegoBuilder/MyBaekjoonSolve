@@ -199,6 +199,7 @@ ld get_theta(const Line& b, const Line& l) {
 	ld y = (b / l) / b.mag();//cross
 	return atan2(y, x);
 }
+ld rad(const Line& b, const Line& l) { return atan2(b / l, b * l); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
