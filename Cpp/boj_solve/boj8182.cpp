@@ -159,10 +159,11 @@ inline void solve() {
 		VH.push_back(ss);
 	}
 	Polygon ret;
-	ret.push_back(P(H[0]));
 	int sz;
 	sz = VH.size();
+	ret.push_back(P(H[0]));
 	for (int i = 0; i < sz - 1; i++) ret.push_back(intersection(VH[i], VH[i + 1]));
+	ret.push_back(P(H[N - 1]));
 	ld ans = 0;
 	sz = ret.size();
 	for (int i = 0; i < sz - 1; i++) ans += (ret[i] - ret[i + 1]).mag();
