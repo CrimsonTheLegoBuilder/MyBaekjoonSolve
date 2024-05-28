@@ -9,7 +9,7 @@ typedef long long ll;
 typedef double ld;
 //typedef long double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e5 + 1;
 int N, M, T, Q;
@@ -110,11 +110,20 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-std::vector<int> B[LEN];//blocked
-int G[LEN];
+Pos P(const Pii& p) { return Pos(p.x, p.y); }
 struct Seg {
-
+	Pii s, e;
+	Seg(Pii s = Pii(0, 0), Pii e = Pii(0, 0)) : s(s), e(e) {}
+	Pii S() const { return e - s; }
+	ll operator / (const Seg& p) const { return S() / p.S(); }
+	int ccw(const Pos& p) const { return sign((P(e) - P(s)) / (p - P(e))); }
 };
+Pos intersection(const Seg& u, const Seg& v) {
+	return intersection(P(u.s), P(u.e), P(v.s), P(v.e));
+}
+int G[LEN];
+std::vector<int> B[LEN];//blocked
+std::vector<Seg> segs, VH;
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -129,17 +138,35 @@ inline void solve() {
 		s--, e--;
 		B[s].push_back(e);
 	}
-	int X = N - 1;
-	for (int i = 0; i < N - 1; i++) {
-		std::sort(B[i].rbegin(), B[i].rend());
-		G[i] = N - 1;
-		for (const int& j : B[i]) {
-			if (X < j) break;
-			if (G[i] == j) G[i]--;
+	e = -1;
+	for (s = 0; s < N - 1; s++) {
+		std::sort(B[s].rbegin(), B[s].rend());
+		G[s] = N - 1;
+		for (const int& j : B[s]) {
+			if (G[s] > j) break;
+			if (G[s] == j) G[s]--;
 		}
-
+		if (e < G[s]) {
+			e = G[s];
+			segs.push_back(Seg(H[s], H[e]));
+		}
 	}
-
-
+	for (const Seg& ss : segs) {
+		while (VH.size() > 2
+			&& VH[VH.size() - 2] / ss < 0
+			&& VH.back().ccw(intersection(VH[VH.size() - 2], ss)) < 0)
+			VH.pop_back();
+		VH.push_back(ss);
+	}
+	Polygon ret;
+	ret.push_back(P(H[0]));
+	int sz;
+	sz = VH.size();
+	for (int i = 0; i < sz - 1; i++) ret.push_back(intersection(VH[i], VH[i + 1]));
+	ld ans = 0;
+	sz = ret.size();
+	for (int i = 0; i < sz - 1; i++) ans += (ret[i] - ret[i + 1]).mag();
+	std::cout << ans << "\n";
+	return;
 }
 int main() { solve(); return 0; }//boj8182 Island
