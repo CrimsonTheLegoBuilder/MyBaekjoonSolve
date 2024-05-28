@@ -32,24 +32,24 @@ struct Pii {
 	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator <= (const Pii& p) const { return x == p.x ? y <= p.y : x <= p.x; }
-	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
-	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
-	Pii operator * (const int& n) const { return { x * n, y * n }; }
-	Pii operator / (const int& n) const { return { x / n, y / n }; }
-	ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
-	ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
+	inline Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
+	inline Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
+	inline Pii operator * (const int& n) const { return { x * n, y * n }; }
+	inline Pii operator / (const int& n) const { return { x / n, y / n }; }
+	inline ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
+	inline ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
 	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
 	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
 	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
 	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-	Pii operator - () const { return { -x, -y }; }
-	Pii operator ~ () const { return { -y, x }; }
-	Pii operator ! () const { return { y, x }; }
-	ll xy() const { return (ll)x * y; }
+	inline Pii operator - () const { return { -x, -y }; }
+	inline Pii operator ~ () const { return { -y, x }; }
+	inline Pii operator ! () const { return { y, x }; }
+	inline ll xy() const { return (ll)x * y; }
 	inline ll Euc() const { return (ll)x * x + (ll)y * y; }
 	inline ld rad() const { return norm(atan2(y, x)); }
 	int Man() const { return std::abs(x) + std::abs(y); }
-	ld mag() const { return hypot(x, y); }
+	inline ld mag() const { return hypot(x, y); }
 	inline friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
 };
@@ -72,23 +72,23 @@ struct Pos {
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	inline Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
-	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
-	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
-	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
+	inline Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	inline Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
+	inline Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	inline ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	inline ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
-	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
+	inline Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	inline Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
+	inline Pos operator ~ () const { return { -y, x }; }
+	inline Pos operator ! () const { return { y, x }; }
 	ld xy() const { return x * y; }
 	inline Pos rot(ld the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
 	inline ld Euc() const { return x * x + y * y; }
-	ld mag() const { return sqrt(Euc()); }
+	inline ld mag() const { return sqrt(Euc()); }
 	//ld mag() const { return hypot(x, y); }
 	Pos unit() const { return *this / mag(); }
 	inline ld rad() const { return norm(atan2(y, x)); }
