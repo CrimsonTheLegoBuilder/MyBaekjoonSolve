@@ -301,7 +301,7 @@ bool query() {
 	norm(B);
 
 	//brute
-	ld ans = maxx - minx;
+	ld ans = INF;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
 			int ii = (i + 1) % N;
@@ -331,6 +331,10 @@ bool query() {
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(9);
 	while (query()) {}
 	return;
 }
+int main() { solve(); return 0; }//boj3922
