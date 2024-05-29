@@ -355,7 +355,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	freopen("shy_out.txt", "w", stdout);
+	//freopen("shy_out.txt", "w", stdout);
 	while (query()) {}
 	return;
 }
