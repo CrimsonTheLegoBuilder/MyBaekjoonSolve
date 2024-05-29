@@ -335,6 +335,10 @@ bool query() {
 		}
 	}
 	if (!F) ans = std::min(amaxx - aminx, bmaxx - bminx);
+	ans *= 100;
+	ans += 0.5;
+	ll a = ans;
+	ans = a / 100.;
 	std::cout << ans << "\n";
 	return 1;
 }
@@ -342,13 +346,11 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(5);
-	//freopen("shy_in.txt", "r", stdin);
-	//freopen("shy_out.txt", "w", stdout);
-	while (query()) {}
+	std::cout.precision(2);
+	query();
 	return;
 }
-int main() { solve(); return 0; }//boj3922 Shy Polygon
+int main() { solve(); return 0; }//boj1879 Shy Polygon
 
 /*
 
