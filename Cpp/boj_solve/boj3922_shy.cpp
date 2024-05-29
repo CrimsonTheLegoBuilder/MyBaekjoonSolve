@@ -261,22 +261,49 @@ std::vector<ld> dists(const Pos& a1, const Pos& a2, const Pos& b, const ld& D) {
 	Pos b1 = b + Pos(1, 0);
 	if (ccw(b, b1, p1) * ccw(b, b1, p2) <= 0) tmp.push_back(intersection(b, b1, p1, p2));
 	if (ccw(b, b1, q1) * ccw(b, b1, q2) <= 0) tmp.push_back(intersection(b, b1, q1, q2));
-	
+	auto inx1 = circle_line_intersection(a1, D, b, b1);
+	for (const Pos& p : inx1) tmp.push_back(p);
+	auto inx2 = circle_line_intersection(a2, D, b, b1);
+	for (const Pos& p : inx2) tmp.push_back(p);
+	for (const Pos& p : tmp) {
+		ld d = dist(a1, a2, p);
+		if (sign(D - d) >= 0) ret.push_back((b - p).mag() * sign(dot(b, b1, p)));
+	}
+	return ret;
 }
 bool query() {
 	ld D;
+	ld maxx = -INF, minx = INF;
 	std::cin >> D;
 	if (zero(D)) return 0;
 	std::cin >> N;
 	Polygon A(N);
-	for (Pos& p : A) std::cin >> p;
+	for (Pos& p : A)
+		std::cin >> p,
+		maxx = std::max(maxx, p.x),
+		minx = std::min(minx, p.x);
 	norm(A);
 	std::cin >> M;
 	Polygon B(M);
-	for (Pos& p : B) std::cin >> p;
+	for (Pos& p : B) 
+		std::cin >> p,
+		maxx = std::max(maxx, p.x),
+		minx = std::min(minx, p.x);
 	norm(B);
 	//brute
 
+	ld ans = maxx - minx;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			int ii = (i + 1) % N;
+			auto VD = dists(A[i], A[ii], B[j], D);
+			for (const ld& d : VD) {
+				Polygon MA;
+				for (const Pos& p : A) MA.push_back(p + Pos(1, 0) * d);
+				if (valid_check(MA, B, D)) ans;
+			}
+		}
+	}
 	return 1;
 }
 void solve() {
