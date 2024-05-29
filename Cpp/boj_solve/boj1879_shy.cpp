@@ -13,9 +13,9 @@ const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 int N, M, T, Q;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
-ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
+inline bool zero(const ld& x) { return std::abs(x) < TOL; }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
 struct Pos {
 	ld x, y;

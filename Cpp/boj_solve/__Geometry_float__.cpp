@@ -216,7 +216,16 @@ bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = dot(d1, d3, d2);
 	return !ccw(d1, d2, d3) && ret > 0;
 }
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
+inline ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	return (d2 - d1) * (d4 - d3) / (d2 - d1).mag();
+}
+inline ld dist(const Pos& d1, const Pos& d2, const Pos& t, bool f = 0) {
+	if (f) return std::abs(cross(d1, d2, t)) / (d1 - d2).mag();
+	if (sign(projection(d1, d2, d2, t)) <= 0 &&
+		sign(projection(d2, d1, d1, t)) <= 0)
+		return std::abs(cross(d1, d2, t)) / (d1 - d2).mag();
+	return std::min((d1 - t).mag(), (d2 - t).mag());
+}
 bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
 }
