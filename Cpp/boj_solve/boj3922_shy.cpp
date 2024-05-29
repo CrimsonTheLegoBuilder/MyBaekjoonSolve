@@ -326,6 +326,8 @@ bool query() {
 				Polygon MB;
 				for (const Pos& p : B) MB.push_back(p + Pos(1, 0) * d);
 				if (valid_check(MB, A, D)) {
+					ld dd = std::max(amaxx - bminx - d, bmaxx + d - aminx);
+					//ans = std::min(ans, dd);
 					ans = std::min(ans, max(MB, A));
 				}
 			}
@@ -337,6 +339,8 @@ bool query() {
 				Polygon MA;
 				for (const Pos& p : A) MA.push_back(p + Pos(1, 0) * d);
 				if (valid_check(MA, B, D)) {
+					ld dd = std::max(bmaxx - aminx - d, amaxx + d - bminx);
+					//ans = std::min(ans, dd);
 					ans = std::min(ans, max(MA, B));
 				}
 			}
@@ -351,6 +355,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
+	freopen("shy_out.txt", "w", stdout);
 	while (query()) {}
 	return;
 }
