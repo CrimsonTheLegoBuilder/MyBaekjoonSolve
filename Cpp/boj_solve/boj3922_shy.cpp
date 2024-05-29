@@ -5,12 +5,6 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <queue>
-#include <deque>
-#include <random>
-#include <array>
-#include <tuple>
-#include <complex>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -21,29 +15,7 @@ const int LEN = 1e3;
 int N, M, T, Q;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
-ld norm(ld th) {
-	while (th < -TOL) th += PI * 2;
-	while (th > PI * 2) th -= PI * 2;
-	return th;
-}
-ld flip(ld lat) {
-	if (zero(lat - PI * .5) || zero(lat + PI * .5)) return 0;
-	if (zero(lat)) return PI * .5;
-	if (lat > 0) return PI * .5 - lat;
-	if (lat < 0) return -(PI * .5) - lat;
-	return INF;
-}
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-//ll gcd(ll a, ll b) {
-//	while (b) {
-//		ll tmp = a % b;
-//		a = b;
-//		b = tmp;
-//	}
-//	return a;
-//}
-struct Seq { int x, y; Seq(int X = 0, int Y = 0) : x(X), y(Y) {} };
-std::vector<Seq> seq;
 
 struct Pos {
 	ld x, y;
@@ -214,72 +186,6 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
 Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
-ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-Polygon convex_cut(const std::vector<Pos>& ps, const Pos& b1, const Pos& b2) {
-	std::vector<Pos> qs;
-	int n = ps.size();
-	for (int i = 0; i < n; i++) {
-		Pos p1 = ps[i], p2 = ps[(i + 1) % n];
-		int d1 = ccw(b1, b2, p1), d2 = ccw(b1, b2, p2);
-		if (d1 >= 0) qs.push_back(p1);
-		if (d1 * d2 < 0) qs.push_back(intersection(p1, p2, b1, b2));
-	}
-	return qs;
-}
-Polygon sutherland_hodgman(const std::vector<Pos>& C, const std::vector<Pos>& clip) {
-	int sz = clip.size();
-	std::vector<Pos> ret = C;
-	for (int i = 0; i < sz; i++) {
-		Pos b1 = clip[i], b2 = clip[(i + 1) % sz];
-		ret = convex_cut(ret, b1, b2);
-	}
-	return ret;
-}
-std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
-	ld d = dist(p1, p2, o);
-	if (std::abs(d) > r) return {};
-	Pos vec = p2 - p1;
-	Pos m = intersection(p1, p2, o, o + ~vec);
-	ld distance = vec.mag();
-	ld ratio = sqrt(r * r - d * d);
-	Pos m1 = m - vec * ratio / distance;
-	Pos m2 = m + vec * ratio / distance;
-	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
-	return { m1, m2 };//p1->p2
-}
-std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
-	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
-		return w.include(intersection(u, v));
-		};
-	std::sort(HP.begin(), HP.end());
-	std::deque<Linear> dq;
-	int sz = HP.size();
-	for (int i = 0; i < sz; ++i) {
-		if (i && same_dir(HP[i], HP[(i - 1) % sz])) continue;
-		while (dq.size() > 1 && !check(dq[dq.size() - 2], dq[dq.size() - 1], HP[i])) dq.pop_back();
-		while (dq.size() > 1 && !check(dq[1], dq[0], HP[i])) dq.pop_front();
-		dq.push_back(HP[i]);
-	}
-	while (dq.size() > 2 && !check(dq[dq.size() - 2], dq[dq.size() - 1], dq[0])) dq.pop_back();
-	while (dq.size() > 2 && !check(dq[1], dq[0], dq[dq.size() - 1])) dq.pop_front();
-	sz = dq.size();
-	if (sz < 3) return {};
-	std::vector<Pos> HPI;
-	for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
-	return HPI;
-}
-bool inner_check(Pos H[], const int& sz, const Pos& p) {//concave
-	int cnt = 0;
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) return 1;
-		if (zero(cur.y - nxt.y)) continue;
-		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
-		cnt += ccw(cur, nxt, p) > 0;
-	}
-	return cnt & 1;
-}
 bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	int cnt = 0, sz = H.size();
 	for (int i = 0; i < sz; i++) {
@@ -292,10 +198,35 @@ bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	}
 	return cnt & 1;
 }
-void solve() {
-	std::cin.tie(0)->sync_with_stdio(0);
+ld area(std::vector<Pos>& H) {
+	Pos pivot = Pos(0, 0);
+	ld ret = 0;
+	int h = H.size();
+	for (int i = 0; i < h; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % h];
+		ret += cross(pivot, cur, nxt);
+	}
+	return ret / 2;
+}
+void norm(std::vector<Pos>& H) { if (area(H) < 0) std::reverse(H.begin(), H.end()); }
+bool query() {
+	ld D;
+	std::cin >> D;
+	if (zero(D)) return 0;
 	std::cin >> N;
 	Polygon A(N);
+	for (Pos& p : A) std::cin >> p;
+	norm(A);
 	std::cin >> M;
 	Polygon B(M);
+	for (Pos& p : B) std::cin >> p;
+	norm(B);
+	//brute
+
+	return 1;
+}
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	while (query()) {}
+	return;
 }
