@@ -274,24 +274,33 @@ std::vector<ld> dists(const Pos& a1, const Pos& a2, const Pos& b, const ld& D) {
 bool query() {
 	ld D;
 	ld maxx = -INF, minx = INF;
+	ld amaxx = -INF, aminx = INF;
+	ld bmaxx = -INF, bminx = INF;
+
 	std::cin >> D;
 	if (zero(D)) return 0;
 	std::cin >> N;
 	Polygon A(N);
-	for (Pos& p : A)
-		std::cin >> p,
-		maxx = std::max(maxx, p.x),
+	for (Pos& p : A) {
+		std::cin >> p;
+		maxx = std::max(maxx, p.x);
 		minx = std::min(minx, p.x);
+		amaxx = std::max(amaxx, p.x);
+		aminx = std::min(aminx, p.x);
+	}
 	norm(A);
 	std::cin >> M;
 	Polygon B(M);
-	for (Pos& p : B) 
-		std::cin >> p,
-		maxx = std::max(maxx, p.x),
+	for (Pos& p : B) {
+		std::cin >> p;
+		maxx = std::max(maxx, p.x);
 		minx = std::min(minx, p.x);
+		bmaxx = std::max(bmaxx, p.x);
+		bminx = std::min(bminx, p.x);
+	}
 	norm(B);
-	//brute
 
+	//brute
 	ld ans = maxx - minx;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
@@ -300,10 +309,24 @@ bool query() {
 			for (const ld& d : VD) {
 				Polygon MA;
 				for (const Pos& p : A) MA.push_back(p + Pos(1, 0) * d);
-				if (valid_check(MA, B, D)) ans;
+				if (valid_check(MA, B, D)) {
+					ld dd = std::max(std::abs(bmaxx - (aminx + d)), std::abs(amaxx + d - bminx));
+					ans = std::min(ans, dd);
+				}
+			}
+			int jj = (j + 1) % M;
+			auto WD = dists(B[j], B[jj], A[i], D);
+			for (const ld& d : WD) {
+				Polygon MB;
+				for (const Pos& p : B) MB.push_back(p + Pos(1, 0) * d);
+				if (valid_check(MB, A, D)) {
+					ld dd = std::max(std::abs(amaxx - (bminx + d)), std::abs(bmaxx + d - aminx));
+					ans = std::min(ans, dd);
+				}
 			}
 		}
 	}
+	std::cout << ans << "\n";
 	return 1;
 }
 void solve() {
