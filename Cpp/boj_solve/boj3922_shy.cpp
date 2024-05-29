@@ -314,13 +314,15 @@ bool query() {
 
 	//brute
 	ld ans = INF;
+	bool F = 0;
 	if (valid_check(A, B, D)) ans = std::min(ans, maxx - minx);
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
 			int ii = (i + 1) % N;
 			auto VD = dists(A[i], A[ii], B[j], D);
-			std::cout << "DEBUG:: VD " << VD.size() << " DEBUG::\n";
+			//std::cout << "DEBUG:: VD " << VD.size() << " DEBUG::\n";
 			for (const ld& d : VD) {
+				F = 1;
 				Polygon MB;
 				for (const Pos& p : B) MB.push_back(p + Pos(1, 0) * d);
 				if (valid_check(MB, A, D)) {
@@ -329,8 +331,9 @@ bool query() {
 			}
 			int jj = (j + 1) % M;
 			auto WD = dists(B[j], B[jj], A[i], D);
-			std::cout << "DEBUG:: WD" << WD.size() << " DEBUG::\n";
+			//std::cout << "DEBUG:: WD" << WD.size() << " DEBUG::\n";
 			for (const ld& d : WD) {
+				F = 1;
 				Polygon MA;
 				for (const Pos& p : A) MA.push_back(p + Pos(1, 0) * d);
 				if (valid_check(MA, B, D)) {
@@ -339,6 +342,7 @@ bool query() {
 			}
 		}
 	}
+	if (!F) ans = std::min(amaxx - aminx, bmaxx - bminx);
 	std::cout << ans << "\n";
 	return 1;
 }
@@ -350,7 +354,7 @@ void solve() {
 	while (query()) {}
 	return;
 }
-int main() { solve(); return 0; }//boj3922
+int main() { solve(); return 0; }//boj3922 Shy Polygon
 
 /*
 
