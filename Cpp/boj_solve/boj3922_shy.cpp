@@ -232,13 +232,13 @@ bool valid_check(const Polygon& A, const Polygon& B, const ld& D) {
 			int ii = (i + 1) % sza;
 			int jj = (j + 1) % szb;
 			if (intersect(A[i], A[ii], B[j], B[jj])) return 0;
-			if (dist(A[i], A[ii], B[j]) < D) return 0;
-			if (dist(A[i], A[ii], B[jj]) < D) return 0;
-			if (dist(B[j], B[jj], A[i]) < D) return 0;
-			if (dist(B[j], B[jj], A[ii]) < D) return 0;
+			if (sign(D - dist(A[i], A[ii], B[j])) > 0) return 0;
+			if (sign(D - dist(A[i], A[ii], B[jj])) > 0) return 0;
+			if (sign(D - dist(B[j], B[jj], A[i])) > 0) return 0;
+			if (sign(D - dist(B[j], B[jj], A[ii])) > 0) return 0;
 		}
 	}
-	return !inner_check(A, B[0]);
+	return !inner_check(A, B[0]) && !inner_check(B, A[0]);
 }
 std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
 	ld d = dist(p1, p2, o, 1);
@@ -271,6 +271,18 @@ std::vector<ld> dists(const Pos& a1, const Pos& a2, const Pos& b, const ld& D) {
 	}
 	return ret;
 }
+ld max(const Polygon& A, const Polygon& B) {
+	ld maxx = -INF, minx = INF;
+	for (const Pos& p : A) {
+		maxx = std::max(maxx, p.x);
+		minx = std::min(minx, p.x);
+	}
+	for (const Pos& p : B) {
+		maxx = std::max(maxx, p.x);
+		minx = std::min(minx, p.x);
+	}
+	return maxx - minx;
+}
 bool query() {
 	ld D;
 	ld maxx = -INF, minx = INF;
@@ -302,26 +314,27 @@ bool query() {
 
 	//brute
 	ld ans = INF;
+	if (valid_check(A, B, D)) ans = std::min(ans, maxx - minx);
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
 			int ii = (i + 1) % N;
 			auto VD = dists(A[i], A[ii], B[j], D);
+			std::cout << "DEBUG:: VD " << VD.size() << " DEBUG::\n";
 			for (const ld& d : VD) {
-				Polygon MA;
-				for (const Pos& p : A) MA.push_back(p + Pos(1, 0) * d);
-				if (valid_check(MA, B, D)) {
-					ld dd = std::max(std::abs(bmaxx - (aminx + d)), std::abs(amaxx + d - bminx));
-					ans = std::min(ans, dd);
+				Polygon MB;
+				for (const Pos& p : B) MB.push_back(p + Pos(1, 0) * d);
+				if (valid_check(MB, A, D)) {
+					ans = std::min(ans, max(MB, A));
 				}
 			}
 			int jj = (j + 1) % M;
 			auto WD = dists(B[j], B[jj], A[i], D);
+			std::cout << "DEBUG:: WD" << WD.size() << " DEBUG::\n";
 			for (const ld& d : WD) {
-				Polygon MB;
-				for (const Pos& p : B) MB.push_back(p + Pos(1, 0) * d);
-				if (valid_check(MB, A, D)) {
-					ld dd = std::max(std::abs(amaxx - (bminx + d)), std::abs(bmaxx + d - aminx));
-					ans = std::min(ans, dd);
+				Polygon MA;
+				for (const Pos& p : A) MA.push_back(p + Pos(1, 0) * d);
+				if (valid_check(MA, B, D)) {
+					ans = std::min(ans, max(MA, B));
 				}
 			}
 		}
@@ -338,3 +351,21 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj3922
+
+/*
+
+10.5235
+3
+0 0
+100 100
+0 100
+4
+0 50
+20 50
+20 80
+0 80
+0
+
+114.882476
+
+*/
