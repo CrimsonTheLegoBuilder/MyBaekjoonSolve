@@ -68,17 +68,22 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0;
 }
-//bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-//	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
-//}
+bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
+	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
+}
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
 	//return f1 && f2;
-	bool f3 = on_seg_strong(s1, s2, d1) ||
-		on_seg_strong(s1, s2, d2) ||
-		on_seg_strong(d1, d2, s1) ||
-		on_seg_strong(d1, d2, s2);
+	//bool f3 = on_seg_strong(s1, s2, d1) ||
+	//	on_seg_strong(s1, s2, d2) ||
+	//	on_seg_strong(d1, d2, s1) ||
+	//	on_seg_strong(d1, d2, s2);
+	//return (f1 && f2) || f3;
+	bool f3 = on_seg_weak(s1, s2, d1) ||
+		on_seg_weak(s1, s2, d2) ||
+		on_seg_weak(d1, d2, s1) ||
+		on_seg_weak(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
 struct Seg {
