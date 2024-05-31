@@ -222,6 +222,10 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+	ll ret = cross(d1, d2, d3, d4);
+	return !ret ? 0 : ret > 0 ? 1 : -1;
+}
 ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
 ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return (d2 - d1) * (d4 - d3) / (d2 - d1).mag();
