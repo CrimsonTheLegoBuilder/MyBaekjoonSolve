@@ -60,23 +60,11 @@ ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 -
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ll ret = cross(d1, d2, d3);
-	return !ret ? 0 : ret > 0 ? 1 : -1;
-}
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	ll ret = cross(d1, d2, d3, d4);
-	return !ret ? 0 : ret > 0 ? 1 : -1;
-}
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0;
-}
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
-}
-int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	return !ccw(d1, d2, d3) && !ccw(d1, d2, d4);
-}
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return ret < 0 ? -1 : !!ret; }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = cross(d1, d2, d3, d4); return ret < 0 ? -1 : !!ret; }
+bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
+bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0; }
+int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 void get_round_memo(Polygon& H, vld& memo) {
 	int sz = H.size();
 	memo.resize(sz + 1, 0);
@@ -105,9 +93,11 @@ struct HullNode {
 	Pos l, r, top;
 	Polygon hull;
 	vld memo;
-	HullNode(Pos l = Pos(), Pos r = Pos(), Polygon h = {}) : l(l), r(r) {
+	HullNode(Polygon h = {}) {
 		hull = h;
 		get_round_memo(hull, memo);
+		l = hull[0];
+		r = hull.back();
 		top = hull[0];
 		for (const Pos& p : hull) if (top.y < p.y) top = p;
 	}
@@ -116,7 +106,7 @@ struct HullNode {
 		for (const Pos& p : hull) C.push_back(p);
 		for (const Pos& p : R.hull) C.push_back(p);
 		H = upper_monotone_chain(C);
-		return HullNode(H[0], H.back(), H);
+		return HullNode(H);
 	}
 	ld len(int s, int e) const {
 		if (!memo.size() || s == e) return 0;
@@ -141,13 +131,12 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 	Polygon& L = hull_tree[I].hull, R = hull_tree[J].hull;
 	if (!L.size() || !R.size()) return Seg(Pos(-1, -1), Pos(-1, -1), -1);
 	if (L.size() == 1 && R.size() == 1) return Seg(L[0], R[1], I);
-	//auto on_hull = [&](const Pos& p, const Polygon& h) -> bool {
-	//	return h[0].x <= p.x && p.x <= h.back().x;
-	//	};
 	int szl = L.size(), szr = R.size();
 	if (L.size() == 1) {//corner case
 		//divide hull
 		Pos& p = L[0];
+		if (p.x <= R[0].x && ccw(R[0], R[1], p) >= 0) return Seg(L[0], R[0], I);
+		if (ccw(R[szr - 2], R.back(), p) >= 0) return Seg(L[0], R.back(), I);
 		int s = 0, e = szr - 1, k, m;
 		while (s + 1 < e) {
 			k = s + e >> 1;
@@ -156,24 +145,36 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 			else e = k;
 		}
 		//r-search
-		int s1 = 0, e1 = s;
+		int s1 = s + 1, e1 = szr - 2;
 		while (s1 < e1) {
 			m = s1 + e1 >> 1;
-			Pos p1 = p, cur = R[m], nxt = R[(m + 1) % szr];
-			if (ccw(p1, cur, nxt) > 0) s1 = m + 1;
+			Pos p1 = p, cur = R[m], nxt = R[m + 1];
+			if (ccw(p1, cur, nxt) < 0) s1 = m + 1;
 			else e1 = m;
 		}
-		int i1 = s1;
-		if (!ccw(p, R[i1], R[(i1 + 1) % szr]) && dot(p, R[(i1 + 1) % szr], R[i1]) > 0) i1 = (i1 + 1) % szr;
-
-		return Seg(O, O, I);
+		return Seg(L[0], R[s1], I);
 	}
 	else if (R.size() == 1) {//corner case
 		//divide hull
-
+		Pos& p = R[0];
+		if (L.back().x <= p.x && ccw(L[szl - 2], L.back(), p) <= 0) return Seg(L.back(), R[0], I);
+		if (ccw(L[0], L[1], p) >= 0) return Seg(L[0], R[0], I);
+		int s = 0, e = szl - 1, k, m;
+		while (s + 1 < e) {
+			k = s + e >> 1;
+			int CCW = ccw(L[0], L[k], p);
+			if (CCW > 0) s = k;
+			else e = k;
+		}
 		//l-search
-
-		return Seg(O, O, I);
+		int s1 = s + 1, e1 = szl - 2;
+		while (s1 < e1) {
+			m = s1 + e1 >> 1;
+			Pos p1 = p, cur = L[m], nxt = L[m + 1];
+			if (ccw(p1, cur, nxt) < 0) s1 = m + 1;
+			else e1 = m;
+		}
+		return Seg(L[s1], R[0], I);
 	}
 	int l = szl - 1, r = 0;
 	auto tangent_check = [&](const int& i, const int& j) -> bool {
@@ -215,8 +216,6 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 		}
 		f ^= 1;
 	}
-	//if (l > 0 && !ccw(L[l], R[r], L[l - 1])) l--;
-	//if (r < szr - 1 && !ccw(L[l], R[r], R[r + 1])) r++;
 	return Seg(L[l], R[r], I);
 }
 typedef std::vector<Seg> Bridge;
@@ -258,20 +257,21 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	sz = stack.size();
 	for (int i = 0; i < sz - 1; i++)
 		H.push_back(upper_tangent_bi_search(stack[i].i, stack[i + 1].i));
-	for (int i = 0; i < sz - 1; i++) {
+	sz = H.size();
+	for (int i = 0; i < sz; i++) {
 		ret += (H[i].e - H[i].s).mag();
-		if (i > 0) ret += hull_tree[H[i].i].len(H[i - 1].e.i, H[i].s.i);
+		if (i < sz - 1) ret += hull_tree[H[i + 1].i].len(H[i].e.i, H[i + 1].s.i);
 	}
 	return ret;
 }
-void query(Pos& pre) {
+inline void query(Pos& pre) {
 	Pos cur;
 	std::cin >> cur;
-	std::cout << upper_monotone_chain(pre, cur);
+	std::cout << upper_monotone_chain(pre, cur) << "\n";
 	pre = cur;
 	return;
 }
-void query() {
+inline void query() {
 	std::cin >> Q, Q--;
 	Pos pre;
 	std::cin >> pre;
@@ -280,9 +280,14 @@ void query() {
 }
 Polygon MT[LEN];
 HullNode init(int s = 1, int e = K, int i = 1) {
-
+	if (s == e) {
+		hull_tree[i] = HullNode(MT[s]);
+		return;
+	}
+	int m = s + e >> 1;
+	return hull_tree[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
 }
-void solve() {
+inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
@@ -292,10 +297,10 @@ void solve() {
 	for (Pos& p : C) std::cin >> p;
 
 	//separating convex hulls
-	K = 0;
+	K = 1;
+	Polygon tmp;
 	for (int i = 0; i < N; i++) {
-		Polygon tmp;
-		if (tmp.size() > 1 && ccw(tmp[tmp.size() - 2], tmp.back(), C[i]) < 0) {
+		if (tmp.size() > 1 && ccw(tmp[tmp.size() - 2], tmp.back(), C[i]) > 0) {
 			int j = 0;
 			for (Pos& p : tmp) p.i = j++, p.hi = K, MT[K].push_back(p);
 			K++;
@@ -305,12 +310,14 @@ void solve() {
 		}
 		tmp.push_back(C[i]);
 	}
+	K--;
 
 	//tree init
 	init();
-
+	
+	//query
 	query();
 
 	return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj11002
