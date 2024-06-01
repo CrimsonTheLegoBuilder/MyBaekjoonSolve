@@ -12,7 +12,7 @@ const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
-int N, M, T, Q;
+int N, M, K, T, Q;
 inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
@@ -138,7 +138,7 @@ Seg upper_tangent_bi_search(const Polygon& L, const Polygon& R, const int& I) {
 				if (ccw(L[l], R[m], R[m + 1]) > 0) s = m + 1;
 				else e = m;
 			}
-			if (s > 0 && !ccw(L[l], R[s], R[s - 1])) s--;
+			if (s < szr - 1 && !ccw(L[l], R[s], R[s + 1])) s++;
 			r = s;
 		}
 		else if (f) {//l search
@@ -149,13 +149,13 @@ Seg upper_tangent_bi_search(const Polygon& L, const Polygon& R, const int& I) {
 				if (ccw(L[m], R[r], L[m + 1]) > 0) s = m + 1;
 				else e = m;
 			}
+			if (s > 0 && !ccw(L[l], R[s], L[s - 1])) s--;
 			l = s;
-			if (s < szl - 1 && !ccw(L[l], R[s], R[s + 1])) s++;
 		}
 		f ^= 1;
 	}
-	if (r > 0 && !ccw(L[l], R[r], R[r - 1])) r--;
-	if (l < szl - 1 && !ccw(L[l], R[r], L[l + 1])) l++;
+	if (l > 0 && !ccw(L[l], R[r], L[l - 1])) l--;
+	if (r < szr - 1 && !ccw(L[l], R[r], R[r + 1])) r++;
 	return Seg(L[l], R[r], I);
 }
 struct HullNode {
@@ -181,6 +181,30 @@ struct Bridge {
 		s = HN.l;
 		e = HN.r;
 	}
+	Bridge(int I = 0, Pos S = Pos(), Pos E = Pos()) : i(I), s(S), e(E) {}
 	bool operator < (const Bridge& p) const { return s == p.s ? e < p.e : s < p.s; }
 };
-typedef std::vector<Bridge> BBB;
+typedef std::vector<Bridge> VectorB;
+bool search(const Pos& L, const Pos& R, VectorB& BBB , int s = 1, int e = K, int i = 1) {
+	if (s == e) {
+		bool f = 0;
+		if (hull_tree[i].l.x <= L.x && L.x <= hull_tree[i].r.x)
+			BBB.push_back(Bridge(i, hull_tree[i]));
+		else if (hull_tree[i].l.x <= R.x && R.x <= hull_tree[i].r.x) {
+			BBB.push_back(Bridge(i, hull_tree[i])), f = 1;
+		}
+		return f;
+	}
+	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return;
+	int m = s + e >> 1;
+	return search(L, R, BBB, s, m, i << 1) || search(L, R, BBB, m + 1, e, i << 1 | 1);
+}
+ld upper_monotone_chain(Pos L, Pos R) {
+	ld ret = 0;
+	if (R < L) std::swap(L, R);
+	VectorB BBB, stack;
+	search(L, R, BBB);
+	std::sort(BBB.begin(), BBB.end());
+	stack.push_back(Bridge(-1, L, L));
+	return ret;
+}
