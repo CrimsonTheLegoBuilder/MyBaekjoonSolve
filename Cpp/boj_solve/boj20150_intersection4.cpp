@@ -270,7 +270,7 @@ inline bool solve() {
 	std::cout << 0;
 	return 0;
 }
-int main() { solve(); return 0; }//boj20151
+int main() { solve(); return 0; }//boj20150
 
 
 /*

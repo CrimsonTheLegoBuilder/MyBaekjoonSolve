@@ -6,7 +6,8 @@
 #include <cassert>
 #include <vector>
 typedef long long ll;
-typedef double ld;
+//typedef double ld;
+typedef long double ld;
 typedef std::vector<ld> vld;
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
@@ -116,7 +117,7 @@ struct HullNode {
 		return HullNode(H);
 	}
 	ld len(int s, int e) const {
-		if (!memo.size() || s == e) return 0;
+		if (memo.size() <= 1 || s == e) return 0;
 		return memo[e] - memo[s];
 	}
 } hull_tree[LEN << 2];//semi-hull index tree (shit)
@@ -474,6 +475,23 @@ int main() { solve(); return 0; }//boj11002 Crow
 -1 0
 12 0
 14.9030655007
+
+12
+0 0
+1 2
+2 2
+3 0
+4 0
+5 3
+6 3
+7 0
+8 0
+9 3
+10 2
+11 0
+2
+5 3
+10 3
 
 */
 
