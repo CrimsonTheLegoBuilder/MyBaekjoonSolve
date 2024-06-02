@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
+#include <unordered_map>
 typedef long long ll;
 //typedef double ld;
 typedef long double ld;
@@ -22,6 +23,7 @@ inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 //freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
 
 //#define DEBUG
+//#define MAP_search
 
 struct Pos {
 	int x, y;
@@ -60,6 +62,16 @@ bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.
 bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 //bool cmpi(const Pos& p, const Pos& q) { return p.i < q.i; }
 typedef std::vector<Pos> Polygon;
+namespace std {
+	template<>
+	struct hash<Pos> {
+		std::size_t operator()(const Pos& p) const {
+			std::size_t h1 = std::hash<int>()(p.x);
+			std::size_t h2 = std::hash<int>()(p.y);
+			return h1 ^ (h2 << 1);
+		}
+	};
+}
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -122,15 +134,17 @@ struct Seg {
 	Pos s, e;
 	int i;
 	Seg(Pos s = Pos(), Pos e = Pos(), int I = 0) : s(s), e(e), i(I) {}
-	Seg(int I = 0, const HullNode& HN = HullNode(Polygon())) : i(I) {
-		s = HN.l;
-		e = HN.r;
-	}
+	//Seg(int I = 0, const HullNode& HN = HullNode(Polygon())) : i(I) {
+	//	s = HN.l;
+	//	e = HN.r;
+	//}
 	Pos S() const { return e - s; }
 	bool operator < (const Seg& p) const { return s == p.s ? e < p.e : s < p.s; }
 	bool operator = (const Seg& p) const { return s == p.s && e == p.e; }
 	ll operator / (const Seg& p) const { return S() / p.S(); }
 };
+Seg make_seg(int I = 0, const HullNode& HN = HullNode(Polygon())) { return Seg(HN.l, HN.r, I); }
+std::unordered_map<Pos, Seg> MAP;
 int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 18190
 	int sz = H.size();
 	int i1{ 0 }, i2{ 0 };
@@ -209,6 +223,15 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 	return ans;
 }
 Seg upper_tangent_bi_search(const int& I, const int& J) {
+#ifdef MAP_search
+	if (0 < I && J <= K * 4) {
+#ifdef DEBUG
+		std::cout << "find upper tangent [" << I << "][" << J << "], MAP search::\n";
+#endif
+		auto it = MAP.find(Pos(I, J));
+		if (it != MAP.end()) return it->second;
+	}
+#endif
 #ifdef DEBUG
 	std::cout << "find upper tangent [" << I << "][" << J << "]\n";
 #endif
@@ -227,6 +250,9 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 #ifdef DEBUG
 		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[0], I).S() << "\n";
 #endif
+#ifdef MAP_search
+		if (0 < I && J <= K * 4) MAP[Pos(I, J)] = Seg(L[0], R[0], I);
+#endif
 		return Seg(L[0], R[0], I);
 	}
 	int szl = L.size(), szr = R.size();
@@ -235,12 +261,18 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 #ifdef DEBUG
 		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[i], I).S() << "\n";
 #endif
+#ifdef MAP_search
+		if (0 < I && J <= K * 4) MAP[Pos(I, J)] = Seg(L[0], R[i], I);
+#endif
 		return Seg(L[0], R[i], I);
 	}
 	if (R.size() == 1) {
 		int i = find_tangent_bi_search(L, R[0], 0);
 #ifdef DEBUG
 		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[i], R[0], I).S() << "\n";
+#endif
+#ifdef MAP_search
+		if (0 < I && J <= K * 4) MAP[Pos(I, J)] = Seg(L[i], R[0], I);
 #endif
 		return Seg(L[i], R[0], I);
 	}
@@ -278,6 +310,9 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 #ifdef DEBUG
 	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
 #endif
+#ifdef MAP_search
+	if (0 < I && J <= K * 4) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
+#endif
 	return Seg(L[l], R[r], I);
 }
 typedef std::vector<Seg> Bridge;
@@ -288,14 +323,14 @@ bool search(const Pos& L, const Pos& R, Bridge& BBB , int s = 1, int e = K, int 
 		std::cout << "DEBUG:: i, s, e : " << i << " " << s << " " << e << "\n";
 #endif
 		if (hull_tree[i].l.x <= L.x && L.x <= hull_tree[i].r.x)
-			f = 1, BBB.push_back(Seg(i, hull_tree[i]));
+			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
 		else if (hull_tree[i].l.x <= R.x && R.x <= hull_tree[i].r.x) 
-			f = 1, BBB.push_back(Seg(i, hull_tree[i]));
+			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
 		return f;
 	}
 	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return 0;
 	if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x) {
-		f = 1, BBB.push_back(Seg(i, hull_tree[i]));
+		f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
 		return f;
 	}
 	int m = s + e >> 1;
