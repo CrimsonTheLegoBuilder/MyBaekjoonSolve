@@ -79,7 +79,7 @@ void get_round_memo(Polygon& H, vld& memo) {
 	}
 	return;
 }
-std::vector<Pos> upper_monotone_chain(std::vector<Pos>& C) {
+Polygon upper_monotone_chain(Polygon& C) {
 	Polygon H;
 	std::sort(C.begin(), C.end());
 	if (C.size() <= 2) { for (const Pos& p : C) H.push_back(p); }
@@ -93,7 +93,7 @@ std::vector<Pos> upper_monotone_chain(std::vector<Pos>& C) {
 	return H;
 }
 struct HullNode {
-	Pos l, r, top;
+	Pos l, r;
 	Polygon hull;
 	vld memo;
 	HullNode(Polygon h = {}) {
@@ -105,9 +105,6 @@ struct HullNode {
 		else l = Pos();
 		if (hull.size()) r = hull.back();
 		else r = Pos();
-		if (hull.size()) top = hull[0];
-		else top = Pos();
-		for (const Pos& p : hull) if (top.y < p.y) top = p;
 	}
 	HullNode operator + (const HullNode& R) const {
 		Polygon C, H;
@@ -286,29 +283,35 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 	return Seg(L[l], R[r], I);
 }
 typedef std::vector<Seg> Bridge;
-void search(const Pos& L, const Pos& R, Bridge& BBB , int s = 1, int e = K, int i = 1) {
+bool search(const Pos& L, const Pos& R, Bridge& BBB , int s = 1, int e = K, int i = 1) {
+	bool f = 0;
 	if (s == e) {
+#ifdef DEBUG
+		std::cout << "DEBUG:: i, s, e : " << i << " " << s << " " << e << "\n";
+#endif
 		if (hull_tree[i].l.x <= L.x && L.x <= hull_tree[i].r.x)
-			BBB.push_back(Seg(i, hull_tree[i]));
+			f = 1, BBB.push_back(Seg(i, hull_tree[i]));
 		else if (hull_tree[i].l.x <= R.x && R.x <= hull_tree[i].r.x) 
-			BBB.push_back(Seg(i, hull_tree[i]));
-		return;
+			f = 1, BBB.push_back(Seg(i, hull_tree[i]));
+		return f;
 	}
-	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return;
+	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return 0;
 	if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x) {
-		BBB.push_back(Seg(i, hull_tree[i]));
-		return;
+		f = 1, BBB.push_back(Seg(i, hull_tree[i]));
+		return f;
 	}
 	int m = s + e >> 1;
-	search(L, R, BBB, s, m, i << 1);
-	search(L, R, BBB, m + 1, e, i << 1 | 1);
+	bool ls = search(L, R, BBB, s, m, i << 1);
+	bool rs = search(L, R, BBB, m + 1, e, i << 1 | 1);
+	return ls || rs;
 }
 ld upper_monotone_chain(Pos L, Pos R) {
 	if (L.x == R.x) { return std::abs(L.y - R.y); }
 	ld ret = 0;
 	if (R < L) std::swap(L, R);
 	Bridge BBB, stack, H;
-	search(L, R, BBB);
+	bool f = search(L, R, BBB);
+	if (!f) { return (L - R).mag(); }
 	std::sort(BBB.begin(), BBB.end());
 	//BBB.erase(unique(BBB.begin(), BBB.end()), BBB.end());
 	hull_tree[0].hull = { L };
@@ -317,7 +320,7 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	BBB.push_back(Seg(R, R, N << 2 | 1));
 
 #ifdef DEBUG
-	std::cout << "\nDEBUG:: Pos L : " << L << " Pos R : " << R << "\n";
+	std::cout << "DEBUG:: Pos L : " << L << " Pos R : " << R << "\n";
 	std::cout << "SEG BBB :\n";
 	for (const Seg& B : BBB) std::cout << B.s << " " << B.e << "\n";
 #endif
@@ -381,7 +384,7 @@ inline void query() {
 }
 Polygon MT[LEN];
 HullNode init(int s = 1, int e = K, int i = 1) {
-	if (s == e) return hull_tree[i] = HullNode(MT[s]);
+	if (s == e) return hull_tree[i] = HullNode(upper_monotone_chain(MT[s]));
 	int m = s + e >> 1;
 	return hull_tree[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
 }
@@ -411,8 +414,7 @@ inline void solve() {
 #endif
 
 	}
-	int j = 0;
-	for (Pos& p : tmp) p.i = j++, MT[K].push_back(p);
+	for (Pos& p : tmp) MT[K].push_back(p);
 	tmp.clear();
 
 	//tree init
@@ -429,6 +431,7 @@ inline void solve() {
 	for (int i = 0; i <= K * 4; i++) {
 		int j = 0;
 		for (const Pos& p : hull_tree[i].hull) std::cout << "hull[" << i << "][" << j++ << "] : " << p << "\n";
+		j = 0;
 		for (const ld& ln : hull_tree[i].memo) std::cout << "memo[" << i << "][" << j++ << "] : " << ln << "\n";
 		std::cout << "\n";
 	}
@@ -492,146 +495,79 @@ int main() { solve(); return 0; }//boj11002 Crow
 2
 5 3
 10 3
+5.000000
+
+12
+0 0
+1 2
+2 2
+3 0
+4 0
+5 3
+6 3
+7 0
+8 0
+9 3
+10 2
+11 0
+2
+3 3
+4 3
+1.000000
+
+4
+0 10
+3 0
+6 0
+9 10
+2
+1 9
+8 9
+7.000000
+
+12
+0 5
+1 4
+2 3
+3 2
+4 1
+5 0
+6 0
+7 1
+8 2
+9 3
+10 4
+11 5
+10
+3 4
+8 4
+3 4
+8 4
+3 4
+8 4
+3 4
+8 4
+3 4
+8 4
+45.0000000000
+
+12
+0 0
+1 100
+2 99
+3 90
+4 50
+5 0
+6 0
+7 50
+8 90
+9 99
+10 100
+11 0
+2
+2 100
+9 100
+
+
 
 */
-
-//Seg upper_tangent_bi_search(const int& I, const int& J) {
-//#ifdef DEBUG
-//	std::cout << "find upper tangent [" << I << "][" << J << "]\n";
-//#endif
-//	Polygon& L = hull_tree[I].hull, R = hull_tree[J].hull;
-//#ifdef DEBUG
-//	for (const Pos& p : L) std::cout << "L : " << p << "\n";
-//	for (const Pos& p : R) std::cout << "R : " << p << "\n";
-//#endif
-//	if (!L.size() || !R.size()) {
-//#ifdef DEBUG
-//		std::cout << "SHIT\n";
-//#endif
-//		return Seg(Pos(-1, -1), Pos(-1, -1), -1);
-//	}
-//	if (L.size() == 1 && R.size() == 1) {
-//#ifdef DEBUG
-//		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[0], I).S() << "\n";
-//#endif
-//		return Seg(L[0], R[0], I);
-//	}
-//	int szl = L.size(), szr = R.size();
-//	bool f = 0;
-//	if (L.size() == 1) {//corner case
-//		//divide hull
-//		Pos& p = L[0];
-//		f = ccw(R[0], R[1], p) > 0;
-//		if (p.x <= R[0].x && ccw(R[0], R[1], p) <= 0) {
-//#ifdef DEBUG
-//			std::cout << "1 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[0], I).S() << "\n";
-//#endif
-//			return Seg(L[0], R[0], I);
-//		}
-//		if (ccw(R[szr - 2], R.back(), p) >= 0) {
-//#ifdef DEBUG
-//			std::cout << "2 Seg[" << I << "][" << J << "] : " << Seg(L[0], R.back(), I).S() << "\n";
-//#endif
-//			return Seg(L[0], R.back(), I);
-//		}
-//		int s = 0, e = szr - 1, k, m;
-//		while (s + 1 < e) {
-//			k = s + e >> 1;
-//			int CCW = ccw(R[0], R[k], p);
-//			if (CCW < 0) s = k;
-//			else e = k;
-//		}
-//		//r-search
-//		int s1 = s, e1 = szr - 2;
-//		//std::cout << "s1, e1: " << s1 << " " << e1 << "\n";
-//		while (s1 < e1) {
-//			m = s1 + e1 >> 1;
-//			Pos p1 = p, cur = R[m], nxt = R[m + 1];
-//			if (ccw(p1, cur, nxt) > 0) s1 = m + 1;
-//			else e1 = m;
-//		}
-//#ifdef DEBUG
-//		std::cout << "3 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[s1], I).S() << "\n";
-//#endif
-//		return Seg(L[0], R[s1], I);
-//	}
-//	else if (R.size() == 1) {//corner case
-//		//divide hull
-//		Pos& p = R[0];
-//		if (L.back().x <= p.x && ccw(L[szl - 2], L.back(), p) <= 0) {
-//#ifdef DEBUG
-//			std::cout << "1 Seg[" << I << "][" << J << "] : " << Seg(L.back(), R[0], I).S() << "\n";
-//#endif
-//			return Seg(L.back(), R[0], I);
-//		}
-//		if (ccw(L[0], L[1], p) >= 0) {
-//#ifdef DEBUG
-//			std::cout << "2 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[0], I).S() << "\n";
-//#endif
-//			return Seg(L[0], R[0], I);
-//		}
-//		int s = 0, e = szl - 1, k, m;
-//		while (s + 1 < e) {
-//			k = s + e >> 1;
-//			int CCW = ccw(L[0], L[k], p);
-//			if (CCW > 0) s = k;
-//			else e = k;
-//		}
-//		//l-search
-//		int s1 = s, e1 = szl - 2;
-//		while (s1 < e1) {
-//			m = s1 + e1 >> 1;
-//			Pos p1 = p, cur = L[m], nxt = L[m + 1];
-//			if (ccw(p1, cur, nxt) > 0) s1 = m + 1;
-//			else e1 = m;
-//		}
-//#ifdef DEBUG
-//		std::cout << "3 Seg[" << I << "][" << J << "] : " << Seg(L[s1], R[0], I).S() << "\n";
-//#endif
-//		return Seg(L[s1], R[0], I);
-//	}
-//int l = szl - 1, r = 0;
-//auto tangent_check = [&](const int& i, const int& j) -> bool {
-//	bool f1 = 0, f2 = 0, f3 = 0, f4 = 0;
-//	if (i > 0) f1 = ccw(L[i], R[j], L[i - 1]) <= 0;
-//	else f1 = 1;
-//	if (i < szl - 1) f2 = ccw(L[i], R[j], L[i + 1]) <= 0;
-//	else f2 = 1;
-//	if (j > 0) f3 = ccw(L[i], R[j], R[j - 1]) <= 0;
-//	else f3 = 1;
-//	if (j < szr - 1) f4 = ccw(L[i], R[j], R[j + 1]) <= 0;
-//	else f4 = 1;
-//	return f1 && f2 && f3 && f4;
-//	};
-//bool f = 0;
-//while (!tangent_check(l, r)) {
-//	int s, e, m;
-//	if (!f) {//r search
-//		s = r, e = szr - 1;
-//		while (s < e) {
-//			m = s + e >> 1;
-//			if (L[l] == R[m]) { e = m; continue; }
-//			if (ccw(L[l], R[m], R[m + 1]) > 0) s = m + 1;
-//			else e = m;
-//		}
-//		if (s < szr - 1 && !ccw(L[l], R[s], R[s + 1])) s++;
-//		r = s;
-//	}
-//	else if (f) {//l search
-//		s = 0, e = l;
-//		while (s < e) {
-//			m = s + e >> 1;
-//			if (L[m] == R[r]) { s = m + 1; continue; }
-//			if (ccw(L[m], R[r], L[m + 1]) > 0) s = m + 1;
-//			else e = m;
-//		}
-//		if (s > 0 && !ccw(L[s], R[r], L[s - 1])) s--;
-//		l = s;
-//	}
-//	f ^= 1;
-//}
-//#ifdef DEBUG
-//	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
-//#endif
-//	return Seg(L[l], R[r], I);
-//}
