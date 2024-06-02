@@ -254,36 +254,27 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 		else f1 = 1;
 		if (i < szl - 1) f2 = ccw(L[i], R[j], L[i + 1]) <= 0;
 		else f2 = 1;
-		if (j > 0) f3 = ccw(L[i], R[j], R[i - 1]) <= 0;
+		if (j > 0) f3 = ccw(L[i], R[j], R[j - 1]) <= 0;
 		else f3 = 1;
-		if (j < szr - 1) f4 = ccw(L[i], R[j], R[i + 1]) <= 0;
+		if (j < szr - 1) f4 = ccw(L[i], R[j], R[j + 1]) <= 0;
 		else f4 = 1;
 		return f1 && f2 && f3 && f4;
 		};
-	bool f = 0;
-	while (!tangent_check(l, r)) {
-		int s, e, m;
-		if (!f) {//r search
-			s = r, e = szr - 1;
-			while (s < e) {
-				m = s + e >> 1;
-				if (L[l] == R[m]) { e = m; continue; }
-				if (ccw(L[l], R[m], R[m + 1]) > 0) s = m + 1;
-				else e = m;
-			}
-			if (s < szr - 1 && !ccw(L[l], R[s], R[s + 1])) s++;
-			r = s;
+	auto valid_check = [&](int& i, int& j) -> bool {
+		if (i > 0 && j < szr - 1 && tangent_check(i - 1, j + 1)) { i--, j++; return 1; }
+		if (i > 0 && tangent_check(i - 1, j)) { i--; return 1; }
+		if (j < szr - 1 && tangent_check(i, j + 1)) { j++; return 1; }
+		return tangent_check(i, j);
+		};
+	bool f = 1;
+	while (!valid_check(l, r)) {
+		if (f) {
+			r = find_tangent_bi_search(R, L[l], f);
+			if (r < szr - 1 && !ccw(L[l], R[r], R[r + 1])) r++;
 		}
-		else if (f) {//l search
-			s = 0, e = l;
-			while (s < e) {
-				m = s + e >> 1;
-				if (L[m] == R[r]) { s = m + 1; continue; }
-				if (ccw(L[m], R[r], L[m + 1]) > 0) s = m + 1;
-				else e = m;
-			}
-			if (s > 0 && !ccw(L[l], R[s], L[s - 1])) s--;
-			l = s;
+		else if (!f) {
+			l = find_tangent_bi_search(L, R[r], f);
+			if (l > 0 && !ccw(L[l], R[r], L[l - 1])) l--;
 		}
 		f ^= 1;
 	}
@@ -581,46 +572,46 @@ int main() { solve(); return 0; }//boj11002 Crow
 //#endif
 //		return Seg(L[s1], R[0], I);
 //	}
-//	int l = szl - 1, r = 0;
-//	auto tangent_check = [&](const int& i, const int& j) -> bool {
-//		bool f1 = 0, f2 = 0, f3 = 0, f4 = 0;
-//		if (i > 0) f1 = ccw(L[i], R[j], L[i - 1]) <= 0;
-//		else f1 = 1;
-//		if (i < szl - 1) f2 = ccw(L[i], R[j], L[i + 1]) <= 0;
-//		else f2 = 1;
-//		if (j > 0) f3 = ccw(L[i], R[j], R[i - 1]) <= 0;
-//		else f3 = 1;
-//		if (j < szr - 1) f4 = ccw(L[i], R[j], R[i + 1]) <= 0;
-//		else f4 = 1;
-//		return f1 && f2 && f3 && f4;
-//		};
-//	bool f = 0;
-//	while (!tangent_check(l, r)) {
-//		int s, e, m;
-//		if (!f) {//r search
-//			s = r, e = szr - 1;
-//			while (s < e) {
-//				m = s + e >> 1;
-//				if (L[l] == R[m]) { e = m; continue; }
-//				if (ccw(L[l], R[m], R[m + 1]) > 0) s = m + 1;
-//				else e = m;
-//			}
-//			if (s < szr - 1 && !ccw(L[l], R[s], R[s + 1])) s++;
-//			r = s;
+//int l = szl - 1, r = 0;
+//auto tangent_check = [&](const int& i, const int& j) -> bool {
+//	bool f1 = 0, f2 = 0, f3 = 0, f4 = 0;
+//	if (i > 0) f1 = ccw(L[i], R[j], L[i - 1]) <= 0;
+//	else f1 = 1;
+//	if (i < szl - 1) f2 = ccw(L[i], R[j], L[i + 1]) <= 0;
+//	else f2 = 1;
+//	if (j > 0) f3 = ccw(L[i], R[j], R[j - 1]) <= 0;
+//	else f3 = 1;
+//	if (j < szr - 1) f4 = ccw(L[i], R[j], R[j + 1]) <= 0;
+//	else f4 = 1;
+//	return f1 && f2 && f3 && f4;
+//	};
+//bool f = 0;
+//while (!tangent_check(l, r)) {
+//	int s, e, m;
+//	if (!f) {//r search
+//		s = r, e = szr - 1;
+//		while (s < e) {
+//			m = s + e >> 1;
+//			if (L[l] == R[m]) { e = m; continue; }
+//			if (ccw(L[l], R[m], R[m + 1]) > 0) s = m + 1;
+//			else e = m;
 //		}
-//		else if (f) {//l search
-//			s = 0, e = l;
-//			while (s < e) {
-//				m = s + e >> 1;
-//				if (L[m] == R[r]) { s = m + 1; continue; }
-//				if (ccw(L[m], R[r], L[m + 1]) > 0) s = m + 1;
-//				else e = m;
-//			}
-//			if (s > 0 && !ccw(L[l], R[s], L[s - 1])) s--;
-//			l = s;
-//		}
-//		f ^= 1;
+//		if (s < szr - 1 && !ccw(L[l], R[s], R[s + 1])) s++;
+//		r = s;
 //	}
+//	else if (f) {//l search
+//		s = 0, e = l;
+//		while (s < e) {
+//			m = s + e >> 1;
+//			if (L[m] == R[r]) { s = m + 1; continue; }
+//			if (ccw(L[m], R[r], L[m + 1]) > 0) s = m + 1;
+//			else e = m;
+//		}
+//		if (s > 0 && !ccw(L[s], R[r], L[s - 1])) s--;
+//		l = s;
+//	}
+//	f ^= 1;
+//}
 //#ifdef DEBUG
 //	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
 //#endif
