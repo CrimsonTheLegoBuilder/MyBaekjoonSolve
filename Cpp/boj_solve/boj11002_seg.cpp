@@ -131,6 +131,7 @@ struct Seg {
 	}
 	Pos S() const { return e - s; }
 	bool operator < (const Seg& p) const { return s == p.s ? e < p.e : s < p.s; }
+	bool operator = (const Seg& p) const { return s == p.s && e == p.e; }
 	ll operator / (const Seg& p) const { return S() / p.S(); }
 	int ccw(const Pos& p) const { return sign((e - s) / (p - e)); }
 	friend ll ccw(const Seg& p, const Seg& q) { return p.S() / q.S(); }
@@ -285,32 +286,31 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 	return Seg(L[l], R[r], I);
 }
 typedef std::vector<Seg> Bridge;
-bool search(const Pos& L, const Pos& R, Bridge& BBB , int s = 1, int e = K, int i = 1) {
+void search(const Pos& L, const Pos& R, Bridge& BBB , int s = 1, int e = K, int i = 1) {
 	if (s == e) {
-		bool f = 0;
 		if (hull_tree[i].l.x <= L.x && L.x <= hull_tree[i].r.x)
 			BBB.push_back(Seg(i, hull_tree[i]));
-		else if (hull_tree[i].l.x <= R.x && R.x <= hull_tree[i].r.x) {
+		else if (hull_tree[i].l.x <= R.x && R.x <= hull_tree[i].r.x) 
 			BBB.push_back(Seg(i, hull_tree[i]));
-			if (R.x <= hull_tree[i].top.x) f = 1;
-		}
-		return f;
+		return;
 	}
-	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return 0;
+	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return;
 	if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x) {
 		BBB.push_back(Seg(i, hull_tree[i]));
-		return 0;
+		return;
 	}
 	int m = s + e >> 1;
-	return search(L, R, BBB, s, m, i << 1) || search(L, R, BBB, m + 1, e, i << 1 | 1);
+	search(L, R, BBB, s, m, i << 1);
+	search(L, R, BBB, m + 1, e, i << 1 | 1);
 }
 ld upper_monotone_chain(Pos L, Pos R) {
+	if (L.x == R.x) { return std::abs(L.y - R.y); }
 	ld ret = 0;
 	if (R < L) std::swap(L, R);
 	Bridge BBB, stack, H;
-	bool f = search(L, R, BBB);
+	search(L, R, BBB);
 	std::sort(BBB.begin(), BBB.end());
-	if (f) BBB.pop_back();
+	//BBB.erase(unique(BBB.begin(), BBB.end()), BBB.end());
 	hull_tree[0].hull = { L };
 	stack.push_back(Seg(L, L, 0));
 	hull_tree[N << 2 | 1].hull = { R };
