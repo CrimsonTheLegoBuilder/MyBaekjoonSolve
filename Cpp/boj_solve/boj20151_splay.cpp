@@ -26,24 +26,24 @@ struct Pos {
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-	bool operator < (const Pos& p) const { return x == p.x ? y == p.y ? d < p.d : y < p.y : x < p.x; }
-	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
-	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const int& n) const { return { x * n, y * n }; }
-	Pos operator / (const int& n) const { return { x / n, y / n }; }
-	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
-	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
+	inline bool operator < (const Pos& p) const { return x == p.x ? y == p.y ? d < p.d : y < p.y : x < p.x; }
+	inline bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
+	inline Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	inline Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	inline Pos operator * (const int& n) const { return { x * n, y * n }; }
+	inline Pos operator / (const int& n) const { return { x / n, y / n }; }
+	inline ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
+	inline ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	inline Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
-	ll xy() const { return (ll)x * y; }
-	ll Euc() const { return (ll)x * x + (ll)y * y; }
+	inline Pos operator - () const { return { -x, -y }; }
+	inline Pos operator ~ () const { return { -y, x }; }
+	inline Pos operator ! () const { return { y, x }; }
+	inline ll xy() const { return (ll)x * y; }
+	inline ll Euc() const { return (ll)x * x + (ll)y * y; }
 	int Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
 	ld rad() const { return atan2(y, x); }
@@ -57,21 +57,21 @@ struct Pos {
 //bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 //bool cmpi(const Pos& p, const Pos& q) { return p.i < q.i; }
 typedef std::vector<Pos> Polygon;
-ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 //ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+inline ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 //ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = cross(d1, d2, d3);
 	return !ret ? 0 : ret > 0 ? 1 : -1;
 }
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0;
 }
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
 }
-bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+inline bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
 	//return f1 && f2;
@@ -102,7 +102,7 @@ struct Seg {
 		return os;
 	}
 } seg[LEN];
-bool intersect(const int& a, const int& b) {
+inline bool intersect(const int& a, const int& b) {
 	const Pos& d1 = seg[a].s, d2 = seg[a].e, d3 = seg[b].s, d4 = seg[b].e;
 	return intersect(d1, d2, d3, d4);
 }
@@ -239,7 +239,7 @@ public:
 		return p->i;
 	}
 } ST;
-bool solve() {
+inline bool solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> N;

@@ -117,7 +117,7 @@ struct Seg {
 	Pos s, e;
 	int i;
 	Seg(Pos s = Pos(), Pos e = Pos(), int I = 0) : s(s), e(e), i(I) {}
-	Seg(int I = 0, const HullNode& HN) : i(I) {
+	Seg(int I = 0, const HullNode& HN = HullNode(Polygon())) : i(I) {
 		s = HN.l;
 		e = HN.r;
 	}
@@ -280,10 +280,7 @@ inline void query() {
 }
 Polygon MT[LEN];
 HullNode init(int s = 1, int e = K, int i = 1) {
-	if (s == e) {
-		hull_tree[i] = HullNode(MT[s]);
-		return;
-	}
+	if (s == e) return hull_tree[i] = HullNode(MT[s]);
 	int m = s + e >> 1;
 	return hull_tree[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
 }
