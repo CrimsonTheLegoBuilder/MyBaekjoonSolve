@@ -130,8 +130,6 @@ struct Seg {
 	bool operator < (const Seg& p) const { return s == p.s ? e < p.e : s < p.s; }
 	bool operator = (const Seg& p) const { return s == p.s && e == p.e; }
 	ll operator / (const Seg& p) const { return S() / p.S(); }
-	int ccw(const Pos& p) const { return sign((e - s) / (p - e)); }
-	friend ll ccw(const Seg& p, const Seg& q) { return p.S() / q.S(); }
 };
 int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 18190
 	int sz = H.size();
@@ -329,8 +327,8 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	for (int i = 0; i < sz; i++) {
 		Seg B = BBB[i];
 		while (stack.size() > 1 &&
-			upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i).S() /
-			upper_tangent_bi_search(stack.back().i, B.i).S() >= 0)
+			upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
+			upper_tangent_bi_search(stack.back().i, B.i) >= 0)
 			stack.pop_back();
 		stack.push_back(B);
 	}
