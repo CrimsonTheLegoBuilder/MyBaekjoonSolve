@@ -276,7 +276,8 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 #endif
 		return Seg(L[i], R[0], I);
 	}
-	int l = szl - 1, r = 0;
+	//int l = szl - 1, r = 0;
+	int l = 0, r = szr - 1;
 	auto tangent_check = [&](const int& i, const int& j) -> bool {
 		bool f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 		if (i > 0) f1 = ccw(L[i], R[j], L[i - 1]) <= 0;

@@ -486,12 +486,6 @@
     <ClCompile Include="boj1255_dijkstra.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj20151_intersection5.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj20151_set.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj23194_HPI.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -1123,6 +1117,12 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj1879_shy.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj20151_splay.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj11002_seg.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
