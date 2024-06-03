@@ -105,7 +105,7 @@ Polygon upper_monotone_chain(Polygon& C) {
 	return H;
 }
 struct HullNode {
-	Pos l, r;
+	Pos l, r, t;
 	Polygon hull;
 	vld memo;
 	HullNode(Polygon h = {}) {
@@ -117,6 +117,9 @@ struct HullNode {
 		else l = Pos();
 		if (hull.size()) r = hull.back();
 		else r = Pos();
+		if (hull.size()) t = hull[0];
+		else t = Pos();
+		for (const Pos& p : hull) if (t.y < p.y) t = p;
 	}
 	HullNode operator + (const HullNode& R) const {
 		Polygon C, H;
@@ -277,7 +280,8 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 		return Seg(L[i], R[0], I);
 	}
 	//int l = szl - 1, r = 0;
-	int l = 0, r = szr - 1;
+	//int l = 0, r = szr - 1;
+	int l = hull_tree[I].t.i, r = hull_tree[J].t.i;
 	auto tangent_check = [&](const int& i, const int& j) -> bool {
 		bool f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 		if (i > 0) f1 = ccw(L[i], R[j], L[i - 1]) <= 0;
@@ -558,6 +562,32 @@ int main() { solve(); return 0; }//boj11002 Crow
 1 9
 8 9
 7.000000
+
+12
+0 5
+1 4
+2 3
+3 2
+4 1
+5 0
+6 0
+7 1
+8 2
+9 3
+10 4
+11 5
+10
+3 4
+8 4
+3 4
+8 4
+3 4
+8 4
+3 4
+8 4
+3 4
+8 4
+45.0000000000
 
 12
 0 5
