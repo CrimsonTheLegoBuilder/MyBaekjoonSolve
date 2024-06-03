@@ -5,7 +5,7 @@
 #include <queue>
 #include <cassert>
 typedef long long ll;
-const int LEN = 5e6 + 5;
+const int LEN = 5e5 + 5;
 const ll INF = 1e17;
 
 int N, M, K;
@@ -66,12 +66,12 @@ void solve() {
 		if (a == 1) {
 			std::cin >> b >> c >> d;
 			if (c < b) std::swap(b, c);
-			update(b, c, d);
+			update(b + 1, c + 1, d);
 		}
 		else if (a == 2) {
 			std::cin >> b >> c;
 			if (c < b) std::swap(b, c);
-			std::cout << search(b, c) << "\n";
+			std::cout << search(b + 1, c + 1) << "\n";
 		}
 	}
 	return;

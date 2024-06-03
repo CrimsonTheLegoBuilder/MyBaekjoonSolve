@@ -6,10 +6,10 @@
 #include <cassert>
 #include <vector>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-4;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 int N, M, T, Q;
@@ -118,6 +118,9 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
+	freopen("levees.in", "r", stdin);
+	freopen("levees.out", "w", stdout);
+
 	Pos a, b, c, d;
 	while (1) {
 		std::cin >> a >> b >> c >> d;
@@ -135,7 +138,7 @@ void solve() {
 		std::vector<Pos> tmp = { p, q, r, s };
 		std::sort(tmp.begin(), tmp.end());
 		for (const Pos& t : tmp) std::cout << t << " ";
-		//std::cout << "\n";
+		std::cout << "\n";
 	}
 }
 int main() { solve(); return 0; }//boj4116
