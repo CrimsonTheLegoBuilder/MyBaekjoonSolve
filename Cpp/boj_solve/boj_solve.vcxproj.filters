@@ -1125,6 +1125,12 @@
     <ClCompile Include="boj11002_seg.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj14245_lazy.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj14245_seg.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

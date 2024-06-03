@@ -253,9 +253,6 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 #ifdef DEBUG
 		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[0], I).S() << "\n";
 #endif
-#ifdef MAP_search
-		if (0 < I && J <= K * 4) MAP[Pos(I, J)] = Seg(L[0], R[0], I);
-#endif
 		return Seg(L[0], R[0], I);
 	}
 	int szl = L.size(), szr = R.size();
@@ -264,18 +261,12 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 #ifdef DEBUG
 		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[i], I).S() << "\n";
 #endif
-#ifdef MAP_search
-		if (0 < I && J <= K * 4) MAP[Pos(I, J)] = Seg(L[0], R[i], I);
-#endif
 		return Seg(L[0], R[i], I);
 	}
 	if (R.size() == 1) {
 		int i = find_tangent_bi_search(L, R[0], 0);
 #ifdef DEBUG
 		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[i], R[0], I).S() << "\n";
-#endif
-#ifdef MAP_search
-		if (0 < I && J <= K * 4) MAP[Pos(I, J)] = Seg(L[i], R[0], I);
 #endif
 		return Seg(L[i], R[0], I);
 	}
@@ -301,6 +292,7 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 		return tangent_check(i, j);
 		};
 	bool f = 1;
+	int cnt = 0;
 	while (!valid_check(l, r)) {
 		if (f) {
 			r = find_tangent_bi_search(R, L[l], f);
@@ -311,12 +303,13 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 			if (l > 0 && !ccw(L[l], R[r], L[l - 1])) l--;
 		}
 		f ^= 1;
+		cnt++;
 	}
 #ifdef DEBUG
 	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
 #endif
 #ifdef MAP_search
-	if (0 < I && J <= K * 4) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
+	if (0 < I && J <= K * 4 && cnt > 50) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
 #endif
 	return Seg(L[l], R[r], I);
 }
@@ -603,16 +596,16 @@ int main() { solve(); return 0; }//boj11002 Crow
 10 4
 11 5
 10
-3 4
-8 4
-3 4
-8 4
-3 4
-8 4
-3 4
-8 4
-3 4
-8 4
+3 2
+8 2
+3 2
+8 2
+3 2
+8 2
+3 2
+8 2
+3 2
+8 2
 45.0000000000
 
 12
