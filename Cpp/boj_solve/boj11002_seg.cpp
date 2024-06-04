@@ -519,6 +519,7 @@ int main() { solve(); return 0; }//boj11002 Crow
 12 0
 14.9030655007
 
+
 12
 0 0
 1 2
