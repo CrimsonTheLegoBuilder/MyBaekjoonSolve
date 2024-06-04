@@ -170,12 +170,12 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 		int s = 0, e = sz - 1, m;
 		if (!ccw1) s += 1;
 		if (!ccwN) e -= 1;
-		bool f = ccw(p, H[s], H[s + 1]) >= 0;
+		bool f = ccw(p, H[s], H[s + 1]) <= 0;
 		while (s < e) {
 			m = s + e >> 1;
 			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
 			if (!f) std::swap(p1, cur);//normalize
-			if (ccw(p1, cur, nxt) > 0) s = m + 1;
+			if (ccw(p1, cur, nxt) < 0) s = m + 1;
 			else e = m;
 		}
 		i2 = s;
@@ -189,7 +189,7 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 			k = s + e >> 1;
 			int CCW = ccw(H[0], H[k], p);
 			if (!f) CCW *= -1;//normailze
-			if (CCW > 0) s = k;
+			if (CCW < 0) s = k;
 			else e = k;
 		}
 		if (on_seg_strong(H[s], H[e], p)) {
@@ -207,7 +207,7 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 			m = s1 + e1 >> 1;
 			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
 			if (!f) std::swap(p1, cur);//normalize
-			if (ccw(p1, cur, nxt) > 0) s1 = m + 1;
+			if (ccw(p1, cur, nxt) < 0) s1 = m + 1;
 			else e1 = m;
 		}
 		i1 = s1;
@@ -219,7 +219,7 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 			m = s2 + e2 >> 1;
 			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
 			if (!f) std::swap(p1, cur);//normalize
-			if (ccw(p1, cur, nxt) < 0) s2 = m + 1;
+			if (ccw(p1, cur, nxt) > 0) s2 = m + 1;
 			else e2 = m;
 		}
 		i2 = s2;
@@ -394,6 +394,7 @@ ld upper_monotone_chain(Pos L, Pos R) {
 		std::cout << "ln : " << (H[i].e - H[i].s).mag() << "\n";
 #endif
 		if (i < sz - 1) {
+			assert(H[i] / H[i + 1] < 0);
 			ld ln = hull_tree[H[i + 1].i].len(H[i].e.i, H[i + 1].s.i);
 #ifdef DEBUG
 			std::cout << H[i].e.i << " " << H[i + 1].s.i << "\n";
@@ -434,7 +435,7 @@ inline void solve() {
 	std::cin >> N;
 	Polygon C(N);
 	for (Pos& p : C) std::cin >> p;
-
+	for (int i = 0; i < N - 1; i++) assert(C[i] < C[i + 1]);
 	//separating convex hulls
 	K = 1;
 	Polygon tmp;
