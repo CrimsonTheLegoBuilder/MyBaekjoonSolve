@@ -24,7 +24,7 @@ inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 //freopen("../../../input_data/triathlon_tests/triathlon_out.txt", "w", stdout);
 
 //#define DEBUG
-//#define MAP_search
+#define MAP_search
 
 struct Pos {
 	int x, y;
@@ -184,7 +184,7 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 	else {
 		//divide hull
 		int s = 0, e = sz - 1, k, m;
-		bool f = ccw1 > 0 && ccwN < 0;//if H[k] is between H[0] && p
+		bool f = ccw1 < 0 && ccwN > 0;//if H[k] is between H[0] && p
 		while (s + 1 < e) {
 			k = s + e >> 1;
 			int CCW = ccw(H[0], H[k], p);
