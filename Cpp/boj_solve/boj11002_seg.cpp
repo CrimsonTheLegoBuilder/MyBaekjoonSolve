@@ -9,6 +9,7 @@
 typedef long long ll;
 //typedef double ld;
 typedef long double ld;
+//typedef __float128 ld;
 typedef std::vector<ld> vld;
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
@@ -132,7 +133,7 @@ struct HullNode {
 		if (memo.size() <= 1 || s == e) return 0;
 		return memo[e] - memo[s];
 	}
-} hull_tree[LEN << 2];//semi-hull index tree (shit)
+} hull_tree[(LEN << 2) + 10];//semi-hull index tree (shit)
 struct Seg {
 	Pos s, e;
 	int i;
@@ -143,7 +144,7 @@ struct Seg {
 	//}
 	Pos S() const { return e - s; }
 	bool operator < (const Seg& p) const { return s == p.s ? e < p.e : s < p.s; }
-	bool operator = (const Seg& p) const { return s == p.s && e == p.e; }
+	bool operator == (const Seg& p) const { return s == p.s && e == p.e; }
 	ll operator / (const Seg& p) const { return S() / p.S(); }
 };
 Seg make_seg(int I = 0, const HullNode& HN = HullNode(Polygon())) { return Seg(HN.l, HN.r, I); }
@@ -154,10 +155,12 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 	int ccw1 = ccw(p, H[0], H[1]), ccwN = ccw(p, H[0], H[sz - 1]);
 	if (on_seg_strong(H[0], H[1], p)) {
 		int ans = l ? 1 : 0;
+		if (l && ans < sz - 1 && p == H[ans]) ans++;
 		return ans;
 	}
 	if (on_seg_strong(H[sz - 2], H[sz - 1], p)) {
 		int ans = l ? sz - 1 : sz - 2;
+		if (!l && ans > 0 && p == H[ans]) ans--;
 		return ans;
 	}
 	if (ccw1 * ccwN >= 0) {
@@ -191,8 +194,10 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 		}
 		if (on_seg_strong(H[s], H[e], p)) {
 			int ans;
-			if (l) ans = H[i1].x < H[i2].x ? i2 : i1;
-			else ans = H[i1].x > H[i2].x ? i2 : i1;
+			if (l) ans = H[s].x < H[e].x ? e : s;
+			else ans = H[s].x > H[e].x ? e : s;
+			if (l && ans < sz - 1 && p == H[ans]) ans++;
+			if (!l && ans > 0 && p == H[ans]) ans--;
 			return ans;
 		}
 
@@ -314,7 +319,7 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 	return Seg(L[l], R[r], I);
 }
 typedef std::vector<Seg> Bridge;
-bool search(const Pos& L, const Pos& R, Bridge& BBB , int s = 1, int e = K, int i = 1) {
+bool search(const Pos& L, const Pos& R, Bridge& BBB, int s = 1, int e = K, int i = 1) {
 	bool f = 0;
 	if (s == e) {
 #ifdef DEBUG
@@ -322,7 +327,9 @@ bool search(const Pos& L, const Pos& R, Bridge& BBB , int s = 1, int e = K, int 
 #endif
 		if (hull_tree[i].l.x <= L.x && L.x <= hull_tree[i].r.x)
 			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
-		else if (hull_tree[i].l.x <= R.x && R.x <= hull_tree[i].r.x) 
+		if (hull_tree[i].l.x <= R.x && R.x <= hull_tree[i].r.x)
+			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
+		if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x)
 			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
 		return f;
 	}
@@ -344,11 +351,11 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	bool f = search(L, R, BBB);
 	if (!f) { return (L - R).mag(); }
 	std::sort(BBB.begin(), BBB.end());
-	//BBB.erase(unique(BBB.begin(), BBB.end()), BBB.end());
+	BBB.erase(unique(BBB.begin(), BBB.end()), BBB.end());
 	hull_tree[0].hull = { L };
 	stack.push_back(Seg(L, L, 0));
-	hull_tree[N << 2 | 1].hull = { R };
-	BBB.push_back(Seg(R, R, N << 2 | 1));
+	hull_tree[LEN << 2 | 1].hull = { R };
+	BBB.push_back(Seg(R, R, LEN << 2 | 1));
 
 #ifdef DEBUG
 	std::cout << "DEBUG:: Pos L : " << L << " Pos R : " << R << "\n";
@@ -365,13 +372,13 @@ ld upper_monotone_chain(Pos L, Pos R) {
 			stack.pop_back();
 		stack.push_back(B);
 	}
-	sz = stack.size();
 
 #ifdef DEBUG
 	std::cout << "SEG stack :\n";
 	for (const Seg& B : stack) std::cout << B.s << " " << B.e << "\n";
 #endif
 
+	sz = stack.size();
 	for (int i = 0; i < sz - 1; i++)
 		H.push_back(upper_tangent_bi_search(stack[i].i, stack[i + 1].i));
 
@@ -410,7 +417,7 @@ inline void query() {
 	std::cin >> pre;
 	ld ret = 0;
 	while (Q--) ret += query(pre);
-	std::cout << ret << "\n";
+	std::cout << (long double)ret << "\n";
 	return;
 }
 Polygon MT[LEN];
@@ -445,12 +452,13 @@ inline void solve() {
 #endif
 
 	}
+	if (tmp.empty()) K--;
 	for (Pos& p : tmp) MT[K].push_back(p);
 	tmp.clear();
 
 	//tree init
 	init();
-	
+
 #ifdef DEBUG
 	std::cout << "\nK : " << K << "\n\n";
 	for (int i = 1; i <= K; i++) {
@@ -625,6 +633,30 @@ int main() { solve(); return 0; }//boj11002 Crow
 2 100
 9 100
 
+1
+5 10
+2
+0 0
+10 0
+
+4
+0 0
+5 5
+7 5
+12 0
+2
+1 2
+11 2
+
+5
+0 0
+2 1
+5 5
+8 1
+10 0
+2
+0 0
+10 0
 
 
 */

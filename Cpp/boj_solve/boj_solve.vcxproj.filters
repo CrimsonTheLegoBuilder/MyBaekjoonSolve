@@ -1128,7 +1128,7 @@
     <ClCompile Include="boj12844_lazy_XOR.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
-    <ClCompile Include="boj14245_seg.cpp">
+    <ClCompile Include="boj14245_seg_XOR.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
   </ItemGroup>
