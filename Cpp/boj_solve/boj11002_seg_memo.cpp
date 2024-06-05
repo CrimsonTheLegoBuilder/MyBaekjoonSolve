@@ -318,18 +318,18 @@ typedef std::vector<Seg> Bridge;
 bool search(const Pos& L, const Pos& R, Bridge& BBB, int s = 1, int e = K, int i = 1) {
 	bool f = 0;
 	if (s == e) {
-		if (hull_tree[i].l.x <= L.x && L.x <= hull_tree[i].r.x)
-			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
-		if (hull_tree[i].l.x <= R.x && R.x <= hull_tree[i].r.x)
+		if (hull_tree[i].l.x <= L.x && L.x < hull_tree[i].r.x)
+			BBB.push_back(make_seg(i, hull_tree[i]));
+		if (hull_tree[i].l.x < R.x && R.x <= hull_tree[i].r.x)
 			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
 		if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x)
-			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
+			BBB.push_back(make_seg(i, hull_tree[i]));
 		return f;
 	}
 	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return 0;
 	if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x) {
-		f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
-		return f;
+		BBB.push_back(make_seg(i, hull_tree[i]));
+		return 0;
 	}
 	int m = s + e >> 1;
 	bool ls = search(L, R, BBB, s, m, i << 1);
@@ -342,10 +342,10 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	if (R < L) std::swap(L, R);
 	Bridge BBB, stack, H;
 	bool f = search(L, R, BBB);
-	//if (!f) { return (L - R).mag(); }
 	if (BBB.empty()) { return (L - R).mag(); }
 	std::sort(BBB.begin(), BBB.end());
 	BBB.erase(unique(BBB.begin(), BBB.end()), BBB.end());
+	Seg last = BBB.back();
 	hull_tree[0].hull = { L };
 	stack.push_back(Seg(L, L, 0));
 	hull_tree[LEN << 2 | 1].hull = { R };
@@ -369,6 +369,22 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	for (const Seg& B : stack) std::cout << B.s << " " << B.e << "\n";
 #endif
 	sz = stack.size();
+	if (!(last == stack[sz - 2])) {
+		stack = { Seg(L, L, 0) };
+		BBB.pop_back();
+		BBB.pop_back();
+		BBB.push_back(Seg(R, R, LEN << 2 | 1));
+		int sz = BBB.size();
+		for (int i = 0; i < sz; i++) {
+			Seg B = BBB[i];
+			while (stack.size() > 1 &&
+				upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
+				upper_tangent_bi_search(stack.back().i, B.i) >= 0)
+				stack.pop_back();
+			stack.push_back(B);
+		}
+		sz = stack.size();
+	}
 	for (int i = 0; i < sz - 1; i++)
 		H.push_back(upper_tangent_bi_search(stack[i].i, stack[i + 1].i));
 #ifdef DEBUG
