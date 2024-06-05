@@ -337,12 +337,13 @@ bool search(const Pos& L, const Pos& R, Bridge& BBB, int s = 1, int e = K, int i
 	return ls || rs;
 }
 ld upper_monotone_chain(Pos L, Pos R) {
-	if (L.x == R.x) { return std::abs(L.y - R.y); }
+	if (L.x == R.x) { return (L - R).mag(); }
 	ld ret = 0;
 	if (R < L) std::swap(L, R);
 	Bridge BBB, stack, H;
 	bool f = search(L, R, BBB);
-	if (!f) { return (L - R).mag(); }
+	//if (!f) { return (L - R).mag(); }
+	if (BBB.empty()) { return (L - R).mag(); }
 	std::sort(BBB.begin(), BBB.end());
 	BBB.erase(unique(BBB.begin(), BBB.end()), BBB.end());
 	hull_tree[0].hull = { L };
@@ -637,5 +638,61 @@ int main() { solve(); return 0; }//boj11002 Crow
 0 0
 10 0
 
+18
+0 0
+1 10
+2 15
+3 18
+4 20
+5 18
+6 15
+7 10
+8 0
+9 0
+10 10
+11 15
+12 18
+13 20
+14 18
+15 15
+16 10
+17 0
+4
+3 19
+14 19
+3 19
+14 19
+
+27
+0 0
+1 10
+2 15
+3 18
+4 20
+5 18
+6 15
+7 10
+8 0
+9 0
+10 10
+11 15
+12 18
+13 20
+14 18
+15 15
+16 10
+17 0
+18 0
+19 10
+20 15
+21 18
+22 20
+23 18
+24 15
+25 10
+26 0
+2
+5 18
+21 18
 
 */
