@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <ctime>
 typedef long long ll;
 typedef double ld;
 ll LEN = 1000000000;
@@ -33,44 +34,53 @@ struct Pos {
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
+ll cross(Pos a, Pos b, Pos c) { return (b - a) / (c - b); }
 std::vector<Pos> C, H;
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	freopen("boj25002_tc.txt", "w", stdout);
-	//std::cout << 250000 << "\n";
-	//for (int i = 1; i <= 250000; i++) std::cout << i << " " << i << " " << i << "\n";
-	//for (int i = 1; i <= 250000; i++) {
-	//	std::cout << i << " " << i << " ";
-	//	int x = (i < 200000 ? i < 150000 ? i < 100000 ? i < 50000 ? 5 : 3 : 1 : 2 : 4);
-	//	std::cout << x << "\n";
-	//}
+	freopen("boj11002_tc.txt", "w", stdout);
+	int N = 10;
+	std::mt19937 E(std::time(0));
 
-	C = { Pos(0, 0), Pos(10, 10), Pos(10, 0), Pos(0, 10), Pos(15, 5), };
-	Pos Dir[10] = { Pos(1000, 1000), Pos(2000, 0), Pos(1000, 1000), Pos(1000, -1000), Pos(0, -2000), Pos(-1000, -1000),
-	Pos(-2000, 0), Pos(-1000, -1000), Pos(50, 100), Pos(-50, -100) };
-	for (int i = 0; i < 5; i++) {
-		for (int j = 1; j < 5000; j++) {
-			for (int k = 0; k < 10; k++) {
-				H.push_back(C[i] + Dir[k] * j);
+	int x = 1, y = 0;
+	C.push_back(Pos(x, 0));
+	for (int i = 0; i < N; i++) {
+		x += E() % 30 + 1;
+		y = E() % 30;
+		C.push_back(Pos(x, y));
+	}
+	C.push_back(Pos(x += E() % 30 + 1, y));
+
+	int M = 10;
+	int cnt = 0;
+	while (1) {
+		int xx = E() % x;
+		y = E() % 35;
+		Pos p = Pos(xx, y);
+		bool f = 0;
+		for (int i = 0; i < 11; i++) {
+			if (C[i].x <= p.x && p.x <= C[i + 1].x) {
+				if (cross(C[i], C[i + 1], p) < 0) {
+					f = 1; break;
+				}
 			}
 		}
+		if (!f) {
+			H.push_back(p);
+			cnt++;
+		}
+		if (cnt == M) break;
 	}
-	shuffle(H.begin(), H.end(), std::mt19937(0x14003));
-	std::cout << H.size() + 2 << "\n";
-	std::cout << "-1000000000 1000000000 1\n1000000000 -1000000000 250000\n";
-	int sz = H.size();
-	for (int i = 0; i <= sz; i++) {
-		std::cout << H[i] << " ";
-		int x = (i < sz * 4 / 5 ? i < sz * 3 / 5 ? i < sz * 2 / 5 ? i < sz * 1 / 5 ? 1 : 125000 : 75000 : 175000 : 250000);
-		std::cout << x << "\n";
-	}
-	std::cout << ((LEN * 2) * (LEN * 2)) * 2 << "\n";
+	std::cout << N + 2 << "\n";
+	for (Pos& p : C) std::cout << p << "\n";
+	std::cout << M << "\n";
+	for (Pos& p : H) std::cout << p << "\n";
 	return 0;
 }
 
 /*
 
-124999000002
+
 
 */

@@ -22,6 +22,7 @@ inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
 //#define DEBUG
 //#define MAP_search
+#define NAIVE
 
 struct Pos {
 	int x, y;
@@ -404,9 +405,13 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	}
 	return ret;
 }
+Polygon seq;
 inline ld query(Pos& pre) {
 	Pos cur;
 	std::cin >> cur;
+#ifdef NAIVE
+	seq.push_back(cur);
+#endif
 	ld ret = upper_monotone_chain(pre, cur);
 	pre = cur;
 	return ret;
@@ -415,6 +420,9 @@ inline void query() {
 	std::cin >> Q, Q--;
 	Pos pre;
 	std::cin >> pre;
+#ifdef NAIVE
+	seq.push_back(pre);
+#endif
 	ld ret = 0;
 	while (Q--) ret += query(pre);
 	std::cout << (long double)ret << "\n";
@@ -425,6 +433,29 @@ HullNode init(int s = 1, int e = K, int i = 1) {
 	if (s == e) return hull_tree[i] = HullNode(i, upper_monotone_chain(MT[s]));
 	int m = s + e >> 1;
 	return hull_tree[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
+}
+void naive(Polygon& C) {
+	ld total = 0;
+	int sz = seq.size();
+	for (int i = 0; i < sz - 1; i++) {
+		Pos s = seq[i], e = seq[i + 1];
+		if (e.x < s.x) std::swap(s, e);
+		Polygon tmp;
+		tmp.push_back(s);
+		tmp.push_back(e);
+		for (const Pos& p : C) {
+			if (s.x < p.x && p.x < e.x) tmp.push_back(p);
+		}
+		Polygon H = upper_monotone_chain(tmp);
+		//for (const Pos& p : H) std::cout << p << " ";
+		//std::cout << "\n";
+		ld ret = 0;
+		for (int j = 0; j < H.size() - 1; j++) {
+			ret += (H[j] - H[j + 1]).mag();
+		}
+		total += ret;
+	}
+	std::cout << "naive:: " << total << "\n";
 }
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -469,6 +500,9 @@ inline void solve() {
 	}
 #endif
 	query();
+#ifdef NAIVE
+	naive(C);
+#endif
 	return;
 }
 int main() { solve(); return 0; }//boj11002 Crow
