@@ -284,6 +284,7 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 		};
 	auto valid_check = [&](int& i, int& j) -> bool {
 		if (i < szl - 1 && j < szr - 1 && tangent_check(i + 1, j + 1)) { i++, j++; return 1; }
+		if (i > 0 && j > 0 && tangent_check(i - 1, j - 1)) { i--, j--; return 1; }
 		if (i > 0 && j < szr - 1 && tangent_check(i - 1, j + 1)) { i--, j++; return 1; }
 		if (i < szl - 1 && j > 0 && tangent_check(i + 1, j - 1)) { i++, j--; return 1; }
 		if (i < szl - 1 && tangent_check(i + 1, j)) { i++; return 1; }
@@ -345,10 +346,12 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	if (BBB.empty()) { return (L - R).mag(); }
 	std::sort(BBB.begin(), BBB.end());
 	BBB.erase(unique(BBB.begin(), BBB.end()), BBB.end());
-	Seg last = BBB.back();
 	hull_tree[0].hull = { L };
 	stack.push_back(Seg(L, L, 0));
 	hull_tree[LEN << 2 | 1].hull = { R };
+	Seg last = BBB.back();
+	Seg vec;
+	if (f) vec = upper_tangent_bi_search(last.i, LEN << 2 | 1), BBB.pop_back();
 	BBB.push_back(Seg(R, R, LEN << 2 | 1));
 #ifdef DEBUG
 	std::cout << "DEBUG:: Pos L : " << L << " Pos R : " << R << "\n";
@@ -364,27 +367,18 @@ ld upper_monotone_chain(Pos L, Pos R) {
 			stack.pop_back();
 		stack.push_back(B);
 	}
+	if (f) {
+		if (upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) / vec < 0) {
+			stack.pop_back();
+			stack.push_back(last);
+			stack.push_back(Seg(R, R, LEN << 2 | 1));
+		}
+	}
 #ifdef DEBUG
 	std::cout << "SEG stack :\n";
 	for (const Seg& B : stack) std::cout << B.s << " " << B.e << "\n";
 #endif
 	sz = stack.size();
-	if (!(last == stack[sz - 2])) {
-		stack = { Seg(L, L, 0) };
-		BBB.pop_back();
-		BBB.pop_back();
-		BBB.push_back(Seg(R, R, LEN << 2 | 1));
-		int sz = BBB.size();
-		for (int i = 0; i < sz; i++) {
-			Seg B = BBB[i];
-			while (stack.size() > 1 &&
-				upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
-				upper_tangent_bi_search(stack.back().i, B.i) >= 0)
-				stack.pop_back();
-			stack.push_back(B);
-		}
-		sz = stack.size();
-	}
 	for (int i = 0; i < sz - 1; i++)
 		H.push_back(upper_tangent_bi_search(stack[i].i, stack[i + 1].i));
 #ifdef DEBUG
