@@ -36,4 +36,7 @@ def cross(d1: Pos, d2: Pos, d3: Pos) -> int or float:
 # h = Pos(h.x / l * 100, h.y / l * 100)
 # print(cross(p1, p2, h) / 2)
 
-print((100 + 25) * pi)
+a = Pos(1, 2)
+b = Pos(10, 27)
+c = Pos(28, 26)
+print((a - b).mag() + (b - c).mag())

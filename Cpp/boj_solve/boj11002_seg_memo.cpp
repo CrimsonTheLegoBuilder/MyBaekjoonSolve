@@ -20,7 +20,7 @@ inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
-//#define DEBUG
+#define DEBUG
 //#define MAP_search
 #define NAIVE
 
@@ -411,7 +411,8 @@ inline ld query(Pos& pre) {
 	std::cin >> cur;
 #ifdef NAIVE
 	seq.push_back(cur);
-#endif
+	std::cout << "pre:: " << pre << " cur:: " << cur << "\n";
+ #endif
 	ld ret = upper_monotone_chain(pre, cur);
 	pre = cur;
 	return ret;
@@ -422,10 +423,19 @@ inline void query() {
 	std::cin >> pre;
 #ifdef NAIVE
 	seq.push_back(pre);
-#endif
+	ld ret = 0;
+	int cnt = 1;
+	while (Q--) {
+		ld tmp = query(pre);
+		std::cout << "query[" << cnt++ << "]:: " << tmp << "\n";
+		ret += tmp;
+	}
+	std::cout << "query[total]:: " << (long double)ret << "\n";
+#else
 	ld ret = 0;
 	while (Q--) ret += query(pre);
 	std::cout << (long double)ret << "\n";
+#endif
 	return;
 }
 Polygon MT[LEN];
@@ -440,6 +450,7 @@ void naive(Polygon& C) {
 	for (int i = 0; i < sz - 1; i++) {
 		Pos s = seq[i], e = seq[i + 1];
 		if (e.x < s.x) std::swap(s, e);
+		std::cout << "s:: " << s << " e:: " << e << "\n";
 		Polygon tmp;
 		tmp.push_back(s);
 		tmp.push_back(e);
@@ -453,9 +464,10 @@ void naive(Polygon& C) {
 		for (int j = 0; j < H.size() - 1; j++) {
 			ret += (H[j] - H[j + 1]).mag();
 		}
+		std::cout << "naive[" << i + 1 << "]:: " << ret << "\n";
 		total += ret;
 	}
-	std::cout << "naive:: " << total << "\n";
+	std::cout << "naive[total]:: " << total << "\n";
 }
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -508,6 +520,33 @@ inline void solve() {
 int main() { solve(); return 0; }//boj11002 Crow
 
 /*
+
+12
+1 0
+9 10
+10 27
+32 13
+33 26
+47 23
+66 19
+94 18
+117 21
+146 18
+148 23
+173 23
+10
+170 26
+75 28
+94 26
+6 18
+28 26
+1 2
+160 27
+27 32
+104 26
+1 18
+774.4844287759
+naive:: 774.0871303214
 
 8
 0 0
