@@ -20,9 +20,9 @@ inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
-#define DEBUG
-//#define MAP_search
-#define NAIVE
+//#define DEBUG
+#define MAP_search
+//#define NAIVE
 
 struct Pos {
 	int x, y;
@@ -297,6 +297,7 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 	bool f = 1;
 	int cnt = 0;
 	while (!valid_check(l, r)) {
+	//while (!tangent_check(l, r)) {
 		if (f) {
 			r = find_tangent_bi_search(R, L[l], f);
 			if (r < szr - 1 && !ccw(L[l], R[r], R[r + 1])) r++;
@@ -312,7 +313,7 @@ Seg upper_tangent_bi_search(const int& I, const int& J) {
 	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
 #endif
 #ifdef MAP_search
-	if (0 < I && J <= K * 4 && cnt > 50) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
+	if (0 < I && J <= K * 4 && cnt > 3) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
 #endif
 	return Seg(L[l], R[r], I);
 }
@@ -371,8 +372,32 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	if (f) {
 		if (upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) / vec < 0) {
 			stack.pop_back();
+			while (stack.size() > 1 &&
+				upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
+				upper_tangent_bi_search(stack.back().i, last.i) >= 0)
+				stack.pop_back();
 			stack.push_back(last);
+			while (stack.size() > 1 &&
+				upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
+				upper_tangent_bi_search(stack.back().i, LEN << 2 | 1) >= 0)
+				stack.pop_back();
 			stack.push_back(Seg(R, R, LEN << 2 | 1));
+
+			
+			//stack.clear();
+			//stack.push_back(Seg(L, L, 0));
+			//BBB.pop_back();
+			//BBB.push_back(last);
+			//BBB.push_back(Seg(R, R, LEN << 2 | 1));
+			//int sz = BBB.size();
+			//for (int i = 0; i < sz; i++) {
+			//	Seg B = BBB[i];
+			//	while (stack.size() > 1 &&
+			//		upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
+			//		upper_tangent_bi_search(stack.back().i, B.i) >= 0)
+			//		stack.pop_back();
+			//	stack.push_back(B);
+			//}
 		}
 	}
 #ifdef DEBUG
@@ -444,6 +469,7 @@ HullNode init(int s = 1, int e = K, int i = 1) {
 	int m = s + e >> 1;
 	return hull_tree[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
 }
+#ifdef NAIVE
 void naive(Polygon& C) {
 	ld total = 0;
 	int sz = seq.size();
@@ -469,6 +495,7 @@ void naive(Polygon& C) {
 	}
 	std::cout << "naive[total]:: " << total << "\n";
 }
+#endif
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
