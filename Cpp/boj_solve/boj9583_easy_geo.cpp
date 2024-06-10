@@ -196,6 +196,7 @@ ld trial(const Polygon& L, const Polygon& U, const ld& q, const ld& w, bool f = 
 	int l2 = bi_search(L, q + w);
 	int u1 = bi_search(U, q, 1);
 	int u2 = bi_search(U, q + w, 1);
+	ld ly1 = L[l1].y + (ld)(L[l1 + 1].y - L[l1].y) * ((q - L[l1].x) / (L[l1 + 1].x - L[l1].x));
 }
 
 ld ternary_search(const Polygon& L, const Polygon& U, Pdd& p1, Pdd& p2) {
