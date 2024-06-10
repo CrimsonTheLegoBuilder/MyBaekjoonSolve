@@ -71,6 +71,7 @@ inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
+inline void norm(const Pos& s, const Pos& e, Pos& p, Pos& q) { if (dot(s, e, p, q) < 0) std::swap(p, q); }
 ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
 	return cross(d1, d2, t) / (d1 - d2).mag();
 }
@@ -98,7 +99,7 @@ Polygon sutherland_hodgman(const std::vector<Pos>& C, const std::vector<Pos>& cl
 	}
 	return ret;
 }
-struct Triangle {};
+struct Triangle;
 struct Circle {
 	Pos c;
 	int r;
@@ -122,12 +123,7 @@ struct Circle {
 	inline ld A() const { return 1. * r * r * PI; }
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
-	bool operator < (const Triangle& t) const {
-		ld d1 = dist(t.a, t.b, c);
-		ld d2 = dist(t.b, t.c, c);
-		ld d3 = dist(t.c, t.a, c);
-		return sign(d1 - r) >= 0 && sign(d2 - r) >= 0 && sign(d3 - r) >= 0;
-	}
+	bool operator < (const Triangle& t) const;
 };
 inline bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 typedef std::vector<Circle> Disks;
@@ -152,6 +148,11 @@ struct Seg {
 	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) { l = (s - e).mag(); }
 	inline ld green(const ld& v) const { return cross(O, s, e) * v; }
 };
+inline void norm(const Seg& S, Pos& p, Pos& q) { norm(S.s, S.e, p, q); }
+inline Pos ratio(const Seg& S, Pos& p, Pos& q) {
+	norm(S, p, q);
+	return Pos();
+}
 struct Triangle {
 	Pos a, b, c;
 	Arcs VA, VB, VC;
@@ -195,6 +196,12 @@ struct Triangle {
 	}
 	bool operator < (const Circle& q) const { return q >= a && q >= b && q >= c; }
 };
+bool Circle::operator < (const Triangle& t) const {
+	ld d1 = dist(t.a, t.b, c);
+	ld d2 = dist(t.b, t.c, c);
+	ld d3 = dist(t.c, t.a, c);
+	return sign(d1 - r) >= 0 && sign(d2 - r) >= 0 && sign(d3 - r) >= 0;
+}
 struct Confetti {
 	bool type;
 	Triangle T;
