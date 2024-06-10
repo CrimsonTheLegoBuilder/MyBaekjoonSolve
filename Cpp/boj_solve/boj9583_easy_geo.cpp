@@ -141,7 +141,7 @@ ld box_area(const Polygon& L, const Polygon& U, const ld& q, const ld& w, Pdd& p
 		else uy2 = U[u2].y + ((ll)U[u2 + 1].y - U[u2].y) * ((q + w - U[u2].x) / ((ll)U[u2 + 1].x - U[u1].x));
 		
 		if (ly2 < ly1 || uy2 < ly1) ret = 0;
-		else ret = w * (std::min(uy1, uy2) - ly1), p1 = Pdd(q, ly1), p2 = Pdd(q + w, std::min(uy1, uy2));
+		else ret = w * (std::min(uy1, uy2) - std::max(ly1, ly2)), p1 = Pdd(q, std::max(ly1, ly2)), p2 = Pdd(q + w, std::min(uy1, uy2));
 	}
 	if (f) {
 		ld lx1, lx2, ux1, ux2;
@@ -153,7 +153,7 @@ ld box_area(const Polygon& L, const Polygon& U, const ld& q, const ld& w, Pdd& p
 		else ux2 = U[u2].x + ((ll)U[u2 + 1].x - U[u2].x) * ((q + w - U[u2].y) / ((ll)U[u2 + 1].y - U[u1].y));
 		
 		if (lx2 > lx1 || ux2 > lx1) ret = 0;
-		else ret = w * (lx1 - std::max(ux1, ux2)), p1 = Pdd(std::max(ux1, ux2), q), p2 = Pdd(lx1, q + w);
+		else ret = w * (std::min(lx1, lx2) - std::max(ux1, ux2)), p1 = Pdd(std::max(ux1, ux2), q), p2 = Pdd(std::min(lx1, lx2), q + w);
 	}
 	return ret;
 }
