@@ -460,7 +460,7 @@ inline void green(const int& I) {
 		for (int i = k; i < I; i++) if (!V[i]) union_area += C[i].green(k, I);
 		A[k] = union_area;
 	}
-	for (int k = 0; k <= I; k++) std::cout << A[k + 1] - A[k] << " ";
+	for (int k = 0; k <= I; k++) std::cout << A[k] - A[k + 1] << " ";
 	std::cout << "\n";
 	return;
 }
