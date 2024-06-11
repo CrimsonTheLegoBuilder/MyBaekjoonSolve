@@ -134,12 +134,12 @@ struct Circle {
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
 	inline ld A() const { return 1. * r * r * PI; }
-	inline ld green(const int i) const {
+	inline ld green(const int& s, const int& e) const {
 		ld ret = 0;
 		ld hi;
 		hi = 0;
 		for (const Arc& ac : VA) {
-			if (ac.i > i || V[ac.i]) continue;
+			if (ac.i < s || ac.i > e || V[ac.i]) continue;
 			if (ac.lo > hi) ret += Arc(hi, ac.lo).green(*this), hi = ac.hi;
 			else hi = std::max(hi, ac.hi);
 		}
@@ -163,12 +163,6 @@ struct Seg {
 	ld l;
 	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) { l = (s - e).mag(); }
 	inline ld green(const ld& v) const { return cross(O, s, e) * v; }
-	//inline ld green(const Pos& p) const {
-	//	Pos vec = (e - s).unit();
-	//	Pos m1 = s + vec * (p.x / l);
-	//	Pos m2 = s + vec * (p.y / l);
-	//	return cross(O, s, e);
-	//}
 };
 inline void norm(const Seg& S, Pos& p, Pos& q) { norm(S.s, S.e, p, q); }
 inline Pos ratio(const Seg& S, Pos& p, Pos& q) {
@@ -189,27 +183,27 @@ struct Triangle {
 			};
 		return inner(q.a) && inner(q.b) && inner(q.c);
 	}
-	inline ld green(const int i) const {
+	inline ld green(const int& s, const int& e) const {
 		ld ret = 0;
 		ld v;
 		ld hi;
 		hi = 0; v = 0;
 		for (const Arc& ac : VA) {
-			if (ac.i > i || V[ac.i]) continue;
+			if (ac.i < s || ac.i > e || V[ac.i]) continue;
 			if (ac.lo > hi) v += ac.lo - hi, hi = ac.hi;
 			else hi = std::max(hi, ac.hi);
 		}
 		ret += Seg(a, b).green(v);
 		hi = 0; v = 0;
 		for (const Arc& ac : VB) {
-			if (ac.i > i || V[ac.i]) continue;
+			if (ac.i < s || ac.i > e || V[ac.i]) continue;
 			if (ac.lo > hi) v += ac.lo - hi, hi = ac.hi;
 			else hi = std::max(hi, ac.hi);
 		}
 		ret += Seg(b, c).green(v);
 		hi = 0; v = 0;
 		for (const Arc& ac : VC) {
-			if (ac.i > i || V[ac.i]) continue;
+			if (ac.i < s || ac.i > e || V[ac.i]) continue;
 			if (ac.lo > hi) v += ac.lo - hi, hi = ac.hi;
 			else hi = std::max(hi, ac.hi);
 		}
@@ -241,18 +235,36 @@ struct Confetti {
 		if (type == 0 && cf.type == 1) return T < cf.C;
 		if (type == 1 && cf.type == 0) return C < cf.T;
 	}
-};
-std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
-	ld d = dist(p1, p2, o);
-	if (std::abs(d) > r) return {};
-	Pos vec = p2 - p1;
-	Pos m = intersection(p1, p2, o, o + ~vec);
-	ld distance = vec.mag();
-	ld ratio = sqrt(r * r - d * d);
-	Pos m1 = m - vec * ratio / distance;
-	Pos m2 = m + vec * ratio / distance;
-	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
-	return { m1, m2 };//p1->p2
+	inline ld green(const int& s, const int& e) const {
+		if (type) return C.green(s, e);
+		else return T.green(s, e);
+	}
+} C[LEN];
+//std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
+//	ld d = dist(p1, p2, o);
+//	if (std::abs(d) > r) return {};
+//	Pos vec = p2 - p1;
+//	Pos m = intersection(p1, p2, o, o + ~vec);
+//	ld distance = vec.mag();
+//	ld ratio = sqrt(r * r - d * d);
+//	Pos m1 = m - vec * ratio / distance;
+//	Pos m2 = m + vec * ratio / distance;
+//	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
+//	return { m1, m2 };//p1->p2
+//}
+std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos& p, const ld& r) {
+	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
+	Pos vec = e - s;
+	Pos OM = s - p;
+	ld a = vec * vec;
+	ld b = 2 * (vec * OM);
+	ld c = OM * OM - r * r;
+	ld J = b * b - 4 * a * c;
+	if (J < TOL) return {};
+	ld lo = (-b - sqrt(J)) / (2 * a);
+	ld hi = (-b + sqrt(J)) / (2 * a);
+	if (hi < 0 || 1 < lo) return {};
+	return { { lo, hi } };//ratio, ratio
 }
 inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
@@ -272,8 +284,27 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	if (zero(h)) return {};
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
+inline void arc_init() {
 
-
+}
+inline void green(const int& I) {
+	memset(A, 0, sizeof A);	
+	for (int k = 0; k <= I; k++) {
+		memset(V, 0, sizeof V);
+		for (int i = k; i <= I; i++) {
+			for (int j = i + 1; j < I; j++) {
+				if (C[i] < C[j]) V[i] = 1;
+				if (C[j] < C[i]) V[j] = 1;
+			}
+		}
+		ld union_area = 0;
+		for (int i = k; i < I; i++) union_area += C[i].green(k, I);
+		A[k] = union_area;
+	}
+	for (int k = 0; k <= I; k++) std::cout << A[k + 1] - A[k] << " ";
+	std::cout << "\n";
+	return;
+}
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -281,5 +312,15 @@ inline void solve() {
 	std::cout.precision(9);
 	int ret = 0;
 	std::cin >> N;
+	int t = 0, a = 0, b = 0, c = 0, d = 0, e = 0, f = 0;
+	for (int i = 0; i < N; i++) {
+		std::cin >> t;
+		if (t == 1) std::cin >> a >> b >> c >> d >> e >> f;
+		else if (t == 2) std::cin >> a >> b >> c;
+		C[i] = Confetti(t, a, b, c, d, e, f, i);
+	}
+	arc_init();
+	for (int i = 0; i < N; i++) green(i);
+	return;
 }
 int main() { solve(); return 0; }//boj11392 Confetti
