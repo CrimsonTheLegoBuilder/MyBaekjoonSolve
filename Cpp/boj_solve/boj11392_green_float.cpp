@@ -177,11 +177,22 @@ struct Triangle {
 		a = p; b = q; c = r;
 		VA.clear(); VB.clear(); VC.clear();
 	}
-	bool operator < (const Triangle& q) const {
+	inline ld area() const { return cross(a, b, c); }
+	bool inner_check(const Triangle& q) const {
 		auto inner = [&](const Pos& p) -> bool {
 			return ccw(a, b, p) >= 0 && ccw(b, c, p) >= 0 && ccw(c, a, p) >= 0;
 			};
 		return inner(q.a) && inner(q.b) && inner(q.c);
+	}
+	bool operator < (const Triangle& q) const {
+		bool f1 = inner_check(q);
+		bool f2 = !zero(area() - q.area());
+		return f1 && f2;
+	}
+	bool operator == (const Triangle& q) const {
+		bool f1 = inner_check(q);
+		bool f2 = zero(area() - q.area());
+		return f1 && f2;
 	}
 	inline ld green(const int& s, const int& e) const {
 		ld ret = 0;
@@ -234,6 +245,11 @@ struct Confetti {
 		if (type == 1 && cf.type == 1) return C < cf.C;
 		if (type == 0 && cf.type == 1) return T < cf.C;
 		if (type == 1 && cf.type == 0) return C < cf.T;
+	}
+	bool operator == (const Confetti& cf) const {
+		if (type != cf.type) return 0;
+		if (type) return C == cf.C;
+		else return T == cf.T;
 	}
 	inline ld green(const int& s, const int& e) const {
 		if (type) return C.green(s, e);
@@ -295,6 +311,7 @@ inline void green(const int& I) {
 			for (int j = i + 1; j < I; j++) {
 				if (C[i] < C[j]) V[i] = 1;
 				if (C[j] < C[i]) V[j] = 1;
+				if ()
 			}
 		}
 		ld union_area = 0;
