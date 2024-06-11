@@ -22,6 +22,8 @@ inline ld norm(ld th) {
 	return th;
 }
 
+#define triangle 0
+#define circle 1
 //#define DEBUG
 //#define ASSERT
 
@@ -237,23 +239,23 @@ struct Confetti {
 	Confetti(int t = 0, int a = 0, int b = 0, int c = 0, int d = 0, int e = 0, int f = 0, int I = -1) : i(I) {
 		t--;
 		type = t;
-		if (type == 1) C = Circle(Pos(a, b), c);
-		else if (!type) T = Triangle(Pos(a, b), Pos(c, d), Pos(e, f));
+		if (type == triangle) T = Triangle(Pos(a, b), Pos(c, d), Pos(e, f));
+		else if (type == circle) C = Circle(Pos(a, b), c);
 	}
 	bool operator < (const Confetti& cf) const {
-		if (type == 0 && cf.type == 0) return T < cf.T;
-		if (type == 1 && cf.type == 1) return C < cf.C;
-		if (type == 0 && cf.type == 1) return T < cf.C;
-		if (type == 1 && cf.type == 0) return C < cf.T;
+		if (type == triangle && cf.type == triangle) return T < cf.T;
+		if (type == circle && cf.type == circle) return C < cf.C;
+		if (type == triangle && cf.type == circle) return T < cf.C;
+		if (type == circle && cf.type == triangle) return C < cf.T;
 	}
 	bool operator == (const Confetti& cf) const {
 		if (type != cf.type) return 0;
-		if (type) return C == cf.C;
-		else return T == cf.T;
+		if (type == triangle) return T == cf.T;
+		else if(type == circle) return C == cf.C;
 	}
 	inline ld green(const int& s, const int& e) const {
-		if (type) return C.green(s, e);
-		else return T.green(s, e);
+		if (type == triangle) return T.green(s, e);
+		else if (type == circle) return C.green(s, e);
 	}
 } C[LEN];
 //std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
@@ -301,7 +303,28 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
 inline void arc_init() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (i == j) continue;
+			if (C[i].type == triangle && C[j].type == triangle) {
 
+			}
+			if (C[i].type == circle && C[j].type == circle) {
+
+			}
+			if (C[i].type == triangle && C[j].type == circle) {
+
+			}
+			if (C[i].type == circle && C[j].type == triangle) {
+
+			}
+		}
+		std::sort(C[i].T.VA.begin(), C[i].T.VA.end());
+		std::sort(C[i].T.VB.begin(), C[i].T.VB.end());
+		std::sort(C[i].T.VC.begin(), C[i].T.VC.end());
+		std::sort(C[i].C.VA.begin(), C[i].C.VA.end());
+	}
+	return;
 }
 inline void green(const int& I) {
 	memset(A, 0, sizeof A);	
@@ -310,12 +333,11 @@ inline void green(const int& I) {
 		for (int i = k; i <= I; i++) {
 			for (int j = i + 1; j < I; j++) {
 				if (C[i] < C[j]) V[i] = 1;
-				if (C[j] < C[i]) V[j] = 1;
-				if ()
+				if (C[j] < C[i] || C[j] == C[i]) V[j] = 1;
 			}
 		}
 		ld union_area = 0;
-		for (int i = k; i < I; i++) union_area += C[i].green(k, I);
+		for (int i = k; i < I; i++) if (!V[i]) union_area += C[i].green(k, I);
 		A[k] = union_area;
 	}
 	for (int k = 0; k <= I; k++) std::cout << A[k + 1] - A[k] << " ";
