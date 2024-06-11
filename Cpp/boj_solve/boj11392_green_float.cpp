@@ -69,23 +69,23 @@ struct Pos {
 };
 const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
-bool cmp_rot(const Pos& p, const Pos& q) { return zero(p.t - q.t) ? p.i > q.i : p.t < q.t; }
+inline bool cmp_rot(const Pos& p, const Pos& q) { return zero(p.t - q.t) ? p.i > q.i : p.t < q.t; }
 inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
+inline ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+inline ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 inline void norm(const Pos& s, const Pos& e, Pos& p, Pos& q) { if (dot(s, e, p, q) < 0) std::swap(p, q); }
-ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
+inline ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
 	return cross(d1, d2, t) / (d1 - d2).mag();
 }
-Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
+inline Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-Polygon convex_cut(const std::vector<Pos>& ps, const Pos& b1, const Pos& b2) {
+inline Polygon convex_cut(const std::vector<Pos>& ps, const Pos& b1, const Pos& b2) {
 	std::vector<Pos> qs;
 	int n = ps.size();
 	for (int i = 0; i < n; i++) {
@@ -96,7 +96,7 @@ Polygon convex_cut(const std::vector<Pos>& ps, const Pos& b1, const Pos& b2) {
 	}
 	return qs;
 }
-Polygon sutherland_hodgman(const std::vector<Pos>& C, const std::vector<Pos>& clip) {
+inline Polygon sutherland_hodgman(const std::vector<Pos>& C, const std::vector<Pos>& clip) {
 	int sz = clip.size();
 	std::vector<Pos> ret = C;
 	for (int i = 0; i < sz; i++) {
@@ -132,12 +132,12 @@ struct Circle {
 		ll rsum = sq(r + q.r);
 		return rsum < (c - q.c).Euc() + TOL;
 	}
-	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
-	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
-	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
-	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
-	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
-	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
+	inline bool operator > (const Pos& p) const { return r > (c - p).mag(); }
+	inline bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
+	inline bool operator < (const Pos& p) const { return r < (c - p).mag(); }
+	inline Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
+	inline Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
+	inline ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
 	inline ld A() const { return 1. * r * r * PI; }
 	inline ld green(const int& s, const int& e) const {
 		ld ret = 0;
@@ -152,7 +152,7 @@ struct Circle {
 	}
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
-	bool operator < (const Triangle& t) const;
+	inline bool operator < (const Triangle& t) const;
 };
 inline bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 typedef std::vector<Circle> Disks;
@@ -183,18 +183,18 @@ struct Triangle {
 		VA.clear(); VB.clear(); VC.clear();
 	}
 	inline ld area() const { return cross(a, b, c); }
-	bool inner_check(const Triangle& q) const {
+	inline bool inner_check(const Triangle& q) const {
 		auto inner = [&](const Pos& p) -> bool {
 			return ccw(a, b, p) >= 0 && ccw(b, c, p) >= 0 && ccw(c, a, p) >= 0;
 			};
 		return inner(q.a) && inner(q.b) && inner(q.c);
 	}
-	bool operator < (const Triangle& q) const {
+	inline bool operator < (const Triangle& q) const {
 		bool f1 = inner_check(q);
 		bool f2 = !zero(area() - q.area());
 		return f1 && f2;
 	}
-	bool operator == (const Triangle& q) const {
+	inline bool operator == (const Triangle& q) const {
 		bool f1 = inner_check(q);
 		bool f2 = zero(area() - q.area());
 		return f1 && f2;
@@ -226,9 +226,9 @@ struct Triangle {
 		ret += Seg(c, a).green(v);
 		return ret;
 	}
-	bool operator < (const Circle& q) const { return q >= a && q >= b && q >= c; }
+	inline bool operator < (const Circle& q) const { return q >= a && q >= b && q >= c; }
 };
-bool Circle::operator < (const Triangle& t) const {
+inline bool Circle::operator < (const Triangle& t) const {
 	ld d1 = dist(t.a, t.b, c);
 	ld d2 = dist(t.b, t.c, c);
 	ld d3 = dist(t.c, t.a, c);
@@ -240,21 +240,20 @@ struct Confetti {
 	Circle C;
 	int i;
 	Confetti(int t = 0, int a = 0, int b = 0, int c = 0, int d = 0, int e = 0, int f = 0, int I = -1) : i(I) {
-		t--;
 		type = t;
 		if (type == triangle) T = Triangle(Pos(a, b), Pos(c, d), Pos(e, f));
 		else if (type == circle) C = Circle(Pos(a, b), c);
 	}
-	bool operator < (const Confetti& cf) const {
+	inline bool operator < (const Confetti& cf) const {
 		if (type == triangle && cf.type == triangle) return T < cf.T;
 		if (type == circle && cf.type == circle) return C < cf.C;
 		if (type == triangle && cf.type == circle) return T < cf.C;
 		if (type == circle && cf.type == triangle) return C < cf.T;
 	}
-	bool operator == (const Confetti& cf) const {
+	inline bool operator == (const Confetti& cf) const {
 		if (type != cf.type) return 0;
 		if (type == triangle) return T == cf.T;
-		else if(type == circle) return C == cf.C;
+		else if (type == circle) return C == cf.C;
 	}
 	inline ld green(const int& s, const int& e) const {
 		if (type == triangle) return T.green(s, e);
@@ -476,7 +475,7 @@ inline void solve() {
 		std::cin >> t;
 		if (t == 1) std::cin >> a >> b >> c >> d >> e >> f;
 		else if (t == 2) std::cin >> a >> b >> c;
-		C[i] = Confetti(t, a, b, c, d, e, f, i);
+		C[i] = Confetti(t - 1, a, b, c, d, e, f, i);
 	}
 	arc_init();
 	for (int i = 0; i < N; i++) green(i);
