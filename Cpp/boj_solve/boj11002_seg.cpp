@@ -458,7 +458,8 @@ inline Seg upper_tangent_bi_search(const int& I, const int& J) {
 	for (int i = std::max(0, s - 2); i < std::min(szl, s + 2); i++) {
 		l = i;
 		r = find_tangent_bi_search(R, L[l]);
-		if (valid_check(l, r)) break;
+		if (tangent_check(l, r)) break;
+		//if (valid_check(l, r)) break;
 	}
 #ifdef DEBUG
 	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
