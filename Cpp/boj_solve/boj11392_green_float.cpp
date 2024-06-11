@@ -284,6 +284,10 @@ std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos
 	if (hi < 0 || 1 < lo) return {};
 	return { { lo, hi } };//ratio, ratio
 }
+std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Circle& c) {
+	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
+	return circle_line_intersections(s, e, c.c, c.r);
+}
 inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
 	Pos vec = cb - ca;
@@ -306,23 +310,102 @@ inline void arc_init() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
+			if (C[i] < C[j]) continue;
+			if (C[j] < C[i] || C[j] == C[i]) continue;
 			if (C[i].type == triangle && C[j].type == triangle) {
-
+				Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
+				Polygon clip = { C[j].T.a, C[j].T.b, C[j].T.c };
+				Polygon seg, tmp;
+				seg = { a, b };
+				tmp = sutherland_hodgman(seg, clip);
+				if (tmp.size()) {
+					Pos p = tmp[0], q = tmp[1];
+					norm(a, b, p, q);
+					ld s = (p - a).mag() / (b - a).mag();
+					ld e = (q - a).mag() / (b - a).mag();
+					C[i].T.VA.push_back(Arc(s, e, j));
+				}
+				seg = { b, c };
+				tmp = sutherland_hodgman(seg, clip);
+				if (tmp.size()) {
+					Pos p = tmp[0], q = tmp[1];
+					norm(b, c, p, q);
+					ld s = (p - b).mag() / (c - b).mag();
+					ld e = (q - b).mag() / (c - b).mag();
+					C[i].T.VB.push_back(Arc(s, e, j));
+				}
+				seg = { c, a };
+				tmp = sutherland_hodgman(seg, clip);
+				if (tmp.size()) {
+					Pos p = tmp[0], q = tmp[1];
+					norm(c, a, p, q);
+					ld s = (p - c).mag() / (a - c).mag();
+					ld e = (q - c).mag() / (a - c).mag();
+					C[i].T.VC.push_back(Arc(s, e, j));
+				}
 			}
 			if (C[i].type == circle && C[j].type == circle) {
+				Pos vec = C[i].C.c - C[j].C.c;
+				int ra = C[i].C.r, rb = C[i].C.r;
+				if (vec.Euc() >= sq(ra + rb)) continue;
+				if (vec.Euc() <= sq(ra - rb)) continue;
 
+				auto inx = intersection(C[i].C, C[j].C);
+				if (!inx.size()) continue;
+				ld lo = inx[0].x;
+				ld hi = inx[0].y;
+
+				if (lo > hi) {
+					C[i].C.VA.push_back(Arc(lo, 2 * PI, j));
+					C[i].C.VA.push_back(Arc(0, hi, j));
+				}
+				else C[i].C.VA.push_back(Arc(lo, hi, j));
+				
 			}
 			if (C[i].type == triangle && C[j].type == circle) {
-
+				Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
+				Circle d = C[j].C;
+				Polygon inx;
+				inx = circle_line_intersections(a, b, d);
+				if (inx.size()) {
+					ld s = std::max(0., inx[0].x);
+					ld e = std::min(1., inx[0].y);
+					C[i].T.VA.push_back(Arc(s, e, j));
+				}
+				inx = circle_line_intersections(b, c, d);
+				if (inx.size()) {
+					ld s = std::max(0., inx[0].x);
+					ld e = std::min(1., inx[0].y);
+					C[i].T.VB.push_back(Arc(s, e, j));
+				}
+				inx = circle_line_intersections(c, a, d);
+				if (inx.size()) {
+					ld s = std::max(0., inx[0].x);
+					ld e = std::min(1., inx[0].y);
+					C[i].T.VC.push_back(Arc(s, e, j));
+				}
 			}
 			if (C[i].type == circle && C[j].type == triangle) {
-
+				Circle d = C[i].C;
+				Pos& a = C[j].T.a, b = C[j].T.b, c = C[j].T.c;
+				Polygon inx;
+				inx = circle_line_intersections(a, b, d);
+				inx = circle_line_intersections(b, c, d);
+				inx = circle_line_intersections(c, a, d);
 			}
 		}
-		std::sort(C[i].T.VA.begin(), C[i].T.VA.end());
-		std::sort(C[i].T.VB.begin(), C[i].T.VB.end());
-		std::sort(C[i].T.VC.begin(), C[i].T.VC.end());
-		std::sort(C[i].C.VA.begin(), C[i].C.VA.end());
+		if (C[i].type == triangle) {
+			std::sort(C[i].T.VA.begin(), C[i].T.VA.end());
+			C[i].T.VA.push_back(Arc(1., 1., -1));
+			std::sort(C[i].T.VB.begin(), C[i].T.VB.end());
+			C[i].T.VB.push_back(Arc(1., 1., -1));
+			std::sort(C[i].T.VC.begin(), C[i].T.VC.end());
+			C[i].T.VC.push_back(Arc(1., 1., -1));
+		}
+		else if (C[i].type == circle) {
+			std::sort(C[i].C.VA.begin(), C[i].C.VA.end());
+			C[i].C.VA.push_back(Arc(2 * PI, 2 * PI, -1));
+		}
 	}
 	return;
 }
