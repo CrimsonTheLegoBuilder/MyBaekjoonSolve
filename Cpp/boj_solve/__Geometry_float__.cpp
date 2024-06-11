@@ -19,10 +19,14 @@ const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 int N, M, T, Q;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
-int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
-int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return !sign(x); }
+inline ll sq(int x) { return (ll)x * x; }
+inline ld norm(ld th) {
+	while (th < 0) th += PI * 2;
+	while (th > PI * 2 - TOL) th -= PI * 2;
+	return th;
+}
 ld norm(ld th) {
 	while (th < 0) th += PI * 2;
 	while (th > PI * 2 - TOL) th -= PI * 2;

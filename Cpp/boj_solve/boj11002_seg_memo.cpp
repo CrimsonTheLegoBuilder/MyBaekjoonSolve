@@ -382,22 +382,6 @@ ld upper_monotone_chain(Pos L, Pos R) {
 				upper_tangent_bi_search(stack.back().i, LEN << 2 | 1) >= 0)
 				stack.pop_back();
 			stack.push_back(Seg(R, R, LEN << 2 | 1));
-
-			
-			//stack.clear();
-			//stack.push_back(Seg(L, L, 0));
-			//BBB.pop_back();
-			//BBB.push_back(last);
-			//BBB.push_back(Seg(R, R, LEN << 2 | 1));
-			//int sz = BBB.size();
-			//for (int i = 0; i < sz; i++) {
-			//	Seg B = BBB[i];
-			//	while (stack.size() > 1 &&
-			//		upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
-			//		upper_tangent_bi_search(stack.back().i, B.i) >= 0)
-			//		stack.pop_back();
-			//	stack.push_back(B);
-			//}
 		}
 	}
 #ifdef DEBUG
@@ -545,6 +529,22 @@ inline void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj11002 Crow
+
+
+//stack.clear();
+//stack.push_back(Seg(L, L, 0));
+//BBB.pop_back();
+//BBB.push_back(last);
+//BBB.push_back(Seg(R, R, LEN << 2 | 1));
+//int sz = BBB.size();
+//for (int i = 0; i < sz; i++) {
+//	Seg B = BBB[i];
+//	while (stack.size() > 1 &&
+//		upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
+//		upper_tangent_bi_search(stack.back().i, B.i) >= 0)
+//		stack.pop_back();
+//	stack.push_back(B);
+//}
 
 /*
 
