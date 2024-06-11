@@ -436,7 +436,7 @@ inline Seg upper_tangent_bi_search(const int& I, const int& J) {
 		};
 	r = find_tangent_bi_search(R, L[l]);
 	if (valid_check(l, r)) Seg(L[l], R[r], I);
-	int s = 0, e = szl - 1, m = 0;
+	int s = 0, e = szl - 2, m = 0;
 	int cnt = 0;
 	while (s < e) {
 		m = s + e >> 1;
@@ -448,8 +448,8 @@ inline Seg upper_tangent_bi_search(const int& I, const int& J) {
 #endif
 		int f = ccw(L[m], inx, R[r]);
 		if (!f) break;
-		if (f < 0) s = m + 1;
-		else e = m;
+		if (inx.y > 1e8 || f < 0) s = m + 1;
+		else if (inx.y < 0 || f >= 0) e = m;
 		cnt++;
 	}
 #ifdef DEBUG
