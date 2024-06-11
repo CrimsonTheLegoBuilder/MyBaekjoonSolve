@@ -10,7 +10,7 @@ typedef double ld;
 //typedef long double ld;
 typedef std::vector<ld> vld;
 const ld INF = 1e17;
-const ld TOL = 1e-11;
+const ld TOL = 1e-9;
 const ld PI = acos(-1);
 const int LEN = 205;
 inline bool zero(const ld& x) { return std::abs(x) < TOL; }
@@ -32,7 +32,9 @@ bool V[LEN];
 ld A[LEN];
 struct Pos {
 	ld x, y;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	ld t;
+	int i;
+	Pos(ld X = 0, ld Y = 0, ld T = 0, int I = 0) : x(X), y(Y), i(I) { t = norm(atan2l(y, x)); }
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -67,6 +69,7 @@ struct Pos {
 };
 const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
+bool cmp_rot(const Pos& p, const Pos& q) { return zero(p.t - q.t) ? p.i > q.i : p.t < q.t; }
 inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
@@ -258,18 +261,6 @@ struct Confetti {
 		else if (type == circle) return C.green(s, e);
 	}
 } C[LEN];
-//std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
-//	ld d = dist(p1, p2, o);
-//	if (std::abs(d) > r) return {};
-//	Pos vec = p2 - p1;
-//	Pos m = intersection(p1, p2, o, o + ~vec);
-//	ld distance = vec.mag();
-//	ld ratio = sqrt(r * r - d * d);
-//	Pos m1 = m - vec * ratio / distance;
-//	Pos m2 = m + vec * ratio / distance;
-//	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
-//	return { m1, m2 };//p1->p2
-//}
 std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos& p, const ld& r) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
 	Pos vec = e - s;
@@ -343,7 +334,7 @@ inline void arc_init() {
 					ld e = (q - c).mag() / (a - c).mag();
 					C[i].T.VC.push_back(Arc(s, e, j));
 				}
-			}
+			}//T && T
 			if (C[i].type == circle && C[j].type == circle) {
 				Pos vec = C[i].C.c - C[j].C.c;
 				int ra = C[i].C.r, rb = C[i].C.r;
@@ -361,7 +352,7 @@ inline void arc_init() {
 				}
 				else C[i].C.VA.push_back(Arc(lo, hi, j));
 				
-			}
+			}//C && C
 			if (C[i].type == triangle && C[j].type == circle) {
 				Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
 				Circle d = C[j].C;
@@ -384,15 +375,61 @@ inline void arc_init() {
 					ld e = std::min(1., inx[0].y);
 					C[i].T.VC.push_back(Arc(s, e, j));
 				}
-			}
+			}//T && C
 			if (C[i].type == circle && C[j].type == triangle) {
 				Circle d = C[i].C;
 				Pos& a = C[j].T.a, b = C[j].T.b, c = C[j].T.c;
-				Polygon inx;
+				Polygon inx, tmp;
 				inx = circle_line_intersections(a, b, d);
+				if (inx.size()) {
+					Pos ratio = inx[0];
+					if (0 - TOL < ratio.x) {
+						Pos s = a + (b - a) * ratio.x;
+						tmp.push_back(Pos(s.x - d.c.x, s.y - d.c.y, 0));
+					}
+					if (ratio.y < 1 + TOL) {
+						Pos e = a + (b - a) * ratio.y;
+						tmp.push_back(Pos(e.x - d.c.x, e.y - d.c.y, 1));
+					}
+				}
 				inx = circle_line_intersections(b, c, d);
+				if (inx.size()) {
+					Pos ratio = inx[0];
+					if (0 - TOL < ratio.x) {
+						Pos s = b + (c - b) * ratio.x;
+						tmp.push_back(Pos(s.x - d.c.x, s.y - d.c.y, 0));
+					}
+					if (ratio.y < 1 + TOL) {
+						Pos e = b + (c - b) * ratio.y;
+						tmp.push_back(Pos(e.x - d.c.x, e.y - d.c.y, 1));
+					}
+				}
 				inx = circle_line_intersections(c, a, d);
-			}
+				if (inx.size()) {
+					Pos ratio = inx[0];
+					if (0 - TOL < ratio.x) {
+						Pos s = c + (a - c) * ratio.x;
+						tmp.push_back(Pos(s.x - d.c.x, s.y - d.c.y, 0));
+					}
+					if (ratio.y < 1 + TOL) {
+						Pos e = c + (a - c) * ratio.y;
+						tmp.push_back(Pos(e.x - d.c.x, e.y - d.c.y, 1));
+					}
+				}
+				std::sort(tmp.begin(), tmp.end(), cmp_rot);
+				int sz = tmp.size();
+				for (int k = 0; k < sz; k++) {
+					if (tmp[k].i) {
+						ld lo = tmp[k].t;
+						ld hi = tmp[(k + 1) % sz].t;
+						if (lo > hi) {
+							C[i].C.VA.push_back(Arc(lo, 2 * PI, j));
+							C[i].C.VA.push_back(Arc(0, hi, j));
+						}
+						else C[i].C.VA.push_back(Arc(lo, hi, j));
+					}
+				}
+			}//C && T
 		}
 		if (C[i].type == triangle) {
 			std::sort(C[i].T.VA.begin(), C[i].T.VA.end());
