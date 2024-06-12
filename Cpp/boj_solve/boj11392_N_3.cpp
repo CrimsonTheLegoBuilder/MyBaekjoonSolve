@@ -204,16 +204,14 @@ struct Triangle {
 		VC = { 0, 1 };
 	}
 	inline ld area() const { return cross(a, b, c); }
-	inline bool inner_check(const Pos& p, const Pos& v) const {
-		ld v1 = (b - a) / (p - a);
-		if (v1 > TOL) return 0;
-		ld v2 = (c - b) / (p - b);
-		if (v2 > TOL) return 0;
-		ld v3 = (a - c) / (p - c);
-		if (v3 > TOL) return 0;
-		if (zero(v1)) return v / (b - a) > 0 ? 2 : 0;
-		if (zero(v2)) return v / (c - b) > 0 ? 2 : 0;
-		if (zero(v3)) return v / (a - c) > 0 ? 2 : 0;
+	inline int inner_check(const Pos& p, const Pos& v) const {
+		ld f1 = cross(a, b, p);
+		ld f2 = cross(b, c, p);
+		ld f3 = cross(c, a, p);
+		if (sign(f1) < 0 || sign(f2) < 0 || sign(f3) < 0) return 0;
+		if (zero(f1)) return (b - a) / v > 0 ? 2 : 0;//on_seg && centripetal
+		if (zero(f2)) return (c - b) / v > 0 ? 2 : 0;
+		if (zero(f3)) return (a - c) / v > 0 ? 2 : 0;
 		return 1;
 	}
 	inline bool inner_check(const Triangle& q) const {
@@ -547,20 +545,21 @@ inline void green_seg(const Seg& S, const vld& VA, const int& I) {
 		if (zero(d)) continue;
 		ld ratio = (VA[i + 1] + VA[i]) * .5;
 		Pos m = S.s + (S.e - S.s) * ratio;
-		int prev = -1, co = -1, nxt1 = N, nxt2 = N;
+
+		int prev = -1, col = -1, nxt1 = N, nxt2 = N;
 		for (int j = I - 1; j >= 0; j--) {
 			if (C[j].type == triangle) {
-				int f = C[j].T.inner_check(m, v1);
-				if (f == 2 || C[j].T.inner_check(m, v2) == 2) co = std::max(co, j);
+				int f = C[j].T.inner_check(m, v1);//centripetal
+				if (f == 2 || C[j].T.inner_check(m, v2) == 2) col = std::max(col, j);
 				if (f) prev = std::max(prev, j);
 			}
 			else if (C[j].type == circle) if (C[j].C >= m) prev = std::max(prev, j);
-			if (prev > j && co > j) break;
+			if (prev >= j && col >= j) break;
 		}
 		for (int j = I + 1; j < N; j++) {
 			if (C[j].type == triangle) {
-				if (C[j].T.inner_check(m, v1)) nxt1 = std::min(nxt1, j);
-				if (C[j].T.inner_check(m, v2)) nxt2 = std::min(nxt2, j);
+				if (C[j].T.inner_check(m, v1)) nxt1 = std::min(nxt1, j);//centripetal
+				if (C[j].T.inner_check(m, v2)) nxt2 = std::min(nxt2, j);//centrifugal
 			}
 			else if (C[j].type == circle) {
 				if (C[j].C >= m) {
@@ -573,7 +572,7 @@ inline void green_seg(const Seg& S, const vld& VA, const int& I) {
 		
 		//ld a = cross(O, S.s, S.e) * .5 * d;
 		ld a = S.green(d);
-		if (prev != -1 && prev > co) {
+		if (prev != -1 && prev > col) {
 			for (int j = I; j < nxt2; j++) A[j][prev] -= a;
 		}
 		for (int j = I; j < nxt1; j++) A[j][I] += a;
@@ -589,6 +588,7 @@ inline void green_circle(const Circle& c, const vld& VA, const int& I) {
 		Pos R = Pos(c.r, 0).rot(t);
 		Pos v = -R;
 		Pos m = c.c + R;
+
 		int prev = -1, nxt = N;
 		for (int j = I - 1; j >= 0; j--) {
 			if (C[j].type == triangle) if (C[j].T.inner_check(m, v)) prev = std::max(prev, j);
