@@ -519,16 +519,16 @@ inline void arc_init() {
 	for (int i = 0; i < N; i++) {
 		if (C[i].type == triangle) {
 			std::cout << "VA::\n";
-			for (Arc& a : C[i].T.VA) std::cout << a << " ";
+			for (ld& a : C[i].T.VA) std::cout << (long double)a << " ";
 			std::cout << "\nVB::\n";
-			for (Arc& a : C[i].T.VB) std::cout << a << " ";
+			for (ld& a : C[i].T.VB) std::cout << (long double)a << " ";
 			std::cout << "\nVC::\n";
-			for (Arc& a : C[i].T.VC) std::cout << a << " ";
+			for (ld& a : C[i].T.VC) std::cout << (long double)a << " ";
 			std::cout << "\n";
 		}
 		if (C[i].type == circle) {
 			std::cout << "VA::\n";
-			for (Arc& a : C[i].C.VA) std::cout << a << " ";
+			for (ld& a : C[i].C.VA) std::cout << (long double)a << " ";
 			std::cout << "\n";
 		}
 	}
@@ -538,8 +538,8 @@ inline void arc_init() {
 inline void green_seg(const Seg& S, const vld& VA, const int& I) {
 	if (!ccw(O, S.s, S.e)) return;
 	int sz = VA.size();
-	Pos v1 = ~(S.e - S.s);
-	Pos v2 = -v1;
+	Pos pet = ~(S.e - S.s);
+	Pos fug = -pet;
 	for (int i = 0; i < sz - 1; i++) {
 		ld d = VA[i + 1] - VA[i];
 		if (zero(d)) continue;
@@ -549,8 +549,8 @@ inline void green_seg(const Seg& S, const vld& VA, const int& I) {
 		int prev = -1, col = -1, nxt1 = N, nxt2 = N;
 		for (int j = I - 1; j >= 0; j--) {
 			if (C[j].type == triangle) {
-				int f = C[j].T.inner_check(m, v1);//centripetal
-				if (f == 2 || C[j].T.inner_check(m, v2) == 2) col = std::max(col, j);
+				int f = C[j].T.inner_check(m, pet);//centripetal
+				if (f == 2 || C[j].T.inner_check(m, fug) == 2) col = std::max(col, j);
 				if (f) prev = std::max(prev, j);
 			}
 			else if (C[j].type == circle) if (C[j].C >= m) prev = std::max(prev, j);
@@ -558,8 +558,8 @@ inline void green_seg(const Seg& S, const vld& VA, const int& I) {
 		}
 		for (int j = I + 1; j < N; j++) {
 			if (C[j].type == triangle) {
-				if (C[j].T.inner_check(m, v1)) nxt1 = std::min(nxt1, j);//centripetal
-				if (C[j].T.inner_check(m, v2)) nxt2 = std::min(nxt2, j);//centrifugal
+				if (C[j].T.inner_check(m, pet)) nxt1 = std::min(nxt1, j);//centripetal
+				if (C[j].T.inner_check(m, fug)) nxt2 = std::min(nxt2, j);//centrifugal
 			}
 			else if (C[j].type == circle) {
 				if (C[j].C >= m) {
@@ -586,12 +586,12 @@ inline void green_circle(const Circle& c, const vld& VA, const int& I) {
 		if (zero(d)) continue;
 		ld t = (VA[i + 1] + VA[i]) * .5;
 		Pos R = Pos(c.r, 0).rot(t);
-		Pos v = -R;
+		Pos pet = -R;
 		Pos m = c.c + R;
 
 		int prev = -1, nxt = N;
 		for (int j = I - 1; j >= 0; j--) {
-			if (C[j].type == triangle) if (C[j].T.inner_check(m, v)) prev = std::max(prev, j);
+			if (C[j].type == triangle) if (C[j].T.inner_check(m, pet)) prev = std::max(prev, j);
 			else if (C[j].type == circle) {
 				if (C[j].C == c) continue;
 				if (C[j].C >= m) prev = std::max(prev, j);
@@ -599,10 +599,8 @@ inline void green_circle(const Circle& c, const vld& VA, const int& I) {
 			if (prev > j) break;
 		}
 		for (int j = I + 1; j < N; j++) {
-			if (C[j].type == triangle) if (C[j].T.inner_check(m, v)) nxt = std::min(nxt, j);
-			else if (C[j].type == circle) {
-				if (C[j].C == c || C[j].C >= m) nxt = std::min(nxt, j);
-			}
+			if (C[j].type == triangle) if (C[j].T.inner_check(m, pet)) nxt = std::min(nxt, j);
+			else if (C[j].type == circle) if (C[j].C == c || C[j].C >= m) nxt = std::min(nxt, j);
 			if (nxt < N) break;
 		}
 
@@ -625,7 +623,7 @@ inline void green() {
 		else if (C[i].type == circle) green_circle(C[i].C, C[i].C.VA, i);
 	}
 	for (int i = 0; i < N; i++) {
-		for (int j = 0; j <= i; j++) std::cout << A[i][j] << " ";
+		for (int j = 0; j <= i; j++) std::cout << (long double)A[i][j] << " ";
 		std::cout << "\n";
 	}
 	std::cout << "\n";
