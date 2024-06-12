@@ -301,7 +301,8 @@ std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos
 	ld b = 2 * (vec * OM);
 	ld c = OM * OM - r * r;
 	ld J = b * b - 4 * a * c;
-	if (J < TOL) return {};
+	//if (J < TOL) return {};
+	if (sign(J) < 0) return {};
 	ld lo = (-b - sqrt(J)) / (2 * a);
 	ld hi = (-b + sqrt(J)) / (2 * a);
 	//if (hi < 0 || 1 < lo) return {};
@@ -319,23 +320,22 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	ld distance = vec.mag();
 	ld rd = vec.rad();
 
-	if (vec.Euc() > sq(ra + rb) - TOL) return {};
-	if (vec.Euc() < sq(ra - rb) + TOL) return {};
+	if (vec.Euc() > sq(ra + rb)) return {};
+	if (vec.Euc() < sq(ra - rb)) return {};
 
 	//2nd hyprblc law of cos
 	ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance * ra);
 	if (X < -1) X = -1;
 	if (X > 1) X = 1;
 	ld h = acos(X);
-	if (!zero(h)) return {};
+	if (zero(h)) return { Pos(-1, norm(rd)) };
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
 inline void arc_init() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
-			if (C[i] < C[j]) continue;
-			if (C[j] < C[i] || C[j] == C[i]) continue;
+			if (C[j] == C[i]) continue;
 			if (C[i].type == triangle && C[j].type == triangle) {
 #ifdef DEBUG
 				std::cout << "T && T\n";
