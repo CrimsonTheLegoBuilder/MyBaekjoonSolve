@@ -333,8 +333,7 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 inline void arc_init() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-			if (i == j) continue;
-			if (C[j] == C[i]) continue;
+			if (i == j || C[j] == C[i]) continue;
 			if (C[i].type == triangle && C[j].type == triangle) {
 #ifdef DEBUG
 				std::cout << "T && T\n";
@@ -365,109 +364,49 @@ inline void arc_init() {
 				if (!inx.size()) continue;
 				ld lo = inx[0].x;
 				ld hi = inx[0].y;
-				C[i].C.VA.push_back(lo);
-				C[i].C.VA.push_back(hi);
+				if (sign(lo) >= 0) C[i].C.VA.push_back(lo);
+				if (sign(hi) >= 0) C[i].C.VA.push_back(hi);
 			}//C && C
 			if (C[i].type == triangle && C[j].type == circle) {
 #ifdef DEBUG
 				std::cout << "T && C\n";
 #endif
-				Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
-				Circle d = C[j].C;
+				Circle& d = C[j].C;
 				Polygon inx;
-				inx = circle_line_intersections(a, b, d);
-#ifdef DEBUG
-				std::cout << "T && C DEBUG:: a, b\n";
-				if (inx.size()) std::cout << inx[0] << "\n";
-				else std::cout << "fuck\n";
-#endif
-				if (inx.size()) {
-					ld s = inx[0].x;
-					ld e = inx[0].y;
-					if (s > 0 - TOL) C[i].T.VA.push_back(s);
-					if (e < 1 + TOL) C[i].T.VA.push_back(e);
-				}
-				inx = circle_line_intersections(b, c, d);
-#ifdef DEBUG
-				std::cout << "T && C DEBUG:: b, c\n";
-				if (inx.size()) std::cout << inx[0] << "\n";
-				else std::cout << "fuck\n";
-#endif
-				if (inx.size()) {
-					ld s = inx[0].x;
-					ld e = inx[0].y;
-					if (s > 0 - TOL) C[i].T.VB.push_back(s);
-					if (e < 1 + TOL) C[i].T.VB.push_back(e);
-				}
-				inx = circle_line_intersections(c, a, d);
-#ifdef DEBUG
-				std::cout << "T && C DEBUG:: c, a\n";
-				if (inx.size()) std::cout << inx[0] << "\n";
-				else std::cout << "fuck\n";
-#endif
-				if (inx.size()) {
-					ld s = inx[0].x;
-					ld e = inx[0].y;
-					if (s > 0 - TOL) C[i].T.VB.push_back(s);
-					if (e < 1 + TOL) C[i].T.VB.push_back(e);
+				Pos* tri[] = { &C[i].T.a, &C[i].T.b, &C[i].T.c };
+				vld* VT[] = { &C[i].T.VA, &C[i].T.VB, &C[i].T.VC };
+				for (int k = 0; k < 3; k++) {
+					Pos& a = *tri[k];
+					Pos& b = *tri[(k + 1) % 3];
+					inx = circle_line_intersections(a, b, d);
+					if (inx.size()) {
+						Pos ratio = inx[0];
+						ld s = inx[0].x;
+						ld e = inx[0].y;
+						if (s > 0 - TOL) VT[k]->push_back(s);
+						if (e < 1 + TOL) VT[k]->push_back(e);
+					}
 				}
 			}//T && C
 			if (C[i].type == circle && C[j].type == triangle) {
 #ifdef DEBUG
 				std::cout << "C && T\n";
 #endif
-				Circle d = C[i].C;
+				Circle& d = C[i].C;
 				Pos& a = C[j].T.a, b = C[j].T.b, c = C[j].T.c;
-				Polygon inx, tmp;
-				inx = circle_line_intersections(a, b, d);
-#ifdef DEBUG
-				std::cout << "C && T DEBUG:: a, b\n";
-				if (inx.size()) std::cout << inx[0] << "\n";
-				else std::cout << "fuck\n";
-#endif
-				if (inx.size()) {
-					Pos ratio = inx[0];
-					if (0 - TOL < ratio.x) {
-						Pos s = a + (b - a) * ratio.x;
-						C[i].C.VA.push_back((s - d.c).rad());
-					}
-					if (ratio.y < 1 + TOL) {
-						Pos e = a + (b - a) * ratio.y;
-						C[i].C.VA.push_back((e - d.c).rad());
-					}
-				}
-				inx = circle_line_intersections(b, c, d);
-#ifdef DEBUG
-				std::cout << "C && T DEBUG:: b, c\n";
-				if (inx.size()) std::cout << inx[0] << "\n";
-				else std::cout << "fuck\n";
-#endif
-				if (inx.size()) {
-					Pos ratio = inx[0];
-					if (0 - TOL < ratio.x) {
-						Pos s = b + (c - b) * ratio.x;
-						C[i].C.VA.push_back((s - d.c).rad());
-					}
-					if (ratio.y < 1 + TOL) {
-						Pos e = b + (c - b) * ratio.y;
-						C[i].C.VA.push_back((e - d.c).rad());
-					}
-				}
-				inx = circle_line_intersections(c, a, d);
-#ifdef DEBUG
-				std::cout << "C && T DEBUG:: c, a\n";
-				if (inx.size()) std::cout << inx[0] << "\n";
-				else std::cout << "fuck\n";
-#endif
-				if (inx.size()) {
-					Pos ratio = inx[0];
-					if (0 - TOL < ratio.x) {
-						Pos s = c + (a - c) * ratio.x;
-						C[i].C.VA.push_back((s - d.c).rad());
-					}
-					if (ratio.y < 1 + TOL) {
-						Pos e = c + (a - c) * ratio.x;
-						C[i].C.VA.push_back((e - d.c).rad());
+				Polygon inx, tri = { a, b, c };
+				for (int k = 0; k < 3; k++) {
+					inx = circle_line_intersections(tri[k], tri[(k + 1) % 3], d);
+					if (inx.size()) {
+						Pos ratio = inx[0];
+						if (0 - TOL < ratio.x) {
+							Pos s = tri[k] + (tri[(k + 1) % 3] - tri[k]) * ratio.x;
+							C[i].C.VA.push_back((s - d.c).rad());
+						}
+						if (ratio.y < 1 + TOL) {
+							Pos e = tri[k] + (tri[(k + 1) % 3] - tri[k]) * ratio.y;
+							C[i].C.VA.push_back((e - d.c).rad());
+						}
 					}
 				}
 			}//C && T
@@ -484,17 +423,17 @@ inline void arc_init() {
 #ifdef DEBUG
 	for (int i = 0; i < N; i++) {
 		if (C[i].type == triangle) {
-			std::cout << "VA::\n";
-			for (ld& a : C[i].T.VA) std::cout << (long double)a << " ";
-			std::cout << "\nVB::\n";
-			for (ld& a : C[i].T.VB) std::cout << (long double)a << " ";
-			std::cout << "\nVC::\n";
-			for (ld& a : C[i].T.VC) std::cout << (long double)a << " ";
+			std::cout << "TVA::\n";
+			for (ld& a : C[i].T.VA) std::cout << a << " ";
+			std::cout << "\nTVB::\n";
+			for (ld& a : C[i].T.VB) std::cout << a << " ";
+			std::cout << "\nTVC::\n";
+			for (ld& a : C[i].T.VC) std::cout << a << " ";
 			std::cout << "\n";
 		}
 		if (C[i].type == circle) {
-			std::cout << "VA::\n";
-			for (ld& a : C[i].C.VA) std::cout << (long double)a << " ";
+			std::cout << "CVA::\n";
+			for (ld& a : C[i].C.VA) std::cout << a << " ";
 			std::cout << "\n";
 		}
 	}
@@ -550,7 +489,8 @@ inline void green_triangle(const int& i) {
 	green_seg(Seg(C[i].T.c, C[i].T.a), C[i].T.VC, i);
 	return;
 }
-inline void green_circle(const Circle& c, const int& I) {//refer to cki86201
+inline void green_circle(const int& I) {//refer to cki86201
+	const Circle& c = C[I].C;
 	const vld& VA = c.VA;
 	int sz = VA.size();
 	for (int i = 0; i < sz - 1; i++) {
@@ -588,7 +528,7 @@ inline void green() {
 	memset(A, 0, sizeof A);
 	for (int i = 0; i < N; i++) {
 		if (C[i].type == triangle) green_triangle(i);
-		if (C[i].type == circle) green_circle(C[i].C, i);
+		if (C[i].type == circle) green_circle(i);
 	}
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j <= i; j++) std::cout << (long double)A[i][j] << " ";
@@ -636,53 +576,3 @@ int main() { solve(); return 0; }//boj11392 Confetti refer to cki86201
 2 0 0 1
 1 0 0 2 0 0 2
 */
-
-
-//#ifdef DEBUG
-//				std::cout << "T && T\n";
-//#endif
-//				Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
-//				Polygon clip = { C[j].T.a, C[j].T.b, C[j].T.c };
-//				Polygon seg, tmp;
-//				seg = { a, b };
-//				tmp = sutherland_hodgman(seg, clip);
-//				if (tmp.size()) {
-//					std::sort(tmp.begin(), tmp.end());
-//					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
-//					for (const Pos& p : tmp) {
-//						ld s = (p - a).mag() / (b - a).mag();
-//						C[i].T.VA.push_back(s);
-//					}
-//				}
-//				seg = { b, c };
-//				tmp = sutherland_hodgman(seg, clip);
-//#ifdef DEBUG
-//				std::cout << "DEBUG::\n";
-//				std::cout << "tmp size :: " << tmp.size() << "\nPOS:: ";
-//				for (Pos& p : tmp) std::cout << p << "\n";
-//				std::cout << "DEBUG::\n";
-//#endif
-//				if (tmp.size() > 1) {
-//					std::sort(tmp.begin(), tmp.end());
-//					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
-//					for (const Pos& p : tmp) {
-//						ld s = (p - b).mag() / (c - b).mag();
-//						C[i].T.VB.push_back(s);
-//					}
-//				}
-//				seg = { c, a };
-//				tmp = sutherland_hodgman(seg, clip);
-//#ifdef DEBUG
-//				std::cout << "DEBUG::\n";
-//				std::cout << "tmp size :: " << tmp.size() << "\nPOS:: ";
-//				for (Pos& p : tmp) std::cout << p << "\n";
-//				std::cout << "DEBUG::\n";
-//#endif
-//				if (tmp.size() > 1) {
-//					std::sort(tmp.begin(), tmp.end());
-//					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
-//					for (const Pos& p : tmp) {
-//						ld s = (p - c).mag() / (a - c).mag();
-//						C[i].T.VC.push_back(s);
-//					}
-//				}
