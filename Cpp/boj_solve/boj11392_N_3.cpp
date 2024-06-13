@@ -33,9 +33,7 @@ bool V[LEN];
 ld A[LEN][LEN];
 struct Pos {
 	ld x, y;
-	ld t;
-	int i;
-	Pos(ld X = 0, ld Y = 0, int I = 0) : x(X), y(Y), i(I) { t = norm(atan2l(y, x)); }
+	Pos(ld X = 0, ld Y = 0, int I = 0) : x(X), y(Y){}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -70,7 +68,6 @@ struct Pos {
 };
 const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
-inline bool cmp_rot(const Pos& p, const Pos& q) { return zero(p.t - q.t) ? p.i > q.i : p.t < q.t; }
 inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
@@ -116,21 +113,10 @@ inline Polygon sutherland_hodgman(const std::vector<Pos>& C, const std::vector<P
 }
 struct Triangle;
 struct Circle;
-struct Arc {
-	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
-	int i;
-	Arc(ld LO = 0, ld HI = 0, int I = -1) : lo(LO), hi(HI), i(I) {}
-	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-	inline ld area(const Circle& cen) const;
-	inline ld green(const Circle& cen) const;
-	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi << " " << l.i; return os; }
-};
-typedef std::vector<Arc> Arcs;
 struct Circle {
 	Pos c;
 	int r;
-	vld VA;
-	Circle(Pos C = Pos(0, 0), int R = 0) : c(C), r(R) { VA = { 0, 2 * PI }; }
+	Circle(Pos C = Pos(0, 0), int R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	inline bool operator < (const Circle& q) const {
@@ -148,60 +134,37 @@ struct Circle {
 	inline Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
 	inline ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
 	inline ld A() const { return 1. * r * r * PI; }
-	inline ld green(const int& s, const int& e) const {
-		ld ret = 0;
-		ld hi;
-		hi = 0;
-		for (const Arc& ac : VA) {
-#ifdef DEBUG
-			std::cout << "ac:: " << ac << "\n";
-			std::cout << "ac.lo : " << ac.lo << " hi : " << hi << "\n";
-#endif
-			if (ac.i < s || ac.i > e || V[ac.i]) continue;
-			if (sign(ac.lo - hi) > 0) ret += Arc(hi, ac.lo).green(*this), hi = ac.hi;
-			else hi = std::max(hi, ac.hi);
-		}
-		return ret;
-	}
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 	inline bool operator < (const Triangle& t) const;
 };
 inline bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
 typedef std::vector<Circle> Disks;
-inline ld Arc::area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
-inline ld Arc::green(const Circle& cen) const {
-#ifdef DEBUG
-	std::cout << "green:: " << lo << " " << hi << " " << cen << "\n";
-#endif
-	Pos LO = -Pos(1, 0).rot(lo) * cen.r;
-	Pos HI = Pos(1, 0).rot(hi) * cen.r;
-	Pos vec = Pos(cen.c.x, cen.c.y);
-#ifdef DEBUG
-	std::cout << "green::Arc:: " << (area(cen) + vec / (HI + LO)) * .5 << "\n";
-#endif
-	return (area(cen) + vec / (HI + LO)) * .5;
-}
+struct Arc {
+	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
+	int i;
+	Arc(ld LO = 0, ld HI = 0, int I = -1) : lo(LO), hi(HI), i(I) {}
+	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
+	inline ld area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
+	inline ld green(const Circle& cen) const {
+		Pos LO = -Pos(1, 0).rot(lo) * cen.r;
+		Pos HI = Pos(1, 0).rot(hi) * cen.r;
+		Pos vec = Pos(cen.c.x, cen.c.y);
+		return (area(cen) + vec / (HI + LO)) * .5;
+	}
+	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi << " " << l.i; return os; }
+};
 struct Seg {
 	Pos s, e;
-	ld l;
-	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) { l = (s - e).mag(); }
+	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) {}
 	inline ld green(const ld& v) const { return cross(O, s, e) * v * .5; }
 };
 inline void norm(const Seg& S, Pos& p, Pos& q) { norm(S.s, S.e, p, q); }
-inline Pos ratio(const Seg& S, Pos& p, Pos& q) {
-	norm(S, p, q);
-	return Pos();
-}
 struct Triangle {
 	Pos a, b, c;
-	vld VA, VB, VC;
 	Triangle(Pos p = Pos(), Pos q = Pos(), Pos r = Pos()) {
 		if (ccw(p, q, r) < 0) std::swap(q, r);
 		a = p; b = q; c = r;
-		VA = { 0, 1 };
-		VB = { 0, 1 };
-		VC = { 0, 1 };
 	}
 	inline ld area() const { return cross(a, b, c); }
 	inline int inner_check(const Pos& p, const Pos& v) const {
@@ -232,33 +195,6 @@ struct Triangle {
 		bool f2 = zero(area() - q.area());
 		return f1 && f2;
 	}
-	inline ld green(const int& s, const int& e) const {
-		ld ret = 0;
-		ld v;
-		ld hi;
-		hi = 0; v = 0;
-		for (const Arc& ac : VA) {
-			if (ac.i < s || ac.i > e || V[ac.i]) continue;
-			if (sign(ac.lo - hi) > 0) v += ac.lo - hi, hi = ac.hi;
-			else hi = std::max(hi, ac.hi);
-		}
-		ret += Seg(a, b).green(v);
-		hi = 0; v = 0;
-		for (const Arc& ac : VB) {
-			if (ac.i < s || ac.i > e || V[ac.i]) continue;
-			if (sign(ac.lo - hi) > 0) v += ac.lo - hi, hi = ac.hi;
-			else hi = std::max(hi, ac.hi);
-		}
-		ret += Seg(b, c).green(v);
-		hi = 0; v = 0;
-		for (const Arc& ac : VC) {
-			if (ac.i < s || ac.i > e || V[ac.i]) continue;
-			if (sign(ac.lo - hi) > 0) v += ac.lo - hi, hi = ac.hi;
-			else hi = std::max(hi, ac.hi);
-		}
-		ret += Seg(c, a).green(v);
-		return ret;
-	}
 	inline bool operator < (const Circle& q) const { return q >= a && q >= b && q >= c; }
 };
 inline bool Circle::operator < (const Triangle& t) const {
@@ -288,10 +224,6 @@ struct Confetti {
 		if (type == triangle) return T == cf.T;
 		else if (type == circle) return C == cf.C;
 	}
-	inline ld green(const int& s, const int& e) const {
-		if (type == triangle) return T.green(s, e);
-		else if (type == circle) return C.green(s, e);
-	}
 } C[LEN];
 std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos& p, const ld& r) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
@@ -303,6 +235,7 @@ std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos
 	ld J = b * b - 4 * a * c;
 	//if (J < TOL) return {};
 	if (sign(J) < 0) return {};
+	if (!sign(J)) return { { -1, -b / (2 * a) } };
 	ld lo = (-b - sqrt(J)) / (2 * a);
 	ld hi = (-b + sqrt(J)) / (2 * a);
 	if (hi < 0 || 1 < lo) return {};
@@ -329,116 +262,6 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	ld h = acos(X);
 	if (zero(h)) return { Pos(-1, norm(rd)) };
 	return { Pos(norm(rd - h), norm(rd + h)) };
-}
-inline void arc_init() {
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			if (i == j || C[j] == C[i]) continue;
-			if (C[i].type == triangle && C[j].type == triangle) {
-#ifdef DEBUG
-				std::cout << "T && T\n";
-#endif
-				auto r = [&](const Pos& p1, const Pos& p2, const Pos& q) -> ld {
-					return (q - p1).mag() / (p2 - p1).mag();
-					};
-				Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
-				Polygon tri = { C[i].T.a, C[i].T.b, C[i].T.c };
-				Polygon clip = { C[j].T.a, C[j].T.b, C[j].T.c };
-				Polygon HPI = sutherland_hodgman(tri, clip);
-				for (const Pos& p : HPI) {
-					if (on_seg_weak(a, b, p)) C[i].T.VA.push_back(r(a, b, p));
-					if (on_seg_weak(b, c, p)) C[i].T.VB.push_back(r(b, c, p));
-					if (on_seg_weak(c, a, p)) C[i].T.VC.push_back(r(c, a, p));
-				}
-			}//T && T
-			if (C[i].type == circle && C[j].type == circle) {
-#ifdef DEBUG
-				std::cout << "C && C\n";
-#endif
-				Pos vec = C[i].C.c - C[j].C.c;
-				int ra = C[i].C.r, rb = C[i].C.r;
-				if (vec.Euc() >= sq(ra + rb)) continue;
-				if (vec.Euc() <= sq(ra - rb)) continue;
-
-				auto inx = intersection(C[i].C, C[j].C);
-				if (!inx.size()) continue;
-				ld lo = inx[0].x;
-				ld hi = inx[0].y;
-				if (sign(lo) >= 0) C[i].C.VA.push_back(lo);
-				if (sign(hi) >= 0) C[i].C.VA.push_back(hi);
-			}//C && C
-			if (C[i].type == triangle && C[j].type == circle) {
-#ifdef DEBUG
-				std::cout << "T && C\n";
-#endif
-				Circle& d = C[j].C;
-				Polygon inx;
-				Pos* tri[] = { &C[i].T.a, &C[i].T.b, &C[i].T.c };
-				vld* VT[] = { &C[i].T.VA, &C[i].T.VB, &C[i].T.VC };
-				for (int k = 0; k < 3; k++) {
-					Pos& a = *tri[k];
-					Pos& b = *tri[(k + 1) % 3];
-					inx = circle_line_intersections(a, b, d);
-					if (inx.size()) {
-						Pos ratio = inx[0];
-						ld s = inx[0].x;
-						ld e = inx[0].y;
-						if (s > 0 - TOL) VT[k]->push_back(s);
-						if (e < 1 + TOL) VT[k]->push_back(e);
-					}
-				}
-			}//T && C
-			if (C[i].type == circle && C[j].type == triangle) {
-#ifdef DEBUG
-				std::cout << "C && T\n";
-#endif
-				Circle& d = C[i].C;
-				Pos& a = C[j].T.a, b = C[j].T.b, c = C[j].T.c;
-				Polygon inx, tri = { a, b, c };
-				for (int k = 0; k < 3; k++) {
-					inx = circle_line_intersections(tri[k], tri[(k + 1) % 3], d);
-					if (inx.size()) {
-						Pos ratio = inx[0];
-						if (0 - TOL < ratio.x) {
-							Pos s = tri[k] + (tri[(k + 1) % 3] - tri[k]) * ratio.x;
-							C[i].C.VA.push_back((s - d.c).rad());
-						}
-						if (ratio.y < 1 + TOL) {
-							Pos e = tri[k] + (tri[(k + 1) % 3] - tri[k]) * ratio.y;
-							C[i].C.VA.push_back((e - d.c).rad());
-						}
-					}
-				}
-			}//C && T
-		}
-		if (C[i].type == triangle) {
-			std::sort(C[i].T.VA.begin(), C[i].T.VA.end());
-			std::sort(C[i].T.VB.begin(), C[i].T.VB.end());
-			std::sort(C[i].T.VC.begin(), C[i].T.VC.end());
-		}
-		if (C[i].type == circle) {
-			std::sort(C[i].C.VA.begin(), C[i].C.VA.end());
-		}
-	}
-#ifdef DEBUG
-	for (int i = 0; i < N; i++) {
-		if (C[i].type == triangle) {
-			std::cout << "TVA::\n";
-			for (ld& a : C[i].T.VA) std::cout << a << " ";
-			std::cout << "\nTVB::\n";
-			for (ld& a : C[i].T.VB) std::cout << a << " ";
-			std::cout << "\nTVC::\n";
-			for (ld& a : C[i].T.VC) std::cout << a << " ";
-			std::cout << "\n";
-		}
-		if (C[i].type == circle) {
-			std::cout << "CVA::\n";
-			for (ld& a : C[i].C.VA) std::cout << a << " ";
-			std::cout << "\n";
-		}
-	}
-#endif
-	return;
 }
 inline void green_seg(const Seg& S, const vld& VA, const int& I) {//refer to cki86201
 	if (!ccw(O, S.s, S.e)) return;
@@ -484,39 +307,113 @@ inline void green_seg(const Seg& S, const vld& VA, const int& I) {//refer to cki
 	return;
 }
 inline void green_triangle(const int& i) {
-	green_seg(Seg(C[i].T.a, C[i].T.b), C[i].T.VA, i);
-	green_seg(Seg(C[i].T.b, C[i].T.c), C[i].T.VB, i);
-	green_seg(Seg(C[i].T.c, C[i].T.a), C[i].T.VC, i);
+	vld VA = { 0, 1 }, VB = { 0, 1 }, VC = { 0, 1 };
+	for (int j = 0; j < N; j++) {
+		if (i == j) continue;
+		if (C[j].type == triangle) {
+			auto r = [&](const Pos& p1, const Pos& p2, const Pos& q) -> ld {
+				return (q - p1).mag() / (p2 - p1).mag();
+				};
+			Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
+			Polygon tri = { C[i].T.a, C[i].T.b, C[i].T.c };
+			Polygon clip = { C[j].T.a, C[j].T.b, C[j].T.c };
+			Polygon HPI = sutherland_hodgman(tri, clip);
+			for (const Pos& p : HPI) {
+				if (on_seg_weak(a, b, p)) VA.push_back(r(a, b, p));
+				if (on_seg_weak(b, c, p)) VB.push_back(r(b, c, p));
+				if (on_seg_weak(c, a, p)) VC.push_back(r(c, a, p));
+			}
+		}//T && T
+		if (C[j].type == circle) {
+			Circle& d = C[j].C;
+			Polygon inx;
+			Pos* tri[] = { &C[i].T.a, &C[i].T.b, &C[i].T.c };
+			vld* VT[] = { &VA, &VB, &VC };
+			for (int k = 0; k < 3; k++) {
+				Pos& a = *tri[k];
+				Pos& b = *tri[(k + 1) % 3];
+				inx = circle_line_intersections(a, b, d);
+				if (inx.size()) {
+					Pos ratio = inx[0];
+					ld s = inx[0].x;
+					ld e = inx[0].y;
+					if (s > 0 - TOL) VT[k]->push_back(s);
+					if (e < 1 + TOL) VT[k]->push_back(e);
+				}
+			}
+		}//T && C
+	}
+	std::sort(VA.begin(), VA.end());
+	std::sort(VB.begin(), VB.end());
+	std::sort(VC.begin(), VC.end());
+	green_seg(Seg(C[i].T.a, C[i].T.b), VA, i);
+	green_seg(Seg(C[i].T.b, C[i].T.c), VB, i);
+	green_seg(Seg(C[i].T.c, C[i].T.a), VC, i);
 	return;
 }
 inline void green_circle(const int& I) {//refer to cki86201
-	const Circle& c = C[I].C;
-	const vld& VA = c.VA;
+	vld VA = { 0, 2 * PI };
+	const Circle& q = C[I].C;
+	for (int j = 0; j < N; j++) {
+		if (I == j || C[j] == C[I]) continue;
+		if (C[j].type == circle) {
+			Pos vec = q.c - C[j].C.c;
+			int ra = q.r, rb = C[j].C.r;
+			if (vec.Euc() >= sq(ra + rb)) continue;
+			if (vec.Euc() <= sq(ra - rb)) continue;
+
+			auto inx = intersection(q, C[j].C);
+			if (!inx.size()) continue;
+			ld lo = inx[0].x;
+			ld hi = inx[0].y;
+			if (sign(lo) >= 0) VA.push_back(lo);
+			if (sign(hi) >= 0) VA.push_back(hi);
+		}//C && C
+		if (C[j].type == triangle) {
+			Pos& a = C[j].T.a, b = C[j].T.b, c = C[j].T.c;
+			Polygon inx, tri = { a, b, c };
+			for (int k = 0; k < 3; k++) {
+				inx = circle_line_intersections(tri[k], tri[(k + 1) % 3], q);
+				if (inx.size()) {
+					Pos ratio = inx[0];
+					if (0 - TOL < ratio.x) {
+						Pos s = tri[k] + (tri[(k + 1) % 3] - tri[k]) * ratio.x;
+						VA.push_back((s - q.c).rad());
+					}
+					if (ratio.y < 1 + TOL) {
+						Pos e = tri[k] + (tri[(k + 1) % 3] - tri[k]) * ratio.y;
+						VA.push_back((e - q.c).rad());
+					}
+				}
+			}
+		}//C && T
+	}
+	std::sort(VA.begin(), VA.end());
 	int sz = VA.size();
 	for (int i = 0; i < sz - 1; i++) {
 		ld d = VA[i + 1] - VA[i];
 		if (zero(d)) continue;
 		ld t = (VA[i + 1] + VA[i]) * .5;
-		Pos R = Pos(c.r, 0).rot(t);
+		Pos R = Pos(q.r, 0).rot(t);
 		Pos pet = -R;
-		Pos m = c.c + R;
+		Pos m = q.c + R;
 
 		int prev = -1, val = N;
 		for (int j = I - 1; j >= 0; j--) {
 			if (C[j].type == triangle) if (C[j].T.inner_check(m, pet)) prev = std::max(prev, j);
 			if (C[j].type == circle) {
-				if (C[j].C == c) continue;
+				if (C[j].C == q) continue;
 				if (C[j].C >= m) prev = std::max(prev, j);
 			}
 			if (prev >= j) break;
 		}
 		for (int j = I + 1; j < N; j++) {
 			if (C[j].type == triangle) if (C[j].T.inner_check(m, pet)) val = std::min(val, j);
-			if (C[j].type == circle) if (C[j].C == c || C[j].C >= m) val = std::min(val, j);
+			if (C[j].type == circle) if (C[j].C == q || C[j].C >= m) val = std::min(val, j);
 			if (val < N) break;
 		}
 
-		ld a = Arc(VA[i], VA[i + 1]).green(c);
+		ld a = Arc(VA[i], VA[i + 1]).green(q);
 		if (prev != -1) {
 			for (int j = I; j < val; j++) A[j][prev] -= a;
 		}
@@ -551,7 +448,6 @@ inline void solve() {
 		else if (t == 2) std::cin >> a >> b >> c;
 		C[i] = Confetti(t - 1, a, b, c, d, e, f, i);
 	}
-	arc_init();
 	green();
 	return;
 }
