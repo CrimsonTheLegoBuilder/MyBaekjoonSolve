@@ -305,8 +305,7 @@ std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos
 	if (sign(J) < 0) return {};
 	ld lo = (-b - sqrt(J)) / (2 * a);
 	ld hi = (-b + sqrt(J)) / (2 * a);
-	//if (hi < 0 || 1 < lo) return {};
-	if (sign(hi) < 0 || 1 < sign(lo)) return {};
+	if (hi < 0 || 1 < lo) return {};
 	return { { lo, hi } };//ratio, ratio
 }
 std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Circle& c) {
