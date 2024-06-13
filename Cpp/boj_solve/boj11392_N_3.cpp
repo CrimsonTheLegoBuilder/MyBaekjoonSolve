@@ -82,6 +82,14 @@ inline void norm(const Pos& s, const Pos& e, Pos& p, Pos& q) { if (dot(s, e, p, 
 inline ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
 	return cross(d1, d2, t) / (d1 - d2).mag();
 }
+inline bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = dot(d1, d3, d2);
+	return !ccw(d1, d2, d3) && sign(ret) >= 0;
+}
+inline bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = dot(d1, d3, d2);
+	return !ccw(d1, d2, d3) && sign(ret) > 0;
+}
 inline Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
@@ -103,14 +111,6 @@ inline Polygon sutherland_hodgman(const std::vector<Pos>& C, const std::vector<P
 	for (int i = 0; i < sz; i++) {
 		Pos b1 = clip[i], b2 = clip[(i + 1) % sz];
 		ret = convex_cut(ret, b1, b2);
-		std::sort(ret.begin(), ret.end());
-		ret.erase(unique(ret.begin(), ret.end()), ret.end());
-#ifdef DEBUG
-		std::cout << "b1, b2:: " << b1 << " | " << b2 << "\n";
-		std::cout << "ret.size:: " << ret.size() << "\nPos:: ";
-		for (Pos& p : ret) std::cout << p << " ";
-		std::cout << "\n";
-#endif
 	}
 	return ret;
 }
@@ -339,50 +339,17 @@ inline void arc_init() {
 #ifdef DEBUG
 				std::cout << "T && T\n";
 #endif
+				auto r = [&](const Pos& p1, const Pos& p2, const Pos& q) -> ld {
+					return (q - p1).mag() / (p2 - p1).mag();
+					};
 				Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
+				Polygon tri = { C[i].T.a, C[i].T.b, C[i].T.c };
 				Polygon clip = { C[j].T.a, C[j].T.b, C[j].T.c };
-				Polygon seg, tmp;
-				seg = { a, b };
-				tmp = sutherland_hodgman(seg, clip);
-				if (tmp.size()) {
-					std::sort(tmp.begin(), tmp.end());
-					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
-					for (const Pos& p : tmp) {
-						ld s = (p - a).mag() / (b - a).mag();
-						C[i].T.VA.push_back(s);
-					}
-				}
-				seg = { b, c };
-				tmp = sutherland_hodgman(seg, clip);
-#ifdef DEBUG
-				std::cout << "DEBUG::\n";
-				std::cout << "tmp size :: " << tmp.size() << "\nPOS:: ";
-				for (Pos& p : tmp) std::cout << p << "\n";
-				std::cout << "DEBUG::\n";
-#endif
-				if (tmp.size() > 1) {
-					std::sort(tmp.begin(), tmp.end());
-					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
-					for (const Pos& p : tmp) {
-						ld s = (p - b).mag() / (c - b).mag();
-						C[i].T.VB.push_back(s);
-					}
-				}
-				seg = { c, a };
-				tmp = sutherland_hodgman(seg, clip);
-#ifdef DEBUG
-				std::cout << "DEBUG::\n";
-				std::cout << "tmp size :: " << tmp.size() << "\nPOS:: ";
-				for (Pos& p : tmp) std::cout << p << "\n";
-				std::cout << "DEBUG::\n";
-#endif
-				if (tmp.size() > 1) {
-					std::sort(tmp.begin(), tmp.end());
-					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
-					for (const Pos& p : tmp) {
-						ld s = (p - c).mag() / (a - c).mag();
-						C[i].T.VC.push_back(s);
-					}
+				Polygon HPI = sutherland_hodgman(tri, clip);
+				for (const Pos& p : HPI) {
+					if (on_seg_weak(a, b, p)) C[i].T.VA.push_back(r(a, b, p));
+					if (on_seg_weak(b, c, p)) C[i].T.VB.push_back(r(b, c, p));
+					if (on_seg_weak(c, a, p)) C[i].T.VC.push_back(r(c, a, p));
 				}
 			}//T && T
 			if (C[i].type == circle && C[j].type == circle) {
@@ -410,7 +377,7 @@ inline void arc_init() {
 				Polygon inx;
 				inx = circle_line_intersections(a, b, d);
 #ifdef DEBUG
-				std::cout << "T && T DEBUG:: a, b\n";
+				std::cout << "T && C DEBUG:: a, b\n";
 				if (inx.size()) std::cout << inx[0] << "\n";
 				else std::cout << "fuck\n";
 #endif
@@ -422,7 +389,7 @@ inline void arc_init() {
 				}
 				inx = circle_line_intersections(b, c, d);
 #ifdef DEBUG
-				std::cout << "T && T DEBUG:: b, c\n";
+				std::cout << "T && C DEBUG:: b, c\n";
 				if (inx.size()) std::cout << inx[0] << "\n";
 				else std::cout << "fuck\n";
 #endif
@@ -434,7 +401,7 @@ inline void arc_init() {
 				}
 				inx = circle_line_intersections(c, a, d);
 #ifdef DEBUG
-				std::cout << "T && T DEBUG:: c, a\n";
+				std::cout << "T && C DEBUG:: c, a\n";
 				if (inx.size()) std::cout << inx[0] << "\n";
 				else std::cout << "fuck\n";
 #endif
@@ -462,11 +429,11 @@ inline void arc_init() {
 					Pos ratio = inx[0];
 					if (0 - TOL < ratio.x) {
 						Pos s = a + (b - a) * ratio.x;
-						C[i].C.VA.push_back(Pos(s.x - d.c.x, s.y - d.c.y). t);
+						C[i].C.VA.push_back((s - d.c).rad());
 					}
 					if (ratio.y < 1 + TOL) {
 						Pos e = a + (b - a) * ratio.y;
-						C[i].C.VA.push_back(Pos(e.x - d.c.x, e.y - d.c.y).t);
+						C[i].C.VA.push_back((e - d.c).rad());
 					}
 				}
 				inx = circle_line_intersections(b, c, d);
@@ -478,12 +445,12 @@ inline void arc_init() {
 				if (inx.size()) {
 					Pos ratio = inx[0];
 					if (0 - TOL < ratio.x) {
-						Pos s = a + (b - a) * ratio.x;
-						C[i].C.VA.push_back(Pos(s.x - d.c.x, s.y - d.c.y).t);
+						Pos s = b + (c - b) * ratio.x;
+						C[i].C.VA.push_back((s - d.c).rad());
 					}
 					if (ratio.y < 1 + TOL) {
-						Pos e = a + (b - a) * ratio.y;
-						C[i].C.VA.push_back(Pos(e.x - d.c.x, e.y - d.c.y).t);
+						Pos e = b + (c - b) * ratio.y;
+						C[i].C.VA.push_back((e - d.c).rad());
 					}
 				}
 				inx = circle_line_intersections(c, a, d);
@@ -495,12 +462,12 @@ inline void arc_init() {
 				if (inx.size()) {
 					Pos ratio = inx[0];
 					if (0 - TOL < ratio.x) {
-						Pos s = a + (b - a) * ratio.x;
-						C[i].C.VA.push_back(Pos(s.x - d.c.x, s.y - d.c.y).t);
+						Pos s = c + (a - c) * ratio.x;
+						C[i].C.VA.push_back((s - d.c).rad());
 					}
 					if (ratio.y < 1 + TOL) {
-						Pos e = a + (b - a) * ratio.y;
-						C[i].C.VA.push_back(Pos(e.x - d.c.x, e.y - d.c.y).t);
+						Pos e = c + (a - c) * ratio.x;
+						C[i].C.VA.push_back((e - d.c).rad());
 					}
 				}
 			}//C && T
@@ -510,7 +477,7 @@ inline void arc_init() {
 			std::sort(C[i].T.VB.begin(), C[i].T.VB.end());
 			std::sort(C[i].T.VC.begin(), C[i].T.VC.end());
 		}
-		else if (C[i].type == circle) {
+		if (C[i].type == circle) {
 			std::sort(C[i].C.VA.begin(), C[i].C.VA.end());
 		}
 	}
@@ -534,7 +501,7 @@ inline void arc_init() {
 #endif
 	return;
 }
-inline void green_seg(const Seg& S, const vld& VA, const int& I) {
+inline void green_seg(const Seg& S, const vld& VA, const int& I) {//refer to cki86201
 	if (!ccw(O, S.s, S.e)) return;
 	int sz = VA.size();
 	Pos pet = ~(S.e - S.s);
@@ -545,40 +512,46 @@ inline void green_seg(const Seg& S, const vld& VA, const int& I) {
 		ld ratio = (VA[i + 1] + VA[i]) * .5;
 		Pos m = S.s + (S.e - S.s) * ratio;
 
-		int prev = -1, col = -1, nxt1 = N, nxt2 = N;
+		int prev = -1, col = -1, val = N, inval = N;
 		for (int j = I - 1; j >= 0; j--) {
 			if (C[j].type == triangle) {
 				int f = C[j].T.inner_check(m, pet);//centripetal
 				if (f == 2 || C[j].T.inner_check(m, fug) == 2) col = std::max(col, j);
 				if (f) prev = std::max(prev, j);
 			}
-			else if (C[j].type == circle) if (C[j].C >= m) prev = std::max(prev, j);
+			if (C[j].type == circle) if (C[j].C >= m) prev = std::max(prev, j);
 			if (prev >= j && col >= j) break;
 		}
 		for (int j = I + 1; j < N; j++) {
 			if (C[j].type == triangle) {
-				if (C[j].T.inner_check(m, pet)) nxt1 = std::min(nxt1, j);//centripetal
-				if (C[j].T.inner_check(m, fug)) nxt2 = std::min(nxt2, j);//centrifugal
+				if (C[j].T.inner_check(m, pet)) val = std::min(val, j);//centripetal
+				if (C[j].T.inner_check(m, fug)) inval = std::min(inval, j);//centrifugal
 			}
-			else if (C[j].type == circle) {
+			if (C[j].type == circle) {
 				if (C[j].C >= m) {
-					nxt1 = std::min(nxt1, j);
-					nxt2 = std::min(nxt2, j);
+					val = std::min(val, j);
+					inval = std::min(inval, j);
 				}
 			}
-			if (nxt1 < N && nxt2 < N) break;
+			if (val < N && inval < N) break;
 		}
 		
-		//ld a = cross(O, S.s, S.e) * .5 * d;
 		ld a = S.green(d);
 		if (prev != -1 && prev > col) {
-			for (int j = I; j < nxt2; j++) A[j][prev] -= a;
+			for (int j = I; j < inval; j++) A[j][prev] -= a;
 		}
-		for (int j = I; j < nxt1; j++) A[j][I] += a;
+		for (int j = I; j < val; j++) A[j][I] += a;
 	}
 	return;
 }
-inline void green_circle(const Circle& c, const vld& VA, const int& I) {
+inline void green_triangle(const int& i) {
+	green_seg(Seg(C[i].T.a, C[i].T.b), C[i].T.VA, i);
+	green_seg(Seg(C[i].T.b, C[i].T.c), C[i].T.VB, i);
+	green_seg(Seg(C[i].T.c, C[i].T.a), C[i].T.VC, i);
+	return;
+}
+inline void green_circle(const Circle& c, const int& I) {//refer to cki86201
+	const vld& VA = c.VA;
 	int sz = VA.size();
 	for (int i = 0; i < sz - 1; i++) {
 		ld d = VA[i + 1] - VA[i];
@@ -588,38 +561,34 @@ inline void green_circle(const Circle& c, const vld& VA, const int& I) {
 		Pos pet = -R;
 		Pos m = c.c + R;
 
-		int prev = -1, nxt = N;
+		int prev = -1, val = N;
 		for (int j = I - 1; j >= 0; j--) {
 			if (C[j].type == triangle) if (C[j].T.inner_check(m, pet)) prev = std::max(prev, j);
-			else if (C[j].type == circle) {
+			if (C[j].type == circle) {
 				if (C[j].C == c) continue;
 				if (C[j].C >= m) prev = std::max(prev, j);
 			}
-			if (prev > j) break;
+			if (prev >= j) break;
 		}
 		for (int j = I + 1; j < N; j++) {
-			if (C[j].type == triangle) if (C[j].T.inner_check(m, pet)) nxt = std::min(nxt, j);
-			else if (C[j].type == circle) if (C[j].C == c || C[j].C >= m) nxt = std::min(nxt, j);
-			if (nxt < N) break;
+			if (C[j].type == triangle) if (C[j].T.inner_check(m, pet)) val = std::min(val, j);
+			if (C[j].type == circle) if (C[j].C == c || C[j].C >= m) val = std::min(val, j);
+			if (val < N) break;
 		}
 
 		ld a = Arc(VA[i], VA[i + 1]).green(c);
 		if (prev != -1) {
-			for (int j = I; j < nxt; j++) A[j][prev] -= a;
+			for (int j = I; j < val; j++) A[j][prev] -= a;
 		}
-		for (int j = I; j < nxt; j++) A[j][I] += a;
+		for (int j = I; j < val; j++) A[j][I] += a;
 	}
 	return;
 }
 inline void green() {
 	memset(A, 0, sizeof A);
 	for (int i = 0; i < N; i++) {
-		if (C[i].type == triangle) {
-			green_seg(Seg(C[i].T.a, C[i].T.b), C[i].T.VA, i);
-			green_seg(Seg(C[i].T.b, C[i].T.c), C[i].T.VB, i);
-			green_seg(Seg(C[i].T.c, C[i].T.a), C[i].T.VC, i);
-		}
-		else if (C[i].type == circle) green_circle(C[i].C, C[i].C.VA, i);
+		if (C[i].type == triangle) green_triangle(i);
+		if (C[i].type == circle) green_circle(C[i].C, i);
 	}
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j <= i; j++) std::cout << (long double)A[i][j] << " ";
@@ -649,11 +618,71 @@ inline void solve() {
 int main() { solve(); return 0; }//boj11392 Confetti refer to cki86201
 
 /*
-2
+4
+1 0 0 2 0 0 2
+1 1 1 -1 1 1 -1
 1 0 0 2 0 0 2
 1 1 1 -1 1 1 -1
 
-2
+4
 1 0 0 2 0 0 2
 1 2 2 2 0 0 2
+1 0 0 2 0 0 2
+1 2 2 2 0 0 2
+
+4
+2 0 0 1
+1 0 0 2 0 0 2
+2 0 0 1
+1 0 0 2 0 0 2
 */
+
+
+//#ifdef DEBUG
+//				std::cout << "T && T\n";
+//#endif
+//				Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
+//				Polygon clip = { C[j].T.a, C[j].T.b, C[j].T.c };
+//				Polygon seg, tmp;
+//				seg = { a, b };
+//				tmp = sutherland_hodgman(seg, clip);
+//				if (tmp.size()) {
+//					std::sort(tmp.begin(), tmp.end());
+//					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
+//					for (const Pos& p : tmp) {
+//						ld s = (p - a).mag() / (b - a).mag();
+//						C[i].T.VA.push_back(s);
+//					}
+//				}
+//				seg = { b, c };
+//				tmp = sutherland_hodgman(seg, clip);
+//#ifdef DEBUG
+//				std::cout << "DEBUG::\n";
+//				std::cout << "tmp size :: " << tmp.size() << "\nPOS:: ";
+//				for (Pos& p : tmp) std::cout << p << "\n";
+//				std::cout << "DEBUG::\n";
+//#endif
+//				if (tmp.size() > 1) {
+//					std::sort(tmp.begin(), tmp.end());
+//					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
+//					for (const Pos& p : tmp) {
+//						ld s = (p - b).mag() / (c - b).mag();
+//						C[i].T.VB.push_back(s);
+//					}
+//				}
+//				seg = { c, a };
+//				tmp = sutherland_hodgman(seg, clip);
+//#ifdef DEBUG
+//				std::cout << "DEBUG::\n";
+//				std::cout << "tmp size :: " << tmp.size() << "\nPOS:: ";
+//				for (Pos& p : tmp) std::cout << p << "\n";
+//				std::cout << "DEBUG::\n";
+//#endif
+//				if (tmp.size() > 1) {
+//					std::sort(tmp.begin(), tmp.end());
+//					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
+//					for (const Pos& p : tmp) {
+//						ld s = (p - c).mag() / (a - c).mag();
+//						C[i].T.VC.push_back(s);
+//					}
+//				}
