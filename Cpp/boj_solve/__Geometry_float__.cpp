@@ -14,6 +14,7 @@
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
+typedef std::vector<ld> vld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
@@ -23,13 +24,8 @@ inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
 inline ld norm(ld th) {
-	while (th < 0) th += PI * 2;
-	while (th > PI * 2 - TOL) th -= PI * 2;
-	return th;
-}
-ld norm(ld th) {
-	while (th < 0) th += PI * 2;
-	while (th > PI * 2 - TOL) th -= PI * 2;
+	while (th < 0) th += 2 * PI;
+	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
 	return th;
 }
 ld flip(ld lat) {
@@ -166,6 +162,106 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 };
 const Line Xaxis = { { 0, -1 }, 0 };
 const Line Yaxis = { { 1, 0 }, 0 };
+struct Triangle {
+	Pos a, b, c;
+	inline Triangle(Pos p = Pos(), Pos q = Pos(), Pos r = Pos()) {
+		if ((q - p) / (r - q) < 0) std::swap(q, r);
+		a = p; b = q; c = r;
+	}
+	inline int inner_check(const Pos& p, const Pos& v) const {
+		ld f1 = (b - a) / (p - a);
+		ld f2 = (c - b) / (p - b);
+		ld f3 = (a - c) / (p - c);
+		if (sign(f1) < 0 || sign(f2) < 0 || sign(f3) < 0) return 0;
+		if (zero(f1)) return (b - a) / v > 0 ? 2 : 0;//on_seg && centripetal
+		if (zero(f2)) return (c - b) / v > 0 ? 2 : 0;
+		if (zero(f3)) return (a - c) / v > 0 ? 2 : 0;
+		return 1;
+	}
+};
+struct Circle {
+	Pos c;
+	int r;
+	inline Circle(Pos C = Pos(), int R = 0) : c(C), r(R) {}
+	inline bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
+	inline bool operator >= (const Pos& p) const { return sign(r * r - (c - p).Euc()) >= 0; }
+	inline ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
+	inline ld rad(const Pos& p) const { return (p - c).rad(); }
+	inline ld green(const ld& lo, const ld& hi) const {
+		Pos s = Pos(cos(lo), sin(lo)), e = Pos(cos(hi), sin(hi));
+		ld fan = area(lo, hi);
+		Pos m = c + (s + e) * r * (ld).5;
+		ld I = (cos(lo) - cos(hi)) * m.y * r;
+		return fan + I - (s / e) * r * r * (ld).5;
+	}
+};
+enum Geo {
+	TRI,
+	CIR,
+};
+struct Shape {
+	Geo type;
+	Triangle T;
+	Circle C;
+	inline Shape(int t = 0, int a = 0, int b = 0, int c = 0, int d = 0, int e = 0, int f = 0) {
+		type = (Geo)t;
+		if (type == TRI) T = Triangle(Pos(a, b), Pos(c, d), Pos(e, f));
+		else if (type == CIR) C = Circle(Pos(a, b), c);
+	}
+} C[LEN];
+inline ld intersection(const Seg& s1, const Seg& s2) {
+	const Pos& p1 = s1.s, p2 = s1.e, q1 = s2.s, q2 = s2.e;
+	ld det = (q2 - q1) / (p2 - p1);
+	if (zero(det)) return -1;
+	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
+	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
+	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
+	return -1;
+}
+inline vld circle_line_intersections(const Pos& s, const Pos& e, const Circle& q, const bool& f = 0) {
+	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
+	Pos vec = e - s;
+	Pos OM = s - q.c;
+	ld a = vec.Euc();
+	ld b = vec * OM;
+	ld c = OM.Euc() - q.r * q.r;
+	ld J = b * b - a * c;
+	if (J < -TOL) return {};
+	ld det = sqrt(std::max((ld)0, J));
+	ld lo = (-b - det) / a;
+	ld hi = (-b + det) / a;
+	vld ret;
+	if (f) {
+		if (0 < hi && hi < 1) ret.push_back(hi);
+		if (zero(det)) return ret;
+		if (0 < lo && lo < 1) ret.push_back(lo);
+	}
+	else {
+		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
+		if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
+		if (zero(det)) return ret;
+		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
+	}
+	return ret;
+}
+inline vld intersection(const Circle& a, const Circle& b) {
+	Pos ca = a.c, cb = b.c;
+	Pos vec = cb - ca;
+	ll ra = a.r, rb = b.r;
+	ld distance = vec.mag();
+	ld rd = vec.rad();
+	if (vec.Euc() > sq(ra + rb) + TOL) return {};
+	if (vec.Euc() < sq(ra - rb) - TOL) return {};
+	ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance * ra);
+	if (X < -1) X = -1;
+	if (X > 1) X = 1;
+	ld h = acos(X);
+	vld ret = {};
+	ret.push_back(norm(rd + h));
+	if (zero(h)) return ret;
+	ret.push_back(norm(rd - h));
+	return ret;
+}
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;

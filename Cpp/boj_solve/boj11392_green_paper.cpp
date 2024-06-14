@@ -60,9 +60,9 @@ struct Triangle {
 		ld f2 = (c - b) / (p - b);
 		ld f3 = (a - c) / (p - c);
 		if (sign(f1) < 0 || sign(f2) < 0 || sign(f3) < 0) return 0;
-		if (zero(f1)) return v / (b - a) < 0 ? 2 : 0;//on_seg && centripetal
-		if (zero(f2)) return v / (c - b) < 0 ? 2 : 0;
-		if (zero(f3)) return v / (a - c) < 0 ? 2 : 0;
+		if (zero(f1)) return (b - a) / v > 0 ? 2 : 0;//on_seg && centripetal
+		if (zero(f2)) return (c - b) / v > 0 ? 2 : 0;
+		if (zero(f3)) return (a - c) / v > 0 ? 2 : 0;
 		return 1;
 	}
 };
@@ -73,7 +73,7 @@ struct Circle {
 	inline bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
 	inline bool operator >= (const Pos& p) const { return sign(r * r - (c - p).Euc()) >= 0; }
 	inline ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
-	inline ld rad(const Pos& p) const { ld v = atan2(p.y - c.y, p.x - c.x); return norm(v); }
+	inline ld rad(const Pos& p) const { return (p - c).rad(); }
 	inline ld green(const ld& lo, const ld& hi) const {
 		Pos s = Pos(cos(lo), sin(lo)), e = Pos(cos(hi), sin(hi));
 		ld fan = area(lo, hi);
@@ -81,7 +81,6 @@ struct Circle {
 		ld I = (cos(lo) - cos(hi)) * m.y * r;
 		return fan + I - (s / e) * r * r * (ld).5;
 	}
-	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 };
 struct Shape {
 	Geo type;
@@ -103,6 +102,7 @@ inline ld intersection(const Seg& s1, const Seg& s2) {
 	return -1;
 }
 inline vld circle_line_intersections(const Pos& s, const Pos& e, const Circle& q, const bool& f = 0) {
+	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
 	Pos vec = e - s;
 	Pos OM = s - q.c;
 	ld a = vec.Euc();
@@ -283,32 +283,3 @@ inline void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj11392 paper refer to cki86201
-
-/*
-2
-1 0 0 2 0 0 2
-1 1 1 -1 1 1 -1
-
-4
-1 0 0 2 0 0 2
-1 1 1 -1 1 1 -1
-1 0 0 2 0 0 2
-1 1 1 -1 1 1 -1
-
-4
-1 0 0 2 0 0 2
-1 2 2 2 0 0 2
-1 0 0 2 0 0 2
-1 2 2 2 0 0 2
-
-4
-2 0 0 1
-1 0 0 2 0 0 2
-2 0 0 1
-1 0 0 2 0 0 2
-
-2
-1 -99 -100 1 -1 100 99
-2 1 -1 1
-
-*/
