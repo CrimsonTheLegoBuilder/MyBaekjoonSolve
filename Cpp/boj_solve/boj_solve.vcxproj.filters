@@ -1137,10 +1137,10 @@
     <ClCompile Include="boj9583_easy_geo.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj11392_green_float.cpp">
+    <ClCompile Include="boj11392_green_cki86201.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj11392_N_3.cpp">
+    <ClCompile Include="boj11392_green_paper.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
