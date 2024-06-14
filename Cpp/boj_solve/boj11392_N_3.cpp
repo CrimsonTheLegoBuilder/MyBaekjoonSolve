@@ -6,20 +6,20 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-typedef double ld;
-//typedef long double ld;
+//typedef double ld;
+typedef long double ld;
 //typedef __float128 ld;
 typedef std::vector<ld> vld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-15;
 const ld PI = acos(-1);
 const int LEN = 205;
-inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline int sign(const ld& x) { return x <= -TOL ? -1 : x >= TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
 inline ld norm(ld th) {
-	while (th < 0) th += PI * 2;
-	while (th > PI * 2 - TOL) th -= PI * 2;
+	while (sign(th) < 0) th += PI * 2;
+	while (sign(th - PI * 2) >= 0) th -= PI * 2;
 	return th;
 }
 
@@ -69,6 +69,7 @@ struct Pos {
 const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return sign(ret);
@@ -159,6 +160,15 @@ struct Seg {
 	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) {}
 	inline ld green(const ld& v) const { return cross(O, s, e) * v * .5; }
 };
+inline ld intersection(const Seg& s1, const Seg& s2) {
+	const Pos& p1 = s1.s, p2 = s1.e, q1 = s2.s, q2 = s2.e;
+	ld det = cross(q1, q2, p1, p2);
+	if (zero(det)) return -1;
+	ld a1 = cross(q1, q2, p1, q1) / det;
+	ld a2 = cross(p1, p2, q1, p1) / -det;
+	if (sign(a1 - 0) >= 0 && sign(1 - a1) >= 0 && sign(a2 - 0) >= 0 && sign(1 - a2) >= 0) return a1;
+	return -1;
+}
 inline void norm(const Seg& S, Pos& p, Pos& q) { norm(S.s, S.e, p, q); }
 struct Triangle {
 	Pos a, b, c;
@@ -235,10 +245,9 @@ std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Pos
 	ld J = b * b - 4 * a * c;
 	//if (J < TOL) return {};
 	if (sign(J) < 0) return {};
-	if (!sign(J)) return { { -1, -b / (2 * a) } };
 	ld lo = (-b - sqrt(J)) / (2 * a);
 	ld hi = (-b + sqrt(J)) / (2 * a);
-	if (hi < 0 || 1 < lo) return {};
+	if (sign(hi - 0) < 0 || sign(lo - 1) > 0) return {};
 	return { { lo, hi } };//ratio, ratio
 }
 std::vector<Pos> circle_line_intersections(const Pos& s, const Pos& e, const Circle& c) {
@@ -252,15 +261,15 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	ld distance = vec.mag();
 	ld rd = vec.rad();
 
-	if (vec.Euc() > sq(ra + rb)) return {};
-	if (vec.Euc() < sq(ra - rb)) return {};
+	if (sign(vec.Euc() - sq(ra + rb)) > 0) return {};
+	if (sign(vec.Euc() - sq(ra - rb)) < 0) return {};
 
 	//2nd hyprblc law of cos
 	ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance * ra);
 	if (X < -1) X = -1;
 	if (X > 1) X = 1;
 	ld h = acos(X);
-	if (zero(h)) return { Pos(-1, norm(rd)) };
+	//if (zero(h)) return { Pos(-1, norm(rd)) };
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
 inline void green_seg(const Seg& S, const vld& VA, const int& I) {//refer to cki86201
@@ -311,17 +320,28 @@ inline void green_triangle(const int& i) {
 	for (int j = 0; j < N; j++) {
 		if (i == j) continue;
 		if (C[j].type == triangle) {
-			auto r = [&](const Pos& p1, const Pos& p2, const Pos& q) -> ld {
-				return (q - p1).mag() / (p2 - p1).mag();
-				};
+			//auto r = [&](const Pos& p1, const Pos& p2, const Pos& q) -> ld {
+			//	return (q - p1).mag() / (p2 - p1).mag();
+			//	};
+			//Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
+			//Polygon tri = { C[i].T.a, C[i].T.b, C[i].T.c };
+			//Polygon clip = { C[j].T.a, C[j].T.b, C[j].T.c };
+			//Polygon HPI = sutherland_hodgman(tri, clip);
+			//for (const Pos& p : HPI) {
+			//	if (on_seg_weak(a, b, p)) VA.push_back(r(a, b, p));
+			//	if (on_seg_weak(b, c, p)) VB.push_back(r(b, c, p));
+			//	if (on_seg_weak(c, a, p)) VC.push_back(r(c, a, p));
+			//}
 			Pos& a = C[i].T.a, b = C[i].T.b, c = C[i].T.c;
-			Polygon tri = { C[i].T.a, C[i].T.b, C[i].T.c };
 			Polygon clip = { C[j].T.a, C[j].T.b, C[j].T.c };
-			Polygon HPI = sutherland_hodgman(tri, clip);
-			for (const Pos& p : HPI) {
-				if (on_seg_weak(a, b, p)) VA.push_back(r(a, b, p));
-				if (on_seg_weak(b, c, p)) VB.push_back(r(b, c, p));
-				if (on_seg_weak(c, a, p)) VC.push_back(r(c, a, p));
+			for (int k = 0; k < 3; k++) {
+				const Pos& q1 = clip[k], q2 = clip[(k + 1) % 3];
+				ld r1 = intersection(Seg(a, b), Seg(q1, q2));
+				if (sign(r1) >= 0) VA.push_back(r1);
+				ld r2 = intersection(Seg(b, c), Seg(q1, q2));
+				if (sign(r2) >= 0) VB.push_back(r2);
+				ld r3 = intersection(Seg(c, a), Seg(q1, q2));
+				if (sign(r3) >= 0) VC.push_back(r3);
 			}
 		}//T && T
 		if (C[j].type == circle) {
@@ -337,8 +357,8 @@ inline void green_triangle(const int& i) {
 					Pos ratio = inx[0];
 					ld s = inx[0].x;
 					ld e = inx[0].y;
-					if (s > 0 - TOL) VT[k]->push_back(s);
-					if (e < 1 + TOL) VT[k]->push_back(e);
+					if (sign(s - 0) >= 0) VT[k]->push_back(s);
+					if (sign(1 - e) >= 0) VT[k]->push_back(e);
 				}
 			}
 		}//T && C
@@ -359,8 +379,10 @@ inline void green_circle(const int& I) {//refer to cki86201
 		if (C[j].type == circle) {
 			Pos vec = q.c - C[j].C.c;
 			int ra = q.r, rb = C[j].C.r;
-			if (vec.Euc() >= sq(ra + rb)) continue;
-			if (vec.Euc() <= sq(ra - rb)) continue;
+			if (sign(vec.Euc() - sq(ra + rb)) > 0) continue;
+			if (sign(vec.Euc() - sq(ra - rb)) < 0) continue;
+			//if (vec.Euc() > sq(ra + rb)) continue;
+			//if (vec.Euc() < sq(ra - rb)) continue;
 
 			auto inx = intersection(q, C[j].C);
 			if (!inx.size()) continue;
@@ -376,11 +398,11 @@ inline void green_circle(const int& I) {//refer to cki86201
 				inx = circle_line_intersections(tri[k], tri[(k + 1) % 3], q);
 				if (inx.size()) {
 					Pos ratio = inx[0];
-					if (0 - TOL < ratio.x) {
+					if (sign(ratio.x - 0) >= 0) {
 						Pos s = tri[k] + (tri[(k + 1) % 3] - tri[k]) * ratio.x;
 						VA.push_back((s - q.c).rad());
 					}
-					if (ratio.y < 1 + TOL) {
+					if (sign(ratio.y - 1) >= 0) {
 						Pos e = tri[k] + (tri[(k + 1) % 3] - tri[k]) * ratio.y;
 						VA.push_back((e - q.c).rad());
 					}
