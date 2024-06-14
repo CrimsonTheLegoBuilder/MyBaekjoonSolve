@@ -12,7 +12,7 @@ typedef long double ld;
 typedef std::vector<ld> vld;
 const ld INF = 1e17;
 const ld TOL = 1e-15;
-const ld PI = acos(-1);
+const ld PI = acosl(-1);
 const int LEN = 205;
 inline int sign(const ld& x) { return x <= -TOL ? -1 : x >= TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -53,7 +53,7 @@ struct Pos {
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
 	ld xy() const { return x * y; }
-	inline Pos rot(ld the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
+	inline Pos rot(ld the) const { return Pos(x * cosl(the) - y * sinl(the), x * sinl(the) + y * cosl(the)); }
 	inline ld Euc() const { return x * x + y * y; }
 	//ld mag() const { return sqrt(Euc()); }
 	ld mag() const { return hypotl(x, y); }
@@ -129,7 +129,7 @@ struct Circle {
 		return rsum < (c - q.c).Euc() + TOL;
 	}
 	inline bool operator > (const Pos& p) const { return r > (c - p).mag(); }
-	inline bool operator >= (const Pos& p) const { return r * r + TOL > (c - p).Euc(); }
+	inline bool operator >= (const Pos& p) const { return sign(r * r - (c - p).Euc()) >= 0; }
 	inline bool operator < (const Pos& p) const { return r < (c - p).mag(); }
 	inline Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	inline Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
@@ -166,7 +166,7 @@ inline ld intersection(const Seg& s1, const Seg& s2) {
 	if (zero(det)) return -1;
 	ld a1 = cross(q1, q2, p1, q1) / det;
 	ld a2 = cross(p1, p2, q1, p1) / -det;
-	if (sign(a1 - 0) >= 0 && sign(1 - a1) >= 0 && sign(a2 - 0) >= 0 && sign(1 - a2) >= 0) return a1;
+	if (sign(a1 - 0) >= 0 && sign(1 + TOL - a1) >= 0 && sign(a2 + TOL) >= 0 && sign(1 - a2) >= 0) return a1;
 	return -1;
 }
 inline void norm(const Seg& S, Pos& p, Pos& q) { norm(S.s, S.e, p, q); }
