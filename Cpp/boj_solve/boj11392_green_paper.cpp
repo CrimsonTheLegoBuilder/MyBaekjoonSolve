@@ -146,7 +146,7 @@ inline vld intersection(const Circle& a, const Circle& b) {
 }
 inline void green_seg(const Seg& S, const int& I) {//refer to cki86201
 	if (!sign(S.s.x - S.e.x)) return;
-	vld VA = { 0, 1 };
+	vld VA = { 0, 1 }, inx;
 	for (int j = 0; j < N; j++) {
 		if (I == j) continue;
 		if (C[j].type == TRI) {
@@ -158,7 +158,7 @@ inline void green_seg(const Seg& S, const int& I) {//refer to cki86201
 			}
 		}
 		if (C[j].type == CIR) {
-			vld inx = circle_line_intersections(S.s, S.e, C[j].C, 1);
+			inx = circle_line_intersections(S.s, S.e, C[j].C, 1);
 			for (const ld& r : inx) VA.push_back(r);
 		}
 	}
@@ -201,19 +201,19 @@ inline void green_seg(const Seg& S, const int& I) {//refer to cki86201
 	return;
 }
 inline void green_circle(const int& I) {//refer to cki86201
-	vld VA = { 0, 2 * PI };
+	vld VA = { 0, 2 * PI }, inx;
 	const Circle& q = C[I].C;
 	for (int j = 0; j < N; j++) {
 		if (I == j || C[j].C == q) continue;
 		if (C[j].type == CIR) {
-			vld inx = intersection(q, C[j].C);
+			inx = intersection(q, C[j].C);
 			for (const ld& r : inx) VA.push_back(r);
 		}
 		if (C[j].type == TRI) {
 			Pos* tri[] = { &C[j].T.a, &C[j].T.b, &C[j].T.c };
 			for (int k = 0; k < 3; k++) {
 				const Pos& p1 = *tri[k], p2 = *tri[(k + 1) % 3];
-				vld inx = circle_line_intersections(p1, p2, q);
+				inx = circle_line_intersections(p1, p2, q);
 				for (const ld& r : inx) VA.push_back(r);
 			}
 		}
