@@ -43,7 +43,6 @@ struct Pos {
 	inline friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	inline friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 };
-typedef std::vector<Pos> Polygon;
 struct Seg {
 	Pos s, e;
 	inline Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) {}
@@ -148,7 +147,6 @@ inline vld intersection(const Circle& a, const Circle& b) {
 inline void green_seg(const Seg& S, const int& I) {//refer to cki86201
 	if (!sign(S.s.x - S.e.x)) return;
 	vld VA = { 0, 1 };
-	const Pos& a = S.s, b = S.e;
 	for (int j = 0; j < N; j++) {
 		if (I == j) continue;
 		if (C[j].type == TRI) {
@@ -160,9 +158,7 @@ inline void green_seg(const Seg& S, const int& I) {//refer to cki86201
 			}
 		}
 		if (C[j].type == CIR) {
-			Circle& c = C[j].C;
-			vld inx;
-			inx = circle_line_intersections(a, b, c, 1);
+			vld inx = circle_line_intersections(S.s, S.e, C[j].C, 1);
 			for (const ld& r : inx) VA.push_back(r);
 		}
 	}
@@ -175,7 +171,6 @@ inline void green_seg(const Seg& S, const int& I) {//refer to cki86201
 		if (zero(d)) continue;
 		ld ratio = (VA[i + 1] + VA[i]) * .5;
 		Pos m = S.s + (S.e - S.s) * ratio;
-
 		int prev = -1, col = -1, val = N, inval = N;
 		for (int j = I - 1; j >= 0; j--) {
 			if (C[j].type == TRI) {
@@ -199,7 +194,6 @@ inline void green_seg(const Seg& S, const int& I) {//refer to cki86201
 			}
 			if (val < N && inval < N) break;
 		}
-
 		ld a = S.green(m, d);
 		if (prev != -1 && prev > col) { for (int j = I; j < inval; j++) A[j][prev] -= a; }
 		for (int j = I; j < val; j++) A[j][I] += a;
@@ -216,11 +210,10 @@ inline void green_circle(const int& I) {//refer to cki86201
 			for (const ld& r : inx) VA.push_back(r);
 		}
 		if (C[j].type == TRI) {
-			vld inx;
 			Pos* tri[] = { &C[j].T.a, &C[j].T.b, &C[j].T.c };
 			for (int k = 0; k < 3; k++) {
 				const Pos& p1 = *tri[k], p2 = *tri[(k + 1) % 3];
-				inx = circle_line_intersections(p1, p2, q);
+				vld inx = circle_line_intersections(p1, p2, q);
 				for (const ld& r : inx) VA.push_back(r);
 			}
 		}
