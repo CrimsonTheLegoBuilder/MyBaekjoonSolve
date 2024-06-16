@@ -8,7 +8,7 @@ typedef long long ll;
 const int LEN = 1e5 + 5;
 const ll INF = 1e17;
 
-int N, M, Q, I, J, K;
+ll N, M, Q, I, J, K;
 ll X, Y;
 ll arr[LEN], step[LEN];
 struct Seq {
@@ -29,7 +29,7 @@ struct Node {//segment tree for cal subsequence max len
 			all && r.all
 		};
 	}
-} len_seg[LEN << 1];
+} len_seg[LEN << 2];
 inline Node node(const ll& x) { return Node(!x, !x, !x, !x); }
 Node init(int s = 1, int e = N, int i = 1) {
 	if (s == e) return len_seg[i] = node(step[s]);
@@ -83,7 +83,7 @@ inline void solve() {
 	while (M--) {
 		std::cin >> Q >> I >> J;
 		if (Q == 1)	std::cin >> X >> Y, update_len(I, J, X, Y);
-		else if (Q == 2) std::cout << search(I + 1, J - 1, 2, N - 1).max + 2 << "\n";
+		if (Q == 2) std::cout << (2 + search(I + 1, J - 1, 2, N - 1).max) << '\n';
 	}
 	return;
 }
