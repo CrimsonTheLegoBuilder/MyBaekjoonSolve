@@ -447,7 +447,7 @@ inline Seg upper_tangent_bi_search(const int& I, const int& J) {
 		std::cout << "binary_search:: cross " << cross(L[m], inx, R[r]) << "\n";
 #endif
 		int f = ccw(L[m], inx, R[r]);
-		if (!f) break;
+		//if (!f) break;
 		if (inx.y > 1e8 || f < 0) s = m + 1;
 		else if (inx.y < 0 || f >= 0) e = m;
 		cnt++;
@@ -461,11 +461,12 @@ inline Seg upper_tangent_bi_search(const int& I, const int& J) {
 		if (tangent_check(l, r)) break;
 		//if (valid_check(l, r)) break;
 	}
+	assert(valid_check(l, r));
 #ifdef DEBUG
 	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
 #endif
 #ifdef MAP_search
-	if (0 < I && J <= K * 4 && cnt > 10) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
+	if (0 < I && J <= K * 4 && cnt > 5) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
 #endif
 	return Seg(L[l], R[r], I);
 }
