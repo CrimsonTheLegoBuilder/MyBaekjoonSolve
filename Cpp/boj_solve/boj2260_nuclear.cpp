@@ -62,12 +62,11 @@ void solve() {
 				G[i][j] = std::min(G[i][j], G[i][k] + G[k][j]);
 
 	int ret = INF;
-	for (int i = 0; i < N; i++) {
-		for (int j = i + 1; j < N; j++) {
-			if (check(seg[i], seg[j])) ret = std::min(ret, G[i][j] + G[j][i]);
-			if (check(seg[j], seg[i])) ret = std::min(ret, G[i][j] + G[j][i]);
-		}
-	}
+	for (int i = 0; i < N; i++)
+		for (int j = i + 1; j < N; j++)
+			if (check(seg[i], seg[j]) || check(seg[j], seg[i]))
+				ret = std::min(ret, G[i][j] + G[j][i]);
+
 	std::cout << (ret > 1e8 ? -1 : ret) << "\n";
 	return;
 }
