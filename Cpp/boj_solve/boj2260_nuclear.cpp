@@ -5,11 +5,11 @@
 #include <cassert>
 typedef long long ll;
 typedef double ld;
-const ll INF = 1e17;
+const int INF = 1e9;
 const int LEN = 101;
 
 int N, M, T, Q;
-ll G[LEN][LEN];
+int G[LEN][LEN];
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -29,8 +29,8 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
 struct Seg {
 	Pos s, e;
-	ll cost;
-	Seg(Pos S = Pos(), Pos E = Pos(), ll COST = 0) : cost(COST) {
+	int cost;
+	Seg(Pos S = Pos(), Pos E = Pos(), int COST = 0) : cost(COST) {
 		s = S, e = E;
 		if (on_seg_strong(s, nu, e)) std::swap(s, e);
 		if (ccw(nu, s, e) < 0) std::swap(s, e);
@@ -46,7 +46,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cin >> N >> nu;
 	for (int i = 0; i < N; i++) {
-		Pos s, e; ll cost;
+		Pos s, e; int cost;
 		std::cin >> s >> e >> cost;
 		assert(!on_seg_strong(s, e, nu));
 		seg[i] = Seg(s, e, cost);
@@ -60,15 +60,15 @@ void solve() {
 		for (int i = 0; i < N; i++)
 			for (int j = 0; j < N; j++)
 				G[i][j] = std::min(G[i][j], G[i][k] + G[k][j]);
-			
-	ll ret = INF;
+
+	int ret = INF;
 	for (int i = 0; i < N; i++) {
 		for (int j = i + 1; j < N; j++) {
 			if (check(seg[i], seg[j])) ret = std::min(ret, G[i][j] + G[j][i]);
 			if (check(seg[j], seg[i])) ret = std::min(ret, G[i][j] + G[j][i]);
 		}
 	}
-	std::cout << (ret > 1e16 ? -1 : ret) << "\n";
+	std::cout << (ret > 1e8 ? -1 : ret) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj2260 nuclear bomb
