@@ -90,7 +90,8 @@ struct Seg {
 } seg[LEN];
 int ccw(const Seg& S, const Seg& E) { return ccw(S.s, S.e, E.s, E.e); }
 bool check(const Seg& S, const Seg& E) {
-	bool f1 = intersect(S.s, S.e, E.s, E.e);
+	//bool f1 = intersect(S.s, S.e, E.s, E.e);
+	bool f1 = S.e == E.s;
 	int f2 = ccw(S.s, S.e, E.s, E.e);
 	if (!f2 && f1) return (on_seg_strong(S.s, S.e, E.s));
 	return f1 && f2 > 0;
