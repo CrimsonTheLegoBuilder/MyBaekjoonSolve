@@ -78,7 +78,6 @@ struct Seg {
 	ll cost;
 	Seg(Pos S = Pos(), Pos E = Pos(), ll COST = 0) : cost(COST) {
 		s = S, e = E;
-		assert(!on_seg_strong(s, e, nu));
 		if (on_seg_strong(s, nu, e)) std::swap(s, e);
 		if (ccw(nu, s, e) < 0) std::swap(s, e);
 	}
@@ -104,15 +103,13 @@ void solve() {
 		Pos s, e;
 		ll cost;
 		std::cin >> s >> e >> cost;
+		assert(!on_seg_strong(s, e, nu));
 		seg[i] = Seg(s, e, cost);
 	}
-	for (int i = 0; i < N; i++) {
-		G[i][i] = 0;
-		for (int j = 0; j < N; j++) {
-			if (i == j) continue;
+	for (int i = 0; i < N; i++) 
+		for (int j = 0; j < N; j++) 
 			G[i][j] = INF;
-		}
-	}
+
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			if (check(seg[i], seg[j])) G[i][j] = seg[i].cost;
@@ -127,16 +124,15 @@ void solve() {
 	}
 	ll ret = INF;
 	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			if (i == j) continue;
+		for (int j = i + 1; j < N; j++) {
 			if (check(seg[i], seg[j])) ret = std::min(ret, G[i][j] + G[j][i]);
+			if (check(seg[j], seg[i])) ret = std::min(ret, G[i][j] + G[j][i]);
 		}
 	}
 	std::cout << (ret > 1e16 ? -1 : ret) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj2260 nuclear bomb
-
 /*
 달디달고 달디단
 bomb 양갱
