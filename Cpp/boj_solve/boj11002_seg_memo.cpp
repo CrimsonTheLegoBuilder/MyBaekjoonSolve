@@ -103,22 +103,29 @@ Polygon upper_monotone_chain(Polygon& C) {
 	}
 	return H;
 }
+int ternary_search(const Polygon& H) {
+	int sz = H.size();
+	if (!sz) return 0;
+	int t = 0;
+	if (sz < 5) {
+		for (const Pos& p : H) t = std::max(t, p.y);
+		return t;
+	}
+	Pos r = H[0], l = H[sz - 1];
+	int s = 0, e = sz - 1, m1, m2;
+	while (e - s > 3) {
+		m1 = (s + s + e) / 3;
+		m2 = (s + e + e) / 3;
+		ll c1 = cross(r, l, H[m1]);
+	}
+	return t;
+}
 struct HullNode {
-	Pos l, r, t;
+	int t;
 	Polygon hull;
 	vld memo;
 	HullNode(int i = 0, Polygon h = {}) {
-		hull = h;
-		int idx = 0;
-		for (Pos& p : hull) p.i = idx++, p.hi = i;
-		get_round_memo(hull, memo);
-		if (hull.size()) l = hull[0];
-		else l = Pos();
-		if (hull.size()) r = hull.back();
-		else r = Pos();
-		if (hull.size()) t = hull[0];
-		else t = Pos();
-		for (const Pos& p : hull) if (t.y < p.y) t = p;
+		t = ternary_search(h);
 	}
 	HullNode operator + (const HullNode& R) const {
 		Polygon C, H;
