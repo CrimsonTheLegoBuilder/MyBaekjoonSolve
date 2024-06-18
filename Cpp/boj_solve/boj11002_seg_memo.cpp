@@ -107,16 +107,23 @@ int ternary_search(const Polygon& H) {
 	int sz = H.size();
 	if (!sz) return 0;
 	int t = 0;
-	if (sz < 5) {
-		for (const Pos& p : H) t = std::max(t, p.y);
-		return t;
-	}
-	Pos r = H[0], l = H[sz - 1];
+	Pos l = Pos(H[0].x, 0), r = Pos(H[sz - 1].x, 0);
 	int s = 0, e = sz - 1, m1, m2;
-	while (e - s > 3) {
+	while (e - s >= 3) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
-		ll c1 = cross(r, l, H[m1]);
+		ll c1 = cross(l, r, H[m1]);
+		ll c2 = cross(l, r, H[m2]);
+		if (c1 < c2) s = m1;
+		else e = m2;
+	}
+	ll tmp = 0;
+	for (int i = s; i <= e; i++) {
+		ll torque = cross(l, r, H[i]);
+		if (tmp < torque) {
+			tmp = torque;
+			t = i;
+		}
 	}
 	return t;
 }
@@ -124,15 +131,17 @@ struct HullNode {
 	int t;
 	Polygon hull;
 	vld memo;
-	HullNode(int i = 0, Polygon h = {}) {
-		t = ternary_search(h);
-	}
 	HullNode operator + (const HullNode& R) const {
 		Polygon C, H;
+		vld memo_; 
 		for (const Pos& p : hull) C.push_back(p);
 		for (const Pos& p : R.hull) C.push_back(p);
 		H = upper_monotone_chain(C);
-		return HullNode(hull[0].hi >> 1, H);
+		int idx = 0;
+		for (Pos& p : H) p.i = idx++;
+		int t_ = ternary_search(H);
+		get_round_memo(H, memo_);
+		return { t_, H, memo_ };
 	}
 	ld len(int s, int e) const {
 		if (memo.size() <= 1 || s == e) return 0;
@@ -148,7 +157,7 @@ struct Seg {
 	bool operator == (const Seg& p) const { return s == p.s && e == p.e; }
 	ll operator / (const Seg& p) const { return S() / p.S(); }
 };
-Seg make_seg(int I = 0, const HullNode& HN = HullNode(0, Polygon())) { return Seg(HN.l, HN.r, I); }
+Seg make_seg(const int& i = 0) { return Seg(hull_tree[i].hull[0], hull_tree[i].hull.back(), i); }
 std::unordered_map<Pos, Seg> MAP;
 int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 18190
 	int sz = H.size();
@@ -168,9 +177,6 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 	
 	int ccw1 = ccw(p, H[0], H[1]), ccwN = ccw(p, H[0], H[sz - 1]);
 	if (ccw1 * ccwN >= 0) {
-#ifdef DEBUG
-		std::cout << "ccw1ccwN\n";
-#endif
 		i1 = 0;
 		if (!ccw1 && dot(p, H[1], H[0]) > 0) i1 = 1;
 		if (!ccwN && dot(p, H[sz - 1], H[0]) > 0) i1 = sz - 1;
@@ -235,54 +241,32 @@ int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 1
 Seg upper_tangent_bi_search(const int& I, const int& J) {
 #ifdef MAP_search
 	if (0 < I && J <= K * 4) {
-#ifdef DEBUG
-		std::cout << "find upper tangent [" << I << "][" << J << "], MAP search::\n";
-#endif
 		auto it = MAP.find(Pos(I, J));
 		if (it != MAP.end()) return it->second;
 	}
 #endif
-#ifdef DEBUG
-	std::cout << "find upper tangent [" << I << "][" << J << "]\n";
-#endif
 	Polygon& L = hull_tree[I].hull, R = hull_tree[J].hull;
-#ifdef DEBUG
-	for (const Pos& p : L) std::cout << "L : " << p << "\n";
-	for (const Pos& p : R) std::cout << "R : " << p << "\n";
-#endif
 	if (!L.size() || !R.size()) {
-#ifdef DEBUG
-		std::cout << "Fuck\n";
-#endif
-		assert(0);
 		return Seg(Pos(-1, -1), Pos(-1, -1), -1);
 	}
 	if (L.size() == 1 && R.size() == 1) {
-#ifdef DEBUG
-		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[0], I).S() << "\n";
-#endif
 		return Seg(L[0], R[0], I);
 	}
 	if (L.size() == 1) {
 		int i = find_tangent_bi_search(R, L[0]);
-#ifdef DEBUG
-		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[i], I).S() << "\n";
-#endif
 		return Seg(L[0], R[i], I);
 	}
 	if (R.size() == 1) {
 		int i = find_tangent_bi_search(L, R[0], 0);
-#ifdef DEBUG
-		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[i], R[0], I).S() << "\n";
-#endif
 		return Seg(L[i], R[0], I);
 	}
 	int szl = L.size(), szr = R.size();
 	//int l = szl - 1, r = 0;
 	//int l = 0, r = szr - 1;
-	int l = hull_tree[I].t.i, r = hull_tree[J].t.i;
+	int l = hull_tree[I].t, r = hull_tree[J].t;
+	//std::cout << "DEBUG:: szl: " << szl << " l: " << l << " szr: " << szr << " r: " << r << "\n";
 	auto tangent_check = [&](const int& i, const int& j) -> bool {
-		assert(L[i] < R[j]);
+		//assert(L[i] < R[j]);
 		bool f1 = 1, f2 = 1, f3 = 1, f4 = 1;
 		if (i > 0) f1 = ccw(L[i], R[j], L[i - 1]) <= 0;
 		if (i < szl - 1) f2 = ccw(L[i], R[j], L[i + 1]) <= 0;
@@ -328,17 +312,17 @@ typedef std::vector<Seg> Bridge;
 bool search(const Pos& L, const Pos& R, Bridge& BBB, int s = 1, int e = K, int i = 1) {
 	bool f = 0;
 	if (s == e) {
-		if (hull_tree[i].l.x <= L.x && L.x < hull_tree[i].r.x)
-			BBB.push_back(make_seg(i, hull_tree[i]));
-		if (hull_tree[i].l.x < R.x && R.x <= hull_tree[i].r.x)
-			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
-		if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x)
-			BBB.push_back(make_seg(i, hull_tree[i]));
+		if (hull_tree[i].hull[0].x <= L.x && L.x < hull_tree[i].hull.back().x)
+			BBB.push_back(make_seg(i));
+		if (hull_tree[i].hull[0].x < R.x && R.x <= hull_tree[i].hull.back().x)
+			f = 1, BBB.push_back(make_seg(i));
+		if (L.x <= hull_tree[i].hull[0].x && hull_tree[i].hull.back().x <= R.x)
+			BBB.push_back(make_seg(i));
 		return f;
 	}
-	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return 0;
-	if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x) {
-		BBB.push_back(make_seg(i, hull_tree[i]));
+	if (hull_tree[i].hull.back().x <= L.x || R.x <= hull_tree[i].hull[0].x) return 0;
+	if (L.x <= hull_tree[i].hull[0].x && hull_tree[i].hull.back().x <= R.x) {
+		BBB.push_back(make_seg(i));
 		return 0;
 	}
 	int m = s + e >> 1;
@@ -362,11 +346,6 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	Seg vec;
 	if (f) vec = upper_tangent_bi_search(last.i, LEN << 2 | 1), BBB.pop_back();
 	BBB.push_back(Seg(R, R, LEN << 2 | 1));
-#ifdef DEBUG
-	std::cout << "DEBUG:: Pos L : " << L << " Pos R : " << R << "\n";
-	std::cout << "SEG BBB :\n";
-	for (const Seg& B : BBB) std::cout << B.s << " " << B.e << "\n";
-#endif
 	int sz = BBB.size();
 	for (int i = 0; i < sz; i++) {
 		Seg B = BBB[i];
@@ -391,31 +370,16 @@ ld upper_monotone_chain(Pos L, Pos R) {
 			stack.push_back(Seg(R, R, LEN << 2 | 1));
 		}
 	}
-#ifdef DEBUG
-	std::cout << "SEG stack :\n";
-	for (const Seg& B : stack) std::cout << B.s << " " << B.e << "\n";
-#endif
 	sz = stack.size();
 	for (int i = 0; i < sz - 1; i++)
 		H.push_back(upper_tangent_bi_search(stack[i].i, stack[i + 1].i));
-#ifdef DEBUG
-	std::cout << "SEG H :\n";
-	for (const Seg& B : H) std::cout << B.s << " " << B.e << "\n";
-#endif
 	sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		ret += (H[i].e - H[i].s).mag();
-#ifdef DEBUG
-		std::cout << "ln : " << (H[i].e - H[i].s).mag() << "\n";
-#endif
 		if (i < sz - 1) {
 			//assert(H[i] / H[i + 1] < 0);
 			ld ln = hull_tree[H[i + 1].i].len(H[i].e.i, H[i + 1].s.i);
-			assert(H[i].e.hi == H[i + 1].s.hi);
-#ifdef DEBUG
-			std::cout << H[i].e.i << " " << H[i + 1].s.i << "\n";
-			std::cout << "ln : " << ln << "\n";
-#endif
+			//assert(H[i].e.hi == H[i + 1].s.hi);
 			ret += ln;
 		}
 	}
@@ -425,10 +389,6 @@ Polygon seq;
 inline ld query(Pos& pre) {
 	Pos cur;
 	std::cin >> cur;
-#ifdef NAIVE
-	seq.push_back(cur);
-	std::cout << "pre:: " << pre << " cur:: " << cur << "\n";
- #endif
 	ld ret = upper_monotone_chain(pre, cur);
 	pre = cur;
 	return ret;
@@ -437,56 +397,30 @@ inline void query() {
 	std::cin >> Q, Q--;
 	Pos pre;
 	std::cin >> pre;
-#ifdef NAIVE
-	seq.push_back(pre);
-	ld ret = 0;
-	int cnt = 1;
-	while (Q--) {
-		ld tmp = query(pre);
-		std::cout << "query[" << cnt++ << "]:: " << tmp << "\n";
-		ret += tmp;
-	}
-	std::cout << "query[total]:: " << (long double)ret << "\n";
-#else
 	ld ret = 0;
 	while (Q--) ret += query(pre);
 	std::cout << (long double)ret << "\n";
-#endif
 	return;
 }
 Polygon MT[LEN];
-HullNode init(int s = 1, int e = K, int i = 1) {
-	if (s == e) return hull_tree[i] = HullNode(i, upper_monotone_chain(MT[s]));
-	int m = s + e >> 1;
-	return hull_tree[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
-}
-#ifdef NAIVE
-void naive(Polygon& C) {
-	ld total = 0;
-	int sz = seq.size();
-	for (int i = 0; i < sz - 1; i++) {
-		Pos s = seq[i], e = seq[i + 1];
-		if (e.x < s.x) std::swap(s, e);
-		std::cout << "s:: " << s << " e:: " << e << "\n";
-		Polygon tmp;
-		tmp.push_back(s);
-		tmp.push_back(e);
-		for (const Pos& p : C) {
-			if (s.x < p.x && p.x < e.x) tmp.push_back(p);
+void init(int s = 1, int e = K, int i = 1) {
+	if (s == e) {
+		hull_tree[i].hull = upper_monotone_chain(MT[s]);
+		int idx = 0;
+		for (Pos& p : hull_tree[i].hull) {
+			p.i = idx++;
+			p.hi = i;
 		}
-		Polygon H = upper_monotone_chain(tmp);
-		//for (const Pos& p : H) std::cout << p << " ";
-		//std::cout << "\n";
-		ld ret = 0;
-		for (int j = 0; j < H.size() - 1; j++) {
-			ret += (H[j] - H[j + 1]).mag();
-		}
-		std::cout << "naive[" << i + 1 << "]:: " << ret << "\n";
-		total += ret;
+		hull_tree[i].t = ternary_search(hull_tree[i].hull);
+		get_round_memo(hull_tree[i].hull, hull_tree[i].memo);
+		return;
 	}
-	std::cout << "naive[total]:: " << total << "\n";
+	int m = s + e >> 1;
+	init(s, m, i << 1);
+	init(m + 1, e, i << 1 | 1);
+	hull_tree[i] = hull_tree[i << 1] + hull_tree[i << 1 | 1];
+	return;
 }
-#endif
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -503,55 +437,16 @@ inline void solve() {
 			K++;
 			tmp.clear();
 		}
-#ifdef DEBUG
-		for (Pos& p : tmp) std::cout << p << " | ";
-		std::cout << "\n";
-#endif
 		tmp.push_back(C[i]);
 	}
 	if (tmp.empty()) K--;
 	for (Pos& p : tmp) MT[K].push_back(p);
 	tmp.clear();
 	init();
-#ifdef DEBUG
-	std::cout << "\nK : " << K << "\n\n";
-	for (int i = 1; i <= K; i++) {
-		int j = 0;
-		for (const Pos& p : MT[i]) std::cout << "MT[" << i << "][" << j++ << "] : " << p << "\n";
-		std::cout << "\n";
-	}
-
-	for (int i = 0; i <= K * 4; i++) {
-		int j = 0;
-		for (const Pos& p : hull_tree[i].hull) std::cout << "hull[" << i << "][" << j++ << "] : " << p << "\n";
-		j = 0;
-		for (const ld& ln : hull_tree[i].memo) std::cout << "memo[" << i << "][" << j++ << "] : " << ln << "\n";
-		std::cout << "\n";
-	}
-#endif
 	query();
-#ifdef NAIVE
-	naive(C);
-#endif
 	return;
 }
 int main() { solve(); return 0; }//boj11002 Crow
-
-
-//stack.clear();
-//stack.push_back(Seg(L, L, 0));
-//BBB.pop_back();
-//BBB.push_back(last);
-//BBB.push_back(Seg(R, R, LEN << 2 | 1));
-//int sz = BBB.size();
-//for (int i = 0; i < sz; i++) {
-//	Seg B = BBB[i];
-//	while (stack.size() > 1 &&
-//		upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
-//		upper_tangent_bi_search(stack.back().i, B.i) >= 0)
-//		stack.pop_back();
-//	stack.push_back(B);
-//}
 
 /*
 
