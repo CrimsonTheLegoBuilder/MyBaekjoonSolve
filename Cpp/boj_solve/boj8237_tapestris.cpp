@@ -144,11 +144,12 @@ inline void query() {
 		if (V[i] && cross(s, e, O) <= 0) { std::cout << "NIE\n"; return; }
 		if (!V[i] && cross(s, e, O) <= 0) continue;
 		for (int j = i + 1; j < i + N; j++) {
-			Pos& u = H[j % N], v = H[(j + 1) % N];
+			Pos u = H[j % N], v = H[(j + 1) % N];
 			if (on_seg_strong(u, v, O)) continue;
 			ll CCW = ccw(O, u, v);
 			if (V[j % N] && CCW <= 0) { std::cout << "NIE\n"; return; }
-			if (CCW <= 0) continue;
+			if (CCW == 0) continue;
+			if (CCW < 0) std::swap(u, v);
 			if (intersect(O, s, u, v) && intersect(O, e, u, v)) {
 				if (V[i]) { std::cout << "NIE\n"; return; }
 				if (!V[i]) break;

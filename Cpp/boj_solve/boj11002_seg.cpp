@@ -24,13 +24,11 @@ inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 #define MAP_search
 //#define NAIVE
 
-struct Pdd;
 struct Pos {
 	int x, y;
 	int i, hi;
 	Pos(int X = 0, int Y = 0, int I = 0, int HI = 0) : x(X), y(Y), i(I), hi(HI) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
-	bool operator == (const Pdd& p) const;
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
@@ -73,40 +71,6 @@ namespace std {
 		}
 	};
 }
-struct Pdd {
-	ld x, y;
-	Pdd(ld X = 0, ld Y = 0) : x(X), y(Y) {}
-	bool operator == (const Pdd& p) const { return x == p.x && y == p.y; }
-	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
-	bool operator != (const Pdd& p) const { return x != p.x || y != p.y; }
-	bool operator < (const Pdd& p) const { return x == p.x ? y < p.y : x < p.x; }
-	bool operator <= (const Pdd& p) const { return x == p.x ? y <= p.y : x <= p.x; }
-	Pdd operator + (const Pdd& p) const { return { x + p.x, y + p.y }; }
-	Pdd operator - (const Pdd& p) const { return { x - p.x, y - p.y }; }
-	Pdd operator * (const ld& n) const { return { x * n, y * n }; }
-	Pdd operator / (const ld& n) const { return { x / n, y / n }; }
-	ld operator * (const Pdd& p) const { return x * p.x + y * p.y; }
-	ld operator / (const Pdd& p) const { return x * p.y - y * p.x; }
-	Pdd operator ^ (const Pdd& p) const { return { x * p.x, y * p.y }; }
-	Pdd& operator += (const Pdd& p) { x += p.x; y += p.y; return *this; }
-	Pdd& operator -= (const Pdd& p) { x -= p.x; y -= p.y; return *this; }
-	Pdd& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pdd& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
-	Pdd operator - () const { return { -x, -y }; }
-	Pdd operator ~ () const { return { -y, x }; }
-	Pdd operator ! () const { return { y, x }; }
-	ld xy() const { return x * y; }
-	ld Euc() const { return x * x + y * y; }
-	ld Man() const { return std::abs(x) + std::abs(y); }
-	ld mag() const { return hypotl(x, y); }
-	ld rad() const { return atan2l(y, x); }
-	friend ld rad(const Pdd& p1, const Pdd& p2) { return atan2l(p1 / p2, p1 * p2); }
-	int quad() const { return y > 0 || y == 0 && x >= 0; }
-	friend bool cmpq(const Pdd& a, const Pdd& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
-	friend std::istream& operator >> (std::istream& is, Pdd& p) { is >> p.x >> p.y; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pdd& p) { os << p.x << " " << p.y; return os; }
-};
-bool Pos::operator == (const Pdd& p) const { return zero(x - p.x) && zero(y - p.y); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -116,19 +80,6 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = c
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0; }
 int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
-
-ld cross(const Pdd& d1, const Pos& d2, const Pos& d3) { return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x); }
-ld cross(const Pos& d1, const Pdd& d2, const Pos& d3) { return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x); }
-ld cross(const Pos& d1, const Pos& d2, const Pdd& d3) { return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x); }
-int ccw(const Pdd& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
-int ccw(const Pos& d1, const Pdd& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
-int ccw(const Pos& d1, const Pos& d2, const Pdd& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
-ld dot(const Pdd& d1, const Pos& d2, const Pos& d3) { return (d2.x - d1.x) * (d3.y - d2.y) + (d2.x - d1.x) * (d3.y - d2.y); }
-ld dot(const Pos& d1, const Pdd& d2, const Pos& d3) { return (d2.x - d1.x) * (d3.y - d2.y) + (d2.x - d1.x) * (d3.y - d2.y); }
-ld dot(const Pos& d1, const Pos& d2, const Pdd& d3) { return (d2.x - d1.x) * (d3.y - d2.y) + (d2.x - d1.x) * (d3.y - d2.y); }
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pdd& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pdd& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0; }
-
 void get_round_memo(Polygon& H, vld& memo) {
 	int sz = H.size();
 	memo.resize(sz + 1, 0);
@@ -152,29 +103,45 @@ Polygon upper_monotone_chain(Polygon& C) {
 	}
 	return H;
 }
+int ternary_search(const Polygon& H) {
+	int sz = H.size();
+	if (!sz) return 0;
+	int t = 0;
+	Pos l = Pos(H[0].x, 0), r = Pos(H[sz - 1].x, 0);
+	int s = 0, e = sz - 1, m1, m2;
+	while (e - s >= 3) {
+		m1 = (s + s + e) / 3;
+		m2 = (s + e + e) / 3;
+		ll c1 = cross(l, r, H[m1]);
+		ll c2 = cross(l, r, H[m2]);
+		if (c1 < c2) s = m1;
+		else e = m2;
+	}
+	ll tmp = 0;
+	for (int i = s; i <= e; i++) {
+		ll torque = cross(l, r, H[i]);
+		if (tmp < torque) {
+			tmp = torque;
+			t = i;
+		}
+	}
+	return t;
+}
 struct HullNode {
-	Pos l, r, t;
+	int t;
 	Polygon hull;
 	vld memo;
-	HullNode(int i = 0, Polygon h = {}) {
-		hull = h;
-		int idx = 0;
-		for (Pos& p : hull) p.i = idx++, p.hi = i;
-		get_round_memo(hull, memo);
-		if (hull.size()) l = hull[0];
-		else l = Pos();
-		if (hull.size()) r = hull.back();
-		else r = Pos();
-		if (hull.size()) t = hull[0];
-		else t = Pos();
-		for (const Pos& p : hull) if (t.y < p.y) t = p;
-	}
 	HullNode operator + (const HullNode& R) const {
 		Polygon C, H;
+		vld memo_;
 		for (const Pos& p : hull) C.push_back(p);
 		for (const Pos& p : R.hull) C.push_back(p);
 		H = upper_monotone_chain(C);
-		return HullNode(hull[0].hi >> 1, H);
+		int idx = 0;
+		for (Pos& p : H) p.i = idx++;
+		int t_ = ternary_search(H);
+		get_round_memo(H, memo_);
+		return { t_, H, memo_ };
 	}
 	ld len(int s, int e) const {
 		if (memo.size() <= 1 || s == e) return 0;
@@ -190,9 +157,9 @@ struct Seg {
 	bool operator == (const Seg& p) const { return s == p.s && e == p.e; }
 	ll operator / (const Seg& p) const { return S() / p.S(); }
 };
-Seg make_seg(int I = 0, const HullNode& HN = HullNode(0, Polygon())) { return Seg(HN.l, HN.r, I); }
+Seg make_seg(const int& i = 0) { return Seg(hull_tree[i].hull[0], hull_tree[i].hull.back(), i); }
 std::unordered_map<Pos, Seg> MAP;
-inline int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 18190
+int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {//from 18190
 	int sz = H.size();
 	assert(sz > 0);
 	int i1{ 0 }, i2{ 0 };
@@ -210,9 +177,6 @@ inline int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {/
 
 	int ccw1 = ccw(p, H[0], H[1]), ccwN = ccw(p, H[0], H[sz - 1]);
 	if (ccw1 * ccwN >= 0) {
-#ifdef DEBUG
-		std::cout << "ccw1ccwN\n";
-#endif
 		i1 = 0;
 		if (!ccw1 && dot(p, H[1], H[0]) > 0) i1 = 1;
 		if (!ccwN && dot(p, H[sz - 1], H[0]) > 0) i1 = sz - 1;
@@ -274,148 +238,35 @@ inline int find_tangent_bi_search(const Polygon& H, const Pos& p, bool l = 1) {/
 	else ans = (ccw(p, H[i1], H[i2]) < 0 ? i2 : i1);
 	return ans;
 }
-inline int find_tangent_bi_search(const Polygon& H, const Pdd& p, bool l = 1) {//from 18190
-	int sz = H.size();
-	assert(sz > 0);
-	int i1{ 0 }, i2{ 0 };
-	if (sz == 1) return 0;
-	if (sz == 2) {
-		if (on_seg_strong(H[0], H[1], p)) return l ? 1 : 0;
-		i1 = 0, i2 = 1;
-		if (l) return ccw(p, H[i1], H[i2]) > 0 ? i2 : i1;
-		else return ccw(p, H[i1], H[i2]) < 0 ? i2 : i1;
-	}
-	if (H[0] == p) return l ? 1 : 0;
-	if (H[sz - 1] == p) return l ? sz - 1 : sz - 2;
-	if (on_seg_weak(H[0], H[1], p)) return l ? 1 : 0;
-	if (H[1] == p) return l ? 2 : 0;
-
-	int ccw1 = ccw(p, H[0], H[1]), ccwN = ccw(p, H[0], H[sz - 1]);
-	if (ccw1 * ccwN >= 0) {
-#ifdef DEBUG
-		std::cout << "ccw1ccwN\n";
-#endif
-		i1 = 0;
-		if (!ccw1 && dot(p, H[1], H[0]) > 0) i1 = 1;
-		if (!ccwN && dot(p, H[sz - 1], H[0]) > 0) i1 = sz - 1;
-		int s = 0, e = sz - 1, m;
-		if (!ccw1) s += 1;
-		if (!ccwN) e -= 1;
-		bool f = ccw(p, H[s], H[s + 1]) <= 0;
-		while (s < e) {
-			m = s + e >> 1;
-			const Pos& cur = H[m], nxt = H[(m + 1) % sz];
-			int CCW = ccw(p, cur, nxt);
-			if (!f) CCW *= -1;//normalize
-			if (CCW < 0) s = m + 1;
-			else e = m;
-		}
-		i2 = s;
-		if (!ccw(p, H[i2], H[(i2 + 1) % sz]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
-	}
-	else {
-		//divide hull
-		int s = 0, e = sz - 1, k, m;
-		bool f = ccw1 < 0 && ccwN > 0;//if H[k] is between H[0] && p
-		while (s + 1 < e) {
-			k = s + e >> 1;
-			int CCW = ccw(H[0], H[k], p);
-			if (!f) CCW *= -1;//normailze
-			if (CCW < 0) s = k;
-			else e = k;
-		}
-		if (on_seg_weak(H[s], H[e], p)) return l ? e : s;
-		if (H[s] == p) return l ? s + 1 : s - 1;
-		if (H[e] == p) return l ? e + 1 : e - 1;
-
-		//search lower hull
-		int s1 = 0, e1 = s;
-		while (s1 < e1) {
-			m = s1 + e1 >> 1;
-			const Pos& cur = H[m], nxt = H[(m + 1) % sz];
-			int CCW = ccw(p, cur, nxt);
-			if (!f) CCW *= -1;//normalize
-			if (CCW < 0) s1 = m + 1;
-			else e1 = m;
-		}
-		i1 = s1;
-		if (!ccw(p, H[i1], H[(i1 + 1) % sz]) && dot(p, H[(i1 + 1) % sz], H[i1]) > 0) i1 = (i1 + 1) % sz;
-
-		//search upper hull
-		int s2 = e, e2 = sz - 1;
-		while (s2 < e2) {
-			m = s2 + e2 >> 1;
-			const Pos& cur = H[m], nxt = H[(m + 1) % sz];
-			int CCW = ccw(p, cur, nxt);
-			if (!f) CCW *= -1;//normalize
-			if (CCW > 0) s2 = m + 1;
-			else e2 = m;
-		}
-		i2 = s2;
-		if (!ccw(p, H[i2], H[(i2 + 1) % sz]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
-	}
-	int ans;
-	if (l) ans = (ccw(p, H[i1], H[i2]) > 0 ? i2 : i1);
-	else ans = (ccw(p, H[i1], H[i2]) < 0 ? i2 : i1);
-	return ans;
-}
-inline Seg upper_tangent_bi_search(const int& I, const int& J) {
+Seg upper_tangent_bi_search(const int& I, const int& J) {
 #ifdef MAP_search
 	if (0 < I && J <= K * 4) {
-#ifdef DEBUG
-		std::cout << "find upper tangent [" << I << "][" << J << "], MAP search::\n";
-#endif
 		auto it = MAP.find(Pos(I, J));
 		if (it != MAP.end()) return it->second;
 	}
 #endif
-#ifdef DEBUG
-	std::cout << "find upper tangent [" << I << "][" << J << "]\n";
-#endif
-	Polygon& L = hull_tree[I].hull, R = hull_tree[J].hull;
-#ifdef DEBUG
-	for (const Pos& p : L) std::cout << "L : " << p << "\n";
-	for (const Pos& p : R) std::cout << "R : " << p << "\n";
-#endif
+	Polygon& L = hull_tree[I].hull, & R = hull_tree[J].hull;
 	if (!L.size() || !R.size()) {
-#ifdef DEBUG
-		std::cout << "Fuck\n";
-#endif
-		assert(0);
 		return Seg(Pos(-1, -1), Pos(-1, -1), -1);
 	}
 	if (L.size() == 1 && R.size() == 1) {
-#ifdef DEBUG
-		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[0], I).S() << "\n";
-#endif
 		return Seg(L[0], R[0], I);
 	}
 	if (L.size() == 1) {
 		int i = find_tangent_bi_search(R, L[0]);
-#ifdef DEBUG
-		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[i], I).S() << "\n";
-#endif
 		return Seg(L[0], R[i], I);
 	}
 	if (R.size() == 1) {
 		int i = find_tangent_bi_search(L, R[0], 0);
-#ifdef DEBUG
-		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[i], R[0], I).S() << "\n";
-#endif
 		return Seg(L[i], R[0], I);
 	}
 	int szl = L.size(), szr = R.size();
-	int l = szl - 1, r = 0;
-	ld mid = (L.back().x + R[0].x) * .5;
-	auto intersection = [&](const int& i) -> Pdd {
-		Pos& a = L[i], b = L[i + 1];
-		int dx = b.x - a.x;
-		int dy = b.y - a.y;
-		ld y = a.y + dy * ((mid - a.x) / dx);
-		return Pdd(mid, y);
-		};
+	//int l = szl - 1, r = 0;
+	//int l = 0, r = szr - 1;
+	int l = hull_tree[I].t, r = hull_tree[J].t;
+	//std::cout << "DEBUG:: szl: " << szl << " l: " << l << " szr: " << szr << " r: " << r << "\n";
 	auto tangent_check = [&](const int& i, const int& j) -> bool {
-		assert(L[i] < R[j]);
+		//assert(L[i] < R[j]);
 		bool f1 = 1, f2 = 1, f3 = 1, f4 = 1;
 		if (i > 0) f1 = ccw(L[i], R[j], L[i - 1]) <= 0;
 		if (i < szl - 1) f2 = ccw(L[i], R[j], L[i + 1]) <= 0;
@@ -434,39 +285,26 @@ inline Seg upper_tangent_bi_search(const int& I, const int& J) {
 		if (j > 0 && tangent_check(i, j - 1)) { j--; return 1; }
 		return tangent_check(i, j);
 		};
-	r = find_tangent_bi_search(R, L[l]);
-	if (valid_check(l, r)) Seg(L[l], R[r], I);
-	int s = 0, e = szl - 2, m = 0;
+	bool f = 1;
 	int cnt = 0;
-	while (s < e) {
-		m = s + e >> 1;
-		Pdd inx = intersection(m);
-		r = find_tangent_bi_search(R, inx);
-#ifdef DEBUG
-		std::cout << "binary_search:: L : " << L[m] << " M : " << inx << " R : " << R[r] << "\n";
-		std::cout << "binary_search:: cross " << cross(L[m], inx, R[r]) << "\n";
-#endif
-		int f = ccw(L[m], inx, R[r]);
-		//if (!f) break;
-		if (inx.y > 1e8 || f < 0) s = m + 1;
-		else if (inx.y < 0 || f >= 0) e = m;
+	while (!valid_check(l, r)) {
+		//while (!tangent_check(l, r)) {
+		if (f) {
+			r = find_tangent_bi_search(R, L[l], f);
+			if (r < szr - 1 && !ccw(L[l], R[r], R[r + 1])) r++;
+		}
+		else if (!f) {
+			l = find_tangent_bi_search(L, R[r], f);
+			if (l > 0 && !ccw(L[l], R[r], L[l - 1])) l--;
+		}
+		f ^= 1;
 		cnt++;
 	}
-#ifdef DEBUG
-	std::cout << "binary_search complete:: s:: " << s << " e:: " << e << "\n";
-#endif
-	for (int i = std::max(0, s - 2); i < std::min(szl, s + 2); i++) {
-		l = i;
-		r = find_tangent_bi_search(R, L[l]);
-		if (tangent_check(l, r)) break;
-		//if (valid_check(l, r)) break;
-	}
-	assert(valid_check(l, r));
 #ifdef DEBUG
 	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
 #endif
 #ifdef MAP_search
-	if (0 < I && J <= K * 4 && cnt > 5) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
+	if (0 < I && J <= K * 4 && cnt > 3) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
 #endif
 	return Seg(L[l], R[r], I);
 }
@@ -474,17 +312,17 @@ typedef std::vector<Seg> Bridge;
 bool search(const Pos& L, const Pos& R, Bridge& BBB, int s = 1, int e = K, int i = 1) {
 	bool f = 0;
 	if (s == e) {
-		if (hull_tree[i].l.x <= L.x && L.x < hull_tree[i].r.x)
-			BBB.push_back(make_seg(i, hull_tree[i]));
-		if (hull_tree[i].l.x < R.x && R.x <= hull_tree[i].r.x)
-			f = 1, BBB.push_back(make_seg(i, hull_tree[i]));
-		if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x)
-			BBB.push_back(make_seg(i, hull_tree[i]));
+		if (hull_tree[i].hull[0].x <= L.x && L.x < hull_tree[i].hull.back().x)
+			BBB.push_back(make_seg(i));
+		if (hull_tree[i].hull[0].x < R.x && R.x <= hull_tree[i].hull.back().x)
+			f = 1, BBB.push_back(make_seg(i));
+		if (L.x <= hull_tree[i].hull[0].x && hull_tree[i].hull.back().x <= R.x)
+			BBB.push_back(make_seg(i));
 		return f;
 	}
-	if (hull_tree[i].r.x <= L.x || R.x <= hull_tree[i].l.x) return 0;
-	if (L.x <= hull_tree[i].l.x && hull_tree[i].r.x <= R.x) {
-		BBB.push_back(make_seg(i, hull_tree[i]));
+	if (hull_tree[i].hull.back().x <= L.x || R.x <= hull_tree[i].hull[0].x) return 0;
+	if (L.x <= hull_tree[i].hull[0].x && hull_tree[i].hull.back().x <= R.x) {
+		BBB.push_back(make_seg(i));
 		return 0;
 	}
 	int m = s + e >> 1;
@@ -508,11 +346,6 @@ ld upper_monotone_chain(Pos L, Pos R) {
 	Seg vec;
 	if (f) vec = upper_tangent_bi_search(last.i, LEN << 2 | 1), BBB.pop_back();
 	BBB.push_back(Seg(R, R, LEN << 2 | 1));
-#ifdef DEBUG
-	std::cout << "DEBUG:: Pos L : " << L << " Pos R : " << R << "\n";
-	std::cout << "SEG BBB :\n";
-	for (const Seg& B : BBB) std::cout << B.s << " " << B.e << "\n";
-#endif
 	int sz = BBB.size();
 	for (int i = 0; i < sz; i++) {
 		Seg B = BBB[i];
@@ -537,31 +370,16 @@ ld upper_monotone_chain(Pos L, Pos R) {
 			stack.push_back(Seg(R, R, LEN << 2 | 1));
 		}
 	}
-#ifdef DEBUG
-	std::cout << "SEG stack :\n";
-	for (const Seg& B : stack) std::cout << B.s << " " << B.e << "\n";
-#endif
 	sz = stack.size();
 	for (int i = 0; i < sz - 1; i++)
 		H.push_back(upper_tangent_bi_search(stack[i].i, stack[i + 1].i));
-#ifdef DEBUG
-	std::cout << "SEG H :\n";
-	for (const Seg& B : H) std::cout << B.s << " " << B.e << "\n";
-#endif
 	sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		ret += (H[i].e - H[i].s).mag();
-#ifdef DEBUG
-		std::cout << "ln : " << (H[i].e - H[i].s).mag() << "\n";
-#endif
 		if (i < sz - 1) {
 			//assert(H[i] / H[i + 1] < 0);
 			ld ln = hull_tree[H[i + 1].i].len(H[i].e.i, H[i + 1].s.i);
-			assert(H[i].e.hi == H[i + 1].s.hi);
-#ifdef DEBUG
-			std::cout << H[i].e.i << " " << H[i + 1].s.i << "\n";
-			std::cout << "ln : " << ln << "\n";
-#endif
+			//assert(H[i].e.hi == H[i + 1].s.hi);
 			ret += ln;
 		}
 	}
@@ -571,10 +389,6 @@ Polygon seq;
 inline ld query(Pos& pre) {
 	Pos cur;
 	std::cin >> cur;
-#ifdef NAIVE
-	seq.push_back(cur);
-	std::cout << "pre:: " << pre << " cur:: " << cur << "\n";
-#endif
 	ld ret = upper_monotone_chain(pre, cur);
 	pre = cur;
 	return ret;
@@ -583,58 +397,30 @@ inline void query() {
 	std::cin >> Q, Q--;
 	Pos pre;
 	std::cin >> pre;
-#ifdef NAIVE
-	seq.push_back(pre);
-	ld ret = 0;
-	int cnt = 1;
-	while (Q--) {
-		ld tmp = query(pre);
-		std::cout << "query[" << cnt++ << "]:: " << tmp << "\n";
-		ret += tmp;
-	}
-	std::cout << "query[total]:: " << (long double)ret << "\n";
-#else
 	ld ret = 0;
 	while (Q--) ret += query(pre);
 	std::cout << (long double)ret << "\n";
-#endif
 	return;
 }
 Polygon MT[LEN];
-HullNode init(int s = 1, int e = K, int i = 1) {
-	if (s == e) return hull_tree[i] = HullNode(i, upper_monotone_chain(MT[s]));
-	int m = s + e >> 1;
-	return hull_tree[i] = init(s, m, i << 1) + init(m + 1, e, i << 1 | 1);
-}
-#ifdef NAIVE
-void naive(Polygon& C) {
-	ld total = 0;
-	int sz = seq.size();
-	for (int i = 0; i < sz - 1; i++) {
-		Pos s = seq[i], e = seq[i + 1];
-		if (e.x < s.x) std::swap(s, e);
-		std::cout << "s:: " << s << " e:: " << e << "\n";
-		Polygon tmp;
-		tmp.push_back(s);
-		tmp.push_back(e);
-		for (const Pos& p : C) {
-			if (s.x < p.x && p.x < e.x) tmp.push_back(p);
+void init(int s = 1, int e = K, int i = 1) {
+	if (s == e) {
+		hull_tree[i].hull = upper_monotone_chain(MT[s]);
+		int idx = 0;
+		for (Pos& p : hull_tree[i].hull) {
+			p.i = idx++;
+			p.hi = i;
 		}
-		Polygon H = upper_monotone_chain(tmp);
-#ifdef DEBUG
-		for (const Pos& p : H) std::cout << p << " ";
-		std::cout << "\n";
-#endif
-		ld ret = 0;
-		for (int j = 0; j < H.size() - 1; j++) {
-			ret += (H[j] - H[j + 1]).mag();
-		}
-		std::cout << "naive[" << i + 1 << "]:: " << ret << "\n";
-		total += ret;
+		hull_tree[i].t = ternary_search(hull_tree[i].hull);
+		get_round_memo(hull_tree[i].hull, hull_tree[i].memo);
+		return;
 	}
-	std::cout << "naive[total]:: " << total << "\n";
+	int m = s + e >> 1;
+	init(s, m, i << 1);
+	init(m + 1, e, i << 1 | 1);
+	hull_tree[i] = hull_tree[i << 1] + hull_tree[i << 1 | 1];
+	return;
 }
-#endif
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -651,176 +437,16 @@ inline void solve() {
 			K++;
 			tmp.clear();
 		}
-#ifdef DEBUG
-		for (Pos& p : tmp) std::cout << p << " | ";
-		std::cout << "\n";
-#endif
 		tmp.push_back(C[i]);
 	}
 	if (tmp.empty()) K--;
 	for (Pos& p : tmp) MT[K].push_back(p);
 	tmp.clear();
 	init();
-#ifdef DEBUG
-	std::cout << "\nK : " << K << "\n\n";
-	for (int i = 1; i <= K; i++) {
-		int j = 0;
-		for (const Pos& p : MT[i]) std::cout << "MT[" << i << "][" << j++ << "] : " << p << "\n";
-		std::cout << "\n";
-	}
-
-	for (int i = 0; i <= K * 4; i++) {
-		int j = 0;
-		for (const Pos& p : hull_tree[i].hull) std::cout << "hull[" << i << "][" << j++ << "] : " << p << "\n";
-		j = 0;
-		for (const ld& ln : hull_tree[i].memo) std::cout << "memo[" << i << "][" << j++ << "] : " << ln << "\n";
-		std::cout << "\n";
-	}
-#endif
 	query();
-#ifdef NAIVE
-	naive(C);
-#endif
 	return;
 }
 int main() { solve(); return 0; }//boj11002 Crow
-
-
-/*
-18
-0 0
-1 10
-2 15
-3 18
-4 20
-5 18
-6 15
-7 10
-8 0
-9 0
-10 10
-11 15
-12 18
-13 20
-14 18
-15 15
-16 10
-17 0
-4
-3 19
-14 19
-3 19
-14 19
-*/
-
-//stack.clear();
-//stack.push_back(Seg(L, L, 0));
-//BBB.pop_back();
-//BBB.push_back(last);
-//BBB.push_back(Seg(R, R, LEN << 2 | 1));
-//int sz = BBB.size();
-//for (int i = 0; i < sz; i++) {
-//	Seg B = BBB[i];
-//	while (stack.size() > 1 &&
-//		upper_tangent_bi_search(stack[stack.size() - 2].i, stack.back().i) /
-//		upper_tangent_bi_search(stack.back().i, B.i) >= 0)
-//		stack.pop_back();
-//	stack.push_back(B);
-//}
-
-
-//Seg upper_tangent_bi_search(const int& I, const int& J) {
-//#ifdef MAP_search
-//	if (0 < I && J <= K * 4) {
-//#ifdef DEBUG
-//		std::cout << "find upper tangent [" << I << "][" << J << "], MAP search::\n";
-//#endif
-//		auto it = MAP.find(Pos(I, J));
-//		if (it != MAP.end()) return it->second;
-//	}
-//#endif
-//#ifdef DEBUG
-//	std::cout << "find upper tangent [" << I << "][" << J << "]\n";
-//#endif
-//	Polygon& L = hull_tree[I].hull, R = hull_tree[J].hull;
-//#ifdef DEBUG
-//	for (const Pos& p : L) std::cout << "L : " << p << "\n";
-//	for (const Pos& p : R) std::cout << "R : " << p << "\n";
-//#endif
-//	if (!L.size() || !R.size()) {
-//#ifdef DEBUG
-//		std::cout << "Fuck\n";
-//#endif
-//		assert(0);
-//		return Seg(Pos(-1, -1), Pos(-1, -1), -1);
-//	}
-//	if (L.size() == 1 && R.size() == 1) {
-//#ifdef DEBUG
-//		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[0], I).S() << "\n";
-//#endif
-//		return Seg(L[0], R[0], I);
-//	}
-//	if (L.size() == 1) {
-//		int i = find_tangent_bi_search(R, L[0]);
-//#ifdef DEBUG
-//		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[0], R[i], I).S() << "\n";
-//#endif
-//		return Seg(L[0], R[i], I);
-//	}
-//	if (R.size() == 1) {
-//		int i = find_tangent_bi_search(L, R[0], 0);
-//#ifdef DEBUG
-//		std::cout << "0 Seg[" << I << "][" << J << "] : " << Seg(L[i], R[0], I).S() << "\n";
-//#endif
-//		return Seg(L[i], R[0], I);
-//	}
-//	int szl = L.size(), szr = R.size();
-//	//int l = szl - 1, r = 0;
-//	//int l = 0, r = szr - 1;
-//	int l = hull_tree[I].t.i, r = hull_tree[J].t.i;
-//	auto tangent_check = [&](const int& i, const int& j) -> bool {
-//		assert(L[i] < R[j]);
-//		bool f1 = 1, f2 = 1, f3 = 1, f4 = 1;
-//		if (i > 0) f1 = ccw(L[i], R[j], L[i - 1]) <= 0;
-//		if (i < szl - 1) f2 = ccw(L[i], R[j], L[i + 1]) <= 0;
-//		if (j > 0) f3 = ccw(L[i], R[j], R[j - 1]) <= 0;
-//		if (j < szr - 1) f4 = ccw(L[i], R[j], R[j + 1]) <= 0;
-//		return f1 && f2 && f3 && f4;
-//		};
-//	auto valid_check = [&](int& i, int& j) -> bool {
-//		if (i < szl - 1 && j < szr - 1 && tangent_check(i + 1, j + 1)) { i++, j++; return 1; }
-//		if (i > 0 && j > 0 && tangent_check(i - 1, j - 1)) { i--, j--; return 1; }
-//		if (i > 0 && j < szr - 1 && tangent_check(i - 1, j + 1)) { i--, j++; return 1; }
-//		if (i < szl - 1 && j > 0 && tangent_check(i + 1, j - 1)) { i++, j--; return 1; }
-//		if (i < szl - 1 && tangent_check(i + 1, j)) { i++; return 1; }
-//		if (i > 0 && tangent_check(i - 1, j)) { i--; return 1; }
-//		if (j < szr - 1 && tangent_check(i, j + 1)) { j++; return 1; }
-//		if (j > 0 && tangent_check(i, j - 1)) { j--; return 1; }
-//		return tangent_check(i, j);
-//		};
-//	bool f = 1;
-//	int cnt = 0;
-//	while (!valid_check(l, r)) {
-//		//while (!tangent_check(l, r)) {
-//		if (f) {
-//			r = find_tangent_bi_search(R, L[l], f);
-//			if (r < szr - 1 && !ccw(L[l], R[r], R[r + 1])) r++;
-//		}
-//		else if (!f) {
-//			l = find_tangent_bi_search(L, R[r], f);
-//			if (l > 0 && !ccw(L[l], R[r], L[l - 1])) l--;
-//		}
-//		f ^= 1;
-//		cnt++;
-//	}
-//#ifdef DEBUG
-//	std::cout << "4 Seg[" << I << "][" << J << "] : " << Seg(L[l], R[r], I).S() << "\n";
-//#endif
-//#ifdef MAP_search
-//	if (0 < I && J <= K * 4 && cnt > 3) MAP[Pos(I, J)] = Seg(L[l], R[r], I);
-//#endif
-//	return Seg(L[l], R[r], I);
-//}
 
 /*
 
