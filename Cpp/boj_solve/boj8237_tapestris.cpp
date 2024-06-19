@@ -72,7 +72,7 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = dot(d1, d3, d2);
-	return !ccw(d1, d2, d3) && (ret > 0 || zero(ret));
+	return !ccw(d1, d2, d3) && ret >= 0;
 }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ll ret = dot(d1, d3, d2);
@@ -90,22 +90,82 @@ inline ld intersection(const Seg& s1, const Seg& s2) {
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
+	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	//return f1 && f2;
+	bool f3 = on_seg_strong(s1, s2, d1) ||
+		on_seg_strong(s1, s2, d2) ||
+		on_seg_strong(d1, d2, s1) ||
+		on_seg_strong(d1, d2, s2);
+	return (f1 && f2) || f3;
+}
+ll area(std::vector<Pos>& H) {
+	ll ret = 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		ret += cross(O, cur, nxt);
+	}
+	return ret;
+}
+int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+	int cnt = 0, sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (cur.y == nxt.y) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y <= p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return (cnt & 1) * 2;
+}
+void norm(std::vector<Pos>& H) { if (area(H) < 0) std::reverse(H.begin(), H.end()); }
 inline void query() {
 	std::cin >> N;
 	Polygon H(N);
 	for (Pos& p : H) std::cin >> p;
+	norm(H);
+	//assert(inner_check(H, O));
 	for (int i = 0; i < N; i++) {
 		char b;
 		std::cin >> b;
 		V[i] = (b == 'C' ? 0 : 1);
 	}
+	auto inner = [&](const Pos& a, const Pos& b, const Pos& c, const Pos& t) {
+		return ccw(a, b, t) > 0 && ccw(b, c, t) > 0 && ccw(c, a, t) > 0;
+		};
 	for (int i = 0; i < N; i++) {
-		Polygon RAT;//ratio
 		Pos& s = H[i], e = H[(i + 1) % N];
-		for (int j = 0; j < N; j++) {
-			if (i == j) continue;
+		Pos cur = e;
+		if (V[i] && on_seg_strong(s, e, O)) continue;
+		if (!V[i] && on_seg_strong(s, e, O)) { std::cout << "NIE\n"; return; }
+		if (V[i] && cross(s, e, O) <= 0) { std::cout << "NIE\n"; return; }
+		if (!V[i] && cross(s, e, O) <= 0) continue;
+		for (int j = i + 1; j < i + N; j++) {
+			Pos& u = H[j % N], v = H[(j + 1) % N];
+			if (on_seg_strong(u, v, O)) continue;
+			ll CCW = ccw(O, u, v);
+			if (V[j % N] && CCW <= 0) { std::cout << "NIE\n"; return; }
+			if (CCW <= 0) continue;
+			if (intersect(O, s, u, v) && intersect(O, e, u, v)) {
+				if (V[i]) { std::cout << "NIE\n"; return; }
+				if (!V[i]) break;
+			}
+			if (inner(O, s, e, u) || inner(O, s, e, v)) {
+				if (V[i]) { std::cout << "NIE\n"; return; }
+				if (!V[i]) {
+					if (ccw(O, cur, v) >= 0) {
+						if (ccw(O, cur, u) < 0) cur = u;
+					}
+				}
+			}
 		}
+		if (!V[i] && ccw(O, s, cur) > 0) { std::cout << "NIE\n"; return; }
 	}
+	std::cout << "TAK\n";
+	return;
 }
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
