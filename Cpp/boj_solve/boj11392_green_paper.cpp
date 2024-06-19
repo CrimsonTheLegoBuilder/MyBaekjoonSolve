@@ -212,7 +212,7 @@ inline void green_circle(const int& I) {//refer to cki86201
 		if (C[j].type == TRI) {
 			Pos* tri[] = { &C[j].T.a, &C[j].T.b, &C[j].T.c };
 			for (int k = 0; k < 3; k++) {
-				const Pos& p1 = *tri[k], p2 = *tri[(k + 1) % 3];
+				const Pos& p1 = *tri[k], & p2 = *tri[(k + 1) % 3];
 				inx = circle_line_intersections(p1, p2, q);
 				for (const ld& r : inx) VA.push_back(r);
 			}
