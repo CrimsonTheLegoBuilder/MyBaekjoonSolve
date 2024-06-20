@@ -110,7 +110,7 @@ inline std::vector<Pos> monotone_chain(std::vector<Pos>& C, int d = 0) {
 				H.pop_back();
 			H.push_back(C[i]);
 		}
-		H.pop_back();
+		//H.pop_back();
 	}
 	if (d == 1 || d == 3) std::reverse(H.begin(), H.end());
 	return H;
@@ -123,13 +123,16 @@ int bi_search(const Polygon& H, const ld& q, bool f = 0) {
 		if (J) s = m + 1;
 		else e = m;
 	}
+	assert(s < H.size());
 	return s;
 }
 ld box_area(const Polygon& L, const Polygon& U, const ld& q, const ld& w, Pdd& p1, Pdd& p2, bool f = 0) {
-	int l1 = bi_search(L, q);
-	int l2 = bi_search(L, q + w);
-	int u1 = bi_search(U, q, 1);
-	int u2 = bi_search(U, q + w, 1);
+	int l1 = bi_search(L, q, f);
+	int l2 = bi_search(L, q + w, f);
+	int u1 = bi_search(U, q, f);
+	int u2 = bi_search(U, q + w, f);
+	std::cout << "DEBUG:: hull size:: " << L.size() << " " << U.size() << "\n";
+	std::cout << "DEBUG:: idx :: " << l1 << " " << l2 << " " << u1 << " " << u2 << "\n";
 	ld ret = 0;
 	if (!f) {
 		ld ly1, ly2, uy1, uy2;
@@ -183,6 +186,8 @@ void max_area(Polygon& C) {
 	UP = monotone_chain(C, 1);
 	RI = monotone_chain(C, 2);
 	LE = monotone_chain(C, 3);
+	std::cout << "DEBUG:: hull init\n";
+	std::cout << "DEBUG:: hull size " << LO.size() << " " << UP.size() << " " << LE.size() << " " << RI.size() << "\n";
 	ll min_x = LO[0].x, max_x = LO.back().x;
 	//for (int i = 1; i < LO.size() - 1; i++) {
 	//	if (LO[i].y <= LO[0].y && LO[0].y <= LO[i + 1].y) {
@@ -198,29 +203,34 @@ void max_area(Polygon& C) {
 	ld w1 = 0, w2 = (max_x - min_x);
 	ld h1 = 0, h2 = (max_y - min_y);
 	ld m1 = 0, m2 = 0, a1 = 0, a2 = 0;
+	std::cout << "DEBUG:: range init\n";
 	int cnt;
-	cnt = 50;
+	cnt = 1;
 	//while (cnt--) {
 	while (!zero(w2 - w1)) {
 		m1 = (w1 + w1 + w2) / 3;
 		m2 = (w1 + w2 + w2) / 3;
+		std::cout << "DEBUG:: ts LO UP :: " << cnt++ << "\n";;
 		a1 = ternary_search(LO, UP, m1, p1, p2);
 		a2 = ternary_search(LO, UP, m2, p1, p2);
 		if (a1 < a2) w1 = m1;
 		else w2 = m2;
 	}
 	if (ret < a1) ret = a1, q1 = p1, q2 = p2;
-	cnt = 50;
+	std::cout << "DEBUG:: ternary search LO UP\n";
+	cnt = 1;
 	//while (cnt--) {
 	while (!zero(h2 - h1)) {
 		m1 = (h1 + h1 + h2) / 3;
 		m2 = (h1 + h2 + h2) / 3;
+		std::cout << "DEBUG:: ts LE RI :: " << cnt++ << "\n";;
 		a1 = ternary_search(RI, LE, m1, p1, p2, 1);
 		a2 = ternary_search(RI, LE, m2, p1, p2, 1);
 		if (a1 < a2) h1 = m1;
 		else h2 = m2;
 	}
 	if (ret < a1) ret = a1, q1 = p1, q2 = p2;
+	std::cout << "DEBUG:: ternary search LE RI\n";
 	std::cout << q1 << " " << q2 << "\n";
 	return;
 }
@@ -232,6 +242,7 @@ void solve() {
 	std::cin >> N;
 	Polygon C(N);
 	for (Pos& p : C) std::cin >> p;
+	//std::reverse(C.begin(), C.end());
 	max_area(C);
 	return;
 }
