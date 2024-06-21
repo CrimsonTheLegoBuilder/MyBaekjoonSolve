@@ -10,7 +10,7 @@ typedef long double ld;
 typedef std::pair<int, int> pi;
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
-const ld TOL = 1e-7;
+const ld TOL = 1e-5;
 const ll MOD = 1'000'000'007;
 int N, M, T, Q;
 inline bool zero(const ld& x) { return std::abs(x) < TOL; }
@@ -120,10 +120,13 @@ int bi_search(const Polygon& H, const ld& q, bool f = 0) {
 	while (s < e) {
 		m = s + e >> 1;
 		bool J = f ? H[m].y < q : H[m].x < q;
+		std::cout << "DEBUG:: f: " << f << "\n";
+		std::cout << "DEBUG:: J: " << J << " q: " << q << " x: " << H[m].x << " y: " << H[m].y << "\n";
 		if (J) s = m + 1;
 		else e = m;
 	}
 	assert(s < H.size());
+	if (H[s].x > q && s > 0) s--;
 	return s;
 }
 ld box_area(const Polygon& L, const Polygon& U, const ld& q, const ld& w, Pdd& p1, Pdd& p2, bool f = 0) {
@@ -131,6 +134,8 @@ ld box_area(const Polygon& L, const Polygon& U, const ld& q, const ld& w, Pdd& p
 	int l2 = bi_search(L, q + w, f);
 	int u1 = bi_search(U, q, f);
 	int u2 = bi_search(U, q + w, f);
+	std::cout << "DEBUG:: f:: " << f << "\n";
+	std::cout << "DEBUG:: range:: " << q << " " << q + w << "\n";
 	std::cout << "DEBUG:: hull size:: " << L.size() << " " << U.size() << "\n";
 	std::cout << "DEBUG:: idx :: " << l1 << " " << l2 << " " << u1 << " " << u2 << "\n";
 	ld ret = 0;
@@ -166,14 +171,17 @@ ld ternary_search(const Polygon& L, const Polygon& U, const ld& w, Pdd& p1, Pdd&
 	ld s, e, m1, m2, a1, a2;
 	if (!f) s = L[0].x, e = L.back().x - w;
 	if (f) s = L[0].y, e = L.back().y - w;
-	//while (cnt--) {
-	while (!zero(e - s)) {
+	while (cnt--) {
+	//while (!zero(e - s)) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
 		a1 = box_area(L, U, m1, w, p1, p2, f);
 		a2 = box_area(L, U, m2, w, p1, p2, f);
+		std::cout << "DEBUG:: a1, a2: " << a1 << " " << a2 << "\n";
+		std::cout << "DEBUG:: m1, m2: " << m1 << " " << m2 << "\n";
 		if (a1 < a2) s = m1;
 		else e = m2;
+		std::cout << "DEBUG:: s, e: " << s << " " << e << "\n";
 	}
 	return box_area(L, U, s, w, p1, p2, f);
 }
@@ -205,12 +213,12 @@ void max_area(Polygon& C) {
 	ld m1 = 0, m2 = 0, a1 = 0, a2 = 0;
 	std::cout << "DEBUG:: range init\n";
 	int cnt;
-	cnt = 1;
-	//while (cnt--) {
-	while (!zero(w2 - w1)) {
+	cnt = 50;
+	while (cnt--) {
+	//while (!zero(w2 - w1)) {
 		m1 = (w1 + w1 + w2) / 3;
 		m2 = (w1 + w2 + w2) / 3;
-		std::cout << "DEBUG:: ts LO UP :: " << cnt++ << "\n";;
+		//std::cout << "DEBUG:: ts LO UP :: " << cnt++ << "\n";;
 		a1 = ternary_search(LO, UP, m1, p1, p2);
 		a2 = ternary_search(LO, UP, m2, p1, p2);
 		if (a1 < a2) w1 = m1;
@@ -218,12 +226,12 @@ void max_area(Polygon& C) {
 	}
 	if (ret < a1) ret = a1, q1 = p1, q2 = p2;
 	std::cout << "DEBUG:: ternary search LO UP\n";
-	cnt = 1;
-	//while (cnt--) {
-	while (!zero(h2 - h1)) {
+	cnt = 50;
+	while (cnt--) {
+	//while (!zero(h2 - h1)) {
 		m1 = (h1 + h1 + h2) / 3;
 		m2 = (h1 + h2 + h2) / 3;
-		std::cout << "DEBUG:: ts LE RI :: " << cnt++ << "\n";;
+		//std::cout << "DEBUG:: ts LE RI :: " << cnt++ << "\n";;
 		a1 = ternary_search(RI, LE, m1, p1, p2, 1);
 		a2 = ternary_search(RI, LE, m2, p1, p2, 1);
 		if (a1 < a2) h1 = m1;
