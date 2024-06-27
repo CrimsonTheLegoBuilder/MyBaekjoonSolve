@@ -101,20 +101,22 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return !ret ? 0 : ret > 0 ? 1 : -1; }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = cross(d1, d2, d3, d4); return !ret ? 0 : ret > 0 ? 1 : -1; }
-void norm() {
-	ll area = 0;
-	for (int i = 0; i < N; i++) area += H[i] / H[(i + 1) % N];
-	if (area < 0) std::reverse(H, H + N);
-	return;
-}
 ll inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) {
-	return ccw(p1, p2, q) > 0 && ccw(p2, p3, q) > 0 && ccw(p3, p1, q) > 0;
+	return ccw(p1, p2, q) < 0 && ccw(p2, p3, q) < 0 && ccw(p3, p1, q) < 0;
 }
 BigInt dot(const Pos& p1, const Pos& p2) { return BigInt(p1 * p2, p2.den); }
-bool cmp_frac(BigInt p, BigInt q) {
+inline bool cmp_frac(BigInt p, BigInt q) {
 	if (p.lo < 0) p = -p;//p.den < 0
 	if (q.lo < 0) q = -q;//q.den < 0
 	return mul(p.hi, q.lo) < mul(q.hi, p.lo);
+}
+bool above(const Line& l, const Pos& inx) {
+	BigInt dist = dot(l.s, inx);
+	return cmp_frac(dist, BigInt(l.c, 1));
+}
+bool on_line(const Line& l, const Pos& inx) {
+	BigInt dist = dot(l.s, inx);
+	return !cmp_frac(dist, BigInt(l.c, 1)) && !cmp_frac(BigInt(l.c, 1), dist);
 }
 bool closer(const Pos& p1, const Pos& p2, const Pos& q, const Pos& candi) {
 	ll ccwq = cross(p1, p2, q);
@@ -138,12 +140,12 @@ std::string all_light_check() {
 			Pos& j1 = H[j], &j2 = H[(j + 1) % N];
 			ll det = cross(i1, i2, j1, j2);
 			if (!det) {
-				if (ccw(j1, j2, i1) <= 0) { rvs = 0; break; }
+				if (ccw(j1, j2, i1) >= 0) { rvs = 0; break; }
 				continue;
 			}
 			BigInt inx = dot(vec, intersection(Line(i1, i2), Line(j1, j2)));
-			if (det > 0 && cmp_frac(inx, hi)) hi = inx;
-			else if (det < 0 && cmp_frac(lo, inx)) lo = inx;
+			if (det < 0 && cmp_frac(inx, hi)) hi = inx;
+			else if (det > 0 && cmp_frac(lo, inx)) lo = inx;
 		}
 		if (lo < hi && rvs) return "TAK";
 	}
@@ -171,7 +173,7 @@ std::string query() {
 		for (i1 = 0; i1 < N; i1++) {
 			i2 = (i1 + 1) % N;
 			i3 = (i2 + 1) % N;
-			if (H[i1].dark && H[i2].dark && ccw(H[i1], H[i2], H[i3]) > 0) break;
+			if (H[i1].dark && H[i2].dark && ccw(H[i1], H[i2], H[i3]) < 0) break;
 		}
 
 		if (i1 == N) break;
@@ -206,19 +208,23 @@ std::string query() {
 
 		if (dark_hi) {//merge dark walls
 			for (int i = c2 + 1; i < N; i++) H[i - (c2 - c1 - 1)] = H[i];
-			H[c1].dark = 1;
+			//H[c1].dark = 1;
 			N -= (c2 - c1 - 1);
 		}
 		else {
 			for (int i = c1; i <= c2; i++) H[i - c1] = H[i];
 			N = (c2 - c1 - 1);
-			H[N - 1].dark = 1;
+			//H[N - 1].dark = 1;
 		}
 	}
 
 	for (int i = 0; i < N; i++) if (H[i].dark && H[(i + 1) % N].dark) return "NIE";
 
 	for (int i = 0; i < N; i++) {
+		/*
+			If there is a light wall in the same direction
+			on either side of a dark wall, a half-plane intersection is not formed.
+		*/
 		Pos& prev = H[i], & w1 = H[(i + 1) % N], & w2 = H[(i + 2) % N], & nxt = H[(i + 3) % N];
 		if (w1.dark && ccw(prev, w1, w2) == ccw(w1, w2, nxt)) return "NIE";
 	}
@@ -229,6 +235,10 @@ std::string query() {
 	while (i2 < N && !H[i2].dark) i2++;
 
 	if (i2 < N) {//two or more dark walls
+		/*
+			All dark walls must intersect at a point
+			and all light walls must contain that point.
+		*/
 		Pos& w1 = H[i1], & w2 = H[(i1 + 1) % N];
 		Pos& w3 = H[i2], & w4 = H[(i2 + 1) % N];
 		if (!ccw(w1, w2, w3, w4)) return "NIE";
@@ -237,11 +247,15 @@ std::string query() {
 			Pos& p1 = H[i], & p2 = H[(i + 1) % N];
 			Line l(p1, p2);
 			BigInt cur = dot(l.s, inx);
-			if (!H[i].dark && !cmp_frac(cur, BigInt(l.c, 1))) return "NIE";
-			if (H[i].dark && (cmp_frac(cur, BigInt(l.c, 1)) || cmp_frac(BigInt(l.c, 1), cur))) return "NIE";
+			if (!H[i].dark && !above(l, inx)) return "NIE";
+			if (H[i].dark && !on_line(l, inx)) return "NIE";
 		}
 	}
 	else {//only one dark wall
+		/*
+			There is a possible point somewhere
+			along the straight line extending the dark wall.
+		*/
 		Pos& w1 = H[i1], & w2 = H[(i1 + 1) % N];
 		Pos vec = w2 - w1;
 		BigInt hi = { INF, 1 }, lo = { -INF, 1 };
@@ -254,8 +268,8 @@ std::string query() {
 				continue;
 			}
 			BigInt inx = dot(vec, intersection(Line(w1, w2), Line(p1, p2)));
-			if (det > 0 && cmp_frac(inx, hi)) hi = inx;
-			else if (det < 0 && cmp_frac(lo, inx)) lo = inx;
+			if (det < 0 && cmp_frac(inx, hi)) hi = inx;
+			else if (det > 0 && cmp_frac(lo, inx)) lo = inx;
 		}
 		if (!cmp_frac(lo, hi)) return "NIE";
 	}
