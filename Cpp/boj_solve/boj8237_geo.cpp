@@ -25,13 +25,14 @@ struct BigInt {
 	BigInt(ll HI = 0, ll LO = 0) : hi(HI), lo(LO) {}
 	BigInt operator - () const { return { -hi, -lo }; }
 	bool operator < (const BigInt& p) const { return hi == p.hi ? lo < p.lo : hi < p.hi; }
+	bool operator == (const BigInt& p) const { return hi == p.hi && lo == p.lo; }
 };
-BigInt mul(ll a, ll b) {
-	int m = a < 0 ? -1 : 1;
-	if (m < 0) a *= -1;
-	assert(0 < b && b < DEN);
-	ll hi = (a / DEN) * b;
-	ll lo = (a % DEN) * b;
+BigInt mul(ll num, ll den) {
+	assert(0 < den && den < DEN);
+	int m = num < 0 ? -1 : 1;
+	if (m < 0) num *= -1;
+	ll hi = (num / DEN) * den;
+	ll lo = (num % DEN) * den;
 	hi += lo / DEN;
 	lo %= DEN;
 	return BigInt(m * hi, m * lo);
@@ -56,9 +57,10 @@ struct Pos {
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator - () const { return { -x, -y }; }
+	Pos operator - () const { return { -x, -y, den }; }
 	Pos operator ~ () const { return { -y, x, den }; }
 	Pos operator ! () const { return { y, x }; }
+	Pos s() const { return { y, -x }; }
 	ld xy() const { return x * y; }
 	ll Euc() const { return x * x + y * y; }
 	ll Man() const { return std::abs(x) + std::abs(y); }
@@ -76,16 +78,8 @@ struct Line {//ax + by = c
 	Pos s;
 	ll c;
 	Line(Pos ps = Pos(0, 0), Pos pe = Pos(0, 0)) {
-		s = ~(pe - ps);
+		s = (pe - ps).s();
 		c = s * ps;
-	}
-	bool operator == (const Line& l) const { return s == l.s && c == l.c; }
-	bool operator < (const Line& l) const {
-		bool f1 = O < s;
-		bool f2 = O < l.s;
-		if (f1 != f2) return f1;
-		ll CCW = s / l.s;
-		return !CCW ? c < l.c : CCW > 0;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s << " " << l.c; return os; }
 };
@@ -104,19 +98,25 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = c
 ll inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) {
 	return ccw(p1, p2, q) < 0 && ccw(p2, p3, q) < 0 && ccw(p3, p1, q) < 0;
 }
-BigInt dot(const Pos& p1, const Pos& p2) { return BigInt(p1 * p2, p2.den); }
+BigInt dot(const Pos& vec, const Pos& inx) { return BigInt(vec * inx, inx.den); }
 inline bool cmp_frac(BigInt p, BigInt q) {
 	if (p.lo < 0) p = -p;//p.den < 0
 	if (q.lo < 0) q = -q;//q.den < 0
 	return mul(p.hi, q.lo) < mul(q.hi, p.lo);
 }
-bool above(const Line& l, const Pos& inx) {
+inline bool frac_eq(BigInt p, BigInt q) {
+	if (p.lo < 0) p = -p;//p.den < 0
+	if (q.lo < 0) q = -q;//q.den < 0
+	return mul(p.hi, q.lo) == mul(q.hi, p.lo);
+}
+bool above(const Line& l, const Pos& inx, bool rvs = 0) {
 	BigInt dist = dot(l.s, inx);
-	return cmp_frac(dist, BigInt(l.c, 1));
+	if (rvs) return cmp_frac(dist, BigInt(l.c, 1));
+	return cmp_frac(BigInt(l.c, 1), dist);
 }
 bool on_line(const Line& l, const Pos& inx) {
 	BigInt dist = dot(l.s, inx);
-	return !cmp_frac(dist, BigInt(l.c, 1)) && !cmp_frac(BigInt(l.c, 1), dist);
+	return frac_eq(dist, BigInt(l.c, 1));
 }
 bool closer(const Pos& p1, const Pos& p2, const Pos& q, const Pos& candi) {
 	ll ccwq = cross(p1, p2, q);
