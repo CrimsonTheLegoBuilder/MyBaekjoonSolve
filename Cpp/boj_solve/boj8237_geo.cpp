@@ -268,8 +268,10 @@ std::string query() {
 		if (!ccw(w1, w2, w3, w4)) return "NIE";
 		Pos inx = intersection(Line(w1, w2), Line(w3, w4));
 		for (int i = 0; i < N; i++) {
+			Pos& prev = H[(i - 1 + N) % N], & nxt = H[(i + 2) % N];
 			Pos& p1 = H[i], & p2 = H[(i + 1) % N];
 			if (p1.dark && p2.dark) return "NIE";
+			if (p1.dark && ccw(prev, p1, p2) == ccw(p1, p2, nxt)) return "NIE";
 			Line l(p1, p2);
 			BigInt cur = dot(l.s, inx);
 			if (!H[i].dark && !above(l, inx)) return "NIE";
@@ -282,8 +284,8 @@ std::string query() {
 			along the straight line extending the dark wall.
 		*/
 		Pos& prev = H[(i1 - 1 + N) % N], & nxt = H[(i1 + 2) % N];
-		Pos& w1 = H[i1], & w2 = H[(i1 + 1) % N];
-		if (w1.dark && ccw(prev, w1, w2) == ccw(w1, w2, nxt)) return "NIE";
+		Pos& p1 = H[i1], & p2 = H[(i1 + 1) % N];
+		if (p1.dark && ccw(prev, p1, p2) == ccw(p1, p2, nxt)) return "NIE";
 		return half_plane_intersection_except_x(i1);
 		//Pos vec = w2 - w1;
 		//BigInt hi = { INF, 1 }, lo = { -INF, 1 };
