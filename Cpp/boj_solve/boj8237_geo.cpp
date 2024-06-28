@@ -264,7 +264,7 @@ std::string query() {
 			Pos& p1 = H[i], & p2 = H[(i + 1) % N];
 			ll det = cross(w1, w2, p1, p2);
 			if (!det) {
-				if (ccw(p1, p2, w1) <= 0) return "NIE";
+				if (ccw(p1, p2, w1) >= 0) return "NIE";
 				continue;
 			}
 			BigInt inx = dot(vec, intersection(Line(w1, w2), Line(p1, p2)));
