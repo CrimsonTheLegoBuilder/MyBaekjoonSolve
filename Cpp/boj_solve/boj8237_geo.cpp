@@ -129,25 +129,49 @@ bool closer(const Pos& p1, const Pos& p2, const Pos& q, const Pos& candi) {
 	ll denx = (candi - p1).Euc();
 	return cmp_frac(BigInt(numq, denq), BigInt(numx, denx));
 }
-std::string all_light_check() {
-	for (int i = 0; i < N; i++) {//half_plane_intersection must include i1-i2
-		Pos& i1 = H[i], &i2 = H[(i + 1) % N];
+//std::string all_light_check() {
+//	for (int i = 0; i < N; i++) {//half_plane_intersection must include i1-i2
+//		Pos& i1 = H[i], &i2 = H[(i + 1) % N];
+//		Pos vec = i2 - i1;
+//		bool rvs = 1;
+//		BigInt hi = { INF, 1 }, lo = { -INF, 1 };
+//		for (int j = 0; j < N; j++) {
+//			if (j == i) continue;
+//			Pos& j1 = H[j], &j2 = H[(j + 1) % N];
+//			ll det = cross(i1, i2, j1, j2);
+//			if (!det) {
+//				if (ccw(j1, j2, i1) >= 0) { rvs = 0; break; }
+//				continue;
+//			}
+//			BigInt inx = dot(vec, intersection(Line(i1, i2), Line(j1, j2)));
+//			if (det < 0 && cmp_frac(inx, hi)) hi = inx;
+//			else if (det > 0 && cmp_frac(lo, inx)) lo = inx;
+//		}
+//		if (cmp_frac(lo, hi) && rvs) return "TAK";
+//	}
+//	return "NIE";
+//}
+std::string half_plane_intersection_except_x(int x = -1) {
+	int sz = (x == -1 ? N : x + 1);
+	int i = (x == -1 ? 0 : x);
+	for (i; i < sz; i++) {//half_plane_intersection must include i1-i2
+		Pos& i1 = H[i], & i2 = H[(i + 1) % N];
 		Pos vec = i2 - i1;
-		bool rvs = 1;
+		bool rvs = 0;
 		BigInt hi = { INF, 1 }, lo = { -INF, 1 };
 		for (int j = 0; j < N; j++) {
 			if (j == i) continue;
-			Pos& j1 = H[j], &j2 = H[(j + 1) % N];
+			Pos& j1 = H[j], & j2 = H[(j + 1) % N];
 			ll det = cross(i1, i2, j1, j2);
 			if (!det) {
-				if (ccw(j1, j2, i1) >= 0) { rvs = 0; break; }
+				if (ccw(j1, j2, i1) >= 0) { rvs = 1; break; }
 				continue;
 			}
 			BigInt inx = dot(vec, intersection(Line(i1, i2), Line(j1, j2)));
 			if (det < 0 && cmp_frac(inx, hi)) hi = inx;
 			else if (det > 0 && cmp_frac(lo, inx)) lo = inx;
 		}
-		if (lo < hi && rvs) return "TAK";
+		if (cmp_frac(lo, hi) && !rvs) return "TAK";
 	}
 	return "NIE";
 }
@@ -163,11 +187,11 @@ std::string query() {
 	}
 
 	if (all_dark) return "NIE";
-	if (all_light) return all_light_check();
+	if (all_light) return half_plane_intersection_except_x();
 
 	int i1 = 0, i2 = 0, i3 = 0, i4 = 0;
 	while (1) {//merge dark walls
-		if (N <= 3) return "NIE";//At least one must be dark.
+		if (N <= 3) return "NIE";//at least one must be dark.
 
 		i1 = 0; i2 = 0; i3 = 0;
 		for (i1 = 0; i1 < N; i1++) {
@@ -176,7 +200,7 @@ std::string query() {
 			if (H[i1].dark && H[i2].dark && ccw(H[i1], H[i2], H[i3]) < 0) break;
 		}
 
-		if (i1 == N) break;
+		if (i1 == N) break;//no continuous dark walls
 
 		int c = -1;
 		for (int i = 0; i < N; i++) {
@@ -204,21 +228,21 @@ std::string query() {
 			}
 		}
 		
-		if (!dark_hi && !dark_lo) return "NIE";
+		if (!dark_hi && !dark_lo) return "NIE";//both sides of a dark passage must be bright.
 
 		if (dark_hi) {//merge dark walls
 			for (int i = c2 + 1; i < N; i++) H[i - (c2 - c1 - 1)] = H[i];
 			//H[c1].dark = 1;
 			N -= (c2 - c1 - 1);
 		}
-		else {
+		else {//merge dark walls
 			for (int i = c1; i <= c2; i++) H[i - c1] = H[i];
 			N = (c2 - c1 - 1);
 			//H[N - 1].dark = 1;
 		}
 	}
 
-	for (int i = 0; i < N; i++) if (H[i].dark && H[(i + 1) % N].dark) return "NIE";
+	//for (int i = 0; i < N; i++) if (H[i].dark && H[(i + 1) % N].dark) return "NIE";
 
 	for (int i = 0; i < N; i++) {
 		/*
@@ -245,6 +269,7 @@ std::string query() {
 		Pos inx = intersection(Line(w1, w2), Line(w3, w4));
 		for (int i = 0; i < N; i++) {
 			Pos& p1 = H[i], & p2 = H[(i + 1) % N];
+			if (p1.dark && p2.dark) return "NIE";
 			Line l(p1, p2);
 			BigInt cur = dot(l.s, inx);
 			if (!H[i].dark && !above(l, inx)) return "NIE";
@@ -256,22 +281,25 @@ std::string query() {
 			There is a possible point somewhere
 			along the straight line extending the dark wall.
 		*/
+		Pos& prev = H[(i1 - 1 + N) % N], & nxt = H[(i1 + 2) % N];
 		Pos& w1 = H[i1], & w2 = H[(i1 + 1) % N];
-		Pos vec = w2 - w1;
-		BigInt hi = { INF, 1 }, lo = { -INF, 1 };
-		for (int i = 0; i < N; i++) {
-			if (i == i1) continue;
-			Pos& p1 = H[i], & p2 = H[(i + 1) % N];
-			ll det = cross(w1, w2, p1, p2);
-			if (!det) {
-				if (ccw(p1, p2, w1) >= 0) return "NIE";
-				continue;
-			}
-			BigInt inx = dot(vec, intersection(Line(w1, w2), Line(p1, p2)));
-			if (det < 0 && cmp_frac(inx, hi)) hi = inx;
-			else if (det > 0 && cmp_frac(lo, inx)) lo = inx;
-		}
-		if (!cmp_frac(lo, hi)) return "NIE";
+		if (w1.dark && ccw(prev, w1, w2) == ccw(w1, w2, nxt)) return "NIE";
+		return half_plane_intersection_except_x(i1);
+		//Pos vec = w2 - w1;
+		//BigInt hi = { INF, 1 }, lo = { -INF, 1 };
+		//for (int i = 0; i < N; i++) {
+		//	if (i == i1) continue;
+		//	Pos& p1 = H[i], & p2 = H[(i + 1) % N];
+		//	ll det = cross(w1, w2, p1, p2);
+		//	if (!det) {
+		//		if (ccw(p1, p2, w1) >= 0) return "NIE";
+		//		continue;
+		//	}
+		//	BigInt inx = dot(vec, intersection(Line(w1, w2), Line(p1, p2)));
+		//	if (det < 0 && cmp_frac(inx, hi)) hi = inx;
+		//	else if (det > 0 && cmp_frac(lo, inx)) lo = inx;
+		//}
+		//if (!cmp_frac(lo, hi)) return "NIE";
 	}
 	return "TAK";
 }
