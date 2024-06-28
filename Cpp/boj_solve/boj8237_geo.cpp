@@ -231,7 +231,7 @@ std::string query() {
 		if (!dark_hi && !dark_lo) return "NIE";//both sides of a dark passage must be bright.
 
 		if (dark_hi) {//merge dark walls
-			for (int i = c2 + 1; i < N; i++) H[i - (c2 - c1 - 1)] = H[i];
+			for (int i = c2; i < N; i++) H[i - (c2 - c1 - 1)] = H[i];
 			//H[c1].dark = 1;
 			N -= (c2 - c1 - 1);
 		}
