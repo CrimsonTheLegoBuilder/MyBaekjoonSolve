@@ -95,7 +95,7 @@ inline bool closer(const Pos& p1, const Pos& p2, const Pos& cur, const Pos& cand
 inline BigInt dot(const Pos& vec, const Pos& inx) { return BigInt(vec * inx, inx.den); }
 inline bool include(const Line& l, const Pos& inx) { return cmp_frac(dot(l.s, inx), BigInt(l.c, 1)); }
 inline bool on_line(const Line& l, const Pos& inx) { return eq_frac(dot(l.s, inx), BigInt(l.c, 1)); }
-std::string half_plane_intersection_include_x(const int& x = -1) {
+inline std::string half_plane_intersection_include_x(const int& x = -1) {
 	//x == -1 : no dark wall
 	//x != -1 : only one dark wall
 	 
@@ -126,7 +126,7 @@ std::string half_plane_intersection_include_x(const int& x = -1) {
 	}
 	return "NIE";
 }
-std::string query() {
+inline std::string query() {
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> H[i];
 	int illum = 0, dark = -1;
@@ -221,7 +221,7 @@ std::string query() {
 	}
 	return "TAK";
 }
-void solve() {
+inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> T;
