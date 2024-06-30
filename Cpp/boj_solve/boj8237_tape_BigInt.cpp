@@ -82,12 +82,17 @@ inline ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) 
 inline ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 inline ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return ret < 0 ? -1 : !!ret; }
+inline bool concave(const int& i) {
+	Pos& p1 = H[(i - 1 + N) % N], & p2 = H[i];
+	Pos& p3 = H[(i + 1) % N], & p4 = H[(i + 2) % N];
+	return cross(p1, p2, p3) > 0 && cross(p2, p3, p4) > 0;
+}
 inline bool not_zig_zag(const int& i) {
 	Pos& p1 = H[(i - 1 + N) % N], & p2 = H[i];
 	Pos& p3 = H[(i + 1) % N], & p4 = H[(i + 2) % N];
 	return ccw(p1, p2, p3) == ccw(p2, p3, p4);
 }
-bool inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) { 
+inline bool inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) { 
 	return cross(p1, p2, q) < 0 && cross(p2, p3, q) < 0 && cross(p3, p1, q) < 0;
 }
 inline bool closer(const Pos& p1, const Pos& p2, const Pos& cur, const Pos& candi) {
@@ -107,6 +112,7 @@ inline std::string half_plane_intersection_include_x(const int& x = -1) {
 	int sz = (x == -1 ? N : x + 1);
 	int i = (x == -1 ? 0 : x);
 	for (i; i < sz; i++) {//half_plane_intersection must include i1-i2
+		if (x == -1 && concave(i)) continue;
 		Pos& i1 = H[i], & i2 = H[(i + 1) % N];
 		Pos vec = i2 - i1;
 		bool rvs = 0;
