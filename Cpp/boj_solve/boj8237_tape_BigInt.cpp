@@ -85,7 +85,8 @@ inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1,
 inline bool not_zig_zag(const int& i) {
 	Pos& p1 = H[(i - 1 + N) % N], & p2 = H[i];
 	Pos& p3 = H[(i + 1) % N], & p4 = H[(i + 2) % N];
-	return ccw(p1, p2, p3) == ccw(p2, p3, p4); }
+	return ccw(p1, p2, p3) == ccw(p2, p3, p4);
+}
 bool inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) { 
 	return cross(p1, p2, q) < 0 && cross(p2, p3, q) < 0 && cross(p3, p1, q) < 0;
 }
