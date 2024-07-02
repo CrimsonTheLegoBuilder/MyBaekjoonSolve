@@ -3,17 +3,17 @@
 #include <cmath>
 #include <cstring>
 typedef long long ll;
-ll N, H, V;
+ll a, b, c;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cin >> N >> H >> V;
-	ll a, b, c, d;
-	a = H * V;
-	b = (N - H) * V;
-	c = H * (N - V);
-	d = (N - H) * (N - V);
-	std::cout << (std::max({ a, b, c, d }) << 2) << "\n";
+	std::cin >> a >> b >> c;
+	ll deci;
+	if (b == 1000) deci = 10000;
+	else if (b >= 100) deci = 1000;
+	else if (b >= 10) deci = 100;
+	else deci = 10;
+	std::cout << a + b - c << "\n" << a * deci + b - c;
 	return 0;
 }
