@@ -3,7 +3,7 @@
 #include <vector>
 #include <queue>
 #include <cmath>
-#include <cstring>
+#include <cstring>;
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -18,35 +18,7 @@ struct Info {
 	ld c;
 	bool operator < (const Info& x) const { return c > x.c; }
 };
-//std::priority_queue<Info> Q;
-//ld COST[LEN << 1];
-//ld dijkstra(int v, int g) {
-//	for (int i = 0; i < LEN << 1; i++) COST[i] = INF;
-//	Q.push({ v, 0 });
-//	COST[v] = 0;
-//	while (Q.size()) {
-//		Info p = Q.top(); Q.pop();
-//		if (p.c > COST[p.i]) continue;
-//		for (int j = 0; j < t; j++) {
-//			ld w = G[p.i][j];
-//			if (w > 1e16) continue;
-//			ld cost = p.c + w;
-//			if (COST[j] > cost) {
-//				COST[j] = cost;
-//				Q.push({ j, cost });
-//			}
-//		}
-//	}
-//	return COST[g];
-//}
 void floyd_warshall() {
-	//for (int k = 0; k < t; k++) {
-	//	for (int i = 0; i < t; i++) {
-	//		for (int j = 0; j < t; j++) {
-	//			G[i][j] = std::min(G[i][k] + G[k][j], G[i][j]);
-	//		}
-	//	}
-	//}
 	for (int k = 0; k < t; k++) {
 		for (int i = 0; i < t; i++) {
 			for (int j = i + 1; j < t; j++) {
@@ -59,7 +31,7 @@ void floyd_warshall() {
 	}
 	return;
 }
-bool z(const ld& x) { return std::abs(x) < TOL; }
+inline bool z(const ld& x) { return std::abs(x) < TOL; }
 struct Pos {
 	ld x, y;
 	int i;
@@ -78,22 +50,22 @@ struct Pos {
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	ld mag() const { return hypot(x, y); }
 } inner[LEN], outer[LEN], nodes[LEN << 1];
-std::vector<Pos> C, H;
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
+//std::vector<Pos> C, H;
+inline ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+inline ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
 	return z(ret) ? 0 : ret > 0 ? 1 : -1;
 }
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = dot(d1, d3, d2);
 	return !ccw(d1, d2, d3) && (ret > 0 || z(ret));
 }
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
+inline bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = dot(d1, d3, d2);
 	return !ccw(d1, d2, d3) && ret > 0;
 }
-bool inner_check(Pos H[], const int& sz, const Pos& p) {
+inline bool inner_check(Pos H[], const int& sz, const Pos& p) {
 	int cnt = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
@@ -105,7 +77,7 @@ bool inner_check(Pos H[], const int& sz, const Pos& p) {
 	}
 	return cnt & 1;
 }
-bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+inline bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
 	//bool f3 = on_seg_strong(s1, s2, p1) ||
@@ -114,12 +86,12 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	//	on_seg_strong(p1, p2, s2);
 	return (f1 && f2);// || f3;
 }
-bool blocked(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+inline bool blocked(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f0 = intersect(s1, s2, d1, d2);
 	bool f4 = on_seg_weak(s1, s2, d1) || on_seg_weak(s1, s2, d2);
 	return f0 || f4;
 }
-bool blocked(Pos H[], const int& sz, const Pos& s1, const Pos& s2) {
+inline bool blocked(Pos H[], const int& sz, const Pos& s1, const Pos& s2) {
 	for (int i = 0; i < sz; i++) if (blocked(s1, s2, H[i], H[(i + 1) % sz])) return 1;
 	return 0;
 }
@@ -146,7 +118,7 @@ void monotone_chain(std::vector<Pos>& C, std::vector<Pos>& H) {
 	H.pop_back();
 	return;
 }
-bool connectable(const int& i, const int& j) {
+inline bool connectable(const int& i, const int& j) {
 	return !blocked(outer, M, nodes[i], nodes[j])
 		&& !blocked(inner, N, nodes[i], nodes[j])
 		&& inner_check(outer, M, (nodes[i] + nodes[j]) * .5)
@@ -172,9 +144,9 @@ void init() {
 		nodes[t] = outer[j];
 		t++;
 	}
-	C.resize(N);
-	for (int i = 0; i < N; i++) C[i] = inner[i];
-	monotone_chain(C, H);
+	//C.resize(N);
+	//for (int i = 0; i < N; i++) C[i] = inner[i];
+	//monotone_chain(C, H);
 	return;
 }
 void solve() {
@@ -199,88 +171,14 @@ void solve() {
 			}
 		}
 	}
-	ld length = 0;
-	int sz = H.size();
-
-	//int s = H[0].i, e = H[1 % sz].i;
-	//ld a = dijkstra(s, e), b = dijkstra(e, s);
-	//length = a + b;
 
 	floyd_warshall();
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (!blocked(outer, M, cur, nxt)) length += (cur - nxt).mag();
-		else length += G[cur.i][nxt.i];
-	}
-
+	int i1 = 0, i2 = 0;
+	for (int i = 0; i < N; i++) if (inner[i].y < inner[i1].y) i1 = i;
+	i2 = (i1 + 1) % N;
+	for (int i = 0; i < N; i++) if (ccw(inner[i1], inner[i2], inner[i]) < 0) i2 = i;
+	ld length = G[i1][i2] + G[i2][i1];
 	std::cout << length << "\n";
 	return;
 }
 int main() { init(); solve(); return 0; }//boj10518
-
-/*
-
-8
-1 1
-15 1
-15 7
-14 7
-14 2
-2 2
-2 7
-1 7
-15
-0 0
-16 0
-16 8
-13 8
-12 4
-11 6
-10 3
-9 6
-8 5
-7 6
-6 3
-5 6
-4 4
-3 8
-0 8
-43.6832385
-
-7
-1 1
-5 1
-5 19
-4 2
-3 18
-2 2
-1 19
-9
-0 0
-6 0
-6 20
-5 20
-4 3
-3 19
-2 3
-1 20
-0 20
-102.129031841
-
-4
--1000 -1000
-0 0
-1000 -1000
-0 2000
-8
-1500 -1500
-0 2500
--1500 -1500
--460 -730
--20 -510
-0 -500
-20 -510
-460 -730
-8560.6232978
-
-*/

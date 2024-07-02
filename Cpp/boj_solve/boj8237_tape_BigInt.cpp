@@ -101,13 +101,13 @@ inline bool closer(const Pos& p1, const Pos& p2, const Pos& cur, const Pos& cand
 inline BigInt dot(const Pos& vec, const Pos& inx) { return BigInt(vec * inx, inx.den); }
 inline bool include(const Line& l, const Pos& inx) { return cmp_frac(dot(l.s, inx), BigInt(l.c, 1)); }
 inline bool on_line(const Line& l, const Pos& inx) { return eq_frac(dot(l.s, inx), BigInt(l.c, 1)); }
-inline std::string half_plane_intersection_include_x(const int& x = -1) {
+inline bool half_plane_intersection_include_x(const int& x = -1) {
 	//x == -1 : no dark wall
 	//x != -1 : only one dark wall
 	 
 	//the two walls next to the dark wall
 	//must have a zigzag shape to be bright.
-	if (x != -1 && not_zig_zag(x)) return "NIE";
+	if (x != -1 && not_zig_zag(x)) return 0;
 
 	int sz = (x == -1 ? N : x + 1);
 	int i = (x == -1 ? 0 : x);
@@ -129,11 +129,11 @@ inline std::string half_plane_intersection_include_x(const int& x = -1) {
 			if (det < 0 && cmp_frac(inx, hi)) hi = inx;
 			else if (det > 0 && cmp_frac(lo, inx)) lo = inx;
 		}
-		if (cmp_frac(lo, hi) && !rvs) return "TAK";
+		if (cmp_frac(lo, hi) && !rvs) return 1;
 	}
-	return "NIE";
+	return 0;
 }
-inline std::string query() {
+inline bool query() {
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> H[i];
 	int illum = 0, dark = -1;
@@ -144,7 +144,7 @@ inline std::string query() {
 		if (H[i].dark) dark = i;
 	}
 
-	if (illum < 3) return "NIE";
+	if (illum < 3) return 0;
 	if (illum >= N - 1) return half_plane_intersection_include_x(dark);
 
 	int i1 = 0, i2 = 0, i3 = 0;
@@ -152,7 +152,7 @@ inline std::string query() {
 	while (1) {//merge all dark walls
 		//a room with only dark walls, leaving only a door.
 
-		if (N <= 3) return "NIE";//at least one must be dark.
+		if (N <= 3) return 0;//at least one must be dark.
 
 		i1 = 0; i2 = 0; i3 = 0;
 		for (i1 = 0; i1 < N; i1++) {
@@ -189,7 +189,7 @@ inline std::string query() {
 			}
 		}
 		
-		if (!dark_hi && !dark_lo) return "NIE";//both sides of a dark passage must be bright.
+		if (!dark_hi && !dark_lo) return 0;//both sides of a dark passage must be bright.
 
 		if (dark_hi) {//merge dark walls
 			int len = c2 - c1 - 1;
@@ -215,24 +215,24 @@ inline std::string query() {
 	//and all left half-plane of light wall must include that point.
 	Pos& w1 = H[i1], & w2 = H[(i1 + 1) % N];
 	Pos& w3 = H[i2], & w4 = H[(i2 + 1) % N];
-	if (!cross(w1, w2, w3, w4)) return "NIE";
+	if (!cross(w1, w2, w3, w4)) return 0;
 	Pos inx = intersection(Line(w1, w2), Line(w3, w4));
 	for (int i = 0; i < N; i++) {
 		Pos& p1 = H[i], & p2 = H[(i + 1) % N];
 		if (p1.dark) {
-			if (p2.dark) return "NIE";
-			if (not_zig_zag(i)) return "NIE";
-			if (!on_line(Line(p1, p2), inx)) return "NIE";
+			if (p2.dark) return 0;
+			if (not_zig_zag(i)) return 0;
+			if (!on_line(Line(p1, p2), inx)) return 0;
 		}
-		if (!p1.dark && !include(Line(p1, p2), inx)) return "NIE";
+		if (!p1.dark && !include(Line(p1, p2), inx)) return 0;
 	}
-	return "TAK";
+	return 1;
 }
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> T;
-	while (T--) std::cout << query() << "\n";
+	while (T--) std::cout << (query() ? "TAK\n" : "NIE\n");
 	return;
 }
 int main() { solve(); return 0; }//boj8237 Tapestries refer to model_code (oj.uz)
