@@ -88,6 +88,8 @@ Vint divide(const Polygon& P, Segs done, Seg new_, Vint idxs, Segs& all) {
 		for (int j = 0; j < 3; j++) if (j != new_.s && j != new_.e) { i = j; break; }
 		all.push_back(Seg(i, new_.s));
 		all.push_back(Seg(i, new_.e));
+		if (ccw(P[i], P[new_.s], P[new_.e]) > 0) return { i, new_.s, new_.e };
+		else return { i, new_.e, new_.s };
 	}
 	return conquer(P, {});
 }
