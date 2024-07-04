@@ -69,7 +69,7 @@ typedef std::unordered_set<Pos> Seg_set;
 std::vector<Pos> C, H;
 struct Seg {
 	Pos s, e;
-	Seg(Pos S = 0, Pos E = 0) { if (E < S) std::swap(S, E); s = S, e = E; }
+	Seg(Pos S = 0, Pos E = 0) : s(S), e (E) {}
 	bool operator == (const Seg& p) const { return s == p.s && e == p.e; }
 	bool operator < (const Seg& p) const { return s == p.s ? e < p.e : s < p.s; }
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) { os << S.s << " " << S.e; return os; }
@@ -82,108 +82,102 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return !ret ? 0 : ret > 0 ? 1 : -1; }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = cross(d1, d2, d3, d4); return !ret ? 0 : ret > 0 ? 1 : -1; }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
+int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 int ccw(const Seg& S, const Pos& p) { return ccw(S.s, S.e, p); }
-std::vector<Pos> monotone_chain(std::vector<Pos>& C, int rvs = 1) {
-	std::vector<Pos> H;
-	std::sort(C.begin(), C.end());
-	C.erase(unique(C.begin(), C.end()), C.end());
-	if (C.size() <= 2) { for (const Pos& pos : C) H.push_back(pos); }
+Polygon conquer(Polygon L, Polygon R, Polygon& all) {
+	int il = 0, ir = 0;
+	int szl = L.size(), szr = R.size();
+	for (int i = 1; i < szl; i++) 
+		if ((L[i] - R[0]).Euc() < (L[il] - R[0]).Euc())
+			il = i;
+	for (int i = 1; i < szr; i++)
+		if ((R[i] - L[il]).Euc() < (R[ir] - L[il]).Euc())
+			ir = i;
+	all.push_back(Pos(il, ir).norm());
+	int jl = il, jr = ir, lhi, llo, rhi, rlo;
+	while (1) {
+		lhi = (jl + 1) % szl;
+		if (ccw(R[jr], L[jl], L[lhi]) < 0) {
+			all.push_back(Pos(L[lhi].i, R[jr].i).norm());
+			jl = lhi;
+			continue;
+		}
+		rlo = (jr - 1 + szr) % szr;
+		if (ccw(L[jl], R[jr], L[rlo]) > 0) {
+			all.push_back(Pos(L[jl].i, R[rlo].i).norm());
+			jr = rlo;
+			continue;
+		}
+		break;
+	}
+	jl = il, jr = ir;
+	while (1) {
+		llo = (jl - 1 + szl) % szl;
+		if (ccw(R[jr], L[jl], L[llo]) > 0) {
+			all.push_back(Pos(L[llo].i, R[jr].i).norm());
+			jl = llo;
+			continue;
+		}
+		rhi = (jr + 1) % szr;
+		if (ccw(L[jl], R[jr], L[rhi]) < 0) {
+			all.push_back(Pos(L[jl].i, R[rhi].i).norm());
+			jr = rhi;
+			continue;
+		}
+		break;
+	}
+	Polygon H;
+	if (lhi <= llo) {
+		for (int i = lhi; i <= llo; i++) H.push_back(L[i]);
+	}
 	else {
-		for (int i = 0; i < C.size(); i++) {
-			while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) * rvs <= 0)
-				H.pop_back();
-			H.push_back(C[i]);
-		}
-		H.pop_back();
-		int s = H.size() + 1;
-		for (int i = C.size() - 1; i >= 0; i--) {
-			while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) * rvs <= 0)
-				H.pop_back();
-			H.push_back(C[i]);
-		}
-		H.pop_back();
+		for (int i = 0; i <= llo; i++) H.push_back(L[i]);
+		for (int i = lhi; i < szl; i++) H.push_back(L[i]);
+	}
+	if (rhi <= rlo) {
+		for (int i = rhi; i <= rlo; i++) H.push_back(R[i]);
+	}
+	else {
+		for (int i = 0; i <= rlo; i++) H.push_back(R[i]);
+		for (int i = rhi; i < szr; i++) H.push_back(R[i]);
 	}
 	return H;
 }
-std::vector<Pos> monotone_chain(std::vector<Pos>& C, const Pos& v1, const Pos& v2, int rvs = 1) {
-	std::vector<Pos> H;
-	std::sort(C.begin(), C.end(), [&](const Pos& p, const Pos& q) -> bool {
-		ll d1 = dot(v1, v2, p);
-		ll d2 = dot(v1, v2, q);
-		if (d1 == d2) return ((p - v1).Euc() < (q - v1).Euc());
-		return d1 < d2;
-		});
-	if (C.size() <= 2) { for (const Pos& pos : C) H.push_back(pos); }
-	else {
-		for (int i = 0; i < C.size(); i++) {
-			while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) * rvs <= 0)
-				H.pop_back();
-			H.push_back(C[i]);
-		}
-		H.pop_back();
-		int s = H.size() + 1;
-		for (int i = C.size() - 1; i >= 0; i--) {
-			while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) * rvs <= 0)
-				H.pop_back();
-			H.push_back(C[i]);
-		}
-		H.pop_back();
-	}
-	return H;
-}
-Polygon conquer(Polygon L, Polygon R, Seg_set& all) {
-	Polygon L = monotone_chain(L, 1);
-	Polygon R = monotone_chain(R, -1);
-	return {};
-}
-Polygon divide(Polygon P, Seg_set& all) {
+Polygon divide(Polygon P, Polygon& all) {
 	if (P.size() == 1) return P;
 	if (P.size() == 2) {
-		all.insert(Pos(P[0].i, P[1].i).norm());
+		all.push_back(Pos(P[0].i, P[1].i).norm());
 		return P;
 	}
 	if (P.size() == 3) {
-		all.insert(Pos(P[0].i, P[1].i).norm());
-		all.insert(Pos(P[1].i, P[2].i).norm());
-		all.insert(Pos(P[2].i, P[0].i).norm());
+		all.push_back(Pos(P[0].i, P[1].i).norm());
+		all.push_back(Pos(P[1].i, P[2].i).norm());
+		all.push_back(Pos(P[2].i, P[0].i).norm());
 		if (ccw(P[0], P[1], P[2]) < 0) std::swap(P[1], P[2]);
 		return P;
 	}
 	Polygon L, R;
-	//std::sort(P.begin(), P.end());
 	int sz = P.size();
 	int m = sz >> 1;
 	for (int i = 0; i < m; i++) L.push_back(P[i]);
 	for (int i = m; i < sz; i++) R.push_back(P[i]);
 	return conquer(divide(L, all), divide(R, all), all);
 }
-Seg_set triangulation_include_done(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) { 
-	if (!ccw(p1, p2, q1, q2)) assert(1);
-	Polygon C1, C2, C3;
-	Seg_set all;
-	if (on_seg_strong(p1, p2, q1) || on_seg_strong(p1, p2, q2)) {
-		Pos p3 = on_seg_strong(p1, p2, q1) ? q2 : q1;
-		if (ccw(p1, p2, p3) < 0) std::swap(p2, p3);
+Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) { 
+	if (!collinear(p1, p2, q1, q2)) assert(1);
+	Polygon C1, C2, C3, all;
+	if (!ccw(p1, p2, q1) || !ccw(p1, p2, q2)) {
+		if (ccw(p1, p2, q1) < 0 || ccw(p1, p2, q2) < 0) std::swap(p1, p2);
+		if (ccw(q1, q2, p1) < 0 || ccw(q1, q2, p2) < 0) std::swap(q1, q2);
+		Pos p3 = !ccw(p1, p2, q1) ? q2 : q1;
 		Polygon C1, C2, C3;
 		C1 = { p1, p2, p3 };
 		int sz = P.size();
 		for (int i = 0; i < sz; i++) {
-			if (ccw(p1, p2, P[i]) > 0 && ccw(p2, p3, P[i]) > 0) C1.push_back(P[i]);
+			if (ccw(p1, p2, P[i]) > 0 && ccw(q1, p2, P[i]) > 0) C1.push_back(P[i]);
 			else if (ccw(p1, p2, P[i]) > 0) C2.push_back(P[i]);
 			else C3.push_back(P[i]);
 		}
-		std::sort(C1.begin(), C1.end());
-		std::sort(C2.begin(), C2.end());
-		std::sort(C3.begin(), C3.end());
-		Polygon H1 = divide(C1, all);
-		Polygon H2 = divide(C2, all);
-		Polygon H3 = divide(C3, all);
-		H1 = monotone_chain(H1, p2, p3, 1);
-		H2 = monotone_chain(H2, p2, p3, 1);
-		Polygon H4 = conquer(H1, H2, all);
-		H3 = monotone_chain(H3, p1, p2, 1);
-		H4 = monotone_chain(H4, p1, p2, 1);
-		conquer(H3, H4, all);
 	}
 	else {
 		Seg fst, snd;
@@ -200,19 +194,17 @@ Seg_set triangulation_include_done(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos
 			}
 			else C3.push_back(P[i]);
 		}
-		std::sort(C1.begin(), C1.end());
-		std::sort(C2.begin(), C2.end());
-		std::sort(C3.begin(), C3.end());
-		Polygon H1 = divide(C1, all);
-		Polygon H2 = divide(C2, all);
-		H1 = monotone_chain(H1, snd.s, snd.e, 1);
-		H2 = monotone_chain(H2, snd.s, snd.e, 1);
-		Polygon H3 = divide(C3, all);
-		Polygon H4 = conquer(H1, H2, all);
-		H3 = monotone_chain(H3, fst.s, fst.e, 1);
-		H4 = monotone_chain(H4, fst.s, fst.e, 1);
-		conquer(H3, H4, all);
 	}
+	std::sort(C1.begin(), C1.end());
+	std::sort(C2.begin(), C2.end());
+	std::sort(C3.begin(), C3.end());
+	Polygon H1 = divide(C1, all);
+	Polygon H2 = divide(C2, all);
+	Polygon H3 = divide(C3, all);
+	Polygon H4 = conquer(H1, H2, all);
+	conquer(H3, H4, all);
+	std::sort(all.begin(), all.end());
+	all.erase(unique(all.begin(), all.end()), all.end());
 	return all;
 }
 void solve(const int& t) {
@@ -221,9 +213,14 @@ void solve(const int& t) {
 	for (Pos& p : P) std::cin >> p;
 	int a1, a2, b1, b2;
 	std::cin >> a1 >> a2 >> b1 >> b2;
+	Pos s1 = Pos(a1, a2).norm();
+	Pos s2 = Pos(b1, b2).norm();
 	a1--, a2--, b1--, b2--;
 	Pos p1 = P[a1], p2 = P[a2], q1 = P[b1], q2 = P[b2];
-	std::cout << "Case #" << t << " :";
+	Polygon ans = convex_hull_dnc(P, p1, p2, q1, q2);
+	std::cout << "Case #" << t << " : " << ans.size() - 2;
+	for (Pos& p : ans) p += Pos(1, 1);
+	for (Pos& p : ans) if (p != s1 && p != s2) std::cout << p << "\n";
 	return;
 }
 void solve() {
@@ -233,3 +230,4 @@ void solve() {
 	for (int t = 1; t <= T; t++) solve(t);
 	return;
 }
+int main() { solve(); return 0; }//boj22915 Fence Design
