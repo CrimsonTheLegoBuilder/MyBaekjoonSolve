@@ -14,7 +14,9 @@
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
-typedef std::vector<ld> vld;
+typedef std::pair<int, int> pi;
+typedef std::vector<int> Vint;
+typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
