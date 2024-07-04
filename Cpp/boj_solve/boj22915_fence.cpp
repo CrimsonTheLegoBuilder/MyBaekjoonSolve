@@ -15,7 +15,6 @@ typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
-typedef std::unordered_set<int> Sint;
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
@@ -65,7 +64,6 @@ struct Pos {
 bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
 bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 typedef std::vector<Pos> Polygon;
-typedef std::unordered_set<Pos> Seg_set;
 std::vector<Pos> C, H;
 struct Seg {
 	Pos s, e;
@@ -74,7 +72,6 @@ struct Seg {
 	bool operator < (const Seg& p) const { return s == p.s ? e < p.e : s < p.s; }
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) { os << S.s << " " << S.e; return os; }
 };
-typedef std::vector<Seg> Segs;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
