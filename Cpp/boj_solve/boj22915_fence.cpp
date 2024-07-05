@@ -238,8 +238,13 @@ void solve(const int& t) {
 	Pos p1 = P[a1], p2 = P[a2], q1 = P[b1], q2 = P[b2];
 	//std::cout << "DEBUG Seg init\n";
 	Polygon ans = convex_hull_dnc(P, p1, p2, q1, q2);
+	ans.push_back(s1);
+	ans.push_back(s2);
 	//std::cout << "DEBUG hull dnc\n";
 	std::cout << "Case #" << t << ": " << ans.size() - 2 << "\n";
+	int cnt = 2;
+	for (Pos& p : ans) if (p != s1 && p != s2) cnt++;
+	assert(ans.size() == cnt);
 	for (Pos& p : ans) if (p != s1 && p != s2) std::cout << p << "\n";
 	return;
 }
