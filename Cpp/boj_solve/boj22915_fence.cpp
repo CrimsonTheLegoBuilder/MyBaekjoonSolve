@@ -222,7 +222,7 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 	std::sort(all.begin(), all.end());
 	all.erase(unique(all.begin(), all.end()), all.end());
 	//std::cout << "DEBUG::fin::all sz " << all.size() << " ";
-	std::cout << all[0] << "\n";
+	//std::cout << all[0] << "\n";
 	return all;
 }
 void solve(const int& t) {
