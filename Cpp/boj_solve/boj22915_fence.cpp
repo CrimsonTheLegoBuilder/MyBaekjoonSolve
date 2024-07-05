@@ -180,7 +180,7 @@ Polygon divide(Polygon P, Polygon& all) {
 	return conquer(divide(L, all), divide(R, all), all);
 }
 Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) { 
-	if (collinear(p1, p2, q1, q2)) assert(0);
+	assert(!collinear(p1, p2, q1, q2));
 	Polygon C1, C2, C3, all;
 	if (!ccw(p1, p2, q1) || !ccw(p1, p2, q2)) {
 		//std::cout << "DEBUG hull 1\n";
