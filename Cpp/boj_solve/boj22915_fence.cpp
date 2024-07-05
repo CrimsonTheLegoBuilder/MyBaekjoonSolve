@@ -84,15 +84,18 @@ int ccw(const Seg& S, const Pos& p) { return ccw(S.s, S.e, p); }
 Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 	int il = 0, ir = 0;
 	int szl = L.size(), szr = R.size();
+	if (!szl) return R;
+	if (!szr) return L;
 	for (int i = 1; i < szl; i++) 
 		if ((L[i] - R[0]).Euc() < (L[il] - R[0]).Euc())
 			il = i;
 	for (int i = 1; i < szr; i++)
 		if ((R[i] - L[il]).Euc() < (R[ir] - L[il]).Euc())
 			ir = i;
-	all.push_back(Pos(il, ir).norm());
+	all.push_back(Pos(L[il].i, R[ir].i).norm());
 	int jl = il, jr = ir, lhi, llo, rhi, rlo;
 	while (1) {
+		std::cout << "DEBUG:: conq 1\n";
 		lhi = (jl + 1) % szl;
 		if (ccw(R[jr], L[jl], L[lhi]) < 0) {
 			all.push_back(Pos(L[lhi].i, R[jr].i).norm());
@@ -109,6 +112,7 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 	}
 	jl = il, jr = ir;
 	while (1) {
+		std::cout << "DEBUG: conq 2\n";
 		llo = (jl - 1 + szl) % szl;
 		if (ccw(R[jr], L[jl], L[llo]) > 0) {
 			all.push_back(Pos(L[llo].i, R[jr].i).norm());
@@ -138,10 +142,13 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 		for (int i = 0; i <= rlo; i++) H.push_back(R[i]);
 		for (int i = rhi; i < szr; i++) H.push_back(R[i]);
 	}
+	std::cout << "DEBUG::all sz:: " << all.size() << "\n";
 	return H;
 }
 Polygon divide(Polygon P, Polygon& all) {
-	if (P.size() == 1) return P;
+	std::cout << "DEBUG::divide:: " << P.size() << "\n";
+	std::cout << "DEBUG::all sz:: " << all.size() << "\n";
+	if (P.size() <= 1) return P;
 	if (P.size() == 2) {
 		all.push_back(Pos(P[0].i, P[1].i).norm());
 		return P;
@@ -164,10 +171,10 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 	if (!collinear(p1, p2, q1, q2)) assert(1);
 	Polygon C1, C2, C3, all;
 	if (!ccw(p1, p2, q1) || !ccw(p1, p2, q2)) {
+		std::cout << "DEBUG hull 1\n";
 		if (ccw(p1, p2, q1) < 0 || ccw(p1, p2, q2) < 0) std::swap(p1, p2);
 		if (ccw(q1, q2, p1) < 0 || ccw(q1, q2, p2) < 0) std::swap(q1, q2);
 		Pos p3 = !ccw(p1, p2, q1) ? q2 : q1;
-		Polygon C1, C2, C3;
 		C1 = { p1, p2, p3 };
 		int sz = P.size();
 		for (int i = 0; i < sz; i++) {
@@ -177,10 +184,10 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 		}
 	}
 	else {
+		std::cout << "DEBUG hull 2\n";
 		Seg fst, snd;
 		if (ccw(p1, p2, q1) == ccw(p1, p2, q2)) fst = Seg(q1, q2), snd = Seg(p1, p2);
 		else fst = Seg(p1, p2), snd = Seg(q1, q2);
-		Polygon C1, C2, C3;
 		int sz = P.size();
 		bool r = 0;
 		int ccw2 = ccw(fst, snd.s);
@@ -192,31 +199,43 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 			else C3.push_back(P[i]);
 		}
 	}
+	std::cout << "DEBUG::sz C1 " << C1.size() << "\n";
+	std::cout << "DEBUG::sz C2 " << C2.size() << "\n";
+	std::cout << "DEBUG::sz C3 " << C3.size() << "\n";
+	std::cout << "DEBUG hull pos init\n";
 	std::sort(C1.begin(), C1.end());
 	std::sort(C2.begin(), C2.end());
 	std::sort(C3.begin(), C3.end());
 	Polygon H1 = divide(C1, all);
+	std::cout << "DEBUG hull divide1\n";
 	Polygon H2 = divide(C2, all);
+	std::cout << "DEBUG hull divide2\n";
 	Polygon H3 = divide(C3, all);
+	std::cout << "DEBUG hull divide3\n";
 	Polygon H4 = conquer(H1, H2, all);
 	conquer(H3, H4, all);
+	std::cout << "DEBUG:: before sort " << all.size() << "\n";
 	std::sort(all.begin(), all.end());
 	all.erase(unique(all.begin(), all.end()), all.end());
+	std::cout << "DEBUG::fin::all sz " << all.size() << " ";
+	std::cout << all[0] << "\n";
 	return all;
 }
 void solve(const int& t) {
 	std::cin >> N;
 	Polygon P(N);
-	for (Pos& p : P) std::cin >> p;
+	int i = 1;
+	for (Pos& p : P) std::cin >> p, p.i = i++;
 	int a1, a2, b1, b2;
 	std::cin >> a1 >> a2 >> b1 >> b2;
 	Pos s1 = Pos(a1, a2).norm();
 	Pos s2 = Pos(b1, b2).norm();
 	a1--, a2--, b1--, b2--;
 	Pos p1 = P[a1], p2 = P[a2], q1 = P[b1], q2 = P[b2];
+	std::cout << "DEBUG Seg init\n";
 	Polygon ans = convex_hull_dnc(P, p1, p2, q1, q2);
-	std::cout << "Case #" << t << " : " << ans.size() - 2;
-	for (Pos& p : ans) p += Pos(1, 1);
+	std::cout << "DEBUG hull dnc\n";
+	std::cout << "Case #" << t << " : " << ans.size() - 2 << "\n";
 	for (Pos& p : ans) if (p != s1 && p != s2) std::cout << p << "\n";
 	return;
 }
