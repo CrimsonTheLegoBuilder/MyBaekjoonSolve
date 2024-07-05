@@ -109,10 +109,12 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 			jr = rlo;
 			continue;
 		}
-		lhi = (jl - 1 + szl) % szl;
-		rlo = (jr + 1) % szr;
+		//lhi = (lhi - 1 + szl) % szl;
+		//rlo = (rlo + 1) % szr;
 		break;
 	}
+	lhi = jl;
+	rlo = jr;
 	jl = il, jr = ir;
 	while (1) {
 		//std::cout << "DEBUG: conq 2\n";
@@ -128,10 +130,12 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 			jr = rhi;
 			continue;
 		}
-		llo = (jl + 1) % szl;
-		rhi = (jr - 1 + szr) % szr;
+		//llo = (llo + 1) % szl;
+		//rhi = (rhi - 1 + szr) % szr;
 		break;
 	}
+	llo = jl;
+	rhi = jr;
 	Polygon H;
 	if (lhi <= llo) {
 		for (int i = lhi; i <= llo; i++) H.push_back(L[i]);
