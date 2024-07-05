@@ -79,19 +79,41 @@ bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1
 int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 int ccw(const Seg& S, const Pos& p) { return ccw(S.s, S.e, p); }
 bool inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) { return cross(p1, p2, q) > 0 && cross(p2, p3, q) > 0 && cross(p3, p1, q) > 0; }
+std::vector<Pos> graham_scan(std::vector<Pos> C) {
+	std::vector<Pos> H;
+	if (C.size() < 3) {
+		std::sort(C.begin(), C.end());
+		return C;
+	}
+	std::swap(C[0], *min_element(C.begin(), C.end()));
+	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
+		int ret = ccw(C[0], p, q);
+		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
+		return ret > 0;
+		}
+	);
+	C.erase(unique(C.begin(), C.end()), C.end());
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
+			H.pop_back();
+		H.push_back(C[i]);
+	}
+	return H;
+}
 Polygon conquer(Polygon L, Polygon R, Polygon& all, const Pos& v1 = Pos(), const Pos& v2 = Pos(), const bool& f = 1) {
 	int il = 0, ir = 0;
 	int szl = L.size(), szr = R.size();
 	if (!szl) return R;
 	if (!szr) return L;
 	if (f) {
-		for (int i = 1; i < szl; i++) if (L[il].x < L[i].x) il = i;
-		for (int i = 1; i < szr; i++) if (R[ir].x > R[i].x) ir = i;
+		for (int i = 0; i < szl; i++) if (L[il].x < L[i].x) il = i;
+		for (int i = 0; i < szr; i++) if (R[ir].x > R[i].x) ir = i;
 	}
 	else {
 		auto dist = [&](const Pos& p) -> ll { return std::abs(cross(v1, v2, p)); };
-		for (int i = 1; i < szl; i++) if (dist(L[il].x) > dist(L[i].x)) il = i;
-		for (int i = 1; i < szr; i++) if (dist(R[ir].x) > dist(R[i].x)) ir = i;
+		for (int i = 0; i < szl; i++) if (dist(L[il].x) > dist(L[i].x)) il = i;
+		for (int i = 0; i < szr; i++) if (dist(R[ir].x) > dist(R[i].x)) ir = i;
 	}
 	all.push_back(Pos(L[il].i, R[ir].i).norm());
 	int jl = il, jr = ir, lhi, llo, rhi, rlo;
@@ -99,13 +121,15 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all, const Pos& v1 = Pos(), const
 	while (1) {
 		//std::cout << "DEBUG:: conq 1\n";
 		lhi = (jl + 1) % szl;
-		if (ccw(R[jr], L[jl], L[lhi]) < 0) {
+		if (ccw(R[jr], L[jl], L[lhi]) < 0 &&
+			!inner_check(R[jr], L[lhi], L[jl], R[(jr - 1 + szr) % szr])) {
 			all.push_back(Pos(L[lhi].i, R[jr].i).norm());
 			jl = lhi;
 			continue;
 		}
 		rlo = (jr - 1 + szr) % szr;
-		if (ccw(L[jl], R[jr], R[rlo]) > 0) {
+		if (ccw(L[jl], R[jr], R[rlo]) > 0 &&
+			!inner_check(L[jl], R[jr], R[rlo], L[(jl + 1) % szl])) {
 			all.push_back(Pos(L[jl].i, R[rlo].i).norm());
 			jr = rlo;
 			continue;
@@ -117,15 +141,17 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all, const Pos& v1 = Pos(), const
 	all.push_back(Pos(L[lhi].i, R[rlo].i).norm());
 	jl = il, jr = ir;
 	while (1) {
-		//std::cout << "DEBUG:: conq 2\n";
+		//std::cout << "DEBUG: conq 2\n";
 		llo = (jl - 1 + szl) % szl;
-		if (ccw(R[jr], L[jl], L[llo]) > 0) {
+		if (ccw(R[jr], L[jl], L[llo]) > 0 &&
+			!inner_check(R[jr], L[jl], L[llo], R[(jr + 1) % szr])) {
 			all.push_back(Pos(L[llo].i, R[jr].i).norm());
 			jl = llo;
 			continue;
 		}
 		rhi = (jr + 1) % szr;
-		if (ccw(L[jl], R[jr], R[rhi]) < 0) {
+		if (ccw(L[jl], R[jr], R[rhi]) < 0 &&
+			!inner_check(L[jl], R[rhi], R[jr], L[(jl - 1 + szl) % szl])) {
 			all.push_back(Pos(L[jl].i, R[rhi].i).norm());
 			jr = rhi;
 			continue;
@@ -150,9 +176,11 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all, const Pos& v1 = Pos(), const
 		for (int i = rhi; i < szr; i++) H.push_back(R[i]);
 		for (int i = 0; i <= rlo; i++) H.push_back(R[i]);
 	}
+
 	int sz = H.size();
-	for (int i = 0; i < sz; i++)
-		assert(ccw(H[i], H[(i + 1) % sz], H[(i + 2) % sz]) > 0);
+	assert(sz > 2);
+	for (int i = 0; i < sz; i++) assert(ccw(H[i], H[(i + 1) % sz], H[(i + 2) % sz]) > 0);
+	
 	//std::cout << "DEBUG::all sz:: " << all.size() << "\n";
 	return H;
 }
@@ -181,19 +209,18 @@ Polygon divide(Polygon P, Polygon& all) {
 	return conquer(divide(L, all), divide(R, all), all);
 }
 Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
-	//assert(!collinear(p1, p2, q1, q2));
+	assert(!collinear(p1, p2, q1, q2));
 	Polygon C1, C2, C3, all;
 	Seg fst, snd;
 	if (!ccw(p1, p2, q1) || !ccw(p1, p2, q2)) {
 		//std::cout << "DEBUG hull 1\n";
 		if (ccw(p1, p2, q1) < 0 || ccw(p1, p2, q2) < 0) std::swap(p1, p2);
 		if (ccw(q1, q2, p1) < 0 || ccw(q1, q2, p2) < 0) std::swap(q1, q2);
-		Pos p3 = !ccw(p1, p2, q1) ? q2 : q1;
+		Pos p3 = (!ccw(p1, p2, q1) ? q2 : q1);
 		fst = Seg(p1, p2), snd = Seg(q1, q2);
-		C1 = { p1, p2, p3 };
 		int sz = P.size();
 		for (int i = 0; i < sz; i++) {
-			if (ccw(p1, p2, P[i]) > 0 && ccw(q1, q2, P[i]) > 0) C1.push_back(P[i]);
+			if (ccw(p1, p2, P[i]) >= 0 && ccw(q1, q2, P[i]) >= 0) C1.push_back(P[i]);
 			else if (ccw(p1, p2, P[i]) > 0) C2.push_back(P[i]);
 			else C3.push_back(P[i]);
 		}
@@ -226,7 +253,9 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 	Polygon H3 = divide(C3, all);
 	//std::cout << "DEBUG hull divide3\n";
 	Polygon H4 = conquer(H1, H2, all, snd.s, snd.e, 0);
-	conquer(H3, H4, all, fst.s, fst.e, 0);
+	Polygon H5 = conquer(H3, H4, all, fst.s, fst.e, 0);
+	Polygon GH = graham_scan(P);
+	assert(GH.size() == H5.size());
 	//std::cout << "DEBUG:: before sort " << all.size() << "\n";
 	std::sort(all.begin(), all.end());
 	all.erase(unique(all.begin(), all.end()), all.end());
@@ -246,7 +275,9 @@ void solve(const int& t) {
 	a1--, a2--, b1--, b2--;
 	Pos p1 = P[a1], p2 = P[a2], q1 = P[b1], q2 = P[b2];
 	//std::cout << "DEBUG Seg init\n";
-	Polygon ans = convex_hull_dnc(P, p1, p2, q1, q2);
+	Polygon tmp = convex_hull_dnc(P, p1, p2, q1, q2);
+	Polygon ans;
+	for (Pos& p : tmp) if (p.x != p.y) ans.push_back(p);
 	std::cout << "Case #" << t << ": " << ans.size() - 2 << "\n";
 	//int cnt = 0;
 	//for (Pos& p : ans) if (p == s1 || p == s2) cnt++;
@@ -262,83 +293,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj22915 Fence Design
-
-
-//Polygon conquer(Polygon L, Polygon R, Polygon& all) {
-//	int il = 0, ir = 0;
-//	int szl = L.size(), szr = R.size();
-//	if (!szl) return R;
-//	if (!szr) return L;
-//	for (int i = 1; i < szl; i++)
-//		if ((L[i] - R[0]).Euc() < (L[il] - R[0]).Euc())
-//			il = i;
-//	for (int i = 1; i < szr; i++)
-//		if ((R[i] - L[il]).Euc() < (R[ir] - L[il]).Euc())
-//			ir = i;
-//	all.push_back(Pos(L[il].i, R[ir].i).norm());
-//	int jl = il, jr = ir, lhi, llo, rhi, rlo;
-//	//std::cout << "DEBUG:: l: " << L[il].i << " r: " << R[ir].i << "\n";
-//	while (1) {
-//		//std::cout << "DEBUG:: conq 1\n";
-//		lhi = (jl + 1) % szl;
-//		if (ccw(R[jr], L[jl], L[lhi]) < 0 &&
-//			!inner_check(R[jr], L[lhi], L[jl], R[(jr - 1 + szr) % szr])) {
-//			all.push_back(Pos(L[lhi].i, R[jr].i).norm());
-//			jl = lhi;
-//			continue;
-//		}
-//		rlo = (jr - 1 + szr) % szr;
-//		if (ccw(L[jl], R[jr], R[rlo]) > 0 &&
-//			!inner_check(L[jl], R[jr], R[rlo], L[(jl + 1) % szl])) {
-//			all.push_back(Pos(L[jl].i, R[rlo].i).norm());
-//			jr = rlo;
-//			continue;
-//		}
-//		break;
-//	}
-//	lhi = jl;
-//	rlo = jr;
-//	all.push_back(Pos(L[lhi].i, R[rlo].i).norm());
-//	jl = il, jr = ir;
-//	while (1) {
-//		//std::cout << "DEBUG: conq 2\n";
-//		llo = (jl - 1 + szl) % szl;
-//		if (ccw(R[jr], L[jl], L[llo]) > 0 &&
-//			!inner_check(R[jr], L[jl], L[llo], R[(jr + 1) % szr])) {
-//			all.push_back(Pos(L[llo].i, R[jr].i).norm());
-//			jl = llo;
-//			continue;
-//		}
-//		rhi = (jr + 1) % szr;
-//		if (ccw(L[jl], R[jr], R[rhi]) < 0 &&
-//			!inner_check(L[jl], R[rhi], R[jr], L[(jl - 1 + szl) % szl])) {
-//			all.push_back(Pos(L[jl].i, R[rhi].i).norm());
-//			jr = rhi;
-//			continue;
-//		}
-//		break;
-//	}
-//	llo = jl;
-//	rhi = jr;
-//	all.push_back(Pos(L[llo].i, R[rhi].i).norm());
-//	Polygon H;
-//	if (lhi <= llo) {
-//		for (int i = lhi; i <= llo; i++) H.push_back(L[i]);
-//	}
-//	else {
-//		for (int i = lhi; i < szl; i++) H.push_back(L[i]);
-//		for (int i = 0; i <= llo; i++) H.push_back(L[i]);
-//	}
-//	if (rhi <= rlo) {
-//		for (int i = rhi; i <= rlo; i++) H.push_back(R[i]);
-//	}
-//	else {
-//		for (int i = rhi; i < szr; i++) H.push_back(R[i]);
-//		for (int i = 0; i <= rlo; i++) H.push_back(R[i]);
-//	}
-//	int sz = H.size();
-//	for (int i = 0; i < sz; i++)
-//		assert(ccw(H[i], H[(i + 1) % sz], H[(i + 2) % sz]) > 0);
-//	//std::cout << "DEBUG::all sz:: " << all.size() << "\n";
-//	return H;
-//}
