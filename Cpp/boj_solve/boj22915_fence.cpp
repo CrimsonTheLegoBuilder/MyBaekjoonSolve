@@ -239,7 +239,7 @@ void solve(const int& t) {
 	//std::cout << "DEBUG Seg init\n";
 	Polygon ans = convex_hull_dnc(P, p1, p2, q1, q2);
 	//std::cout << "DEBUG hull dnc\n";
-	std::cout << "Case #" << t << " : " << ans.size() - 2 << "\n";
+	std::cout << "Case #" << t << ": " << ans.size() - 2 << "\n";
 	for (Pos& p : ans) if (p != s1 && p != s2) std::cout << p << "\n";
 	return;
 }
