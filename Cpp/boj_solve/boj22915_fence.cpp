@@ -223,6 +223,8 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 	Polygon H4 = conquer(H1, H2, all);
 	conquer(H3, H4, all);
 	//std::cout << "DEBUG:: before sort " << all.size() << "\n";
+	std::sort(all.begin(), all.end());
+	all.erase(unique(all.begin(), all.end()), all.end());
 	//std::cout << "DEBUG::fin::all sz " << all.size() << " ";
 	//std::cout << all[0] << "\n";
 	return all;
@@ -240,10 +242,10 @@ void solve(const int& t) {
 	Pos p1 = P[a1], p2 = P[a2], q1 = P[b1], q2 = P[b2];
 	//std::cout << "DEBUG Seg init\n";
 	Polygon ans = convex_hull_dnc(P, p1, p2, q1, q2);
-	ans.push_back(s1);
-	ans.push_back(s2);
-	std::sort(ans.begin(), ans.end());
-	ans.erase(unique(ans.begin(), ans.end()), ans.end());
+	//ans.push_back(s1);
+	//ans.push_back(s2);
+	//std::sort(ans.begin(), ans.end());
+	//ans.erase(unique(ans.begin(), ans.end()), ans.end());
 	//std::cout << "DEBUG hull dnc\n";
 	std::cout << "Case #" << t << ": " << ans.size() - 2 << "\n";
 	int cnt = 2;
