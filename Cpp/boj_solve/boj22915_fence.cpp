@@ -182,7 +182,7 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 		C1 = { p1, p2, p3 };
 		int sz = P.size();
 		for (int i = 0; i < sz; i++) {
-			if (ccw(p1, p2, P[i]) > 0 && ccw(q1, p2, P[i]) > 0) C1.push_back(P[i]);
+			if (ccw(p1, p2, P[i]) > 0 && ccw(q1, q2, P[i]) > 0) C1.push_back(P[i]);
 			else if (ccw(p1, p2, P[i]) > 0) C2.push_back(P[i]);
 			else C3.push_back(P[i]);
 		}
