@@ -133,15 +133,15 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 		for (int i = lhi; i <= llo; i++) H.push_back(L[i]);
 	}
 	else {
-		for (int i = 0; i <= llo; i++) H.push_back(L[i]);
 		for (int i = lhi; i < szl; i++) H.push_back(L[i]);
+		for (int i = 0; i <= llo; i++) H.push_back(L[i]);
 	}
 	if (rhi <= rlo) {
 		for (int i = rhi; i <= rlo; i++) H.push_back(R[i]);
 	}
 	else {
-		for (int i = 0; i <= rlo; i++) H.push_back(R[i]);
 		for (int i = rhi; i < szr; i++) H.push_back(R[i]);
+		for (int i = 0; i <= rlo; i++) H.push_back(R[i]);
 	}
 	//std::cout << "DEBUG::all sz:: " << all.size() << "\n";
 	return H;
@@ -172,7 +172,7 @@ Polygon divide(Polygon P, Polygon& all) {
 	return conquer(divide(L, all), divide(R, all), all);
 }
 Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) { 
-	if (collinear(p1, p2, q1, q2)) assert(1);
+	if (collinear(p1, p2, q1, q2)) assert(0);
 	Polygon C1, C2, C3, all;
 	if (!ccw(p1, p2, q1) || !ccw(p1, p2, q2)) {
 		//std::cout << "DEBUG hull 1\n";
@@ -190,8 +190,8 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 	else {
 		//std::cout << "DEBUG hull 2\n";
 		Seg fst, snd;
-		if (ccw(p1, p2, q1) == ccw(p1, p2, q2)) fst = Seg(q1, q2), snd = Seg(p1, p2);
-		else fst = Seg(p1, p2), snd = Seg(q1, q2);
+		if (ccw(p1, p2, q1) == ccw(p1, p2, q2)) fst = Seg(p1, p2), snd = Seg(q1, q2);
+		else fst = Seg(q1, q2), snd = Seg(p1, p2);
 		int sz = P.size();
 		bool r = 0;
 		int ccw2 = ccw(fst, snd.s);
