@@ -8,7 +8,6 @@
 #include <random>
 #include <array>
 #include <tuple>
-#include <unordered_set>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -25,7 +24,6 @@ inline ll sq(int x) { return (ll)x * x; }
 //ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
 int N, M, T, Q;
-int V[LEN];
 struct Pos {
 	int x, y;
 	int i;
@@ -64,7 +62,6 @@ struct Pos {
 bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
 bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 typedef std::vector<Pos> Polygon;
-std::vector<Pos> C, H;
 struct Seg {
 	Pos s, e;
 	Seg(Pos S = 0, Pos E = 0) : s(S), e (E) {}
@@ -81,6 +78,7 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = c
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
 int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 int ccw(const Seg& S, const Pos& p) { return ccw(S.s, S.e, p); }
+bool inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) { return cross(p1, p2, q) < 0 && cross(p2, p3, q) < 0 && cross(p3, p1, q) < 0; }
 Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 	int il = 0, ir = 0;
 	int szl = L.size(), szr = R.size();
@@ -98,44 +96,46 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 	while (1) {
 		//std::cout << "DEBUG:: conq 1\n";
 		lhi = (jl + 1) % szl;
-		if (ccw(R[jr], L[jl], L[lhi]) < 0) {
+		if (ccw(R[jr], L[jl], L[lhi]) < 0 &&
+			!inner_check(R[jr], L[lhi], L[jl], R[(jr - 1 + szr) % szr])) {
 			all.push_back(Pos(L[lhi].i, R[jr].i).norm());
 			jl = lhi;
 			continue;
 		}
 		rlo = (jr - 1 + szr) % szr;
-		if (ccw(L[jl], R[jr], R[rlo]) > 0) {
+		if (ccw(L[jl], R[jr], R[rlo]) > 0 &&
+			!inner_check(L[jl], R[jr], R[rlo], L[(jl + 1) % szl])) {
 			all.push_back(Pos(L[jl].i, R[rlo].i).norm());
 			jr = rlo;
 			continue;
 		}
-		//lhi = (lhi - 1 + szl) % szl;
-		//rlo = (rlo + 1) % szr;
 		break;
 	}
 	lhi = jl;
 	rlo = jr;
+	all.push_back(Pos(L[lhi].i, R[rlo].i).norm());
 	jl = il, jr = ir;
 	while (1) {
 		//std::cout << "DEBUG: conq 2\n";
 		llo = (jl - 1 + szl) % szl;
-		if (ccw(R[jr], L[jl], L[llo]) > 0) {
+		if (ccw(R[jr], L[jl], L[llo]) > 0 &&
+			!inner_check(R[jr], L[jl], L[llo], R[(jr + 1) % szr])) {
 			all.push_back(Pos(L[llo].i, R[jr].i).norm());
 			jl = llo;
 			continue;
 		}
 		rhi = (jr + 1) % szr;
-		if (ccw(L[jl], R[jr], R[rhi]) < 0) {
+		if (ccw(L[jl], R[jr], R[rhi]) < 0 &&
+			!inner_check(L[jl], R[rhi], R[jr], L[(jl - 1 + szl) % szl])) {
 			all.push_back(Pos(L[jl].i, R[rhi].i).norm());
 			jr = rhi;
 			continue;
 		}
-		//llo = (llo + 1) % szl;
-		//rhi = (rhi - 1 + szr) % szr;
 		break;
 	}
 	llo = jl;
 	rhi = jr;
+	all.push_back(Pos(L[llo].i, R[rhi].i).norm());
 	Polygon H;
 	if (lhi <= llo) {
 		for (int i = lhi; i <= llo; i++) H.push_back(L[i]);
@@ -151,6 +151,9 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 		for (int i = rhi; i < szr; i++) H.push_back(R[i]);
 		for (int i = 0; i <= rlo; i++) H.push_back(R[i]);
 	}
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) 
+		assert(ccw(H[i], H[(i + 1) % sz], H[(i + 2) % sz]) > 0);
 	//std::cout << "DEBUG::all sz:: " << all.size() << "\n";
 	return H;
 }
@@ -180,7 +183,7 @@ Polygon divide(Polygon P, Polygon& all) {
 	return conquer(divide(L, all), divide(R, all), all);
 }
 Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) { 
-	assert(!collinear(p1, p2, q1, q2));
+	//assert(!collinear(p1, p2, q1, q2));
 	Polygon C1, C2, C3, all;
 	if (!ccw(p1, p2, q1) || !ccw(p1, p2, q2)) {
 		//std::cout << "DEBUG hull 1\n";
@@ -201,7 +204,6 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 		if (ccw(p1, p2, q1) == ccw(p1, p2, q2)) fst = Seg(p1, p2), snd = Seg(q1, q2);
 		else fst = Seg(q1, q2), snd = Seg(p1, p2);
 		int sz = P.size();
-		bool r = 0;
 		int ccw2 = ccw(fst, snd.s);
 		for (int i = 0; i < sz; i++) {
 			if (ccw(fst, P[i]) == ccw2) {
@@ -252,9 +254,9 @@ void solve(const int& t) {
 	//ans.erase(unique(ans.begin(), ans.end()), ans.end());
 	//std::cout << "DEBUG hull dnc\n";
 	std::cout << "Case #" << t << ": " << ans.size() - 2 << "\n";
-	int cnt = 2;
-	for (Pos& p : ans) if (p != s1 && p != s2) cnt++;
-	assert(ans.size() == cnt);
+	//int cnt = 0;
+	//for (Pos& p : ans) if (p == s1 || p == s2) cnt++;
+	//assert(cnt == 2);
 	for (Pos& p : ans) if (p != s1 && p != s2) std::cout << p << "\n";
 	return;
 }
