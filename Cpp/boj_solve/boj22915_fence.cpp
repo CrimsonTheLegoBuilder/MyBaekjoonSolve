@@ -129,7 +129,7 @@ Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 			continue;
 		}
 		llo = (jl + 1) % szl;
-		rhi = (jr - 1 % szr) % szr;
+		rhi = (jr - 1 + szr) % szr;
 		break;
 	}
 	Polygon H;
