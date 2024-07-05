@@ -78,7 +78,7 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = c
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
 int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 int ccw(const Seg& S, const Pos& p) { return ccw(S.s, S.e, p); }
-bool inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) { return cross(p1, p2, q) < 0 && cross(p2, p3, q) < 0 && cross(p3, p1, q) < 0; }
+bool inner_check(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& q) { return cross(p1, p2, q) > 0 && cross(p2, p3, q) > 0 && cross(p3, p1, q) > 0; }
 Polygon conquer(Polygon L, Polygon R, Polygon& all) {
 	int il = 0, ir = 0;
 	int szl = L.size(), szr = R.size();
@@ -178,6 +178,7 @@ Polygon divide(Polygon P, Polygon& all) {
 	Polygon L, R;
 	int sz = P.size();
 	int m = sz >> 1;
+	if (sz == 4) m++;
 	for (int i = 0; i < m; i++) L.push_back(P[i]);
 	for (int i = m; i < sz; i++) R.push_back(P[i]);
 	return conquer(divide(L, all), divide(R, all), all);
