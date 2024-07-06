@@ -31,7 +31,7 @@ int main() {
 			if (l * r > MAX) MAX = l * r;
 		}
 	}
-		std::cout << std::fixed;
+	std::cout << std::fixed;
 	std::cout.precision(1);
 	if (!MAX) std::cout << "-1\n";
 	else std::cout << (ld)MAX / 2;
