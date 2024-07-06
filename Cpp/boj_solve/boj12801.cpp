@@ -3,20 +3,17 @@
 #include <algorithm>
 #include <vector>
 typedef long long ll;
-const int LEN = 100'000;
+const int LEN = 1e5;
+
 int N, M;
-
 struct Pos {
-	ll x, y;
+	int x, y;
 	bool i;
-	bool operator<(const Pos& p) const {
-		return (x == p.x ? y < p.y : x < p.x);
-	}
-}LB, LI, RB, RI, B[LEN];
+	bool operator<(const Pos& p) const { return (x == p.x ? y < p.y : x < p.x); }
+} LB, LI, RB, RI, B[LEN];
 std::vector<Pos> I, BM, BR, BL, HR, HL;
-
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	return (d2.x - d1.x) * (d4.y - d3.y) - (d2.y - d1.y) * (d4.x - d3.x);
+	return ((ll)d2.x - d1.x) * ((ll)d4.y - d3.y) - ((ll)d2.y - d1.y) * ((ll)d4.x - d3.x);
 }
 std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	std::vector<Pos> H;
@@ -42,14 +39,9 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	H.pop_back();
 	return H;
 }
-
-
-
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("relay.in.3j", "r", stdin);
-	//freopen("result.txt", "w", stdout);
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {
 		std::cin >> B[i].x >> B[i].y;
@@ -66,8 +58,6 @@ int main() {
 		if (cross(B[0], IL, IL, I[j]) > 0) IL = I[j];
 		if (cross(B[0], IR, IR, I[j]) < 0) IR = I[j];
 	}
-	//std::cout << IR.x << " " << IR.y << " " << IL.x << " " << IL.y << " DEBUG\n";
-
 	for (int i = 0; i < N; i++) {
 		if (cross(B[0], IL, IL, B[i]) >= 0) BL.push_back(B[i]);
 		if (cross(B[0], IR, IR, B[i]) <= 0) BR.push_back(B[i]);
@@ -75,7 +65,6 @@ int main() {
 	}
 
 	bool FL = !BL.empty(), FR = !BR.empty();
-	//std::cout << FL << " " << BL.size() << " " << FR << " " << BR.size() << " DEBUG\n";
 
 	for (int j = 0; j < M; j++) {
 		BL.push_back(I[j]);
@@ -95,16 +84,10 @@ int main() {
 			RB = HR[i], RI = HR[(i + 1) % SR];
 		}
 	}
-	//std::cout << LI.x << " " << LI.y << " LI DEBUG\n";
-	//std::cout << LB.x << " " << LB.y << " LB DEBUG\n";
-	//std::cout << RI.x << " " << RI.y << " RI DEBUG\n";
-	//std::cout << RB.x << " " << RB.y << " RB DEBUG\n";
 	int SM = BM.size(), O = 0;
 	for (int i = 0; i < SM; i++) {
 		bool fl = (!FL || cross(B[0], LI, LI, BM[i]) < 0 && cross(LB, LI, LI, BM[i]) < 0);
 		bool fr = (!FR || cross(B[0], RI, RI, BM[i]) > 0 && cross(RB, RI, RI, BM[i]) > 0);
-		//std::cout << BM[i].x << " " << BM[i].y << " B DEBUG\n";
-		//std::cout << fl << " " << fr << " F DEBUG\n";
 		O += fl && fr;
 	}
 	std::cout << N - O - 1 << "\n";
