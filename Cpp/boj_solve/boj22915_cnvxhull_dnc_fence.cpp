@@ -48,7 +48,7 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3
 int ccw(const Seg& S, const Pos& p) { return ccw(S.s, S.e, p); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
-Polygon conquer(const Polygon& L, const Polygon& R, Polygon& all, const Pos& v1 = Pos(), const Pos& v2 = Pos(), const bool& f = 1) {
+Polygon conquer(const Polygon& L, const Polygon& R, Polygon& all, const Seg& v = Seg(), const bool& f = 1) {
 	int szl = L.size(), szr = R.size();
 	if (!szl) return R;
 	if (!szr) return L;
@@ -58,7 +58,7 @@ Polygon conquer(const Polygon& L, const Polygon& R, Polygon& all, const Pos& v1 
 		for (int i = 0; i < szr; i++) if (R[ir].x > R[i].x) ir = i;
 	}
 	else {
-		auto dist = [&](const Pos& p) -> ll { return std::abs(cross(v1, v2, p)); };
+		auto dist = [&](const Pos& p) -> ll { return std::abs(cross(v, p)); };
 		for (int i = 0; i < szl; i++) if (dist(L[il]) > dist(L[i])) il = i;
 		for (int i = 0; i < szr; i++) if (dist(R[ir]) > dist(R[i])) ir = i;
 	}
@@ -143,8 +143,10 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 		if (cross(q1, q2, p1) < 0 || cross(q1, q2, p2) < 0) std::swap(q1, q2);
 		fst = Seg(p1, p2), snd = Seg(q1, q2);
 		for (int i = 0; i < sz; i++) {
-			if (cross(p1, p2, P[i]) >= 0 && cross(q1, q2, P[i]) >= 0) C1.push_back(P[i]);
-			else if (cross(p1, p2, P[i]) > 0) C2.push_back(P[i]);
+			if (cross(fst, P[i]) >= 0) {
+				if (cross(snd, P[i]) >= 0) C1.push_back(P[i]);
+				else C2.push_back(P[i]);
+			}
 			else C3.push_back(P[i]);
 		}
 	}
@@ -154,7 +156,7 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 		int ccw2 = ccw(fst, snd.s);
 		for (int i = 0; i < sz; i++) {
 			if (ccw(fst, P[i]) == ccw2) {
-				if (cross(snd, P[i]) > 0) C1.push_back(P[i]);
+				if (cross(snd, P[i]) >= 0) C1.push_back(P[i]);
 				else C2.push_back(P[i]);
 			}
 			else C3.push_back(P[i]);
@@ -170,8 +172,8 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 	if (sz > 0) H2 = divide(C2, 0, sz - 1, all);
 	sz = C3.size();
 	if (sz > 0) H3 = divide(C3, 0, sz - 1, all);
-	H4 = conquer(H1, H2, all, snd.s, snd.e, 0);
-	conquer(H3, H4, all, fst.s, fst.e, 0);
+	H4 = conquer(H1, H2, all, snd, 0);
+	conquer(H3, H4, all, fst, 0);
 	std::sort(all.begin(), all.end());
 	all.erase(unique(all.begin(), all.end()), all.end());
 	return all;
