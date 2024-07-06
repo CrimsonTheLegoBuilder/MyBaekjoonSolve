@@ -83,7 +83,6 @@ Polygon conquer(const Polygon& L, const Polygon& R, Polygon& all, const Seg& v =
 		break;
 	}
 	lhi = jl; rlo = jr;
-	all.push_back(Pos(L[lhi].i, R[rlo].i).norm());
 
 	jl = il, jr = ir;
 	while (1) {
@@ -102,7 +101,6 @@ Polygon conquer(const Polygon& L, const Polygon& R, Polygon& all, const Seg& v =
 		break;
 	}
 	llo = jl; rhi = jr;
-	all.push_back(Pos(L[llo].i, R[rhi].i).norm());
 
 	Polygon H;
 	H.push_back(L[lhi]);
@@ -174,8 +172,8 @@ Polygon convex_hull_dnc(const Polygon& P, Pos p1, Pos p2, Pos q1, Pos q2) {
 	if (sz > 0) H3 = divide(C3, 0, sz - 1, all);
 	H4 = conquer(H1, H2, all, snd, 0);
 	conquer(H3, H4, all, fst, 0);
-	std::sort(all.begin(), all.end());
-	all.erase(unique(all.begin(), all.end()), all.end());
+	//std::sort(all.begin(), all.end());
+	//all.erase(unique(all.begin(), all.end()), all.end());
 	return all;
 }
 void solve(const int& t) {
