@@ -33,7 +33,6 @@ bool ccw(pll x, pll y, pll z)
 {
     pll v = y - x, u = z - y;
     return v / u > 0;
-
 }
 
 ll n, i, j, k, maxi;
@@ -124,44 +123,22 @@ int main() {
                 maxi = dis(p[convex[0]], p[convex[1]]);
             else
             {
-                ll small = 10000000, large = -10000000, lpoint, spoint;
-
-                for (i = 0; i < aa; i++)
-                {
-                    if (p[convex[i]].first < small)
-                        small = p[convex[i]].first, spoint = i;
-                    if (p[convex[i]].first > large)
-                        large = p[convex[i]].first, lpoint = i;
-                }
-
-
-                ll lp = lpoint, sp = spoint;
-
-                while ((lp < lpoint + aa) || (sp < spoint + aa))
-                {
-                    if (maxi < dis(p[convex[lp]], p[convex[sp]]))
-                        maxi = dis(p[convex[lp]], p[convex[sp]]);
-
+                auto CCW = [&](int lp, int sp) -> ll {
                     pll lpp = p[convex[lp + 1]] - p[convex[lp]];
                     pll spp = p[convex[sp + 1]] - p[convex[sp]];
+                    return lpp / spp;
+                    };
 
-                    if (lpp / spp == 0)
-                    {
-                        if (lp == 2 * aa - 1)
-                            sp++;
-                        else
-                            lp++;
+                for (int lp = 0, sp = 1; lp < aa; lp++)
+                {
+                    while (CCW(lp, sp) < 0) {
+                        sp = (sp + 1) % aa;
+                        if (maxi < dis(p[convex[lp]], p[convex[sp]]))
+                            maxi = dis(p[convex[lp]], p[convex[sp]]);
                     }
-                    else if (lpp / spp > 0)
-                        lp++;
-                    else
-                        sp++;
-
-
-
+                    if (maxi < dis(p[convex[lp]], p[convex[sp]]))
+                        maxi = dis(p[convex[lp]], p[convex[sp]]);
                 }
-
-
             }
 
             cout << maxi;
