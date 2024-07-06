@@ -33,6 +33,7 @@ bool ccw(pll x, pll y, pll z)
 {
     pll v = y - x, u = z - y;
     return v / u > 0;
+
 }
 
 ll n, i, j, k, maxi;
