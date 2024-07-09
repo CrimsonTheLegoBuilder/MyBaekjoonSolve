@@ -38,7 +38,7 @@ struct Pos {
 	//	bool f2 = zero(p.x) ? p.y > 0 : p.x > 0;
 	//	if (f1 != f2) return f1;
 	//	ld tq = x * p.y - y * p.x;
-	//	return tq ? tq > 0 : (x * x + y * y) < (p.x * p.x + p.y * p.y);
+	//	return !zero(tq) ? tq > 0 : (x * x + y * y) < (p.x * p.x + p.y * p.y);
 	//}
 	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
