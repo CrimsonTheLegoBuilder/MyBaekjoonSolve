@@ -129,9 +129,9 @@ inline Vld circle_line_intersections(const Pos& s, const Pos& e, const ll& r) {
 	ld hi = (-b + det) / a;
 	Vld ret;
 	auto the = [&](ld rt) { return (s + (e - s) * rt).rad(); };
-	if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
+	ret.push_back(the(hi));
 	if (zero(det)) return ret;
-	if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
+	ret.push_back(the(lo));
 	return ret;
 }
 Info find_tangent_bi_search(const Polygon& H, const Pos& p) {
@@ -156,7 +156,7 @@ Info find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		}
 		i2 = s;
 		if (on_seg_weak(p, H[i2], H[(i2 + 1) % sz])) i2 = (i2 + 1) % sz;
-		if (on_seg_weak(p, H[i2], H[(i2 - 1 + sz) % sz])) i2 = (i2 - 1 + sz) % sz;
+		//if (on_seg_weak(p, H[i2], H[(i2 - 1 + sz) % sz])) i2 = (i2 - 1 + sz) % sz;
 	}
 	else {
 		//divide hull
@@ -181,7 +181,7 @@ Info find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		}
 		i1 = s1;
 		if (on_seg_weak(p, H[i1], H[(i1 + 1) % sz])) i1 = (i1 + 1) % sz;
-		if (on_seg_weak(p, H[i1], H[(i1 - 1 + sz) % sz])) i1 = (i1 - 1 + sz) % sz;
+		//if (on_seg_weak(p, H[i1], H[(i1 - 1 + sz) % sz])) i1 = (i1 - 1 + sz) % sz;
 
 		//search upper hull
 		int s2 = e, e2 = sz - 1;
@@ -194,9 +194,9 @@ Info find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		}
 		i2 = s2;
 		if (on_seg_weak(p, H[i2], H[(i2 + 1) % sz])) i2 = (i2 + 1) % sz;
-		if (on_seg_weak(p, H[i2], H[(i2 - 1 + sz) % sz])) i2 = (i2 - 1 + sz) % sz;
+		//if (on_seg_weak(p, H[i2], H[(i2 - 1 + sz) % sz])) i2 = (i2 - 1 + sz) % sz;
 	}
-	if (ccw(p, H[i1], H[i2]) < 0) std::swap(i2, i1);//normalize
+	if (ccw(p, H[i1], H[i2]) < 0) std::swap(i1, i2);//normalize
 	return { i1, i2 };
 }
 void solve() {
