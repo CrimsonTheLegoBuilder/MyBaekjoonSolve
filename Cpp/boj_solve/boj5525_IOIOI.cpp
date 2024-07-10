@@ -12,13 +12,13 @@ void solve() {
 	std::cout.tie(0);
 	std::cin >> N >> M >> S;
 	int cnt = 0, ret = 0;
-	for (int i = 0, j; i < M - N + 1; i = j + 1) {
+	for (int i = 0, j; i < M - 2 * N + 1; i = j + 1) {
 		if (S[i] == 'I') {
 			j = i;
 			cnt = 0;
 			while (j < M - 2 && S[j + 1] == 'O' && S[j + 2] == 'I')
 				j += 2, cnt++;
-			if (cnt >= N) ret += cnt - N;
+			if (cnt >= N) ret += cnt - N + 1;
 		}
 		else j = i;
 	}

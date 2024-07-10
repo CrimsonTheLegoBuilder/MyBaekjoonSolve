@@ -942,7 +942,7 @@
     <ClCompile Include="jhnah_boj6839.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="__fast_delaunay_codeforce__.cpp">
+    <ClCompile Include="_fast_delaunay_codeforce.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj5401_fast_delaunay_union.cpp">
