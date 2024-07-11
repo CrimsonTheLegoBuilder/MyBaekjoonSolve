@@ -7,8 +7,8 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
@@ -112,27 +112,6 @@ ld area(std::vector<Pos>& H) {
 	return ret / 2;
 }
 void norm(Polygon& H) { if (area(H) < 0) std::reverse(H.begin(), H.end()); }
-std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
-	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
-		return w.include(intersection(u, v));
-		};
-	std::sort(HP.begin(), HP.end());
-	std::deque<Linear> dq;
-	int sz = HP.size();
-	for (int i = 0; i < sz; ++i) {
-		if (i && same_dir(HP[i], HP[(i - 1) % sz])) continue;
-		while (dq.size() > 1 && !check(dq[dq.size() - 2], dq[dq.size() - 1], HP[i])) dq.pop_back();
-		while (dq.size() > 1 && !check(dq[1], dq[0], HP[i])) dq.pop_front();
-		dq.push_back(HP[i]);
-	}
-	while (dq.size() > 2 && !check(dq[dq.size() - 2], dq[dq.size() - 1], dq[0])) dq.pop_back();
-	while (dq.size() > 2 && !check(dq[1], dq[0], dq[dq.size() - 1])) dq.pop_front();
-	sz = dq.size();
-	if (sz < 3) return {};
-	std::vector<Pos> HPI;
-	for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
-	return HPI;
-}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -142,19 +121,17 @@ void solve() {
 	Polygon H(N);
 	for (Pos& p : H) std::cin >> p;
 	norm(H);
-	VHP hp;
-	for (int i = 0; i < N; i++) {
-		Pos& p0 = H[i], & p1 = H[(i + 1) % N], & p2 = H[(i + 2) % N], & p3 = H[(i + 3) % N];
-		if (ccw(p1, p2, p3) < 0) {
-			if (ccw(p0, p1, p2) < 0) continue;
-			else hp.push_back(Linear(p1, p2));
+	while (1) {
+		int cw = -1;
+		for (int i = 0; i < N; i++) {
+			int j = (i - 1 + N) % N, k = (i + 1) % N;
+			if (ccw(H[j], H[i], H[k]) < 0) cw = i;
 		}
-		else if (ccw(p1, p2, p3) > 0) {
-			hp.push_back(Linear(p1, p2));
+		if (cw == -1) break;
+		for (int i = cw + 1; i != cw; i = (i + 1) % N) {
+
 		}
 	}
-	Polygon HPI = half_plane_intersection(hp);
-	std::cout << area(HPI) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj18219
