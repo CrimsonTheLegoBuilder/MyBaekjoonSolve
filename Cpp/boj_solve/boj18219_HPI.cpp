@@ -145,11 +145,11 @@ void solve() {
 	VHP hp;
 	for (int i = 0; i < N; i++) {
 		Pos& p0 = H[i], & p1 = H[(i + 1) % N], & p2 = H[(i + 2) % N], & p3 = H[(i + 3) % N];
-		if (ccw(p0, p1, p2) < 0) {
-			if (ccw(p1, p2, p3) < 0) continue;
+		if (ccw(p1, p2, p3) < 0) {
+			if (ccw(p0, p1, p2) < 0) continue;
 			else hp.push_back(Linear(p1, p2));
 		}
-		else if (ccw(p0, p1, p2) < 0) {
+		else if (ccw(p1, p2, p3) > 0) {
 			hp.push_back(Linear(p1, p2));
 		}
 	}
