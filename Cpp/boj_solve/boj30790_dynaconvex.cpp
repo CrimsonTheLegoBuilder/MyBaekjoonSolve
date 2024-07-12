@@ -245,7 +245,7 @@ struct DynamicHull {
 		U = HalfHull(UH, -1);
 	}
 	void insert(const Pos& p) { L.insert(p); U.insert(p); return; }
-	ll round() const { return L.r + U.r; }
+	ld round() const { return L.r + U.r; }
 	ll area() const { return L.a + U.a; }
 };
 void solve() {
