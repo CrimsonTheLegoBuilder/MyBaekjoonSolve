@@ -86,6 +86,10 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 	}
 };
 typedef std::vector<Linear> VHP;
+struct Seg {
+	Pos s, e;
+	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) {}
+};
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
 	ld ret = cross(d1, d2, d3);
@@ -96,11 +100,21 @@ ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 
 ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
 	return cross(d1, d2, t) / (d1 - d2).mag();
 }
+bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
+	ld ret = dot(d1, d3, d2);
+	return !ccw(d1, d2, d3) && sign(ret) >= 0;
+}
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
 Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
+bool block(const Pos& p0, const Pos& p1, const Pos& d0, const Pos& d1) {
+	return ccw(p0, p1, d0) <= 0 && ccw(p0, p1, d1) >= 0 && ccw(d0, d1, p1) >= 0;
+}
+bool back(const Pos& p0, const Pos& p1, const Pos& d0, const Pos& d1) {
+	return ccw(p0, p1, d0) < 0 && ccw(p0, p1, d1) > 0 && ccw(d0, d1, p1) < 0;
+}
 ld area(std::vector<Pos>& H) {
 	Pos pivot = Pos(0, 0);
 	ld ret = 0;
@@ -121,14 +135,40 @@ void solve() {
 	Polygon H(N);
 	for (Pos& p : H) std::cin >> p;
 	norm(H);
-	while (1) {
-		int cw = -1;
-		for (int i = 0; i < N; i++) {
-			int j = (i - 1 + N) % N, k = (i + 1) % N;
-			if (ccw(H[j], H[i], H[k]) < 0) cw = i;
-		}
-		if (cw == -1) break;
-		for (int i = cw + 1; i != cw; i = (i + 1) % N) {
+	for (int i = 0; i < N; i++) {
+		Pos& p0 = H[i], & p1 = H[(i + 1) % N], & p2 = H[(i + 2) % N];
+		if (ccw(p0, p1, p2) < 0) {
+			int b = -1;
+			int d = -1;
+			ld dmin = INF;
+			ld dmax = -1;
+			Pos inx = Pos();
+			for (int j = (i + 2) % N; j != (i + 1) % N; j = (j + 1) % N) {
+				int k = (j + 1) % N;
+				if (on_seg_strong(p0, H[j], p1) && dist(H[j], H[k], p1) < dmin) {
+					b = j;
+					inx = H[j];
+					dmin = (p1 - H[j]).mag();
+				}
+				else if (block(p0, p1, H[j], H[k]) && dist(H[j], H[k], p1) < dmin) {
+					b = j;
+					inx = intersection(p0, p1, H[j], H[k]);
+					dmin = (p1 - inx).mag();
+				}
+			}
+			assert(b != -1 && d != -1);
+			int u = i;
+			bool f = 0;
+			while (u != (i + 1) % N) {
+				int k = (u - 1 + N) % N;
+				if (on_seg_strong(p1, H[u], p0) || (ccw(p0, p1, H[u]) != ccw(p0, p1, H[u]))) {
+					break;
+				}
+				u = (u - 1 + N) % N;
+			}
+			for (int j = i; j != (u - 1 + N) % N; j = (j - 1 + N) % N) {
+				if (ccw(p0, p1, H[j]) < 0) { f = 1; break; }
+			}
 
 		}
 	}
