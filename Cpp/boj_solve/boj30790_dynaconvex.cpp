@@ -8,6 +8,7 @@
 #include <random>
 #include <array>
 #include <tuple>
+#include <set>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -15,7 +16,7 @@ typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ll INF = 1e17;
-const int LEN = 1e5 + 1;
+const int LEN = 3e5 + 1;
 const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -32,7 +33,7 @@ ll powmod(ll a, ll b) {
 	return res;
 }
 
-int N;
+int N, Q;
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -66,6 +67,7 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
+typedef std::set<Pos> DynaPoly;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -88,150 +90,183 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-ll area(Pos H[], const int& sz) {
-	ll ret = 0;
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		ret += cross(O, cur, nxt);
-	}
-	return ret;
-}
-ll area(std::vector<Pos>& H) {
+ll area(std::vector<Pos>& H, int lo = 1) {
 	ll ret = 0;
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
 		ret += cross(O, cur, nxt);
 	}
-	return ret;
+	return ret * lo;
 }
-int inner_check(Pos H[], const int& sz, const Pos& p) {//concave
-	int cnt{ 0 };
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) return 1;
-		if (cur.y == nxt.y) continue;
-		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y <= p.y || cur.y > p.y) continue;
-		cnt += ccw(cur, nxt, p) > 0;
-	}
-	return (cnt & 1) * 2;
-}
-int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
-	int cnt = 0, sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) return 1;
-		if (cur.y == nxt.y) continue;
-		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y <= p.y || cur.y > p.y) continue;
-		cnt += ccw(cur, nxt, p) > 0;
-	}
-	return (cnt & 1) * 2;
-}
-int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {//convex
-	if (!sz) return -1;
-	if (sz == 1) return p == H[0] ? 0 : -1;
-	if (sz == 2) return on_seg_strong(H[0], H[1], p) ? 0 : -1;
-	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
-	if (on_seg_strong(H[0], H[1], p) || on_seg_strong(H[0], H[sz - 1], p)) return 0;
-	int s = 0, e = sz - 1, m;
-	while (s + 1 < e) {
-		m = s + e >> 1;
-		if (cross(H[0], H[m], p) > 0) s = m;
-		else e = m;
-	}
-	if (cross(H[s], H[e], p) > 0) return 1;
-	else if (on_seg_strong(H[s], H[e], p)) return 0;
-	else return -1;
-}
-int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
-	int sz = H.size();
-	if (!sz) return -1;
-	if (sz == 1) return p == H[0] ? 0 : -1;
-	if (sz == 2) return on_seg_strong(H[0], H[1], p) ? 0 : -1;
-	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
-	if (on_seg_strong(H[0], H[1], p) || on_seg_strong(H[0], H[sz - 1], p)) return 0;
-	int s = 0, e = sz - 1, m;
-	while (s + 1 < e) {
-		m = s + e >> 1;
-		if (cross(H[0], H[m], p) > 0) s = m;
-		else e = m;
-	}
-	if (cross(H[s], H[e], p) > 0) return 1;
-	else if (on_seg_strong(H[s], H[e], p)) return 0;
-	else return -1;
-}
-std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
+Polygon half_monotone_chain(Polygon& C, int lo = 1) {
 	std::vector<Pos> H;
-	std::sort(C.begin(), C.end());
-	C.erase(unique(C.begin(), C.end()), C.end());
+	if (lo > 0) std::sort(C.begin(), C.end());
+	//C.erase(unique(C.begin(), C.end()), C.end());
 	if (C.size() <= 2) { for (const Pos& pos : C) H.push_back(pos); }
 	else {
 		for (int i = 0; i < C.size(); i++) {
-			while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+			while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) * lo <= 0)
 				H.pop_back();
 			H.push_back(C[i]);
 		}
-		H.pop_back();
-		int s = H.size() + 1;
-		for (int i = C.size() - 1; i >= 0; i--) {
-			while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
-				H.pop_back();
-			H.push_back(C[i]);
-		}
-		H.pop_back();
 	}
 	return H;
 }
-Polygon graham_scan(Polygon& C) {
-	Polygon H;
-	if (C.size() < 3) {
-		std::sort(C.begin(), C.end());
-		return C;
+struct HalfHull {
+	std::set<Pos> hull;
+	int is_low;//low == 1, hi == -1
+	ll a;
+	ld r;
+
+	HalfHull(int lo = 1) : is_low(lo) { a = 0; r = 0; }
+	HalfHull(Polygon& H, int lo) : is_low(lo) {
+		for (const Pos& p : H) hull.insert(p);
+		a = area(H, is_low);
+		r = 0;
+		int sz = H.size();
+		assert(sz > 1);
+		for (int i = 0; i < sz - 1; i++) r += (H[i] - H[i + 1]).mag();
 	}
-	std::swap(C[0], *min_element(C.begin(), C.end()));
-	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
-		int ret = ccw(C[0], p, q);
-		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
-		return ret > 0;
+
+	bool able_to_go_left(const Pos& p) {
+		std::set<Pos>::iterator it = hull.find(p);
+		if (it == hull.begin()) return 0;
+		if (--it == hull.begin()) return 0;
+		return 1;
+	}
+	Pos update_left(const Pos& p0, std::set<Pos>& S) {
+		std::set<Pos>::iterator it = hull.find(p0);
+		std::set<Pos>::iterator p1 = it, p2 = it;
+		while (able_to_go_left(p0)) {
+			it = hull.find(p0);
+			p1 = --it;
+			p2 = --it;
+
+			if (ccw(p0, *p1, *p2) * is_low >= 0) {
+				S.insert(*p1);
+				hull.erase(p1);
+			}
+			else break;
 		}
-	);
-	C.erase(unique(C.begin(), C.end()), C.end());
-	int sz = C.size();
-	for (int i = 0; i < sz; i++) {
-		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
-			H.pop_back();
-		H.push_back(C[i]);
+		it = hull.find(p0);
+		if (it == S.begin()) return p0;
+		--it;
+		return *it;
 	}
-	return H;
-}
-ll rotating_calipers(const Polygon& H) {
-	int sz = H.size();
-	assert(sz);
-	if (sz == 1) return 0;
-	if (sz == 2) return (H[0] - H[1]).Euc();
-	ll ret = 0;
-	auto CCW = [&](const int& i, const int& j) -> int {
-		return ccw(H[i], H[(i + 1) % sz], H[j], H[(j + 1) % sz]);
-		};
-	for (int i = 0, j = 1; i < sz; i++) {
-		while (CCW(i, j) > 0) {
-			j = (j + 1) % sz;
-			ret = std::max(ret, (H[i] - H[j]).Euc());
+
+	bool able_to_go_right(const Pos& p) {
+		std::set<Pos>::iterator it = hull.find(p);
+		if (++it == hull.end()) return 0;
+		if (++it == hull.end()) return 0;
+		return 1;
+	}
+	Pos update_right(const Pos& p0, std::set<Pos>& S) {
+		std::set<Pos>::iterator it = hull.find(p0);
+		std::set<Pos>::iterator p1 = it, p2 = it;
+		while (able_to_go_right(p0)) {
+			it = hull.find(p0);
+			p1 = ++it;
+			p2 = ++it;
+
+			if (ccw(p0, *p1, *p2) * is_low <= 0) {
+				S.insert(*p1);
+				hull.erase(p1);
+			}
+			else break;
 		}
-		ret = std::max(ret, (H[i] - H[j]).Euc());
+		it = hull.find(p0);
+		++it;
+		if (it == S.end()) return p0;
+		return *it;
 	}
-	return ret;
-}
+
+	bool inner_check(const Pos& p) {
+		std::set<Pos>::iterator it = hull.upper_bound(p);
+
+		if (it == hull.end()) return 0;//right most
+		if (it == hull.begin()) return 0;//left most
+
+		std::set<Pos>::iterator nxt = it;
+		std::set<Pos>::iterator prev = --it;
+
+		return ccw(*prev, *nxt, p) * is_low >= 0;
+	}
+
+	inline bool exist(const Pos& p) { return hull.count(p); }
+
+	void insert(Pos p) {
+		assert(hull.size());
+		if (!inner_check(p)) {
+			std::set<Pos> S;
+			//Since the maximum number of points to be removed is N, 
+			//the time complexity is O(N log N) even after collection and sorting.
+			hull.insert(p);
+
+			Pos L, R;
+			L = update_left(p, S);
+			R = update_right(p, S);
+			r += (p - L).mag();
+			r += (p - R).mag();
+
+			if (S.empty()) {
+				if (p != L && p != R) r -= (L - R).mag();
+				a += cross(p, L, R) * -is_low;
+				return;
+			}
+
+			std::set<Pos>::iterator p0 = S.begin();
+
+			r -= (L - *p0).mag();
+			a += cross(p, L, *p0) * -is_low;
+
+			std::set<Pos>::iterator it = p0;
+			std::set<Pos>::iterator p1 = it, p2 = it;
+			while (1) {
+				p1 = it;
+				p2 = ++it;
+				if (p2 == S.end()) break;
+				r -= (*p1 - *p2).mag();
+				a += cross(p, *p1, *p2) * -is_low;
+			}
+
+			r -= (R - *p1).mag();
+			a += cross(p, *p1, R) * -is_low;
+		}
+		return;
+	}
+};
+struct DynamicHull {
+	HalfHull U, L;
+	DynamicHull(Polygon& C) {
+		Polygon LH = half_monotone_chain(C);
+		Polygon UH = half_monotone_chain(C, -1);
+		L = HalfHull(LH, 1);
+		U = HalfHull(UH, -1);
+	}
+	void insert(const Pos& p) { L.insert(p); U.insert(p); return; }
+	ll round() const { return L.r + U.r; }
+	ll area() const { return L.a + U.a; }
+};
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(10);
 	std::cin >> N;
 	Polygon C(N);
 	for (Pos& p : C) std::cin >> p;
-	Polygon H = graham_scan(C);
-	std::cout << rotating_calipers(H) << "\n";
+	DynamicHull H = DynamicHull(C);
+	std::cin >> Q;
+	while (Q--) {
+		Pos p;
+		std::cin >> p;
+		H.insert(p);
+		ld R = H.round();
+		ll A = H.area();
+		std::cout << R << " ";
+		std::cout << (A >> 1) << "." << ((A & 1) * 5) << "\n";
+	}
 	return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj30790 expansion construction
