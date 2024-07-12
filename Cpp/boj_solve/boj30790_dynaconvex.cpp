@@ -150,7 +150,7 @@ struct HalfHull {
 			else break;
 		}
 		it = hull.find(p0);
-		if (it == S.begin()) return p0;
+		if (it == hull.begin()) return p0;
 		--it;
 		return *it;
 	}
@@ -177,7 +177,7 @@ struct HalfHull {
 		}
 		it = hull.find(p0);
 		++it;
-		if (it == S.end()) return p0;
+		if (it == hull.end()) return p0;
 		return *it;
 	}
 
@@ -196,7 +196,7 @@ struct HalfHull {
 	inline bool exist(const Pos& p) { return hull.count(p); }
 
 	void insert(Pos p) {
-		assert(hull.size());
+		assert(hull.size() >= 2);
 		if (!inner_check(p)) {
 			std::set<Pos> S;
 			//Since the maximum number of points to be removed is N, 
@@ -217,7 +217,7 @@ struct HalfHull {
 
 			std::set<Pos>::iterator p0 = S.begin();
 
-			r -= (L - *p0).mag();
+			if (p != L) r -= (L - *p0).mag();
 			a += cross(p, L, *p0) * -is_low;
 
 			std::set<Pos>::iterator it = p0;
@@ -230,7 +230,7 @@ struct HalfHull {
 				a += cross(p, *p1, *p2) * -is_low;
 			}
 
-			r -= (R - *p1).mag();
+			if (p != R) r -= (R - *p1).mag();
 			a += cross(p, *p1, R) * -is_low;
 		}
 		return;
@@ -253,7 +253,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(10);
-	std::cin >> N;
+	std::cin >> N; assert(N >= 3);
 	Polygon C(N);
 	for (Pos& p : C) std::cin >> p;
 	DynamicHull H = DynamicHull(C);
