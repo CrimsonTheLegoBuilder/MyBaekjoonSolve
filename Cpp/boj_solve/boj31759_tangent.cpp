@@ -8,9 +8,9 @@
 #include <cassert>
 #include <cstring>
 typedef long long ll;
-typedef long double ld;
+//typedef long double ld;
+typedef double ld;
 typedef std::vector<ld> Vld;
-//typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-12;
 const ld PI = acos(-1);
@@ -33,13 +33,6 @@ struct Pos {
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
-	//bool operator < (const Pos& p) const {
-	//	bool f1 = zero(x) ? y > 0 : x > 0;
-	//	bool f2 = zero(p.x) ? p.y > 0 : p.x > 0;
-	//	if (f1 != f2) return f1;
-	//	ld tq = x * p.y - y * p.x;
-	//	return !zero(tq) ? tq > 0 : (x * x + y * y) < (p.x * p.x + p.y * p.y);
-	//}
 	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -156,7 +149,6 @@ Info find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		}
 		i2 = s;
 		if (on_seg_weak(p, H[i2], H[(i2 + 1) % sz])) i2 = (i2 + 1) % sz;
-		//if (on_seg_weak(p, H[i2], H[(i2 - 1 + sz) % sz])) i2 = (i2 - 1 + sz) % sz;
 	}
 	else {
 		//divide hull
@@ -181,7 +173,6 @@ Info find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		}
 		i1 = s1;
 		if (on_seg_weak(p, H[i1], H[(i1 + 1) % sz])) i1 = (i1 + 1) % sz;
-		//if (on_seg_weak(p, H[i1], H[(i1 - 1 + sz) % sz])) i1 = (i1 - 1 + sz) % sz;
 
 		//search upper hull
 		int s2 = e, e2 = sz - 1;
@@ -194,7 +185,6 @@ Info find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		}
 		i2 = s2;
 		if (on_seg_weak(p, H[i2], H[(i2 + 1) % sz])) i2 = (i2 + 1) % sz;
-		//if (on_seg_weak(p, H[i2], H[(i2 - 1 + sz) % sz])) i2 = (i2 - 1 + sz) % sz;
 	}
 	if (ccw(p, H[i1], H[i2]) < 0) std::swap(i1, i2);//normalize
 	return { i1, i2 };
@@ -209,11 +199,22 @@ void solve() {
 	Polygon C;
 	for (int i = 0; i < N; i++) {
 		std::cin >> x >> y;
-		assert(R * R >= x * x + y * y);
-		//if (R * R < x * x + y * y) continue;
+		//assert(R * R >= x * x + y * y);
+		if (R * R < x * x + y * y) continue;
 		C.push_back(Pos(x, y));
 	}
+	N = C.size();
 
+	if (N == 1) { std::cout << 0 << "\n"; return; }
+	if (N == 2) {
+		Pos& p1 = C[0], & p2 = C[1];
+		Pos vec = ~(p1 - p2).unit();
+		Pos q1 = vec * R;
+		Pos q2 = -vec * R;
+		ld a = std::max(std::abs(cross(p1, p2, q1)), std::abs(cross(p1, p2, q2)));
+		std::cout << a * .5 << "\n";
+		return;
+	}
 	Polygon H = graham_scan(C);
 	N = H.size();
 
@@ -226,6 +227,7 @@ void solve() {
 		auto inx = circle_line_intersections(s, e, R);
 		for (ld& rd : inx) arcs.push_back(rd);
 	}
+
 	arcs.push_back(0);
 	arcs.push_back(2 * PI);
 	std::sort(arcs.begin(), arcs.end());
@@ -251,19 +253,19 @@ void solve() {
 		}
 		else if (t.hi < t.lo) {
 			a = memo[t.lo] - memo[t.hi] + H[t.lo] / H[t.hi];
-			a1 = a + cross(S, H[t.hi], H[t.hi]);
-			a2 = a + cross(E, H[t.hi], H[t.hi]);
-			if (f) a3 = a + cross(OP, H[t.hi], H[t.hi]);
+			a1 = a + cross(S, H[t.hi], H[t.lo]);
+			a2 = a + cross(E, H[t.hi], H[t.lo]);
+			if (f) a3 = a + cross(OP, H[t.hi], H[t.lo]);
 		}
 		else {
 			a = memo[N] - (memo[t.hi] - memo[t.lo] + H[t.hi] / H[t.lo]);
-			a1 = a + cross(S, H[t.hi], H[t.hi]);
-			a2 = a + cross(E, H[t.hi], H[t.hi]);
-			if (f) a3 = a + cross(OP, H[t.hi], H[t.hi]);
+			a1 = a + cross(S, H[t.hi], H[t.lo]);
+			a2 = a + cross(E, H[t.hi], H[t.lo]);
+			if (f) a3 = a + cross(OP, H[t.hi], H[t.lo]);
 		}
 		ret = std::max({ ret, a1, a2, a3 });
 	}
-	std::cout << ret << "\n";
+	std::cout << ret * .5 << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj31759 Insects, Mathematics, Accuracy, and Efficiency
