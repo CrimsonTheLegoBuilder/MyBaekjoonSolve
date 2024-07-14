@@ -226,13 +226,15 @@ void solve() {
 		if (ccw(pre, cur, nxt) > 0) {
 			Pii& nnxt = H[(i + 2) % N];
 			if (ccw(cur, nxt, nnxt) > 0) continue;
+			//std::cout << "DEBUG:: cur: " << cur << " nxt: " << nxt << "\n";
 			int j;
 			for (j = (i + 2) % N; j != (i - 1 + N) % N; j = (j + 1) % N) {
 				int j2 = (j + 1) % N;
 				if (!ccw(cur, nxt, H[j2]) ||
-					(ccw(cur, nxt, H[j]) != ccw(cur, nxt, H[j2])))
+					(ccw(cur, nxt, H[j]) != ccw(cur, nxt, H[j2]))) {
 					cur.e = intersection(P(cur), P(nxt), P(H[j]), P(H[j2]));
 					break;
+				}
 			}
 			cur.i = (j + 1) % N;
 			for (int k = (i + 2) % N; k != (j + 1) % N; k = (k + 1) % N) {
@@ -248,10 +250,14 @@ void solve() {
 		}
 		else continue;
 	}
+	//for (int i = 0; i < N; i++) {
+	//	std::cout << "DEBUG:: idx: " << i + 1  << " " << H[i] << " i: " << H[i].i << "\n";
+	//}
 	VHP vhp;
 	for (int i = 0; i < N; i++) {
 		if (H[i].i == -1) continue;
 		Pii& cur = H[i], & nxt = H[(i + 1) % N];
+		//std::cout << "DEBUG:: cur: " << cur << " nxt: " << nxt << "\n";
 		vhp.push_back(Linear(Seg(nxt, cur).hp()));
 		int j, k = -1;
 		for (j = (i + 2) % N; j != cur.i; j = (j + 1) % N) {
@@ -267,10 +273,10 @@ void solve() {
 			}
 		}
 		else {
-			if (ccw(P(cur), P(nxt), H[k].s) <= 0 && ccw(P(cur), P(nxt), H[k].e) <= 0) {
-				std::cout << 0 << "\n";
-				return;
-			}
+			//if (ccw(P(cur), P(nxt), H[k].s) <= 0 && ccw(P(cur), P(nxt), H[k].e) <= 0) {
+			//	std::cout << 0 << "\n";
+			//	return;
+			//}
 			int k1 = (k + 1) % N;
 			for (j = (i + 1) % N; j != k; j = (j + 1) % N) {
 				assert(H[j].i == -1);
@@ -286,8 +292,44 @@ void solve() {
 			}
 		}
 	}
+	//for (Linear& l : vhp) std::cout << l.ps[0] << " " << l.ps[1] << "\n";
 	Polygonf hpi = half_plane_intersection(vhp);
 	std::cout << area(hpi) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj18219 ICPC 2019 Asia Yokohama Regional J Fun Region
+
+/*
+
+8
+10000 5000
+6290 9098
+4839 9872
+4493 5089
+0 5000
+1303 4598
+6845 4019
+9531 4513
+
+19096233.35306930
+
+14
+80 20
+100 20
+100 30
+80 30
+100 40
+100 50
+80 40
+80 50
+70 50
+70 0
+80 0
+80 10
+90 0
+100 0
+
+250.00000000
+
+
+*/
