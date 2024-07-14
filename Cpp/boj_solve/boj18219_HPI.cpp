@@ -18,63 +18,6 @@ bool V[LEN];
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 
-struct Pii {
-	int x, y;
-	int i;
-	Pii(int X = 0, int Y = 0) : x(X), y(Y) { i = -1; }
-	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
-	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
-	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
-	bool operator <= (const Pii& p) const { return x == p.x ? y <= p.y : x <= p.x; }
-	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
-	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
-	Pii operator * (const int& n) const { return { x * n, y * n }; }
-	Pii operator / (const int& n) const { return { x / n, y / n }; }
-	ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
-	ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
-	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
-	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-	Pii operator - () const { return { -x, -y }; }
-	Pii operator ~ () const { return { -y, x }; }
-	Pii operator ! () const { return { y, x }; }
-	ll xy() const { return (ll)x * y; }
-	ll Euc() const { return (ll)x * x + (ll)y * y; }
-	int Man() const { return std::abs(x) + std::abs(y); }
-	ld mag() const { return hypot(x, y); }
-	friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
-};
-const Pii Oii = { 0, 0 };
-const Pii INF_PT = { (int)INF, (int)INF };
-typedef std::vector<Pii> Polygon;
-ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
-ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
-ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
-ll dot(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) * (d4 - d3); }
-int ccw(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = cross(d1, d2, d3); return ret < 0 ? -1 : !!ret; }
-bool on_seg_strong(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && ret >= 0; }
-bool on_seg_weak(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && ret > 0; }
-bool inner_check(Pii d1, Pii d2, Pii d3, const Pii& t) {
-	if (ccw(d1, d2, d3) < 0) std::swap(d2, d3);
-	return ccw(d1, d2, t) > 0 && ccw(d2, d3, t) > 0 && ccw(d3, d1, t) > 0;
-}
-ll area(const Polygon& H) {
-	Pii pivot = Pii(0, 0);
-	ld ret = 0;
-	int h = H.size();
-	for (int i = 0; i < h; i++) {
-		const Pii& cur = H[i], & nxt = H[(i + 1) % h];
-		ret += cross(pivot, cur, nxt);
-	}
-	return ret;
-}
-void norm(Polygon& H, const bool& f = 1) {
-	if (f && area(H) < 0) std::reverse(H.begin(), H.end());//ccw
-	if (!f && area(H) > 0) std::reverse(H.begin(), H.end());//cw
-	return;
-}
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -185,6 +128,66 @@ ld area(const Polygonf& H) {
 	}
 	return ret * .5;
 }
+struct Pii {
+	int x, y;
+	int i;
+	Pos s, e;
+	Pii(int X = 0, int Y = 0) : x(X), y(Y) { i = -1; s = Pos(X, Y), e = Pos(); }
+	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
+	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
+	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator <= (const Pii& p) const { return x == p.x ? y <= p.y : x <= p.x; }
+	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
+	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
+	Pii operator * (const int& n) const { return { x * n, y * n }; }
+	Pii operator / (const int& n) const { return { x / n, y / n }; }
+	ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
+	ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
+	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
+	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
+	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
+	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pii operator - () const { return { -x, -y }; }
+	Pii operator ~ () const { return { -y, x }; }
+	Pii operator ! () const { return { y, x }; }
+	ll xy() const { return (ll)x * y; }
+	ll Euc() const { return (ll)x * x + (ll)y * y; }
+	int Man() const { return std::abs(x) + std::abs(y); }
+	ld mag() const { return hypot(x, y); }
+	friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
+};
+const Pii Oii = { 0, 0 };
+const Pii INF_PT = { (int)INF, (int)INF };
+typedef std::vector<Pii> Polygon;
+ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
+ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
+ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
+ll dot(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) * (d4 - d3); }
+int ccw(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = cross(d1, d2, d3); return ret < 0 ? -1 : !!ret; }
+bool on_seg_strong(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && ret >= 0; }
+bool on_seg_weak(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && ret > 0; }
+bool inner_check(Pii d1, Pii d2, Pii d3, const Pii& t) {
+	if (ccw(d1, d2, d3) < 0) std::swap(d2, d3);
+	return ccw(d1, d2, t) > 0 && ccw(d2, d3, t) > 0 && ccw(d3, d1, t) > 0;
+}
+ll area(const Polygon& H) {
+	Pii pivot = Pii(0, 0);
+	ld ret = 0;
+	int h = H.size();
+	for (int i = 0; i < h; i++) {
+		const Pii& cur = H[i], & nxt = H[(i + 1) % h];
+		ret += cross(pivot, cur, nxt);
+	}
+	return ret;
+}
+void norm(Polygon& H, const bool& f = 1) {
+	if (f && area(H) < 0) std::reverse(H.begin(), H.end());//ccw
+	if (!f && area(H) > 0) std::reverse(H.begin(), H.end());//cw
+	return;
+}
+Pos P(Pii p) { return Pos(p.x, p.y); }
+Pii P(Pos p) { return Pii(p.x, p.y); }
 struct Seg {
 	Pii s, e;
 	Seg(Pii S = Pii(), Pii E = Pii()) : s(S), e(E) {}
@@ -228,6 +231,7 @@ void solve() {
 				int j2 = (j + 1) % N;
 				if (!ccw(cur, nxt, H[j2]) ||
 					(ccw(cur, nxt, H[j]) != ccw(cur, nxt, H[j2])))
+					cur.e = intersection(P(cur), P(nxt), P(H[j]), P(H[j2]));
 					break;
 			}
 			cur.i = (j + 1) % N;
@@ -263,13 +267,20 @@ void solve() {
 			}
 		}
 		else {
+			if (ccw(P(cur), P(nxt), H[k].s) <= 0 && ccw(P(cur), P(nxt), H[k].e) <= 0) {
+				std::cout << 0 << "\n";
+				return;
+			}
 			int k1 = (k + 1) % N;
 			for (j = (i + 1) % N; j != k; j = (j + 1) % N) {
 				assert(H[j].i == -1);
 				int j2 = (j + 1) % N;
 				int ccw1 = ccw(H[k], H[k1], H[j]);
 				int ccw2 = ccw(H[k], H[k1], H[j2]);
-				if (ccw1 == -1 || ccw2 == -1) {
+				if (ccw1 == -1 && ccw2 == -1) {
+					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
+				}
+				else if ((ccw1 == -1 || ccw2 == -1) && inner_check(H[k1], H[j], H[j2], H[k])) {
 					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
 				}
 			}
