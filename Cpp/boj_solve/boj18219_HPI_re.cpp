@@ -58,9 +58,9 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 		if (same_dir(*this, l0)) return l0.include(ps[0]);
 		else return cmpq(this->dir(), l0.dir());
 	}
-	bool operator == (const Linear& l0) const {
-		return ps[0] == l0.ps[0] && ps[1] == l0.ps[1] && dir_ == l0.dir_;
-	}
+	//bool operator == (const Linear& l0) const {
+	//	return ps[0] == l0.ps[0] && ps[1] == l0.ps[1] && dir_ == l0.dir_;
+	//}
 };
 typedef std::vector<Linear> VHP;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
@@ -72,7 +72,7 @@ std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bu
 		return w.include(intersection(u, v));
 		};
 	std::sort(HP.begin(), HP.end());
-	HP.erase(unique(HP.begin(), HP.end()), HP.end());
+	//HP.erase(unique(HP.begin(), HP.end()), HP.end());
 	std::deque<Linear> dq;
 	int sz = HP.size();
 	for (int i = 0; i < sz; ++i) {
