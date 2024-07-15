@@ -13,8 +13,7 @@ const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 2e3 + 5;
-int N, M, T, Q;
-bool V[LEN];
+int N;
 bool zero(const ld& x) { return std::abs(x) < TOL; }
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 
@@ -32,18 +31,10 @@ struct Pos {
 	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
-	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
-	ld xy() const { return x * y; }
-	Pos rot(ld the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
 	Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
@@ -61,19 +52,6 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 		dir_ = (ps[1] - ps[0]).unit();
 	}
 	bool include(const Pos& p) const { return sign(dir_ / (p - ps[0])) > 0; }
-	Linear push() const {//push eps outward
-		const double eps = 1e-8;
-		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
-		return Linear(ps[0] + delta, ps[1] + delta);
-	}
-	Linear operator + (const double eps) const {//push eps outward
-		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
-		return Linear(ps[0] + delta, ps[1] + delta);
-	}
-	Linear operator - (const double eps) const {//pull eps inward
-		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
-		return Linear(ps[0] - delta, ps[1] - delta);
-	}
 	friend bool parallel(const Linear& l0, const Linear& l1) { return zero(l0.dir() / l1.dir()); }
 	friend bool same_dir(const Linear& l0, const Linear& l1) { return parallel(l0, l1) && l0.dir() * l1.dir() > 0; }
 	bool operator < (const Linear& l0) const {
@@ -87,10 +65,6 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 typedef std::vector<Linear> VHP;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) >= 0; }
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) > 0; }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
 Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
 std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
@@ -132,37 +106,20 @@ struct Pii {
 	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
-	bool operator <= (const Pii& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
 	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
 	Pii operator * (const int& n) const { return { x * n, y * n }; }
 	Pii operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
 	ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
-	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
-	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-	Pii operator - () const { return { -x, -y }; }
-	Pii operator ~ () const { return { -y, x }; }
-	Pii operator ! () const { return { y, x }; }
-	ll xy() const { return (ll)x * y; }
-	ll Euc() const { return (ll)x * x + (ll)y * y; }
-	int Man() const { return std::abs(x) + std::abs(y); }
-	ld mag() const { return hypot(x, y); }
 	friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
 };
-const Pii Oii = { 0, 0 };
-const Pii INF_PT = { (int)INF, (int)INF };
 typedef std::vector<Pii> Polygon;
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
-ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
-ll dot(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) * (d4 - d3); }
 int ccw(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = cross(d1, d2, d3); return ret < 0 ? -1 : !!ret; }
 bool on_seg_strong(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && ret >= 0; }
-bool on_seg_weak(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && ret > 0; }
 bool inner_check(Pii d1, Pii d2, Pii d3, const Pii& t) {
 	if (ccw(d1, d2, d3) < 0) std::swap(d2, d3);
 	return ccw(d1, d2, t) > 0 && ccw(d2, d3, t) > 0 && ccw(d3, d1, t) > 0;
@@ -182,18 +139,8 @@ void norm(Polygon& H, const bool& f = 1) {
 	if (!f && area(H) > 0) std::reverse(H.begin(), H.end());//cw
 	return;
 }
-Pos P(Pii p) { return Pos(p.x, p.y); }
-Pii P(Pos p) { return Pii(p.x, p.y); }
-struct Seg {
-	Pii s, e;
-	Seg(Pii S = Pii(), Pii E = Pii()) : s(S), e(E) {}
-	Seg operator ! () const { return Seg(e, s); }
-	Linear hp() const {
-		Pos s_ = Pos(s.x, s.y);
-		Pos e_ = Pos(e.x, e.y);
-		return Linear(s_, e_);
-	}
-};
+Pos P(const Pii& p) { return Pos(p.x, p.y); }
+Pii P(const Pos& p) { return Pii(p.x, p.y); }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -216,13 +163,11 @@ void solve() {
 	//convex
 
 	//concave
-	int cnt = 0;
 	for (int i = 0; i < N; i++) {
 		Pii& pre = H[(i - 1 + N) % N], & cur = H[i], & nxt = H[(i + 1) % N];
 		if (ccw(pre, cur, nxt) > 0) {
 			Pii& nnxt = H[(i + 2) % N];
 			if (ccw(cur, nxt, nnxt) > 0) continue;
-			//std::cout << "DEBUG:: cur: " << cur << " nxt: " << nxt << "\n";
 			int j;
 			for (j = (i + 2) % N; j != (i - 1 + N) % N; j = (j + 1) % N) {
 				int j2 = (j + 1) % N;
@@ -241,19 +186,14 @@ void solve() {
 					break;
 				}
 			}
-			cnt += cur.i != -1;
 		}
 		else continue;
 	}
-	//for (int i = 0; i < N; i++) {
-	//	std::cout << "DEBUG:: idx: " << i + 1  << " " << H[i] << " i: " << H[i].i << "\n";
-	//}
 	VHP vhp;
 	for (int i = 0; i < N; i++) {
 		if (H[i].i == -1) continue;
 		Pii& cur = H[i], & nxt = H[(i + 1) % N];
-		//std::cout << "DEBUG:: i: " << i + 1 << " cur: " << cur << " nxt: " << nxt << "\n";
-		vhp.push_back(Linear(Seg(nxt, cur).hp()));
+		vhp.push_back(Linear(P(nxt), P(cur)));
 		int j, k = -1;
 		for (j = (i + 2) % N; j != cur.i; j = (j + 1) % N) {
 			if (H[j].i != -1) {
@@ -264,7 +204,7 @@ void solve() {
 		if (k == -1) {
 			for (j = (i + 1) % N; j != cur.i; j = (j + 1) % N) {
 				int j2 = (j + 1) % N;
-				vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
+				vhp.push_back(Linear(P(H[j2]), P(H[j])));
 			}
 		}
 		else {
@@ -275,16 +215,15 @@ void solve() {
 				int ccw1 = ccw(H[k], H[k1], H[j]);
 				int ccw2 = ccw(H[k], H[k1], H[j2]);
 				if (ccw1 == -1 && ccw2 == -1) {
-					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
+					vhp.push_back(Linear(P(H[j2]), P(H[j])));
 				}
 				else if ((ccw1 == -1 || ccw2 == -1) && inner_check(H[k1], H[j], H[j2], H[k])) {
-					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
+					vhp.push_back(Linear(P(H[j2]), P(H[j])));
 					break;
 				}
 			}
 		}
 	}
-	//for (Linear& l : vhp) std::cout << l.ps[0] << " " << l.ps[1] << "\n";
 	Polygonf hpi = half_plane_intersection(vhp);
 	std::cout << area(hpi) << "\n";
 	return;
