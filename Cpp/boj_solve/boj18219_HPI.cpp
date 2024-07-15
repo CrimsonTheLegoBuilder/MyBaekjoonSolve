@@ -257,7 +257,7 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		if (H[i].i == -1) continue;
 		Pii& cur = H[i], & nxt = H[(i + 1) % N];
-		std::cout << "DEBUG:: i: " << i + 1 << " cur: " << cur << " nxt: " << nxt << "\n";
+		//std::cout << "DEBUG:: i: " << i + 1 << " cur: " << cur << " nxt: " << nxt << "\n";
 		vhp.push_back(Linear(Seg(nxt, cur).hp()));
 		int j, k = -1;
 		for (j = (i + 2) % N; j != cur.i; j = (j + 1) % N) {
@@ -284,11 +284,13 @@ void solve() {
 				int ccw1 = ccw(H[k], H[k1], H[j]);
 				int ccw2 = ccw(H[k], H[k1], H[j2]);
 				if (ccw1 == -1 && ccw2 == -1) {
-					Pos inx = intersection(P(H[k]), P(H[k1]), P(H[j]), P(H[j2]));
-					if (on_seg_strong(P(H[k1]), inx, P(H[k]))) vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
+					//Pos inx = intersection(P(H[k]), P(H[k1]), P(H[j]), P(H[j2]));
+					//if (on_seg_strong(P(H[k1]), inx, P(H[k]))) vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
+					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
 				}
 				else if ((ccw1 == -1 || ccw2 == -1) && inner_check(H[k1], H[j], H[j2], H[k])) {
 					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
+					break;
 				}
 			}
 		}
@@ -364,5 +366,29 @@ int main() { solve(); return 0; }//boj18219 ICPC 2019 Asia Yokohama Regional J F
 162 472
 
 16853.80365582
+
+9
+7720 2038
+8160 2661
+6427 4528
+7007 5869
+7399 6513
+2037 4071
+995 3028
+3176 881
+5040 1874
+
+(7720, 2038),
+(8160, 2661),
+(6427, 4528),
+(7007, 5869),
+(7399, 6513),
+(2037, 4071),
+(995, 3028),
+(3176, 881),
+(5040, 1874),
+
+16379711.10531969
+
 
 */
