@@ -7,8 +7,8 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
@@ -89,13 +89,10 @@ ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 -
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-ld dist(const Pos& d1, const Pos& d2, const Pos& t) { return cross(d1, d2, t) / (d1 - d2).mag(); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) > 0; }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
 Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
-bool block(const Pos& p0, const Pos& p1, const Pos& d0, const Pos& d1) { return ccw(p0, p1, d0) <= 0 && ccw(p0, p1, d1) >= 0 && ccw(d0, d1, p1) >= 0; }
-bool back(const Pos& p0, const Pos& p1, const Pos& d0, const Pos& d1) { return ccw(p0, p1, d0) < 0 && ccw(p0, p1, d1) > 0 && ccw(d0, d1, p1) < 0; }
 std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
 	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
 		return w.include(intersection(u, v));
@@ -131,8 +128,7 @@ ld area(const Polygonf& H) {
 struct Pii {
 	int x, y;
 	int i;
-	Pos s, e;
-	Pii(int X = 0, int Y = 0) : x(X), y(Y) { i = -1; s = Pos(X, Y), e = Pos(); }
+	Pii(int X = 0, int Y = 0) : x(X), y(Y) { i = -1; }
 	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -232,7 +228,6 @@ void solve() {
 				int j2 = (j + 1) % N;
 				if (!ccw(cur, nxt, H[j2]) ||
 					(ccw(cur, nxt, H[j]) != ccw(cur, nxt, H[j2]))) {
-					cur.e = intersection(P(cur), P(nxt), P(H[j]), P(H[j2]));
 					break;
 				}
 			}
@@ -273,10 +268,6 @@ void solve() {
 			}
 		}
 		else {
-			//if (ccw(P(cur), P(nxt), H[k].s) <= 0 && ccw(P(cur), P(nxt), H[k].e) <= 0) {
-			//	std::cout << 0 << "\n";
-			//	return;
-			//}
 			int k1 = (k + 1) % N;
 			for (j = (i + 1) % N; j != k; j = (j + 1) % N) {
 				assert(H[j].i == -1);
@@ -284,8 +275,6 @@ void solve() {
 				int ccw1 = ccw(H[k], H[k1], H[j]);
 				int ccw2 = ccw(H[k], H[k1], H[j2]);
 				if (ccw1 == -1 && ccw2 == -1) {
-					//Pos inx = intersection(P(H[k]), P(H[k1]), P(H[j]), P(H[j2]));
-					//if (on_seg_strong(P(H[k1]), inx, P(H[k]))) vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
 					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
 				}
 				else if ((ccw1 == -1 || ccw2 == -1) && inner_check(H[k1], H[j], H[j2], H[k])) {
@@ -302,93 +291,3 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj18219 ICPC 2019 Asia Yokohama Regional J Fun Region
 
-/*
-
-8
-10000 5000
-6290 9098
-4839 9872
-4493 5089
-0 5000
-1303 4598
-6845 4019
-9531 4513
-
-19096233.35306930
-
-14
-80 20
-100 20
-100 30
-80 30
-100 40
-100 50
-80 40
-80 50
-70 50
-70 0
-80 0
-80 10
-90 0
-100 0
-
-250.00000000
-
-29
-132 465
-107 334
-123 242
-114 128
-124 50
-165 40
-177 88
-194 170
-186 208
-190 273
-197 332
-189 371
-189 412
-226 425
-285 410
-286 364
-278 312
-241 295
-215 294
-204 283
-200 261
-208 238
-250 234
-319 258
-332 301
-341 381
-317 431
-220 471
-162 472
-
-16853.80365582
-
-9
-7720 2038
-8160 2661
-6427 4528
-7007 5869
-7399 6513
-2037 4071
-995 3028
-3176 881
-5040 1874
-
-(7720, 2038),
-(8160, 2661),
-(6427, 4528),
-(7007, 5869),
-(7399, 6513),
-(2037, 4071),
-(995, 3028),
-(3176, 881),
-(5040, 1874),
-
-16379711.10531969
-
-
-*/
