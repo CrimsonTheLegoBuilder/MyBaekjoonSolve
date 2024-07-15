@@ -257,7 +257,7 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		if (H[i].i == -1) continue;
 		Pii& cur = H[i], & nxt = H[(i + 1) % N];
-		//std::cout << "DEBUG:: cur: " << cur << " nxt: " << nxt << "\n";
+		std::cout << "DEBUG:: i: " << i + 1 << " cur: " << cur << " nxt: " << nxt << "\n";
 		vhp.push_back(Linear(Seg(nxt, cur).hp()));
 		int j, k = -1;
 		for (j = (i + 2) % N; j != cur.i; j = (j + 1) % N) {
@@ -331,5 +331,37 @@ int main() { solve(); return 0; }//boj18219 ICPC 2019 Asia Yokohama Regional J F
 
 250.00000000
 
+29
+132 465
+107 334
+123 242
+114 128
+124 50
+165 40
+177 88
+194 170
+186 208
+190 273
+197 332
+189 371
+189 412
+226 425
+285 410
+286 364
+278 312
+241 295
+215 294
+204 283
+200 261
+208 238
+250 234
+319 258
+332 301
+341 381
+317 431
+220 471
+162 472
+
+16853.80365582
 
 */
