@@ -284,7 +284,8 @@ void solve() {
 				int ccw1 = ccw(H[k], H[k1], H[j]);
 				int ccw2 = ccw(H[k], H[k1], H[j2]);
 				if (ccw1 == -1 && ccw2 == -1) {
-					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
+					Pos inx = intersection(P(H[k]), P(H[k1]), P(H[j]), P(H[j2]));
+					if (on_seg_strong(P(H[k1]), inx, P(H[k]))) vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
 				}
 				else if ((ccw1 == -1 || ccw2 == -1) && inner_check(H[k1], H[j], H[j2], H[k])) {
 					vhp.push_back(Linear(Seg(H[j2], H[j]).hp()));
