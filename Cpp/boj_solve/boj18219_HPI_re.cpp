@@ -178,10 +178,10 @@ void solve() {
 			}
 			cur.i = (j + 1) % N;
 			for (int k = (i + 2) % N; k != (j + 1) % N; k = (k + 1) % N) {
-				int j2 = (k + 1) % N;
+				int k1 = (k + 1) % N;
 				if (ccw(cur, nxt, H[k]) > 0 ||
 					on_seg_strong(cur, H[k], nxt) ||
-					inner_check(cur, H[k], H[j2], nxt)) {
+					inner_check(cur, H[k], H[k1], nxt)) {
 					cur.i = -1;
 					break;
 				}
