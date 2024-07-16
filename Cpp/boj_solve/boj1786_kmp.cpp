@@ -13,7 +13,7 @@ Vint get_pi(const std::string& s) {
 	Vint pi(m, 0);
 	for (int i = 1; i < m; i++) {
 		while (j > 0 && s[i] != s[j]) j = pi[j - 1];
-		if (s[i] == s[j]) pi[i] = j++;
+		if (s[i] == s[j]) pi[i] = ++j;
 	}
 	return pi;
 }
