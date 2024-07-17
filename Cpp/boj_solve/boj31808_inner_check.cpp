@@ -33,9 +33,11 @@ ll powmod(ll a, ll b) {
 }
 
 int N, M;
+ll V[LEN];
 struct Pos {
 	int x, y;
-	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
+	int q;
+	Pos(int X = 0, int Y = 0) : x(X), y(Y) { q = 0; }
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -103,20 +105,24 @@ inline bool inner_check(Pos d1, Pos d2, Pos d3, const Pos& t) {
 }
 int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
-	if (!sz) return -1;
-	if (sz == 1) return p == H[0] ? 0 : -1;
-	if (sz == 2) return on_seg_strong(H[0], H[1], p) ? 0 : -1;
+	//if (!sz) return -1;
+	//if (sz == 1) return p == H[0] ? 0 : -1;
+	//if (sz == 2) return on_seg_strong(H[0], H[1], p) ? 0 : -1;
+	assert(sz >= 3);
 	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
 	if (on_seg_strong(H[0], H[1], p) || on_seg_strong(H[0], H[sz - 1], p)) return 0;
+	if (inner_check(H[0], H[1], H[sz - 1], p)) { V[0] += p.q; }
 	int s = 0, e = sz - 1, m;
 	while (s + 1 < e) {
 		m = s + e >> 1;
 		if (cross(H[0], H[m], p) > 0) s = m;
 		else e = m;
 	}
-	if (cross(H[s], H[e], p) > 0) return 1;
-	else if (on_seg_strong(H[s], H[e], p)) return 0;
-	else return -1;
+	if (cross(H[s], H[e], p) < 0) return -1;
+	if (on_seg_strong(H[s], H[e], p)) return 0;
+	if (inner_check(H[s], H[e], H[(s - 1 + sz) % sz], p)) { V[s] += p.q; }
+	if (inner_check(H[s], H[e], H[(e + 1) % sz], p)) { V[e] += p.q; }
+	return 1;
 }
 std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
 	std::vector<Pos> H;
@@ -170,6 +176,7 @@ void solve() {
 	Polygon H(N), C(M);
 	for (Pos& p : H) std::cin >> p;
 	for (Pos& p : C) std::cin >> p;
+	memset(V, 0, sizeof V);
 	return;
 }
 int main() { solve(); return 0; }
