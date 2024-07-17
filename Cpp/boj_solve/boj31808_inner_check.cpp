@@ -80,18 +80,20 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-ll area(std::vector<Pos>& H) {
+ll area(const std::vector<Pos>& H) {
 	ll ret = 0;
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		ret += cross(O, cur, nxt);
+		const Pos& pre = H[(i - 1 + sz) % sz], & cur = H[i], & nxt = H[(i + 1) % sz];
+		assert(ccw(pre, cur, nxt) == 1);
+		ret += H[i] / H[(i + 1) % sz];
 	}
+	assert(ret > 0);
 	return ret;
 }
-inline bool inner_check(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& t) {
-	if (on_seg_weak(d2, d3, t)) return 1;
-	return ccw(d1, d2, t) > 0 && ccw(d2, d3, t) > 0 && ccw(d3, d1, t) > 0;
+bool inner_check(const Pos& d0, const Pos& d1, const Pos& d2, const Pos& t) {
+	if (on_seg_weak(d1, d2, t)) return 1;
+	return ccw(d0, d1, t) > 0 && ccw(d1, d2, t) > 0 && ccw(d2, d0, t) > 0;
 }
 int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
@@ -121,12 +123,29 @@ void solve() {
 	Polygon H(N), C(M);
 	for (Pos& p : H) std::cin >> p;
 	for (Pos& p : C) std::cin >> p >> p.q;
+	area(H);
 	memset(V, 0, sizeof V);
 	ll all = 0;
 	for (Pos& p : C) if (inner_check_bi_search(H, p) == 1) all += p.q;
-	ll ret = std::abs(all);
+	ll ret = -1;
 	for (int i = 0; i < N; i++) ret = std::max(std::abs(all - V[i]), ret);
+	assert(ret >= 0);
 	std::cout << ret << "\n";
 	return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj31808 gauss's law
+
+/*
+
+4 4
+-10 10
+-10 -10
+10 -10
+10 10
+
+5 5 1
+5 -5 3
+5 0 3
+6 0 3
+
+*/
