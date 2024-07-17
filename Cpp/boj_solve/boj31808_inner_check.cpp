@@ -89,8 +89,8 @@ ll area(std::vector<Pos>& H) {
 	}
 	return ret;
 }
-inline bool inner_check(Pos d1, Pos d2, Pos d3, const Pos& t) {
-	if (ccw(d1, d2, d3) < 0) std::swap(d2, d3);
+inline bool inner_check(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& t) {
+	if (on_seg_weak(d2, d3, t)) return 1;
 	return ccw(d1, d2, t) > 0 && ccw(d2, d3, t) > 0 && ccw(d3, d1, t) > 0;
 }
 int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
@@ -111,7 +111,7 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	if (cross(H[s], H[e], p) < 0) return -1;
 	if (on_seg_strong(H[s], H[e], p)) return 0;
 	if (inner_check(H[s], H[e], H[(s - 1 + sz) % sz], p)) { V[s] += p.q; }
-	if (inner_check(H[s], H[e], H[(e + 1) % sz], p)) { V[e] += p.q; }
+	if (inner_check(H[e], H[(e + 1) % sz], H[s], p)) { V[e] += p.q; }
 	return 1;
 }
 void solve() {
@@ -123,7 +123,7 @@ void solve() {
 	for (Pos& p : C) std::cin >> p >> p.q;
 	memset(V, 0, sizeof V);
 	ll all = 0;
-	for (Pos& p : C) if (inner_check_bi_search(H, p)) all += p.q;
+	for (Pos& p : C) if (inner_check_bi_search(H, p) == 1) all += p.q;
 	ll ret = std::abs(all);
 	for (int i = 0; i < N; i++) ret = std::max(std::abs(all - V[i]), ret);
 	std::cout << ret << "\n";
