@@ -134,7 +134,7 @@ void solve() {
 	//ll ret = -1;
 	ll ret = std::abs(all);
 
-	if (N == 3) { std::cout << 0 << "\n"; return; }//no answer
+	if (N == 3) { std::cout << ret << "\n"; return; }//no answer
 	if (N == 4) {//brute
 		for (int i = 0; i < 4; i++) {
 			ll tmp = 0;
