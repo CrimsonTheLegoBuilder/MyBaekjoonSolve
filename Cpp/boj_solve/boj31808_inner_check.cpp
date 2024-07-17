@@ -112,8 +112,10 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	}
 	if (cross(H[s], H[e], p) < 0) return -1;
 	if (on_seg_strong(H[s], H[e], p)) return 0;
+	if (s == 2 && on_seg_weak(H[2], H[0], p)) { V[(s - 1 + sz) % sz] += p.q; }
 	if (inner_check(H[s], H[e], H[(s - 1 + sz) % sz], p)) { V[s] += p.q; }
 	if (inner_check(H[e], H[(e + 1) % sz], H[s], p)) { V[e] += p.q; }
+	if (e == sz - 2 && on_seg_weak(H[sz - 2], H[0], p)) { V[(e + 1) % sz] += p.q; }
 	return 1;
 }
 void solve() {
@@ -127,7 +129,23 @@ void solve() {
 	memset(V, 0, sizeof V);
 	ll all = 0;
 	for (Pos& p : C) if (inner_check_bi_search(H, p) == 1) all += p.q;
-	ll ret = -1;
+	//for (Pos& p : C) std::cout << "in:: " << inner_check_bi_search(H, p) << "\n";
+
+	//ll ret = -1;
+	ll ret = std::abs(all);
+
+	if (N == 3) { std::cout << 0 << "\n"; return; }//no answer
+	if (N == 4) {//brute
+		for (int i = 0; i < 4; i++) {
+			ll tmp = 0;
+			Polygon tri = { H[i], H[(i + 1) % 4], H[(i + 2) % 4] };
+			for (const Pos& p : C) if (inner_check_bi_search(tri, p) == 1) tmp += p.q;
+			ret = std::max(std::abs(tmp), ret);
+		}
+		std::cout << ret << "\n";
+		return;
+	}
+
 	for (int i = 0; i < N; i++) ret = std::max(std::abs(all - V[i]), ret);
 	assert(ret >= 0);
 	std::cout << ret << "\n";
