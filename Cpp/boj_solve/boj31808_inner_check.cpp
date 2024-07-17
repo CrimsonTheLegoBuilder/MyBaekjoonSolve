@@ -88,14 +88,6 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-ll area(Pos H[], const int& sz) {
-	ll ret = 0;
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		ret += cross(O, cur, nxt);
-	}
-	return ret;
-}
 ll area(std::vector<Pos>& H) {
 	ll ret = 0;
 	int sz = H.size();
@@ -105,45 +97,9 @@ ll area(std::vector<Pos>& H) {
 	}
 	return ret;
 }
-int inner_check(Pos H[], const int& sz, const Pos& p) {//concave
-	int cnt{ 0 };
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) return 1;
-		if (cur.y == nxt.y) continue;
-		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y <= p.y || cur.y > p.y) continue;
-		cnt += ccw(cur, nxt, p) > 0;
-	}
-	return (cnt & 1) * 2;
-}
-int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
-	int cnt = 0, sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) return 1;
-		if (cur.y == nxt.y) continue;
-		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y <= p.y || cur.y > p.y) continue;
-		cnt += ccw(cur, nxt, p) > 0;
-	}
-	return (cnt & 1) * 2;
-}
-int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {//convex
-	if (!sz) return -1;
-	if (sz == 1) return p == H[0] ? 0 : -1;
-	if (sz == 2) return on_seg_strong(H[0], H[1], p) ? 0 : -1;
-	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
-	if (on_seg_strong(H[0], H[1], p) || on_seg_strong(H[0], H[sz - 1], p)) return 0;
-	int s = 0, e = sz - 1, m;
-	while (s + 1 < e) {
-		m = s + e >> 1;
-		if (cross(H[0], H[m], p) > 0) s = m;
-		else e = m;
-	}
-	if (cross(H[s], H[e], p) > 0) return 1;
-	else if (on_seg_strong(H[s], H[e], p)) return 0;
-	else return -1;
+inline bool inner_check(Pos d1, Pos d2, Pos d3, const Pos& t) {
+	if (ccw(d1, d2, d3) < 0) std::swap(d2, d3);
+	return ccw(d1, d2, t) > 0 && ccw(d2, d3, t) > 0 && ccw(d3, d1, t) > 0;
 }
 int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
@@ -206,6 +162,7 @@ Polygon graham_scan(Polygon& C) {
 	}
 	return H;
 }
+
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
