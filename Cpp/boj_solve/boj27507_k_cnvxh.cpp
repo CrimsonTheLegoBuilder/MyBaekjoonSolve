@@ -20,7 +20,6 @@ const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 bool zero(const ld& x) { return !sign(x); }
-ll sq(int x) { return (ll)x * x; }
 
 int N, K;
 bool V[LEN];
