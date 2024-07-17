@@ -21,16 +21,6 @@ const ll MOD = 1'000'000'007;
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 bool zero(const ld& x) { return !sign(x); }
 ll sq(int x) { return (ll)x * x; }
-ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-ll powmod(ll a, ll b) {
-	ll res = 1; a %= MOD;
-	assert(b >= 0);
-	for (; b; b >>= 1) {
-		if (b & 1) res = res * a % MOD;
-		a = a * a % MOD;
-	}
-	return res;
-}
 
 int N, M;
 ll V[LEN];
@@ -124,59 +114,19 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	if (inner_check(H[s], H[e], H[(e + 1) % sz], p)) { V[e] += p.q; }
 	return 1;
 }
-std::vector<Pos> monotone_chain(std::vector<Pos>& C) {
-	std::vector<Pos> H;
-	std::sort(C.begin(), C.end());
-	C.erase(unique(C.begin(), C.end()), C.end());
-	if (C.size() <= 2) { for (const Pos& pos : C) H.push_back(pos); }
-	else {
-		for (int i = 0; i < C.size(); i++) {
-			while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
-				H.pop_back();
-			H.push_back(C[i]);
-		}
-		H.pop_back();
-		int s = H.size() + 1;
-		for (int i = C.size() - 1; i >= 0; i--) {
-			while (H.size() > s && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
-				H.pop_back();
-			H.push_back(C[i]);
-		}
-		H.pop_back();
-	}
-	return H;
-}
-Polygon graham_scan(Polygon& C) {
-	Polygon H;
-	if (C.size() < 3) {
-		std::sort(C.begin(), C.end());
-		return C;
-	}
-	std::swap(C[0], *min_element(C.begin(), C.end()));
-	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
-		int ret = ccw(C[0], p, q);
-		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
-		return ret > 0;
-		}
-	);
-	C.erase(unique(C.begin(), C.end()), C.end());
-	int sz = C.size();
-	for (int i = 0; i < sz; i++) {
-		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
-			H.pop_back();
-		H.push_back(C[i]);
-	}
-	return H;
-}
-
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> N >> M;
 	Polygon H(N), C(M);
 	for (Pos& p : H) std::cin >> p;
-	for (Pos& p : C) std::cin >> p;
+	for (Pos& p : C) std::cin >> p >> p.q;
 	memset(V, 0, sizeof V);
+	ll all = 0;
+	for (Pos& p : C) if (inner_check_bi_search(H, p)) all += p.q;
+	ll ret = std::abs(all);
+	for (int i = 0; i < N; i++) ret = std::max(std::abs(all - V[i]), ret);
+	std::cout << ret << "\n";
 	return;
 }
 int main() { solve(); return 0; }
