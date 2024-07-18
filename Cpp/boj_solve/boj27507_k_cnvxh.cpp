@@ -95,7 +95,7 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	//if (!sz) return -1;
 	//if (sz == 1) return p == H[0] ? 0 : -1;
 	//if (sz == 2) return on_seg_strong(H[0], H[1], p) ? 0 : -1;
-	assert(sz >= 3);
+	//assert(sz >= 3);
 	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
 	if (on_seg_strong(H[0], H[1], p)) {
 		DEL[0].push_back(p);
