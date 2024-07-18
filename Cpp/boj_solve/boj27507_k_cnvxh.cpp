@@ -63,22 +63,8 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return ret < 0 ? -1 : !!ret; }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = cross(d1, d2, d3, d4); return ret < 0 ? -1 : !!ret; }
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3) / (d2 - d1).mag(); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0; }
-bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
-bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const bool f = 1) {
-	//f : include end of seg, !f : ignore end of seg
-	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
-	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	if (!f) return f1 && f2;
-	bool f3 = on_seg_strong(s1, s2, d1) ||
-		on_seg_strong(s1, s2, d2) ||
-		on_seg_strong(d1, d2, s1) ||
-		on_seg_strong(d1, d2, s2);
-	return (f1 && f2) || f3;
-}
 bool inner_check(const Pos& d0, const Pos& d1, const Pos& d2, const Pos& t) {
 	return ccw(d0, d1, t) >= 0 && ccw(d1, d2, t) >= 0 && ccw(d2, d0, t) >= 0;
 }
@@ -182,27 +168,20 @@ void solve() {
 		ret += sz - 1 + tmp == K;
 	}
 	std::cout << ret << "\n";
-	//std::cout << "DEBUG:: H\n";
-	//for (Pos& p : H) std::cout << p << "\n";
-	//std::cout << "DEBUG::\n";
-	//std::cout << "DEBUG:: I\n";
-	//for (Pos& p : I) std::cout << p << "\n";
-	//std::cout << "DEBUG::\n";
 	return;
 }
 int main() { solve(); return 0; }//boj27507 K - convex hull
 
 /*
 
-4 4
+8 4
 -10 10
 -10 -10
 10 -10
 10 10
-
-5 5 1
-5 -5 3
-5 0 3
-6 0 3
+5 5
+5 -5
+5 0
+6 0
 
 */
