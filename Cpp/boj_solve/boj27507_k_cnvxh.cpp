@@ -152,7 +152,7 @@ int lower_monotone_chain(const Polygon& H, const int& x) {
 		ll fp = dot(s, e, p), fq = dot(s, e, q);
 		if (fp == fq) {
 			ll tp = cross(s, e, p), tq = cross(s, e, q);
-			return tp > tq;
+			return tp < tq;
 		}
 		return fp < fq;
 		});
