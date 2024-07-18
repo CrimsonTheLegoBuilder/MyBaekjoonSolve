@@ -168,21 +168,26 @@ int lower_monotone_chain(const Polygon& H, const int& x) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cin >> N >> K;
-	Polygon C(N);
-	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
-	Polygon H = graham_scan(C), I;
 	memset(V, 0, sizeof V);
+	std::cin >> N >> K;
+	Polygon C(N), H, I;
+	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
+	H = graham_scan(C);
+	int sz = H.size(), ret = 0;
 	for (const Pos& p : H) V[p.i] = 1;
 	for (const Pos& p : C) if (!V[p.i]) I.push_back(p);
-	for (const Pos& p : I) inner_check_bi_search(H, p);
-	int sz = H.size();
-	int ret = 0;
+	for (const Pos& p : I) inner_check_bi_search(H, p), ret += sz == K;
 	for (int i = 0; i < sz; i++) {
 		int tmp = lower_monotone_chain(H, i);
-		ret += sz + tmp == K;
+		ret += sz - 1 + tmp == K;
 	}
 	std::cout << ret << "\n";
+	//std::cout << "DEBUG:: H\n";
+	//for (Pos& p : H) std::cout << p << "\n";
+	//std::cout << "DEBUG::\n";
+	//std::cout << "DEBUG:: I\n";
+	//for (Pos& p : I) std::cout << p << "\n";
+	//std::cout << "DEBUG::\n";
 	return;
 }
 int main() { solve(); return 0; }//boj27507 K - convex hull
