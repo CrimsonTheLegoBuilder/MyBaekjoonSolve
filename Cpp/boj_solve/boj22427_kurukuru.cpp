@@ -6,26 +6,57 @@
 #include <cassert>
 #include <vector>
 #include <deque>
+#include <queue>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
-const int LEN = 3e3 + 5;
-int N, M, T, Q;
-bool V[LEN];
-bool zero(const ld& x) { return std::abs(x) < TOL; }
+const int LEN = 100;//7 * 7 * 2 
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+bool zero(const ld& x) { return !sign(x); }
+inline ld norm(ld th) {
+	while (th < 0) th += 2 * PI;
+	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
+	return th;
+}
 
-///========================================================///
-//half plane intersection - refer to bulijiojiodibuliduo
-//O(N^2logN + 6QN) power-diagram query
-///========================================================///
-
+int N, M, T;
+int pt;
+bool V[LEN];
+struct Info {
+	int i;
+	ld c;
+	Info(int I = 0, ld co = 0) : i(I), c(co) {}
+	bool operator < (const Info& x) const { return c > x.c; }
+};
+std::priority_queue<Info> Q;
+std::vector<Info> G[LEN];
+ld C[LEN];
+ld dijkstra(int v, int e) {
+	for (int i = 0; i < LEN; i++) C[i] = INF;
+	Q.push({ v, 0 });
+	C[v] = 0;
+	while (!Q.empty()) {
+		Info p = Q.top(); Q.pop();
+		if (p.c > C[p.i]) continue;
+		if (p.i == e) return C[e];
+		for (const Info& w : G[p.i]) {
+			ld cost = p.c + w.c;
+			if (C[w.i] > cost) {
+				C[w.i] = cost;
+				Q.push(Info(w.i, cost));
+			}
+		}
+	}
+	return C[e];
+}
 struct Pos {
 	ld x, y;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	int i;
+	ld th;
+	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { i = 0; th = 0; }
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -49,80 +80,76 @@ struct Pos {
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
 	Pos unit() const { return *this / mag(); }
-	ld rad() const { return atan2(y, x); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+	ld rad() const { return norm(atan2(y, x)); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return norm(atan2l(p1 / p2, p1 * p2)); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-}; const Pos O = { 0, 0 };
+} poles[10], nodes[LEN]; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
-struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
-	Pos ps[2];
-	Pos dir_;
-	Pos& operator[](int i) { return ps[i]; }
-	Pos dir() const { return dir_; }
-	Linear(Pos a = Pos(0, 0), Pos b = Pos(0, 0)) {
-		ps[0] = a;
-		ps[1] = b;
-		dir_ = (ps[1] - ps[0]).unit();
-	}
-	bool include(const Pos& p) const { return sign(dir_ / (p - ps[0])) > 0; }
-	Linear push() const {//push eps outward
-		const double eps = 1e-8;
-		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
-		return Linear(ps[0] + delta, ps[1] + delta);
-	}
-	Linear operator + (const double eps) const {//push eps outward
-		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
-		return Linear(ps[0] + delta, ps[1] + delta);
-	}
-	Linear operator - (const double eps) const {//pull eps inward
-		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
-		return Linear(ps[0] - delta, ps[1] - delta);
-	}
-	friend bool parallel(const Linear& l0, const Linear& l1) { return zero(l0.dir() / l1.dir()); }
-	friend bool same_dir(const Linear& l0, const Linear& l1) { return parallel(l0, l1) && l0.dir() * l1.dir() > 0; }
-	bool operator < (const Linear& l0) const {
-		if (same_dir(*this, l0)) return l0.include(ps[0]);
-		else return cmpq(this->dir(), l0.dir());
-	}
-};
+Polygon rev[10];
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = cross(d1, d2, d3);
-	return sign(ret);
-}
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ld ret = cross(d1, d2, d3, d4); return sign(ret); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-ld dist(const Pos& d1, const Pos& d2, const Pos& t) {
-	return cross(d1, d2, t) / (d1 - d2).mag();
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3) / (d2 - d1).mag(); }
+ld dist(const Pos& d1, const Pos& d2, const Pos& t, const int f = 0) {
+	ld ret = cross(d1, d2, t) / (d1 - d2).mag();
+	if (f == 1) return std::abs(ret);
+	if (f == 2) {
+		if (sign(dot(d1, d2, t)) <= 0 &&
+			sign(dot(d2, d1, t)) <= 0)
+			return std::abs(cross(d1, d2, t)) / (d1 - d2).mag();
+		return std::min((d1 - t).mag(), (d2 - t).mag());
+	}
+	return ret;
 }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
-Polygon convex_cut(const std::vector<Pos>& ps, const Pos& b1, const Pos& b2) {
-	std::vector<Pos> qs;
-	int n = ps.size();
-	for (int i = 0; i < n; i++) {
-		Pos p1 = ps[i], p2 = ps[(i + 1) % n];
-		int d1 = ccw(b1, b2, p1), d2 = ccw(b1, b2, p2);
-		if (d1 >= 0) qs.push_back(p1);
-		if (d1 * d2 < 0) qs.push_back(intersection(p1, p2, b1, b2));
-	}
-	return qs;
+
+bool between(const Pos& d1, const Pos& d2, const Pos& target) {
+	ld dot1 = dot(d1, d2, target), dot2 = dot(d2, d1, target);
+	return ((zero(dot1) || dot1 < 0) && (zero(dot2) || dot2 < 0));
 }
-Polygon sutherland_hodgman(const std::vector<Pos>& C, const std::vector<Pos>& clip) {
-	int sz = clip.size();
-	std::vector<Pos> ret = C;
-	for (int i = 0; i < sz; i++) {
-		Pos b1 = clip[i], b2 = clip[(i + 1) % sz];
-		ret = convex_cut(ret, b1, b2);
-	}
-	return ret;
+ld dist(const Pos& d1, const Pos& d2) {
+	return hypot((d1.x - d2.x), (d1.y - d2.y));
 }
+//ld dist(const Pos& d1, const Pos& d2, const Pos& target) {
+//	return std::abs(cross(d1, d2, target) / dist(d1, d2));
+//}
+bool close(const Pos& d, const ld& R, const Pos& target) {
+	return dist(d, target) < R - TOL;
+}
+bool close(const Pos& d1, const Pos& d2, const ld& R, const Pos& target) {
+	if (between(d1, d2, target)) return dist(d1, d2, target) < R - TOL;
+	else return close(d1, R, target) || close(d2, R, target);
+}
+ld get_theta(const Pos& d1, const Pos& d2, const ld& R) {
+	ld w = dist(d1, d2);
+	return asin(R / w);
+}
+Pos rotate(const Pos& pivot, const Pos& p, ld theta, int i) {
+	Pos v = p - pivot;
+	ld ratio = cos(theta);
+	ld x = v.x * cos(theta) - v.y * sin(theta);
+	ld y = v.x * sin(theta) + v.y * cos(theta);
+	return Pos(x, y) * ratio + pivot;
+}
+void connect_node(int n1, int n2, const ld& R) {
+	Pos d1 = nodes[n1], d2 = nodes[n2];
+	if (!d1.i || d1.i != d2.i) {
+		for (int i = 1; i < N + 1; i++) if (close(d1, d2, R, poles[i])) return;
+		G[n1].push_back({ n2, dist(d1, d2) });
+		G[n2].push_back({ n1, dist(d1, d2) });
+	}
+	return;
+}
+
 std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& p1, const Pos& p2) {
 	ld d = dist(p1, p2, o);
 	if (std::abs(d) > r) return {};
@@ -134,27 +161,6 @@ std::vector<Pos> circle_line_intersection(const Pos& o, const ld& r, const Pos& 
 	Pos m2 = m + vec * ratio / distance;
 	if (dot(p1, p2, m1, m2) < 0) std::swap(m1, m2);
 	return { m1, m2 };//p1->p2
-}
-std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
-	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
-		return w.include(intersection(u, v));
-		};
-	std::sort(HP.begin(), HP.end());
-	std::deque<Linear> dq;
-	int sz = HP.size();
-	for (int i = 0; i < sz; ++i) {
-		if (i && same_dir(HP[i], HP[(i - 1) % sz])) continue;
-		while (dq.size() > 1 && !check(dq[dq.size() - 2], dq[dq.size() - 1], HP[i])) dq.pop_back();
-		while (dq.size() > 1 && !check(dq[1], dq[0], HP[i])) dq.pop_front();
-		dq.push_back(HP[i]);
-	}
-	while (dq.size() > 2 && !check(dq[dq.size() - 2], dq[dq.size() - 1], dq[0])) dq.pop_back();
-	while (dq.size() > 2 && !check(dq[1], dq[0], dq[dq.size() - 1])) dq.pop_front();
-	sz = dq.size();
-	if (sz < 3) return {};
-	std::vector<Pos> HPI;
-	for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
-	return HPI;
 }
 struct Circle {
 	Pos c;
@@ -177,7 +183,6 @@ struct Circle {
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 } INVAL = { { 0, 0 }, -1 };
 bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
-std::vector<Pos> pd[LEN];//power diagram (Laguerre-Voronoi diagram)
 std::vector<Circle> disks;
 ld circle_cut(const Circle& c, const Pos& p1, const Pos& p2) {
 	Pos v1 = p1 - c.c, v2 = p2 - c.c;
@@ -193,62 +198,298 @@ ld circle_cut(const Circle& c, const Pos& p1, const Pos& p2) {
 		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
 	else return (r * r * rad(v1, v2)) * .5;
 }
-void query() {
-	ll x, y, w, h;
-	std::vector<Pos> box;
-	std::cin >> x >> y >> w >> h;
-	box = { Pos(x, y), Pos(x + w, y), Pos(x + w, y + h), Pos(x, y + h) };
-	ld ret = 0;
-	for (int i = 0; i < N; i++) {
-		if (pd[i].empty()) continue;
-		std::vector<Pos> rem = sutherland_hodgman(pd[i], box);
-		int sz = rem.size();
-		if (sz < 3) continue;
-		for (int j = 0; j < sz; j++)
-			ret += circle_cut(disks[i], rem[j], rem[(j + 1) % sz]);
+bool query() {
+	std::cin >> N;
+	if (!N) return 0;
+	int r, R;
+	ld I;
+	Pos s, t;
+	std::cin >> r >> R >> s >> t;
+	assert(s.x * t.x < 0);
+	if (s.x < 0) std::swap(s, t);
+	s.i = 0;
+	t.i = 1;
+	pt = 2;
+	ld the = PI / N;
+	I = r / sin(the);
+	//if (sign(I + r - R) > 0) { std::cout << "-1\n"; return 1; }
+	if (sign(I + r - R) > 0) { std::cout << "DEBUG:: answer:: -1\n"; return 1; }
+	Pos p1, p2, p3, p4;
+	p1 = Pos(1, 0).rot(the * .5) * R;
+	p2 = Pos(1, 0).rot(PI - the * .5) * R;
+	p3 = Pos(1, 0).rot(PI + the * .5) * R;
+	p4 = Pos(1, 0).rot(-the * .5) * R;
+	if (sign(dist(s, t, O, 1) - I) >= 0 &&
+		sign(dist(s, t, p1) - R) >= 0 &&
+		sign(dist(s, t, p2) + R) <= 0 &&
+		sign(dist(s, t, p3) + R) <= 0 &&
+		sign(dist(s, t, p4) - R) >= 0) {
+		//std::cout << (s - t).mag() << "\n";
+		std::cout << "DEBUG:: direct:: " << (s - t).mag() << "\n";
+		return 1;
 	}
-	std::cout << ret * 100 / w / h << "\n";
-	return;
+
+	Pos p11 = p1 + (p1 - O).unit() * r;
+	p11.i = pt++;
+	Pos p1_ = p1 + ~(p11 - p1).unit() * r;
+	rev[1].push_back(p11);
+
+	Pos p21 = p1 + (p2 - O).unit() * r;
+	p21.i = pt++;
+	Pos p2_ = p2 + ~(p21 - p2).unit() * -r;
+	rev[2].push_back(p21);
+
+	Pos p31 = p1 + (p3 - O).unit() * r;
+	p31.i = pt++;
+	rev[3].push_back(p31);
+	Pos p3_ = p3 + ~(p31 - p3).unit() * r;
+
+	Pos p41 = p1 + (p4 - O).unit() * r;
+	p41.i = pt++;
+	rev[4].push_back(p41);
+	Pos p4_ = p4 + ~(p41 - p4).unit() * -r;
+
+	if (sign(dist(s, p21, O) - R) >= 0 && sign(dist(s, p21, p3) - r) >= 0) {
+		G[0].push_back(Info(p21.i, (s - p21).mag()));
+		G[p21.i].push_back(Info(0, (s - p21).mag()));
+	}
+	if (sign(dist(s, p31, O) - R) >= 0 && sign(dist(s, p31, p2) - r) >= 0) {
+		G[0].push_back(Info(p31.i, (s - p31).mag()));
+		G[p31.i].push_back(Info(0, (s - p31).mag()));
+	}
+	if (sign(dist(t, p11, O) - R) >= 0 && sign(dist(t, p11, p4) - r) >= 0) {
+		G[1].push_back(Info(p11.i, (t - p11).mag()));
+		G[p11.i].push_back(Info(1, (t - p11).mag()));
+	}
+	if (sign(dist(t, p41, O) - R) >= 0 && sign(dist(t, p41, p1) - r) >= 0) {
+		G[1].push_back(Info(p41.i, (t - p41).mag()));
+		G[p41.i].push_back(Info(1, (t - p41).mag()));
+	}
+
+	ld w = R + r;
+	ld a = (O - s).mag();
+	ld the = std::min(1., std::max(-1., w / a));
+	ld gam = acos(the);
+	//s -> p2
+	if (ccw(p2, p21, s) < 0 && sign(dist(p2, p2_, s) - r) < 0) {
+		Pos p22 = Pos(R + r, 0).rot(s.rad() + gam);
+		p22.i = pt++;
+		G[0].push_back(Info(p22.i, (s - p22).mag()));
+		G[p22.i].push_back(Info(0, (s - p22).mag()));
+		G[p21.i].push_back(Info(p22.i, std::abs(rad(p21, p22)) * w));
+		G[p22.i].push_back(Info(p21.i, std::abs(rad(p21, p22)) * w));
+	}
+	//s -> p3
+	if (ccw(p3, p31, s) > 0 && sign(dist(p3_, p3, s) - r) < 0) {
+		Pos p32 = Pos(R + r, 0).rot(s.rad() + gam);
+		p32.i = pt++;
+		G[0].push_back(Info(p32.i, (s - p32).mag()));
+		G[p32.i].push_back(Info(0, (s - p32).mag()));
+		G[p31.i].push_back(Info(p32.i, std::abs(rad(p31, p32)) * w));
+		G[p32.i].push_back(Info(p31.i, std::abs(rad(p31, p32)) * w));
+	}
+
+	a = (O - t).mag();
+	the = std::min(1., std::max(-1., w / a));
+	gam = acos(the);
+	//t -> p4
+	if (ccw(p4, p41, t) < 0 && sign(dist(p4, p4_, t) - r) < 0) {
+		Pos p42 = Pos(R + r, 0).rot(t.rad() + gam);
+		p42.i = pt++;
+		G[1].push_back(Info(p42.i, (t - p42).mag()));
+		G[p42.i].push_back(Info(1, (t - p42).mag()));
+		G[p41.i].push_back(Info(p42.i, std::abs(rad(p41, p42)) * w));
+		G[p42.i].push_back(Info(p41.i, std::abs(rad(p41, p42)) * w));
+	}
+	//t -> p1
+	if (ccw(p1, p11, t) > 0 && sign(dist(p1_, p1, t) - r) < 0) {
+		Pos p12 = Pos(R + r, 0).rot(t.rad() + gam);
+		p12.i = pt++;
+		G[1].push_back(Info(p12.i, (t - p12).mag()));
+		G[p12.i].push_back(Info(1, (t - p12).mag()));
+		G[p11.i].push_back(Info(p12.i, std::abs(rad(p11, p12)) * w));
+		G[p12.i].push_back(Info(p11.i, std::abs(rad(p11, p12)) * w));
+	}
+
+	//s -> p1, p2, p3, p4
+	Pos vec;
+	vec = s - p2;
+	a = vec.mag();
+	the = std::min(1., std::max(-1., r / a));
+	gam = acos(the);
+	Pos p23 = p2 + vec.unit().rot(gam) * r;
+	if (sign(dist(s, p23, O, 2) - R) >= 0 && sign(dist(s, p23, p3, 2) - r) >= 0) {
+		p23.i = pt++;
+		G[0].push_back(Info(p23.i, (s - p23).mag()));
+		G[p23.i].push_back(Info(0, (s - p23).mag()));
+		rev[2].push_back(p23);
+	}
+	vec = s - p3;
+	a = vec.mag();
+	the = std::min(1., std::max(-1., r / a));
+	gam = acos(the);
+	Pos p33 = p3 + vec.unit().rot(-gam) * r;
+	if (sign(dist(s, p33, O, 2) - R) >= 0 && sign(dist(s, p33, p2, 2) - r) >= 0) {
+		p33.i = pt++;
+		G[0].push_back(Info(p33.i, (s - p33).mag()));
+		G[p33.i].push_back(Info(0, (s - p33).mag()));
+		rev[3].push_back(p33);
+	}
+	vec = s - p4;
+	a = vec.mag();
+	the = std::min(1., std::max(-1., r / a));
+	gam = acos(the);
+	Pos p43 = p4 + vec.unit().rot(gam) * r;
+	if (sign(dist(s, p43, O, 2) - I) >= 0 &&
+		sign(dist(s, p43, p2, 2) - r) >= 0 &&
+		sign(dist(s, p43, p3, 2) - r) >= 0) {
+		p43.i = pt++;
+		G[0].push_back(Info(p43.i, (s - p43).mag()));
+		G[p43.i].push_back(Info(0, (s - p43).mag()));
+		rev[4].push_back(p43);
+	}
+	vec = s - p1;
+	a = vec.mag();
+	the = std::min(1., std::max(-1., r / a));
+	gam = acos(the);
+	Pos p13 = p1 + vec.unit().rot(-gam) * r;
+	if (sign(dist(s, p13, O, 2) - I) >= 0 &&
+		sign(dist(s, p13, p2, 2) - r) >= 0 &&
+		sign(dist(s, p13, p3, 2) - r) >= 0) {
+		p13.i = pt++;
+		G[0].push_back(Info(p13.i, (s - p13).mag()));
+		G[p13.i].push_back(Info(0, (s - p13).mag()));
+		rev[1].push_back(p13);
+	}
+	//s -> p1, p2, p3, p4
+
+	//t -> p1, p2, p3, p4
+	vec = t - p4;
+	a = vec.mag();
+	the = std::min(1., std::max(-1., r / a));
+	gam = acos(the);
+	Pos p44 = p4 + vec.unit().rot(gam) * r;
+	if (sign(dist(t, p44, O, 2) - R) >= 0 && sign(dist(t, p44, p1, 2) - r) >= 0) {
+		p44.i = pt++;
+		G[1].push_back(Info(p44.i, (t - p44).mag()));
+		G[p44.i].push_back(Info(1, (t - p44).mag()));
+		rev[4].push_back(p44);
+	}
+	vec = t - p1;
+	a = vec.mag();
+	the = std::min(1., std::max(-1., r / a));
+	gam = acos(the);
+	Pos p14 = p1 + vec.unit().rot(-gam) * r;
+	if (sign(dist(t, p14, O, 2) - R) >= 0 && sign(dist(t, p14, p4, 2) - r) >= 0) {
+		p14.i = pt++;
+		G[1].push_back(Info(p14.i, (t - p14).mag()));
+		G[p14.i].push_back(Info(1, (t - p14).mag()));
+		rev[1].push_back(p14);
+	}
+	vec = s - p2;
+	a = vec.mag();
+	the = std::min(1., std::max(-1., r / a));
+	gam = acos(the);
+	Pos p24 = p2 + vec.unit().rot(gam) * r;
+	if (sign(dist(t, p24, O, 2) - I) >= 0 &&
+		sign(dist(t, p24, p1, 2) - r) >= 0 &&
+		sign(dist(t, p24, p4, 2) - r) >= 0) {
+		p24.i = pt++;
+		G[1].push_back(Info(p24.i, (t - p24).mag()));
+		G[p24.i].push_back(Info(0, (t - p24).mag()));
+		rev[2].push_back(p24);
+	}
+	vec = s - p3;
+	a = vec.mag();
+	the = std::min(1., std::max(-1., r / a));
+	gam = acos(the);
+	Pos p34 = p3 + vec.unit().rot(-gam) * r;
+	if (sign(dist(t, p34, O, 2) - I) >= 0 &&
+		sign(dist(t, p34, p1, 2) - r) >= 0 &&
+		sign(dist(t, p34, p4, 2) - r) >= 0) {
+		p34.i = pt++;
+		G[1].push_back(Info(p34.i, (t - p34).mag()));
+		G[p34.i].push_back(Info(0, (t - p34).mag()));
+		rev[2].push_back(p34);
+	}
+	//t -> p1, p2, p3, p4
+
+	//s -> O
+	if (ccw(O, p2, s) > 0 && ccw(O, p3, s) < 0) {
+		vec = s - O;
+		a = vec.mag();
+		the = std::min(1., std::max(-1., I / a));
+		gam = acos(the);
+		Pos p02 = O + vec.unit().rot(gam) * r;
+		if (sign(dist(s, p02, p2, 2) - r) >= 0 && sign(dist(s, p02, p3, 2) - r) >= 0) {
+			p02.i = pt++;
+			G[0].push_back(Info(p02.i, (s - p02).mag()));
+			G[p02.i].push_back(Info(0, (s - p02).mag()));
+			rev[0].push_back(p02);
+		}
+		Pos p03 = O + vec.unit().rot(-gam) * r;
+		if (sign(dist(s, p03, p2, 2) - r) >= 0 && sign(dist(s, p03, p3, 2) - r) >= 0) {
+			p03.i = pt++;
+			G[0].push_back(Info(p03.i, (s - p03).mag()));
+			G[p03.i].push_back(Info(0, (s - p03).mag()));
+			rev[0].push_back(p03);
+		}
+	}
+	//s -> O
+	 
+	//t -> O
+	if (ccw(O, p4, s) > 0 && ccw(O, p1, s) < 0) {
+		vec = t - O;
+		a = vec.mag();
+		the = std::min(1., std::max(-1., I / a));
+		gam = acos(the);
+		Pos p04 = O + vec.unit().rot(gam) * r;
+		if (sign(dist(s, p04, p4, 2) - r) >= 0 && sign(dist(s, p04, p1, 2) - r) >= 0) {
+			p04.i = pt++;
+			G[1].push_back(Info(p04.i, (t - p04).mag()));
+			G[p04.i].push_back(Info(1, (t - p04).mag()));
+			rev[0].push_back(p04);
+		}
+		Pos p01 = O + vec.unit().rot(-gam) * r;
+		if (sign(dist(s, p01, p4, 2) - r) >= 0 && sign(dist(s, p01, p1, 2) - r) >= 0) {
+			p01.i = pt++;
+			G[1].push_back(Info(p01.i, (t - p01).mag()));
+			G[p01.i].push_back(Info(1, (t - p01).mag()));
+			rev[0].push_back(p01);
+		}
+	}
+	//t -> O
+
+	//Pos p24 = p2 + Pos(0, -r);
+	//Pos p14 = p1 + Pos(0, -r);
+	//if (sign(dist(p24, p14, O, 1) - I) >= 0) {
+	//	p24.i = pt++;
+	//	p14.i = pt++;
+	//	rev[2].push_back(p24);
+	//	rev[1].push_back(p14);
+	//}
+	//Pos p34 = p3 + Pos(0, r);
+	//Pos p44 = p4 + Pos(0, r);
+	//if (sign(dist(p34, p44, O, 1) - I) >= 0) {
+	//	p34.i = pt++;
+	//	p44.i = pt++;
+	//	rev[3].push_back(p34);
+	//	rev[4].push_back(p44);
+	//}
+	
+
+
+	ld ans = dijkstra(0, 1);
+	//std::cout << ans << "\n";
+	std::cout << "DEBUG:: answer::" << ans << "\n";
+	return 1;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	std::cin >> N >> Q;
-	std::vector<Circle> tmp(N);
-	for (Circle& c : tmp) std::cin >> c;
-	memset(V, 0, sizeof V);
-	for (int i = 0; i < N; i++) {//remove
-		if (V[i]) continue;
-		for (int j = 0; j < N; j++) {
-			if (i < j && tmp[i] == tmp[j]) V[i] = 1;
-			if (tmp[i] < tmp[j]) V[i] = 1;
-			if (tmp[j] < tmp[i]) V[j] = 1;
-		}
-	}
-	for (int i = 0; i < N; i++) if (!V[i]) disks.push_back(tmp[i]);
-	N = disks.size();
-	int bnd = 3e6;
-	for (int i = 0; i < N; i++) {//compose power diagram
-		std::vector<Linear> HP;
-		HP.push_back(Linear(Pos(bnd, bnd), Pos(-bnd, bnd)));
-		HP.push_back(Linear(Pos(-bnd, bnd), Pos(-bnd, -bnd)));
-		HP.push_back(Linear(Pos(-bnd, -bnd), Pos(bnd, -bnd)));
-		HP.push_back(Linear(Pos(bnd, -bnd), Pos(bnd, bnd)));
-		for (int j = 0; j < N; j++) {
-			if (i == j) continue;
-			Pos& ca = disks[i].c, cb = disks[j].c;
-			ll ra = disks[i].r, rb = disks[j].r;
-			Pos vec = cb - ca;//vec a -> b
-			ld distance = vec.mag();
-			ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
-			Pos m = ca + vec * X / distance;
-			HP.push_back(Linear(m, m + ~vec));
-		}
-		pd[i] = half_plane_intersection(HP);
-	}
-	while (Q--) query();
+	while (query());
 	return;
 }
 int main() { solve(); return 0; }
