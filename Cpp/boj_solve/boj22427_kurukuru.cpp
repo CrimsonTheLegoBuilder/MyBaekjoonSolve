@@ -16,7 +16,7 @@ typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
-const int LEN = 200;//7 * 7 * 4
+const int LEN = 300;
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 bool zero(const ld& x) { return !sign(x); }
 inline ld norm(ld th) {
@@ -227,6 +227,7 @@ bool query() {
 	std::cin >> r >> R >> s >> t;
 	assert(s.x * t.x < 0);
 	if (s.x > 0) std::swap(s, t);
+	assert(s.x < 0 && t.x > 0);
 	//std::cout << "DEBUG:: s:: " << s << " t:: " << t << "\n";
 	s.i = 0;
 	t.i = 1;
@@ -238,6 +239,8 @@ bool query() {
 
 	//if (sign(I + r - R) > 0) { std::cout << "-1\n"; return 1; }
 	if (sign(I + r - R) > 0) { std::cout << "DEBUG:: answer:: -1\n"; return 1; }
+	assert(R >= r + I);
+
 	Pos p1, p2, p3, p4;
 	p1 = Pos(1, 0).rot(the * .5) * R;
 	p2 = Pos(1, 0).rot(PI - the * .5) * R;
@@ -253,31 +256,39 @@ bool query() {
 		return 1;
 	}
 
-	Pos p1_, p2_, p3_, p4_, p11, p21, p31, p41 , p1t, p2t, p3t, p4t;
+	Pos p1_, p2_, p3_, p4_, p11, p21, p31, p41, p1t, p2t, p3t, p4t;
 
 	p11 = p1 + (p1 - O).unit() * r;
-	p1t = p1 + (p1 - O).unit() * r * .5;
-	p11.i = pt++;
+	p1t = p1 + (p1 - O).unit().s() * r;
 	p1_ = p1 + ~(p11 - p1).unit() * r;
+	p11.i = pt++;
+	p1t.i = pt++;
 	rev[1].push_back(p11);
+	rev[1].push_back(p1t);
 
 	p21 = p2 + (p2 - O).unit() * r;
-	p2t = p2 + (p2 - O).unit() * r * .5;
-	p21.i = pt++;
+	p2t = p2 + (p2 - O).unit().s() * -r;
 	p2_ = p2 + ~(p21 - p2).unit() * -r;
+	p21.i = pt++;
+	p2t.i = pt++;
 	rev[2].push_back(p21);
+	rev[2].push_back(p2t);
 
 	p31 = p3 + (p3 - O).unit() * r;
-	p3t = p3 + (p3 - O).unit() * r * .5;
-	p31.i = pt++;
+	p3t = p3 + (p3 - O).unit().s() * r;
 	p3_ = p3 + ~(p31 - p3).unit() * r;
+	p31.i = pt++;
+	p3t.i = pt++;
 	rev[3].push_back(p31);
+	rev[3].push_back(p3t);
 
 	p41 = p4 + (p4 - O).unit() * r;
-	p4t = p4 + (p4 - O).unit() * r * .5;
-	p41.i = pt++;
+	p4t = p4 + (p4 - O).unit().s() * -r;
 	p4_ = p4 + ~(p41 - p4).unit() * -r;
+	p41.i = pt++;
+	p4t.i = pt++;
 	rev[4].push_back(p41);
+	rev[4].push_back(p4t);
 
 	//std::cout << "DEBUG:: 1:: p1 ::" << p1 << " p1_:: " << p1_ << "\n";
 	//std::cout << "DEBUG:: 1:: vec:: p1_ - p1:: " << p1_ - p1 << "\n";
@@ -314,7 +325,7 @@ bool query() {
 	the = std::min(1., std::max(-1., w / a));
 	gam = acos(the);
 	//std::cout << "DEBUG:: gam " << gam * 180 / PI << "\n";
-	//s -> p2
+	//s -> R
 	Pos p22 = Pos(w, 0).rot(s.rad() + gam);
 	if (ccw(p2, p21, s) < 0 &&
 		sign(dist(p2, p2_, s) - r) < 0) {
@@ -325,8 +336,7 @@ bool query() {
 		G[p21.i].push_back(Info(p22.i, std::abs(rad(p21, p22)) * w));
 		G[p22.i].push_back(Info(p21.i, std::abs(rad(p21, p22)) * w));
 	}
-	//s -> p3
-	Pos p32 = Pos(w, 0).rot(s.rad() + gam);
+	Pos p32 = Pos(w, 0).rot(s.rad() - gam);
 	if (ccw(p3, p31, s) > 0 &&
 		sign(dist(p3_, p3, s) - r) < 0) {
 		//std::cout << "DEBUG:: tangent3 " << " " << "\n";
@@ -343,7 +353,7 @@ bool query() {
 	the = std::min(1., std::max(-1., w / a));
 	gam = acos(the);
 	//std::cout << "DEBUG:: gam " << gam * 180 / PI << "\n";
-	//t -> p4
+	//t -> R
 	Pos p42 = Pos(w, 0).rot(t.rad() + gam);
 	if (ccw(p4, p41, t) < 0 &&
 		sign(dist(p4, p4_, t) - r) < 0) {
@@ -354,8 +364,7 @@ bool query() {
 		G[p41.i].push_back(Info(p42.i, std::abs(rad(p41, p42)) * w));
 		G[p42.i].push_back(Info(p41.i, std::abs(rad(p41, p42)) * w));
 	}
-	//t -> p1
-	Pos p12 = Pos(w, 0).rot(t.rad() + gam);
+	Pos p12 = Pos(w, 0).rot(t.rad() - gam);
 	if (ccw(p1, p11, t) > 0 &&
 		sign(dist(p1_, p1, t) - r) < 0) {
 		//std::cout << "DEBUG:: tangent1 " << " " << "\n";
@@ -376,8 +385,8 @@ bool query() {
 	the = std::min(1., std::max(-1., r / a));
 	gam = acos(the);
 	Pos p23 = p2 + vec.unit().rot(gam) * r;
-	std::cout << "DEBUG:: p23 :: " << p23 << "\n";
-	if (sign(dist(p2, p2_, s) - r) >= 0) {
+	//std::cout << "DEBUG:: p23 :: " << p23 << "\n";
+	if (sign(dist(p3, p2, s) - r) >= 0 && sign(dist(p31, p3, s) - r) >= r) {
 		p23.i = pt++;
 		G[0].push_back(Info(p23.i, (s - p23).mag()));
 		G[p23.i].push_back(Info(0, (s - p23).mag()));
@@ -388,7 +397,7 @@ bool query() {
 	the = std::min(1., std::max(-1., r / a));
 	gam = acos(the);
 	Pos p33 = p3 + vec.unit().rot(-gam) * r;
-	if (sign(dist(p3_, p3, s) - r) >= 0) {
+	if (sign(dist(p3, p2, s) - r) >= 0 && sign(dist(p2, p21, s) - r) >= r) {
 		p33.i = pt++;
 		G[0].push_back(Info(p33.i, (s - p33).mag()));
 		G[p33.i].push_back(Info(0, (s - p33).mag()));
@@ -428,7 +437,7 @@ bool query() {
 	the = std::min(1., std::max(-1., r / a));
 	gam = acos(the);
 	Pos p44 = p4 + vec.unit().rot(gam) * r;
-	if (sign(dist(p4, p4_, t) - r) >= 0) {
+	if (sign(dist(p1, p4, t) - r) >= 0 && sign(dist(p11, p1, t) - r) >= r) {
 		p44.i = pt++;
 		G[1].push_back(Info(p44.i, (t - p44).mag()));
 		G[p44.i].push_back(Info(1, (t - p44).mag()));
@@ -439,7 +448,7 @@ bool query() {
 	the = std::min(1., std::max(-1., r / a));
 	gam = acos(the);
 	Pos p14 = p1 + vec.unit().rot(-gam) * r;
-	if (sign(dist(p1_, p1, t) - r) >= 0) {
+	if (sign(dist(p1, p4, t) - r) >= 0 && sign(dist(p4, p41, t) - r) >= r) {
 		p14.i = pt++;
 		G[1].push_back(Info(p14.i, (t - p14).mag()));
 		G[p14.i].push_back(Info(1, (t - p14).mag()));
@@ -542,9 +551,9 @@ bool query() {
 	Vint v = { 1, -1 };
 
 	//p2 - O
-	vec = p2 - O;
-	a = vec.mag();
 	for (const int& i : v) {
+		vec = p2 - O;
+		a = vec.mag();
 		b = I + r * i;
 		c = sqrt(a * a + b * b);
 		the = std::min(1., std::max(-1., b / a));
@@ -561,9 +570,9 @@ bool query() {
 	}
 
 	//p3 - O
-	vec = p3 - O;
-	a = vec.mag();
 	for (const int& i : v) {
+		vec = p3 - O;
+		a = vec.mag();
 		b = I + r * i;
 		c = sqrt(a * a + b * b);
 		the = std::min(1., std::max(-1., b / a));
@@ -580,9 +589,9 @@ bool query() {
 	}
 
 	//p4 - O
-	vec = p4 - O;
-	a = vec.mag();
 	for (const int& i : v) {
+		vec = p4 - O;
+		a = vec.mag();
 		b = I + r * i;
 		c = sqrt(a * a + b * b);
 		the = std::min(1., std::max(-1., b / a));
@@ -599,9 +608,9 @@ bool query() {
 	}
 
 	//p1 - O
-	vec = p1 - O;
-	a = vec.mag();
 	for (const int& i : v) {
+		vec = p1 - O;
+		a = vec.mag();
 		b = I + r * i;
 		c = sqrt(a * a + b * b);
 		the = std::min(1., std::max(-1., b / a));
@@ -636,9 +645,9 @@ bool query() {
 	sz = r1.size();
 	for (int i = 0; i < sz; i++) {
 		Pos& q1 = r1[i], & q2 = r1[(i + 1) % sz];
-		Pos v1 = r1[i] - O, v2 = r1[(i + 1) % sz] - O;
-		if (intersect(p1t, p1_, v1, v2)) continue;
-		c = std::abs(rad(v1, v2)) * I;
+		Pos v1 = r1[i] - p1, v2 = r1[(i + 1) % sz] - p1;
+		if (intersect(p1, p1_, q1, q2)) continue;
+		c = std::abs(rad(v1, v2)) * r;
 		G[q1.i].push_back(Info(q2.i, c));
 		G[q2.i].push_back(Info(q1.i, c));
 	}
@@ -646,9 +655,9 @@ bool query() {
 	sz = r2.size();
 	for (int i = 0; i < sz; i++) {
 		Pos& q1 = r2[i], & q2 = r2[(i + 1) % sz];
-		Pos v1 = r2[i] - O, v2 = r2[(i + 1) % sz] - O;
-		if (intersect(p2t, p2_, v1, v2)) continue;
-		c = std::abs(rad(v1, v2)) * I;
+		Pos v1 = r2[i] - p2 , v2 = r2[(i + 1) % sz] - p2;
+		if (intersect(p2, p2_, q1, q2)) continue;
+		c = std::abs(rad(v1, v2)) * r;
 		G[q1.i].push_back(Info(q2.i, c));
 		G[q2.i].push_back(Info(q1.i, c));
 	}
@@ -656,9 +665,9 @@ bool query() {
 	sz = r3.size();
 	for (int i = 0; i < sz; i++) {
 		Pos& q1 = r3[i], & q2 = r3[(i + 1) % sz];
-		Pos v1 = r3[i] - O, v2 = r3[(i + 1) % sz] - O;
-		if (intersect(p3t, p3_, v1, v2)) continue;
-		c = std::abs(rad(v1, v2)) * I;
+		Pos v1 = r3[i] - p3, v2 = r3[(i + 1) % sz] - p3;
+		if (intersect(p3, p3_, q1, q2)) continue;
+		c = std::abs(rad(v1, v2)) * r;
 		G[q1.i].push_back(Info(q2.i, c));
 		G[q2.i].push_back(Info(q1.i, c));
 	}
@@ -666,9 +675,9 @@ bool query() {
 	sz = r4.size();
 	for (int i = 0; i < sz; i++) {
 		Pos& q1 = r4[i], & q2 = r4[(i + 1) % sz];
-		Pos v1 = r4[i] - O, v2 = r4[(i + 1) % sz] - O;
-		if (intersect(p4t, p4_, v1, v2)) continue;
-		c = std::abs(rad(v1, v2)) * I;
+		Pos v1 = r4[i] - p4, v2 = r4[(i + 1) % sz] - p4;
+		if (intersect(p4, p4_, q1, q2)) continue;
+		c = std::abs(rad(v1, v2)) * r;
 		G[q1.i].push_back(Info(q2.i, c));
 		G[q2.i].push_back(Info(q1.i, c));
 	}
