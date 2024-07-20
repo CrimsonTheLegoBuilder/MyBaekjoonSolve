@@ -342,7 +342,7 @@ bool query() {
 	gam = acos(the);
 	Pos p23 = p2 + vec.unit().rot(gam) * r;
 	//std::cout << "DEBUG:: p23 :: " << p23 << "\n";
-	if (sign(dist(p3, p2, s) - r) >= 0 || sign(dist(p2, p2_, s) - r) >= r) {
+	if (sign(dist(p3, p2, s) - r) >= 0 || sign(dist(p2, p2_, s) - r) >= 0) {
 		p23.i = pt++;
 		node.push_back(p23);
 		G[0].push_back(Info(p23.i, (s - p23).mag()));
@@ -356,7 +356,7 @@ bool query() {
 	the = std::min((ld)1., std::max(-(ld)1., r / a));
 	gam = acos(the);
 	Pos p33 = p3 + vec.unit().rot(-gam) * r;
-	if (sign(dist(p3, p2, s) - r) >= 0 || sign(dist(p3_, p3, s) - r) >= r) {
+	if (sign(dist(p3, p2, s) - r) >= 0 || sign(dist(p3_, p3, s) - r) >= 0) {
 		p33.i = pt++;
 		node.push_back(p33);
 		G[0].push_back(Info(p33.i, (s - p33).mag()));
@@ -399,7 +399,7 @@ bool query() {
 	the = std::min((ld)1., std::max(-(ld)1., r / a));
 	gam = acos(the);
 	Pos p44 = p4 + vec.unit().rot(gam) * r;
-	if (sign(dist(p1, p4, t) - r) >= 0 || sign(dist(p4, p4_, t) - r) >= r) {
+	if (sign(dist(p1, p4, t) - r) >= 0 || sign(dist(p4, p4_, t) - r) >= 0) {
 		p44.i = pt++;
 		node.push_back(p44);
 		G[1].push_back(Info(p44.i, (t - p44).mag()));
@@ -411,7 +411,7 @@ bool query() {
 	the = std::min((ld)1., std::max(-(ld)1., r / a));
 	gam = acos(the);
 	Pos p14 = p1 + vec.unit().rot(-gam) * r;
-	if (sign(dist(p1, p4, t) - r) >= 0 || sign(dist(p1_, p1, t) - r) >= r) {
+	if (sign(dist(p1, p4, t) - r) >= 0 || sign(dist(p1_, p1, t) - r) >= 0) {
 		p14.i = pt++;
 		node.push_back(p14);
 		G[1].push_back(Info(p14.i, (t - p14).mag()));
@@ -681,7 +681,7 @@ bool query() {
 	std::cout << ans << "\n";
 	//std::cout << "DEBUG:: answer::" << ans << "\n";
 
-	back_trace();
+	//back_trace();
 
 	return 1;
 }
@@ -690,10 +690,10 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(10);
-	//freopen("door2.in", "r", stdin);
-	//freopen("door2_my.out", "w", stdout);
+	//freopen("door1.in", "r", stdin);
+	//freopen("door1_my.out", "w", stdout);
 	
-	while (query());
+	//while (query());
 	return;
 }
 int main() { solve(); return 0; }//boj22427 JAG Domestic Contest 2015 G Kuru Kuru Door
