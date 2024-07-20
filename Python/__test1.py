@@ -1,38 +1,71 @@
-# import matplotlib.pyplot as plt
-#
-# # 주어진 점 좌표 리스트
-# points = [
-#     (7720, 2038),
-#     (8160, 2661),
-#     (6427, 4528),
-#     (7007, 5869),
-#     (7399, 6513),
-#     (2037, 4071),
-#     (995, 3028),
-#     (3176, 881),
-#     (5040, 1874),
-# ]
-#
-# points = points[::-1]
-#
-# # x, y 좌표 분리
-# x_coords, y_coords = zip(*points)
-#
-# # 시각화
-# plt.figure(figsize=(10, 10))
-# plt.scatter(x_coords, y_coords, color='blue')
-#
-# # 점을 순서대로 잇는 선 추가
-# plt.plot(x_coords, y_coords, linestyle='-', color='red', marker='o')
-#
-# # 각 점에 번호 및 좌표 라벨 추가
-# for i, (x, y) in enumerate(points):
-#     plt.text(x, y, f'{i+1} ({x}, {y})', fontsize=10, ha='right')
-#
-# plt.xlabel('X coordinate')
-# plt.ylabel('Y coordinate')
-# plt.title('Scatter Plot of Given Points with Connecting Lines and Coordinates')
-# plt.grid(True)
-# plt.show()
+import matplotlib.pyplot as plt
+import numpy as np
 
-print(330 / (330 + 470) * 13)
+# 주어진 점 좌표 리스트
+points = [
+(-78.0000000000, -822.0000000000),
+(645.0000000000, 418.0000000000),
+(7.7994232975, 1.7801674717),
+(-7.7994232975, 1.7801674717),
+(-7.7994232975, -1.7801674717),
+(7.7994232975, -1.7801674717),
+(8.7743512096, 2.0026884056),
+(8.0219442314, 0.8052395595),
+(-8.7743512096, 2.0026884056),
+(-8.0219442314, 0.8052395595),
+(-8.7743512096, -2.0026884056),
+(-8.0219442314, -0.8052395595),
+(8.7743512096, -2.0026884056),
+(8.0219442314, -0.8052395595),
+(-6.8031380905, 1.6940525117),
+(-8.7958835393, -1.6961021017),
+(7.2503810941, -0.9443728444),
+(8.3473935736, 0.9436696674),
+(-2.2819274957, 3.8714953523),
+(-7.2916466599, 0.9186787101),
+(-2.8130898366, -3.5045962576),
+(-8.4253946752, 1.0003214393),
+(-2.2819274957, -3.8714953523),
+(-7.2916466599, -0.9186787101),
+(-2.8130898366, 3.5045962576),
+(-8.4253946752, -1.0003214393),
+(2.2819274957, -3.8714953523),
+(7.2916466599, -0.9186787101),
+(2.8130898366, 3.5045962576),
+(8.4253946752, -1.0003214393),
+(2.2819274957, 3.8714953523),
+(7.2916466599, 0.9186787101),
+(2.8130898366, -3.5045962576),
+(8.4253946752, 1.0003214393),
+]
+
+# x, y 좌표 분리
+x_coords, y_coords = zip(*points)
+
+# 시각화
+plt.figure(figsize=(10, 10))
+plt.scatter(x_coords, y_coords, color='blue')
+
+# 각 점에 번호 및 좌표 라벨 추가
+for i, (x, y) in enumerate(points):
+    plt.text(x, y, f'{i+1} ({x:.3f}, {y:.3f})', fontsize=10, ha='right')
+
+# 원 그리기 함수
+def plot_circle(center, radius, **kwargs):
+    circle = plt.Circle(center, radius, fill=False, **kwargs)
+    plt.gca().add_artist(circle)
+
+# 0,0 중심의 반지름 4인 원
+plot_circle((0, 0), 8, color='red', linestyle='--')
+
+# 3, 4, 5, 6 번 점을 중심으로 하는 반지름 1인 원
+circle_centers = [points[2], points[3], points[4], points[5]]
+for center in circle_centers:
+    plot_circle(center, 1, color='green', linestyle='--')
+
+plt.xlabel('X coordinate')
+plt.ylabel('Y coordinate')
+plt.title('Scatter Plot of Given Points with Circles')
+plt.grid(True)
+plt.gca().set_aspect('equal', adjustable='box')
+plt.show()
