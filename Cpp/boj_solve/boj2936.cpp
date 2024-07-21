@@ -67,11 +67,21 @@ void solve() {
 	Pos ans;
 	ld A = 125 * 250;
 	if (on_seg_strong(O, r, p)) {
+		if (p.x >= 125) {
+			ld y = A / p.x;
+			std::cout << "0.00 " << y << "\n";
+			return;
+		}
 		ld w = (r - p).mag();
 		ld h = A / w;
 		ans = r - Pos(h, 0) + Pos(0, h);
 	}
 	if (on_seg_strong(O, l, p)) {
+		if (p.y >= 125) {
+			ld x = A / p.y;
+			std::cout << x << " 0.00\n";
+			return;
+		}
 		ld w = (l - p).mag();
 		ld h = A / w;
 		ans = l - Pos(0, h) + Pos(h, 0);
