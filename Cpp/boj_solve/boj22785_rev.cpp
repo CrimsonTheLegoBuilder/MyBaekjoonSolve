@@ -171,9 +171,10 @@ bool polygon_intersection(const Polygon& H1, const Polygon& H2, Polygon& hull) {
 Pos centroid(const Polygon& H) {
 	Pos cen = Pos(0, 0);
 	ld A = 0;
-	for (int i = 0; i < N; i++) {
-		ld a = H[i] / H[(i + 1) % N];
-		cen += (H[i] + H[(i + 1) % N]) * a;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		ld a = H[i] / H[(i + 1) % sz];
+		cen += (H[i] + H[(i + 1) % sz]) * a;
 		A += a;
 	}
 	A *= .5;
@@ -202,17 +203,19 @@ void query() {
 	if (f1 && f2) {
 		//std::cout << "zzz\n";
 		Polygon H3, tmp;
-		//for (Pos& p : H1) std::cout << p << " ";
-		//std::cout << "\n";
+		for (Pos& p : H0) std::cout << p << " ";
+		std::cout << "\n";
 		Pos vec = Pos(l.s.vy, l.s.vx).unit();
 		int sz = H1.size();
-		//for (int i = 0; i < sz; i++) {
-		//	std::cout << "DEBUG:: " << H1[i] << " " << l.dist(H1[i]) << "\n";
-		//	Pos mr = H1[i] + vec * -l.dist(H1[i]) * 2;
-		//	tmp.push_back(mr);
-		//}
+		for (int i = 0; i < sz; i++) {
+			//std::cout << "DEBUG:: " << H1[i] << " " << l.dist(H1[i]) << "\n";
+			Pos mr = H1[i] + vec * -l.dist(H1[i]) * 2;
+			tmp.push_back(mr);
+		}
 		norm(tmp);
- 		polygon_intersection(tmp, H2, H3);
+ 		bool f3 = polygon_intersection(tmp, H2, H3);
+		if (!f3) { std::cout << "err\n"; return; }
+		//std::cout << tmp.size() << " " << H2.size() << " " << H3.size() << "\n";
 		//for (Pos& p : tmp) std::cout << p << " ";
 		//std::cout << "\n";
 		//for (Pos& p : H2) std::cout << p << " ";
@@ -243,10 +246,23 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(1);
-	//freopen("pol.in", "r", stdin);
-	//freopen("pol_my.out", "w", stdout);
+	freopen("pol.in", "r", stdin);
+	freopen("pol_my.out", "w", stdout);
 	std::cin >> T;
 	while (T--) query();
 	return;
 }
 int main() { solve(); return 0; }//boj22785 Polygon Revolution
+
+/*
+
+1
+5
+10 15
+14 13
+12 9
+8 9
+6 13
+0 1 -10
+
+*/
