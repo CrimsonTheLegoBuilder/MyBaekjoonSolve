@@ -97,12 +97,13 @@ struct Line {//ax + by = c
 	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
-	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
+	ld dist(const Pos& p) const { return above(p) / mag(); }
 	ld mag() const { return s.mag(); }
 	friend inline ld rad(const Line& b, const Line& l) { return atan2(b / l, b * l); }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
 };
+typedef std::vector<Line> Lines;
 Line L(const Pos& s, const Pos& e) {
 	ld dy, dx, c;
 	dy = e.y - s.y;
@@ -167,7 +168,6 @@ bool polygon_intersection(const Polygon& H1, const Polygon& H2, Polygon& hull) {
 	for (int i = 0; i < sz; i++) hp.push_back(L(H2[i], H2[(i + 1) % sz]));
 	return half_plane_intersection(hp, hull);
 }
-typedef std::vector<Line> Lines;
 Pos centroid(const Polygon& H) {
 	Pos cen = Pos(0, 0);
 	ld A = 0;
@@ -188,7 +188,7 @@ void query() {
 	norm(H0);
 	ld a, b, c;
 	std::cin >> a >> b >> c;
-	Line l = { {a, b}, -c };
+	Line l = { { a, b }, -c };
 	Lines hp1, hp2;
 	for (int i = 0; i < N; i++) hp1.push_back(L(H0[i], H0[(i + 1) % N]));
 	hp2 = hp1;
@@ -200,20 +200,40 @@ void query() {
 	f1 = half_plane_intersection(hp1, H1);
 	f2 = half_plane_intersection(hp2, H2);
 	if (f1 && f2) {
-		Polygon H3;
-		polygon_intersection(H1, H2, H3);
+		//std::cout << "zzz\n";
+		Polygon H3, tmp;
+		//for (Pos& p : H1) std::cout << p << " ";
+		//std::cout << "\n";
+		Pos vec = Pos(l.s.vy, l.s.vx).unit();
+		int sz = H1.size();
+		//for (int i = 0; i < sz; i++) {
+		//	std::cout << "DEBUG:: " << H1[i] << " " << l.dist(H1[i]) << "\n";
+		//	Pos mr = H1[i] + vec * -l.dist(H1[i]) * 2;
+		//	tmp.push_back(mr);
+		//}
+		norm(tmp);
+ 		polygon_intersection(tmp, H2, H3);
+		//for (Pos& p : tmp) std::cout << p << " ";
+		//std::cout << "\n";
+		//for (Pos& p : H2) std::cout << p << " ";
+		//std::cout << "\n";
+		//for (Pos& p : H3) std::cout << p << " ";
+		//std::cout << "\n";
 		Pos cen;
 		cen = centroid(H1);
-		v += 2 * PI * area(H1) * std::abs(l.above(cen));
+		v += 2 * PI * area(H1) * std::abs(l.dist(cen));
+		//std::cout << "v::" << v << "\n";
 		cen = centroid(H2);
-		v += 2 * PI * area(H2) * std::abs(l.above(cen));
+		v += 2 * PI * area(H2) * std::abs(l.dist(cen));
+		//std::cout << "v::" << v << "\n";
 		cen = centroid(H3);
-		v -= 2 * PI * area(H3) * std::abs(l.above(cen));
+		v -= 2 * PI * area(H3) * std::abs(l.dist(cen));
+		//std::cout << "v::" << v << "\n";
 	}
 	else {
 		Polygon& H3 = f1 ? H1 : H2;
 		Pos cen = centroid(H3);
-		v = 2 * PI * area(H3) * std::abs(l.above(cen));
+		v = 2 * PI * area(H3) * std::abs(l.dist(cen));
 	}
 	std::cout << v << "\n";
 	return;
