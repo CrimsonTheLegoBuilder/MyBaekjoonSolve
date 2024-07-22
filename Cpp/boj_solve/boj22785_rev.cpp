@@ -183,12 +183,16 @@ Pos centroid(const Polygon& H) {
 	return cen;
 }
 void query() {
+	//std::cout << ++M << "\n";
 	std::cin >> N;
 	Polygon H0(N), H1, H2;
 	for (Pos& p : H0) std::cin >> p;
+	std::cout << N << "\n";
+	for (Pos& p : H0) std::cout << "(" << p.x << ", " << p.y << "),\n";
 	norm(H0);
 	ld a, b, c;
 	std::cin >> a >> b >> c;
+	//std::cout << a << " " << b << " " << c << "\n";
 	Line l = { { a, b }, -c };
 	Lines hp1, hp2;
 	for (int i = 0; i < N; i++) hp1.push_back(L(H0[i], H0[(i + 1) % N]));
@@ -203,8 +207,8 @@ void query() {
 	if (f1 && f2) {
 		//std::cout << "zzz\n";
 		Polygon H3, tmp;
-		for (Pos& p : H0) std::cout << p << " ";
-		std::cout << "\n";
+		//for (Pos& p : H0) std::cout << p << " ";
+		//std::cout << "\n";
 		Pos vec = Pos(l.s.vy, l.s.vx).unit();
 		int sz = H1.size();
 		for (int i = 0; i < sz; i++) {
@@ -245,9 +249,9 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(1);
-	freopen("pol.in", "r", stdin);
-	freopen("pol_my.out", "w", stdout);
+	std::cout.precision(10);
+	//freopen("pol.in", "r", stdin);
+	//freopen("pol_my.out", "w", stdout);
 	std::cin >> T;
 	while (T--) query();
 	return;
@@ -264,5 +268,37 @@ int main() { solve(); return 0; }//boj22785 Polygon Revolution
 8 9
 6 13
 0 1 -10
+
+1
+10
+10000.0 5000.0
+9045.1 2061.1
+6545.1 244.7
+3454.9 244.7
+954.9 2061.1
+0.0 5000.0
+954.9 7938.9
+3454.9 9755.3
+6545.1 9755.3
+9045.1 7938.9
+2.5 9.7 -60822.0
+
+503210627676.1
+
+488259039917.1
+
+1
+10
+10000.0000000000 5000.0000000000
+9045.0849718747 2061.0737385376
+6545.0849718747 244.7174185242
+3454.9150281253 244.7174185242
+954.9150281253 2061.0737385376
+0.0000000000 5000.0000000000
+954.9150281253 7938.9262614624
+3454.9150281253 9755.2825814758
+6545.0849718747 9755.2825814758
+9045.0849718747 7938.9262614624
+2.5477706749 9.7139154346 -60821.9840097030
 
 */
