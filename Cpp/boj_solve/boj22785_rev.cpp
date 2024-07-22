@@ -97,9 +97,11 @@ struct Line {//ax + by = c
 	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
 	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
+	bool same_dir(const Line& l) const { return zero(*this / l) && *this * l > 0; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	ld dist(const Pos& p) const { return above(p) / mag(); }
 	ld mag() const { return s.mag(); }
+	bool include(const Pos& p) const { return above(p) < 0; }
 	friend inline ld rad(const Line& b, const Line& l) { return atan2(b / l, b * l); }
 	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.vy << " " << l.s.vx << " " << l.c; return os; }
 };
@@ -151,7 +153,6 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
 Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
-
 std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
 	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
 		return w.include(intersection(u, v));
@@ -199,30 +200,50 @@ void norm(Polygon& H, const bool& f = 1) {
 	if (!f && sign(area(H)) > 0) std::reverse(H.begin(), H.end());
 	return;
 }
+//bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
+//	auto cw = [&](const Line& l1, const Line& l2, const Line& target) -> bool {
+//		if (l1.s / l2.s < TOL) return 0;
+//		Pos p = intersection(l1, l2);
+//		return sign(target.above(p)) >= 0;
+//		};
+//	std::deque<Line> dq;
+//	std::sort(HP.begin(), HP.end());
+//	for (const Line& l : HP) {
+//		if (!dq.empty() && zero(dq.back() / l)) continue;
+//		while (dq.size() >= 2 && cw(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
+//		while (dq.size() >= 2 && cw(l, dq.front(), dq[1])) dq.pop_front();
+//		dq.push_back(l);
+//	}
+//	while (dq.size() >= 3 && cw(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
+//	while (dq.size() >= 3 && cw(dq.back(), dq.front(), dq[1])) dq.pop_front();
+//	for (int i = 0; i < (int)dq.size(); i++) {
+//		Line cur = dq[i], nxt = dq[(i + 1) % (int)dq.size()];
+//		if (cur / nxt < TOL) {
+//			hull.clear();
+//			return 0;
+//		}
+//		hull.push_back(intersection(cur, nxt));
+//	}
+//	return 1;
+//}
 bool half_plane_intersection(std::vector<Line>& HP, std::vector<Pos>& hull) {
-	auto cw = [&](const Line& l1, const Line& l2, const Line& target) -> bool {
-		if (l1.s / l2.s < TOL) return 0;
-		Pos p = intersection(l1, l2);
-		return sign(target.above(p)) >= 0;
+	auto check = [&](Line& u, Line& v, Line& w) -> bool {
+		return w.include(intersection(u, v));
 		};
-	std::deque<Line> dq;
 	std::sort(HP.begin(), HP.end());
-	for (const Line& l : HP) {
-		if (!dq.empty() && zero(dq.back() / l)) continue;
-		while (dq.size() >= 2 && cw(dq[dq.size() - 2], dq.back(), l)) dq.pop_back();
-		while (dq.size() >= 2 && cw(l, dq.front(), dq[1])) dq.pop_front();
-		dq.push_back(l);
+	std::deque<Line> dq;
+	int sz = HP.size();
+	for (int i = 0; i < sz; ++i) {
+		if (i && HP[i].same_dir(HP[(i - 1) % sz])) continue;
+		while (dq.size() > 1 && !check(dq[dq.size() - 2], dq[dq.size() - 1], HP[i])) dq.pop_back();
+		while (dq.size() > 1 && !check(dq[1], dq[0], HP[i])) dq.pop_front();
+		dq.push_back(HP[i]);
 	}
-	while (dq.size() >= 3 && cw(dq[dq.size() - 2], dq.back(), dq.front())) dq.pop_back();
-	while (dq.size() >= 3 && cw(dq.back(), dq.front(), dq[1])) dq.pop_front();
-	for (int i = 0; i < (int)dq.size(); i++) {
-		Line cur = dq[i], nxt = dq[(i + 1) % (int)dq.size()];
-		if (cur / nxt < TOL) {
-			hull.clear();
-			return 0;
-		}
-		hull.push_back(intersection(cur, nxt));
-	}
+	while (dq.size() > 2 && !check(dq[dq.size() - 2], dq[dq.size() - 1], dq[0])) dq.pop_back();
+	while (dq.size() > 2 && !check(dq[1], dq[0], dq[dq.size() - 1])) dq.pop_front();
+	sz = dq.size();
+	if (sz < 3) return 0;
+	for (int i = 0; i < sz; ++i) hull.push_back(intersection(dq[i], dq[(i + 1) % sz]));
 	return 1;
 }
 bool polygon_intersection(const Polygon& H1, const Polygon& H2, Polygon& hull) {
