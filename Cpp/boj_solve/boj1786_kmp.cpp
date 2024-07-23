@@ -28,6 +28,7 @@ Vint kmp(const std::string& T, const std::string& P) {
 			else j++;
 		}
 	}
+	return ans;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
