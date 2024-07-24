@@ -61,17 +61,14 @@ struct Circle {
 	Pos c;
 	ll r;
 	Circle(Pos C = Pos(0, 0), ll R = 0) : c(C), r(R) {}
-	bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
-	bool operator != (const Circle& C) const { return !(*this == C); }
-	bool operator < (const Circle& q) const {
-		ll dist = (c - q.c).Euc();
-		return r < q.r && dist < sq(q.r - r);
-	}
-	bool operator <= (const Circle& q) const { return *this == q || *this < q; }
+	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
+	bool operator != (const Circle& q) const { return !(*this == q); }
+	bool operator < (const Circle& q) const { return r < q.r && (c - q.c).Euc() <= sq(q.r - r); }
+	bool operator <= (const Circle& q) const { return *this < q || *this == q; }
+	bool meet(const Circle& q) const { return sq(r + q.r) >= (c - q.c).Euc(); }
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
-	bool meet(const Circle& q) const { return sq(r + q.r) >= (c - q.c).Euc(); }
 	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
@@ -84,14 +81,14 @@ bool cmpri(const Pos& p, const Pos& q) { return p.radius == q.radius ? p.idx < q
 typedef std::vector<Circle> Disks;
 typedef std::unordered_map<ll, Vint> Table;
 Table idxs;
-ll key(const Pos& p, const int& len) { return ((p.x / (1ll << len)) << 32) | (p.y / (1ll << len)); }
-void grid_init(Table& T, const Disks& C, const int& len) {
+ll key(const Pos& p, const int& ex) { return ((p.x / (1ll << ex)) << 32) | (p.y / (1ll << ex)); }
+void grid_init(Table& T, const Disks& C, const int& ex) {
 	T.clear();
 	int sz = C.size();
 	for (int i = 0; i < sz; i++) {
 		if (V[i]) continue;
 		const Pos& p = C[i].c;
-		T[key(p, len)].push_back(i);
+		T[key(p, ex)].push_back(i);
 	}
 	return;
 }
@@ -111,16 +108,20 @@ void solve() {
 	}
 	std::sort(R.begin(), R.end(), cmpri);
 	memset(V, 0, sizeof V);
-	int len = 30;//The exponent of the interval dividing the grid
+	int ex = 30;//exponent of the interval dividing the grid
+	while ((1ll << ex) >= (R[0].radius) * 2) ex--;
+	grid_init(idxs, C, ex);
 	for (int i = 0; i < N; i++) {
 		if (V[R[i].idx]) continue;
-		while ((1ll << len) >= (R[i].radius) * 2) len--;
-		grid_init(idxs, C, len);
+		if ((1ll << ex) >= (R[i].radius) * 2) {
+			while ((1ll << ex) >= (R[i].radius) * 2) ex--;
+			grid_init(idxs, C, ex);
+		}
 		int I = R[i].idx;
 		Pos p = C[I].c;
 		for (int j = -2; j <= 2; j++) {
 			for (int k = -2; k <= 2; k++) {
-				ll K = key(p + Pos(j, k), len);
+				ll K = key(p + Pos(j, k), ex);
 				if (!idxs.count(K)) continue;
 				Vint& vi = idxs[K];
 				for (const int& v : vi) {
@@ -136,3 +137,4 @@ void solve() {
 int main() { solve(); return 0; }//APIO 2018 B boj15767 Circle selection
 //refer to jjang36524
 //https://jjang36524.tistory.com/26
+//https://codeforces.com/blog/entry/59650
