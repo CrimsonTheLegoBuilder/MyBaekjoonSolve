@@ -130,10 +130,8 @@ Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 	int sz = H.size();
 	Pos IN = Pos(sz, sz);
 	Pos F = inner_check_bi_search(H, p);
-	if (F != INVAL) {
-		if (F == IN) return INVAL;
-		else return F;
-	}
+	if (F == IN) return INVAL;
+	if (F != INVAL) return F;
 	int i1{ 0 }, i2{ 0 };
 	int ccw1 = ccw(p, H[0], H[1]), ccwN = ccw(p, H[0], H[sz - 1]);
 	if (ccw1 * ccwN >= 0) {
