@@ -5,9 +5,6 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <random>
-#include <array>
-#include <tuple>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -16,7 +13,7 @@ typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 #define right x
 #define left y
-const ll INF = 1e17;
+const ld INF = 1e30;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
@@ -65,8 +62,6 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return ret < 0 ? -1 : !!ret; }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = cross(d1, d2, d3, d4); return ret < 0 ? -1 : !!ret; }
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d1) / (d2 - d1).mag(); }
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3) / (d2 - d1).mag(); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0; }
 bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
@@ -88,7 +83,7 @@ bool inner_check(Pos p0, Pos p1, Pos p2, const Pos& t) {
 Pos inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
 	if (!sz) return Pos(-1, -1);
-	if (sz == 1) return p == H[0] ? Pos(0, -1) : Pos(-1, -1);
+	if (sz == 1) return p == H[0] ? Pos(0, 0) : Pos(-1, -1);
 	if (sz == 2) {
 		int i1 = -1, i2 = -1;
 		if (H[0] == p) i1 = 0;
@@ -134,9 +129,10 @@ Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		bool f = ccw(p, H[s], H[s + 1]) >= 0;
 		while (s < e) {
 			m = s + e >> 1;
-			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
-			if (!f) std::swap(p1, cur);//normalize
-			if (ccw(p1, cur, nxt) > 0) s = m + 1;
+			const Pos& p1 = p, &cur = H[m], &nxt = H[(m + 1) % sz];
+			int CCW = ccw(p1, cur, nxt);
+			if (!f) CCW *= -1;//normailze
+			if (CCW > 0) s = m + 1;
 			else e = m;
 		}
 		i2 = s;
@@ -158,9 +154,10 @@ Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		int s1 = 0, e1 = s;
 		while (s1 < e1) {
 			m = s1 + e1 >> 1;
-			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
-			if (!f) std::swap(p1, cur);//normalize
-			if (ccw(p1, cur, nxt) > 0) s1 = m + 1;
+			const Pos& p1 = p, &cur = H[m], &nxt = H[(m + 1) % sz];
+			int CCW = ccw(p1, cur, nxt);
+			if (!f) CCW *= -1;//normailze
+			if (CCW > 0) s1 = m + 1;
 			else e1 = m;
 		}
 		i1 = s1;
@@ -170,31 +167,32 @@ Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 		int s2 = e, e2 = sz - 1;
 		while (s2 < e2) {
 			m = s2 + e2 >> 1;
-			Pos p1 = p, cur = H[m], nxt = H[(m + 1) % sz];
-			if (!f) std::swap(p1, cur);//normalize
-			if (ccw(p1, cur, nxt) < 0) s2 = m + 1;
+			const Pos& p1 = p, &cur = H[m], &nxt = H[(m + 1) % sz];
+			int CCW = ccw(p1, cur, nxt);
+			if (!f) CCW *= -1;//normailze
+			if (CCW < 0) s2 = m + 1;
 			else e2 = m;
 		}
 		i2 = s2;
 		if (!ccw(p, H[i2], H[(i2 + 1) % sz]) && dot(p, H[(i2 + 1) % sz], H[i2]) > 0) i2 = (i2 + 1) % sz;
 	}
 	if (ccw(p, H[i1], H[i2]) < 0) std::swap(i1, i2);
-	return Pos(i1, i2);
+	return Pos(i2, i1);
 }
 struct Pdd {
 	ld x, y;
 	Pdd(ld X = 0, ld Y = 0) : x(X), y(Y) {}
 	Pdd operator + (const Pdd& p) const { return { x + p.x, y + p.y }; }
 	Pdd operator - (const Pdd& p) const { return { x - p.x, y - p.y }; }
-	Pdd operator * (const int& n) const { return { x * n, y * n }; }
-	Pdd operator / (const int& n) const { return { x / n, y / n }; }
-	ll operator * (const Pdd& p) const { return (ll)x * p.x + (ll)y * p.y; }
-	ll operator / (const Pdd& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	Pdd operator * (const ld& n) const { return { x * n, y * n }; }
+	Pdd operator / (const ld& n) const { return { x / n, y / n }; }
+	ld operator * (const Pdd& p) const { return x * p.x + y * p.y; }
+	ld operator / (const Pdd& p) const { return x * p.y - y * p.x; }
 	Pdd operator ^ (const Pdd& p) const { return { x * p.x, y * p.y }; }
 	Pdd& operator += (const Pdd& p) { x += p.x; y += p.y; return *this; }
 	Pdd& operator -= (const Pdd& p) { x -= p.x; y -= p.y; return *this; }
-	Pdd& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-	Pdd& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pdd& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
+	Pdd& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	ld mag() const { return hypot(x, y); }
 };
 Pdd P(const Pos& p) { return Pdd(p.x, p.y); }
@@ -251,3 +249,17 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj32079
+
+/*
+
+6
+1 5
+-1 1
+0 -1
+2 1
+4 5
+3 7
+1
+3 7 0 -1
+
+*/
