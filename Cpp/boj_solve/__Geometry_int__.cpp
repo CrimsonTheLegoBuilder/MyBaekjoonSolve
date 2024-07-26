@@ -319,7 +319,7 @@ int inner_check_bi_search(Pos H[], const int& sz, const Pos& p) {//convex
 	int s = 0, e = sz - 1, m;
 	while (s + 1 < e) {
 		m = s + e >> 1;
-		if (cross(H[0], H[m], p) > 0) s = m;
+		if (cross(H[0], H[m], p) >= 0) s = m;
 		else e = m;
 	}
 	if (cross(H[s], H[e], p) > 0) return 1;
@@ -336,7 +336,7 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int s = 0, e = sz - 1, m;
 	while (s + 1 < e) {
 		m = s + e >> 1;
-		if (cross(H[0], H[m], p) > 0) s = m;
+		if (cross(H[0], H[m], p) >= 0) s = m;
 		else e = m;
 	}
 	if (cross(H[s], H[e], p) > 0) return 1;
