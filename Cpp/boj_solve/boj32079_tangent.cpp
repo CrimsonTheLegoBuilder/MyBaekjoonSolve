@@ -23,7 +23,7 @@ const ll MOD = 1'000'000'007;
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 bool zero(const ld& x) { return !sign(x); }
 
-int N;
+int N, T;
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -81,23 +81,6 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-//int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
-//	int sz = H.size();
-//	if (!sz) return -1;
-//	if (sz == 1) return p == H[0] ? 0 : -1;
-//	if (sz == 2) return on_seg_strong(H[0], H[1], p) ? 0 : -1;
-//	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
-//	if (on_seg_strong(H[0], H[1], p) || on_seg_strong(H[0], H[sz - 1], p)) return 0;
-//	int s = 0, e = sz - 1, m;
-//	while (s + 1 < e) {
-//		m = s + e >> 1;
-//		if (cross(H[0], H[m], p) > 0) s = m;
-//		else e = m;
-//	}
-//	if (cross(H[s], H[e], p) > 0) return 1;
-//	else if (on_seg_strong(H[s], H[e], p)) return 0;
-//	else return -1;
-//}
 Pos inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
 	if (!sz) return Pos(-1, -1);
@@ -109,7 +92,7 @@ Pos inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 		return Pos(i1, i2);
 	}
 	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return Pos(-1, -1);
-	if (H[0] == p) return Pos(1, sz - 1);
+	if (H[0] == p) return Pos(sz - 1, 1);
 	if (H[1] == p) return Pos(0, 2 % sz);
 	if (H[sz - 1] == p) return Pos(sz - 2, 0);
 	if (on_seg_weak(H[0], H[1], p)) return Pos(0, 1);
@@ -191,13 +174,25 @@ Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 	if (ccw(p, H[i1], H[i2]) < 0) std::swap(i1, i2);
 	return Pos(i1, i2);
 }
-
+void query(const Polygon& H) {
+	Pos u, v;
+	std::cin >> u >> v;
+	Pos tu = find_tangent_bi_search(H, u);
+	Pos tv = find_tangent_bi_search(H, v);
+	std::cout << "\n";
+	return;
+}
 
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(8);
+	std::cin >> N;
+	Polygon H(N);
+	for (Pos& p : H) std::cin >> p;
+	std::cin >> T;
+	while (T--) query(H);
 	return;
 }
 int main() { solve(); return 0; }//boj18190
