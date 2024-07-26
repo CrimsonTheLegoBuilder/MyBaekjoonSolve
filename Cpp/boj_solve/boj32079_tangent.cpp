@@ -107,19 +107,19 @@ Pos inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 		if (cross(H[0], H[m], p) >= 0) s = m;
 		else e = m;
 	}
-	std::cout << "DEBUG:: " << s << " " << e << "\n";
+	//std::cout << "DEBUG:: " << s << " " << e << "\n";
 	if (cross(H[s], H[e], p) < 0) return Pos(-1, -1);
 	if (H[s] == p) return Pos((s - 1 + sz) % sz, e);
 	if (H[e] == p) return Pos(s, (e + 1) % sz);
 	if (on_seg_weak(H[s], H[e], p)) return Pos(s, e);
-	std::cout << "DEBUG:: fuck\n";
+	//std::cout << "DEBUG:: fuck\n";
 	return Pos(sz + 1, sz + 1);
 }
 Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 	int sz = H.size();
 	Pos IN = Pos(sz + 1, sz + 1);
 	Pos F = inner_check_bi_search(H, p);
-	std::cout << "inner_bi:: " << F << "\n";
+	//std::cout << "inner_bi:: " << F << "\n";
 	if (F == IN) return INVAL;
 	if (F != INVAL) return F;
 	int i1{ 0 }, i2{ 0 };
@@ -207,11 +207,12 @@ void query(const Polygon& H) {
 	ld dist = INF;
 	Pos u, v;
 	std::cin >> u >> v;
+	if (u == v) { std::cout << "0.0000000\n"; return; }
 	Pos tu = find_tangent_bi_search(H, u);
 	Pos tv = find_tangent_bi_search(H, v);
 	int ur = tu.right, ul = tu.left;
 	int vr = tv.right, vl = tv.left;
-	std::cout << "DEBUG:: tangent:: " << ur << " " << ul << " " << vr << " " << vl << " fuck::\n";
+	//std::cout << "DEBUG:: tangent:: " << ur << " " << ul << " " << vr << " " << vl << " fuck::\n";
 	if (!ccw(H[ul], u, H[ur]) &&
 		!ccw(H[vl], v, H[vr]) &&
 		!collinear(H[ul], H[ur], H[vl], H[vr]) &&
