@@ -14,8 +14,8 @@ typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
-#define left x
-#define right y
+#define right x
+#define left y
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
@@ -81,6 +81,10 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
+bool inner_check(Pos p0, Pos p1, Pos p2, const Pos& t) {
+	if (ccw(p0, p1, p2) < 0) std::swap(p1, p2);
+	return ccw(p0, p1, t) >= 0 && ccw(p1, p2, t) >= 0 && ccw(p2, p0, t) >= 0;
+}
 Pos inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
 	if (!sz) return Pos(-1, -1);
@@ -107,11 +111,11 @@ Pos inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	if (H[s] == p) return Pos((s - 1 + sz) % sz, e);
 	if (H[e] == p) return Pos(s, (e + 1) % sz);
 	if (on_seg_weak(H[s], H[e], p)) return Pos(s, e);
-	return Pos(sz, sz);
+	return Pos(sz + 1, sz + 1);
 }
 Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 	int sz = H.size();
-	Pos IN = Pos(sz, sz);
+	Pos IN = Pos(sz + 1, sz + 1);
 	Pos F = inner_check_bi_search(H, p);
 	if (F == IN) return INVAL;
 	if (F != INVAL) return F;
@@ -174,15 +178,61 @@ Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 	if (ccw(p, H[i1], H[i2]) < 0) std::swap(i1, i2);
 	return Pos(i1, i2);
 }
+struct Pdd {
+	ld x, y;
+	Pdd(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	Pdd operator + (const Pdd& p) const { return { x + p.x, y + p.y }; }
+	Pdd operator - (const Pdd& p) const { return { x - p.x, y - p.y }; }
+	Pdd operator * (const int& n) const { return { x * n, y * n }; }
+	Pdd operator / (const int& n) const { return { x / n, y / n }; }
+	ll operator * (const Pdd& p) const { return (ll)x * p.x + (ll)y * p.y; }
+	ll operator / (const Pdd& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	Pdd operator ^ (const Pdd& p) const { return { x * p.x, y * p.y }; }
+	Pdd& operator += (const Pdd& p) { x += p.x; y += p.y; return *this; }
+	Pdd& operator -= (const Pdd& p) { x -= p.x; y -= p.y; return *this; }
+	Pdd& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
+	Pdd& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	ld mag() const { return hypot(x, y); }
+};
+Pdd P(const Pos& p) { return Pdd(p.x, p.y); }
+ll cross(const Pdd& d1, const Pdd& d2, const Pdd& d3) { return (d2 - d1) / (d3 - d2); }
+Pdd intersection(const Pdd& p1, const Pdd& p2, const Pdd& q1, const Pdd& q2) {
+	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
+	return (p1 * a2 + p2 * a1) / (a1 + a2);
+}
 void query(const Polygon& H) {
+	ld dist = INF;
 	Pos u, v;
 	std::cin >> u >> v;
 	Pos tu = find_tangent_bi_search(H, u);
 	Pos tv = find_tangent_bi_search(H, v);
-	std::cout << "\n";
+	int ur = tu.right, ul = tu.left;
+	int vr = tv.right, vl = tv.left;
+	if (!ccw(H[ul], u, H[ur]) &&
+		!ccw(H[vl], v, H[vr]) &&
+		!collinear(H[ul], H[ur], H[vl], H[vr]) &&
+		!ccw(H[ul], H[ur], H[vl], H[vr])) {
+		std::cout << "-1\n";
+		return;
+	}
+	if (!ccw(u, v, H[ur]) ||
+		!ccw(u, v, H[ul]) ||
+		ccw(u, v, H[ur]) == ccw(u, v, H[ul]) ||
+		inner_check(u, H[ur], H[ul], v) ||
+		inner_check(v, H[vr], H[vl], u)) {
+		dist = std::min(dist, (u - v).mag());
+	}
+	else {
+		Pdd U = P(u), V = P(v);
+		Pdd UL = P(H[ul]), UR = P(H[ur]);
+		Pdd VL = P(H[vl]), VR = P(H[vr]);
+		Pdd inx1 = intersection(U, UL, V, VR);
+		Pdd inx2 = intersection(U, UR, V, VL);
+		dist = std::min({ dist, (U - inx1).mag() + (V - inx1).mag(), (U - inx2).mag() + (V - inx2).mag() });
+	}
+	std::cout << dist << "\n";
 	return;
 }
-
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
