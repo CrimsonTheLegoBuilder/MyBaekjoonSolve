@@ -195,7 +195,7 @@ struct Pdd {
 	ld mag() const { return hypot(x, y); }
 };
 Pdd P(const Pos& p) { return Pdd(p.x, p.y); }
-ll cross(const Pdd& d1, const Pdd& d2, const Pdd& d3) { return (d2 - d1) / (d3 - d2); }
+ld cross(const Pdd& d1, const Pdd& d2, const Pdd& d3) { return (d2 - d1) / (d3 - d2); }
 Pdd intersection(const Pdd& p1, const Pdd& p2, const Pdd& q1, const Pdd& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
@@ -245,4 +245,4 @@ void solve() {
 	while (T--) query(H);
 	return;
 }
-int main() { solve(); return 0; }//boj18190
+int main() { solve(); return 0; }//boj32079
