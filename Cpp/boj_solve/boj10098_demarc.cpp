@@ -125,11 +125,11 @@ bool operator == (const Polygon& p, const Polygon& q) { return polygon_cmp(p, q)
 Polygon make_polygon(int u, int v, Pos s, Pos e, bool rvs = 0) {
     if (rvs) std::swap(s, e);
     Polygon H;
-    for (int i = u; i != (v + 1) % N; i++) {
-        Pos& cur = pos[i], nxt = pos[(i + 1) % N];
-        if (on_seg_weak(cur, nxt, s)) H.push_back(s);
+    for (int i = (u + 1) % N; i != (v + 1) % N; i++) {
+        Pos& prev = pos[(i - 1 + N) % N], cur = pos[i], nxt = pos[(i + 1) % N];
+        if (on_seg_strong(prev, cur, s) && s != cur) H.push_back(s);
         H.push_back(cur);
-        if (on_seg_weak(cur, nxt, e)) H.push_back(s);
+        if (on_seg_strong(cur, nxt, e) && e != cur) H.push_back(s);
     }
     return H;
 }
