@@ -447,6 +447,7 @@ void solve() {
     ll A = area(pos, N);
     assert(A);
     if (A < 0) std::reverse(pos, pos + N);
+    A *= -1;
     A >>= 1;
     if (A & 1) { std::cout << "NO\n"; return; }
 
