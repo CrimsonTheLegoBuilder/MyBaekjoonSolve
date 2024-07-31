@@ -133,7 +133,7 @@ Polygon make_polygon(int u, int v, Pos s, Pos e) {
         Pos& prev = pos[(i - 1 + N) % N], cur = pos[i], nxt = pos[(i + 1) % N];
         if (on_seg_strong(prev, cur, s) && s != cur) H.push_back(s);
         H.push_back(cur);
-        if (on_seg_strong(cur, nxt, e) && e != cur) H.push_back(s);
+        if (on_seg_strong(cur, nxt, e) && e != cur) H.push_back(e);
     }
     return H;
 }
