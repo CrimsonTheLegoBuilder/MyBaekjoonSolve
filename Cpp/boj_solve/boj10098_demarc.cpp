@@ -103,15 +103,20 @@ void norm(Polygon& H) {
     auto s = std::min_element(H.begin(), H.end());
     std::rotate(H.begin(), s, H.end());
 }
-void move(const Pos& s, Pos H[]) { for (int i = 0; i < N; i++) H[i] += s; }
-void move(const Pos& s, Polygon& H) {
+void move(Pos H[], const Pos& vec) { for (int i = 0; i < N; i++) H[i] += vec; }
+void move(Polygon& H, const Pos& vec) {
     int sz = H.size();
-    for (int i = 0; i < N; i++) H[i] += s;
+    for (int i = 0; i < N; i++) H[i] += vec;
 }
 void rotate() { for (int i = 0; i < N; i++) pos[i] = ~pos[i]; }
 void rotate(Polygon& H) {
     int sz = H.size();
     for (int i = 0; i < sz; i++) H[i] = ~H[i];
+}
+void mirror() { for (int i = 0; i < N; i++) pos[i].x = -pos[i].x; }
+void mirror(Polygon& H) {
+    int sz = H.size();
+    for (int i = 0; i < sz; i++) H[i].x = -H[i].x;
 }
 bool polygon_cmp(const Polygon& A, const Polygon& B) {
     int a = A.size(), b = B.size();
@@ -122,8 +127,7 @@ bool polygon_cmp(const Polygon& A, const Polygon& B) {
     return 1;
 }
 bool operator == (const Polygon& p, const Polygon& q) { return polygon_cmp(p, q); }
-Polygon make_polygon(int u, int v, Pos s, Pos e, bool rvs = 0) {
-    if (rvs) std::swap(s, e);
+Polygon make_polygon(int u, int v, Pos s, Pos e) {
     Polygon H;
     for (int i = (u + 1) % N; i != (v + 1) % N; i++) {
         Pos& prev = pos[(i - 1 + N) % N], cur = pos[i], nxt = pos[(i + 1) % N];
@@ -133,7 +137,24 @@ Polygon make_polygon(int u, int v, Pos s, Pos e, bool rvs = 0) {
     }
     return H;
 }
-
+bool all_polygon_cmp(int u, int v, Pos s, Pos e) {
+    Polygon A = make_polygon(u, v, s, e);
+    Polygon B = make_polygon(v, u, e, s);
+    if (A.size() != B.size()) return 0;
+    norm(A), norm(B);
+    Pos b = *std::min_element(B.begin(), B.end());
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 4; j++) {
+            rotate(A);
+            norm(A);
+            Pos a = *std::min_element(A.begin(), A.end());
+            move(A, b - a);
+            if (A == B) return 1;
+        }
+        mirror(A);
+    }
+    return 0;
+}
 struct Line {
     int y;      // y coord
     int l, r;   // x coords (l <= r)
@@ -210,6 +231,7 @@ bool find_split(const int i, const Seg& S, Pos& s, Pos& e) {
         if (w & 1) return 0;
         s = Pos(r - (w >> 1), p2.y);
         e = Pos(r - (w >> 1), pos[S.i].y);
+        assert(s < e);
         return 1;
     }
     return 0;
@@ -409,7 +431,7 @@ bool vertical_split(Pos& s, Pos& e) {
             sp.query(events[i].l.l, events[i].l.r, events[i].i);
             for (Seg& S : Segs) {
                 if (find_split(events[i].i, S, s, e)) {
-
+                    if (all_polygon_cmp(events[i].i, S.i, s, e)) return 1;
                 }
             }
         }
@@ -438,7 +460,7 @@ void solve() {
     rotate();
     if (vertical_split(s, e)) {
         std::cout << "YES\n";
-        std::cout << s << e << "\n";
+        std::cout << -~s << -~e << "\n";
         return;
     }
     std::cout << "NO\n";
