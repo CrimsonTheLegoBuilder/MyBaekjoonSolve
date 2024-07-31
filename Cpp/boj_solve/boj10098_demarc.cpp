@@ -211,25 +211,26 @@ void match(int u, int v, int l, int r) {
     Segs.push_back(Seg(l, r, v));
 }
 bool find_split(const int i, const Seg& S, Pos& s, Pos& e) {
-    int j = S.i, k = i;
+    int j = i, k = S.i;
     bool f = 0;
     if (k < j) f = 1, std::swap(j, k);
     ll a1 = memo[k] - memo[j] + pos[k] / pos[j];
     if (f) a1 = memo[N] - a1;
-    Pos& p1 = pos[i], p2 = pos[(i + 1) % N];
-    assert(p1.x < p2.x);
-    int r = std::min(p2.x, S.r);
-    int l = std::max(p1.x, S.l);
-    int h = std::abs(pos[S.i].y - p1.y);
-    int w1 = p2.x - l, w2 = pos[i].x - l;
-    int w3 = p2.x - r, w4 = pos[i].x - r;
+    Pos& pl = pos[i], & pr = pos[(i + 1) % N];
+    assert(pl.x < pr.x);
+    int r = std::min(pr.x, S.r);
+    int l = std::max(pl.x, S.l);
+    int h = pos[S.i].y - pl.y;
+    int w1 = pr.x - l, w2 = pos[S.i].x - l;
+    int w3 = pr.x - r, w4 = pos[S.i].x - r;
     ll amax = a1 + 1ll * h * (w1 + w2);
     ll amin = a1 + 1ll * h * (w3 + w4);
-    if (amin <= (memo[N] >> 1) && (memo[N] >> 1) <= amax) {
-        ll B = (memo[N] >> 1) - amin;
-        ll w = B / h;
+    ll a2 = memo[N] >> 1;
+    if (amin <= a2 && a2 <= amax) {
+        ll box = a2 - amin;
+        ll w = box / h;
         if (w & 1) return 0;
-        s = Pos(r - (w >> 1), p2.y);
+        s = Pos(r - (w >> 1), pr.y);
         e = Pos(r - (w >> 1), pos[S.i].y);
         assert(s < e);
         return 1;
