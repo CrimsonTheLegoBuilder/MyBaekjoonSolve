@@ -384,8 +384,7 @@ public:
         if (x->val.r == x->val.l) pop(x); // pop if all range covered
 
         while (x = find(l)) { // find leftmost
-            if (x->val.r < l) return;
-            if (x->val.r == l) {
+            if (x->val.r <= l) { // if leftmost is out of range
                 if (!x->r) return; // no more right segment
                 x = x->r;
                 while (x->l) x = x->l; // find very right segment
