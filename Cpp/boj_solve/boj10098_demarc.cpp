@@ -486,8 +486,8 @@ bool vertical_split(Pos& s, Pos& e) {
     return 0;
 }
 void solve() {
-    //freopen("demarcation.in copy.4", "r", stdin);
-    //freopen("demarcation.out", "w", stdout);
+    freopen("demarcation.in copy.14", "r", stdin);
+    freopen("demarcation.out", "w", stdout);
     std::cin.tie(0)->sync_with_stdio(0);
     //std::cout.tie(0);
     std::cin >> N;
@@ -510,6 +510,10 @@ void solve() {
     Pos s, e;
     if (vertical_split(s, e)) {
         //std::cout << "YES\n";
+        for (int i = 0; i < N; i++) {
+            if (pos[i].x == e.x && s.y < pos[i].y && e.y > pos[i].y)
+                e = pos[i];
+        }
         std::cout << s << " " << e << "\n";
         return;
     }
@@ -517,7 +521,11 @@ void solve() {
     //std::cout << "FUCK::\n";
     if (vertical_split(s, e)) {
         //std::cout << "YES\n";
-        std::cout << -~s << " " << - ~e << "\n";
+        for (int i = 0; i < N; i++) {
+            if (pos[i].x == e.x && s.y < pos[i].y && e.y > pos[i].y)
+                e = pos[i];
+        }
+        std::cout << -~s << " " << -~e << "\n";
         return;
     }
     //std::cout << "FUCK::\n";
