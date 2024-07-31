@@ -11,6 +11,9 @@
 
 typedef long long ll;
 typedef double ld;
+typedef std::pair<int, int> pi;
+typedef std::vector<int> Vint;
+typedef std::vector<ld> Vld;
 const int LEN = 1e5 + 1;
 
 int N;
@@ -107,7 +110,7 @@ void norm(Polygon& H) {
 void move(Pos H[], const Pos& vec) { for (int i = 0; i < N; i++) H[i] += vec; }
 void move(Polygon& H, const Pos& vec) {
     int sz = H.size();
-    for (int i = 0; i < N; i++) H[i] += vec;
+    for (int i = 0; i < sz; i++) H[i] += vec;
 }
 void rotate() { for (int i = 0; i < N; i++) pos[i] = ~pos[i]; }
 void rotate(Polygon& H) {
@@ -129,15 +132,24 @@ bool polygon_cmp(const Polygon& A, const Polygon& B) {
 }
 bool operator == (const Polygon& p, const Polygon& q) { return polygon_cmp(p, q); }
 Polygon make_polygon(int u, int v, Pos s, Pos e) {
-    Polygon H;
-    //std::cout << "fuck:: " << u << " " << v << "\n";
+    Polygon H, tmp;
+    Vint V;
+    //std::cout << "fuck:: make poly " << u << " " << v << "\n";
+    //std::cout << "fuck:: " << s << " " << e << "\n";
+    H.push_back(e);
+    H.push_back(s);
     for (int i = (u + 1) % N; i != (v + 1) % N; i = (i + 1) % N) {
-        Pos& prev = pos[(i - 1 + N) % N], cur = pos[i], nxt = pos[(i + 1) % N];
-        if (on_seg_strong(prev, cur, s) && s != cur) H.push_back(s);
-        H.push_back(cur);
-        if (on_seg_strong(cur, nxt, e) && e != cur) H.push_back(e);
+        const Pos& p = pos[i];
+        if (p != s && p != e) H.push_back(p);
     }
-    return H;
+    int sz = H.size();
+    V.resize(sz, 0);
+    for (int i = 0; i < sz; i++) {
+        const Pos& pre = H[(i - 1 + sz) % sz], cur = H[i], nxt = H[(i + 1) % sz];
+        if (!ccw(pre, cur, nxt)) V[i] = 1;
+    }
+    for (int i = 0; i < sz; i++) if (!V[i]) tmp.push_back(H[i]);
+    return tmp;
 }
 bool all_polygon_cmp(int u, int v, Pos s, Pos e) {
     Polygon A = make_polygon(u, v, s, e);
@@ -155,7 +167,6 @@ bool all_polygon_cmp(int u, int v, Pos s, Pos e) {
         std::cout << "(" << p.x << ", " << p.y << "), \n";
     }
     std::cout << "]\n";
-    
 #endif
     if (A.size() != B.size()) return 0;
     norm(A), norm(B);
@@ -229,20 +240,25 @@ void match(int u, int v, int l, int r) {
 }
 bool find_split(const int i, const Seg& S, Pos& s, Pos& e) {
     int j = i, k = S.i;
+    Pos& J = pos[j], & K = pos[k];
     bool f = 0;
     if (k < j) f = 1, std::swap(j, k);
-    ll a1 = memo[k] - memo[j] + pos[k] / pos[j];
+    ll a1 = memo[k] - memo[j];
+    //std::cout << "FUCK:: a1:: " << a1 << "\n";
+    //std::cout << "FUCK:: A :: " << memo[N] << "\n";
     if (f) a1 = memo[N] - a1;
     Pos& pl = pos[i], & pr = pos[(i + 1) % N];
     assert(pl.x < pr.x);
     int r = std::min(pr.x, S.r);
     int l = std::max(pl.x, S.l);
+    int yh = pl.y;
+    int yl = pos[S.i].y;
     int h = pos[S.i].y - pl.y;
-    int w1 = pr.x - l, w2 = pos[S.i].x - l;
-    int w3 = pr.x - r, w4 = pos[S.i].x - r;
-    ll amax = a1 + 1ll * h * (w1 + w2);
-    ll amin = a1 + 1ll * h * (w3 + w4);
+    Pos b1 = Pos(r, yh), b2 = Pos(l, yh), b3 = Pos(l, yl), b4 = Pos(r, yl);
+    ll amax = a1 + K / b2 + b2 / b3 + b3 / J;
+    ll amin = a1 + K / b1 + b1 / b4 + b4 / J;
     ll a2 = memo[N] >> 1;
+    //std::cout << "DEBUG:: amin:: " << amin << " amax:: " << amax << " a2:: " << a2 << "\n";
     if (amin <= a2 && a2 <= amax) {
         ll box = a2 - amin;
         ll w = box / h;
@@ -459,7 +475,7 @@ bool vertical_split(Pos& s, Pos& e) {
     return 0;
 }
 void solve() {
-    //freopen("demarcation.in.3", "r", stdin);
+    //freopen("demarcation.in copy.4", "r", stdin);
     //freopen("demarcation.out", "w", stdout);
     std::cin.tie(0)->sync_with_stdio(0);
     //std::cout.tie(0);
@@ -470,28 +486,48 @@ void solve() {
     if (A < 0) std::reverse(pos, pos + N);
     A *= -1;
     A >>= 1;
+#ifdef CRIMSON_MODULE_DEBUG
+    std::cout << "FUCK::\n";
+    std::cout << "pos = [\n";
+    for (int i = 0; i < N; i++) {
+        std::cout << "(" << pos[i].x << ", " << pos[i].y << "), \n";
+    }
+    std::cout << "]\n";
+#endif
     if (A & 1) { std::cout << "NO\n"; return; }
 
     Pos s, e;
     if (vertical_split(s, e)) {
-        std::cout << "YES\n";
-        std::cout << s << e << "\n";
+        //std::cout << "YES\n";
+        std::cout << s << " " << e << "\n";
         return;
     }
     rotate();
     //std::cout << "FUCK::\n";
     if (vertical_split(s, e)) {
-        std::cout << "YES\n";
-        std::cout << -~s << -~e << "\n";
+        //std::cout << "YES\n";
+        std::cout << -~s << " " << - ~e << "\n";
         return;
     }
-    std::cout << "FUCK::\n";
+    //std::cout << "FUCK::\n";
     std::cout << "NO\n";
     return;
 }
 int main() { solve(); return 0; }//
 
 /*
+
+8
+0 0
+6 0
+6 2
+5 2
+5 1
+1 1
+1 4
+0 4
+
+
 
 void solve() {
     freopen("demarcation.in.1", "r", stdin);
