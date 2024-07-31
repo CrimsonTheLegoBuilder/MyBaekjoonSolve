@@ -6,7 +6,8 @@
 #include <cmath>
 #include <cstring>
 
-#define JAY_MODULE_DEBUG
+//#define JAY_MODULE_DEBUG
+#define CRIMSON_MODULE_DEBUG
 
 typedef long long ll;
 typedef double ld;
@@ -129,7 +130,8 @@ bool polygon_cmp(const Polygon& A, const Polygon& B) {
 bool operator == (const Polygon& p, const Polygon& q) { return polygon_cmp(p, q); }
 Polygon make_polygon(int u, int v, Pos s, Pos e) {
     Polygon H;
-    for (int i = (u + 1) % N; i != (v + 1) % N; i++) {
+    //std::cout << "fuck:: " << u << " " << v << "\n";
+    for (int i = (u + 1) % N; i != (v + 1) % N; i = (i + 1) % N) {
         Pos& prev = pos[(i - 1 + N) % N], cur = pos[i], nxt = pos[(i + 1) % N];
         if (on_seg_strong(prev, cur, s) && s != cur) H.push_back(s);
         H.push_back(cur);
@@ -140,6 +142,21 @@ Polygon make_polygon(int u, int v, Pos s, Pos e) {
 bool all_polygon_cmp(int u, int v, Pos s, Pos e) {
     Polygon A = make_polygon(u, v, s, e);
     Polygon B = make_polygon(v, u, e, s);
+#ifdef CRIMSON_MODULE_DEBUG
+    std::cout << "FUCK:: s:: " << s << " e:: " << e << "\n";
+    std::cout << "FUCK::\n";
+    std::cout << "A = [\n";
+    for (Pos& p : A) {
+        std::cout << "(" << p.x << ", " << p.y << "), \n";
+    }
+    std::cout << "]\n";
+    std::cout << "B = [\n";
+    for (Pos& p : B) {
+        std::cout << "(" << p.x << ", " << p.y << "), \n";
+    }
+    std::cout << "]\n";
+    
+#endif
     if (A.size() != B.size()) return 0;
     norm(A), norm(B);
     Pos b = *std::min_element(B.begin(), B.end());
@@ -385,6 +402,7 @@ public:
         if (x->val.r == x->val.l) pop(x); // pop if all range covered
 
         while (x = find(l)) { // find leftmost
+            //if (x->val.r == l) break;
             if (x->val.r <= l) { // if leftmost is out of range
                 if (!x->r) return; // no more right segment
                 x = x->r;
@@ -422,15 +440,18 @@ bool vertical_split(Pos& s, Pos& e) {
     std::sort(events, events + Q);
 
     for (int i = 0; i < Q; ++i) {
-        std::cout << (events[i].d == 0 ? "insert" : "query") << " segment: (h, l, r) ";
-        std::cout << events[i].l.y << ' ' << events[i].l.l << ' ' << events[i].l.r << '\n';
+        //std::cout << (events[i].d == 0 ? "insert" : "query") << " segment: (h, l, r) ";
+        //std::cout << events[i].l.y << ' ' << events[i].l.l << ' ' << events[i].l.r << '\n';
         if (events[i].d == 0) sp.insert(events[i].l.l, events[i].l.r, events[i].i);
         if (events[i].d == 1) {
             Segs.clear();
             sp.query(events[i].l.l, events[i].l.r, events[i].i);
             for (Seg& S : Segs) {
+                //std::cout << "segs::\n";
                 if (find_split(events[i].i, S, s, e)) {
+                    //std::cout << "polygon cmp before::\n";
                     if (all_polygon_cmp(events[i].i, S.i, s, e)) return 1;
+                    //std::cout << "polygon cmp after::\n";
                 }
             }
         }
@@ -438,8 +459,8 @@ bool vertical_split(Pos& s, Pos& e) {
     return 0;
 }
 void solve() {
-    freopen("demarcation.in.3", "r", stdin);
-    freopen("demarcation.out", "w", stdout);
+    //freopen("demarcation.in.3", "r", stdin);
+    //freopen("demarcation.out", "w", stdout);
     std::cin.tie(0)->sync_with_stdio(0);
     //std::cout.tie(0);
     std::cin >> N;
@@ -458,15 +479,17 @@ void solve() {
         return;
     }
     rotate();
+    //std::cout << "FUCK::\n";
     if (vertical_split(s, e)) {
         std::cout << "YES\n";
         std::cout << -~s << -~e << "\n";
         return;
     }
+    std::cout << "FUCK::\n";
     std::cout << "NO\n";
     return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//
 
 /*
 
