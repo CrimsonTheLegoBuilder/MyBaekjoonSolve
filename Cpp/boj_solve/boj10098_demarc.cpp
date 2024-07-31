@@ -421,7 +421,6 @@ bool vertical_split(Pos& s, Pos& e) {
 
     std::sort(events, events + Q);
 
-    Pos s, e;
     for (int i = 0; i < Q; ++i) {
         std::cout << (events[i].d == 0 ? "insert" : "query") << " segment: (h, l, r) ";
         std::cout << events[i].l.y << ' ' << events[i].l.l << ' ' << events[i].l.r << '\n';
@@ -439,7 +438,7 @@ bool vertical_split(Pos& s, Pos& e) {
     return 0;
 }
 void solve() {
-    freopen("demarcation.in.1", "r", stdin);
+    freopen("demarcation.in.3", "r", stdin);
     freopen("demarcation.out", "w", stdout);
     std::cin.tie(0)->sync_with_stdio(0);
     //std::cout.tie(0);
