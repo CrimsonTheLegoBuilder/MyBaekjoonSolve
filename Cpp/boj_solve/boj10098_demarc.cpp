@@ -6,8 +6,15 @@
 #include <cmath>
 #include <cstring>
 
+/*
+* 
+* Splay tree / sweeping by jay0202
+* Geometry by crimson231
+* 
+*/
+
 //#define JAY_MODULE_DEBUG
-#define CRIMSON_MODULE_DEBUG
+//#define CRIMSON_MODULE_DEBUG
 
 typedef long long ll;
 typedef double ld;
@@ -251,10 +258,14 @@ bool find_split(const int i, const Seg& S, Pos& s, Pos& e) {
     assert(pl.x < pr.x);
     int r = std::min(pr.x, S.r);
     int l = std::max(pl.x, S.l);
-    int yh = pl.y;
-    int yl = pos[S.i].y;
-    int h = pos[S.i].y - pl.y;
+    int yh = pos[S.i].y;
+    int yl = pl.y;
+    int h = yh - yl;
     Pos b1 = Pos(r, yh), b2 = Pos(l, yh), b3 = Pos(l, yl), b4 = Pos(r, yl);
+    /*
+    sl b2 b1 sr K  -- a1
+    pl b3 b4 pr J  --
+    */
     ll amax = a1 + K / b2 + b2 / b3 + b3 / J;
     ll amin = a1 + K / b1 + b1 / b4 + b4 / J;
     ll a2 = memo[N] >> 1;
@@ -513,7 +524,7 @@ void solve() {
     std::cout << "NO\n";
     return;
 }
-int main() { solve(); return 0; }//
+int main() { solve(); return 0; }//boj10098 Demarcation
 
 /*
 
