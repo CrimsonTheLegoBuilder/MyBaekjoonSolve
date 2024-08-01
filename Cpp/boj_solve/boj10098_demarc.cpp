@@ -486,8 +486,8 @@ bool vertical_split(Pos& s, Pos& e) {
     return 0;
 }
 void solve() {
-    freopen("demarcation.in copy.14", "r", stdin);
-    freopen("demarcation.out", "w", stdout);
+    //freopen("demarcation.in copy.14", "r", stdin);
+    //freopen("demarcation.out", "w", stdout);
     std::cin.tie(0)->sync_with_stdio(0);
     //std::cout.tie(0);
     std::cin >> N;
