@@ -241,8 +241,8 @@ void match(int u, int v, int l, int r) {
 #ifdef JAY_MODULE_DEBUG
     std::cout << "facing pair: " << u << ' ' << v << '\n';
     std::cout << "    facing range: " << l << ' ' << r << '\n';
-#endif
     g[u].push_back(v);
+#endif
     Segs.push_back(Seg(l, r, v));
 }
 bool find_split(const int i, const Seg& S, Pos& s, Pos& e) {
@@ -263,8 +263,8 @@ bool find_split(const int i, const Seg& S, Pos& s, Pos& e) {
     int h = yh - yl;
     Pos b1 = Pos(r, yh), b2 = Pos(l, yh), b3 = Pos(l, yl), b4 = Pos(r, yl);
     /*
-    sl b2 b1 sr K  -- a1
-    pl b3 b4 pr J  --
+         sl b2 b1 sr == K <--...
+    J == pl b3 b4 pr ------->... a1
     */
     ll amax = a1 + K / b2 + b2 / b3 + b3 / J;
     ll amin = a1 + K / b1 + b1 / b4 + b4 / J;
