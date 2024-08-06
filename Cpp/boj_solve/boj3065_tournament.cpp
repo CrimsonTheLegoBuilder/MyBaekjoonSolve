@@ -5,7 +5,7 @@
 #include <cstring>
 typedef long long ll;
 typedef std::vector<int> vint;
-const int LEN = 1 << 8;
+const int LEN = 1 << 9;
 
 #define DEBUG
 
@@ -16,7 +16,7 @@ void query() {
 	std::cin >> N;
 	int c = 1 << (N - 1);
 	int n = 1;
-	for (int i = c + c; i < c + c + c + c; i++) {
+	for (int i = c << 1; i < c << 2; i++) {
 		tree[i] = n;
 		n++;
 	}
@@ -30,27 +30,23 @@ void query() {
 	}
 
 #ifdef DEBUG
-	std::cout << "\nDEBUG::\n";
-	for (int i = 1; i <= (1 << (N + 1)); i++) {
-		std::cout << tree[i] << " ";
-	}
-	std::cout << "\nDEBUG::\n";
+	std::cout << "\nDEBUG:: fuck::\n";
+	for (int i = 1; i < (1 << (N + 1)); i++) std::cout << tree[i] << " ";
+	std::cout << "\nDEBUG:: suck::\n";
 #endif
 
 	c = 1 << N;
 	std::cin >> Q;
 	while (Q--) {
 		int q, a1 = 1, a2 = 0;
-		//
 		std::cin >> q;
-		int p = c + q;
+		int p = c + q - 1;
 		while (tree[p] == q) {
 			a2++;
 			p >>= 1;
 		}
-		a2 = c - (1 << a2) + 1;
-		int pre = tree[p];
-		p >>= 1;
+		a2 = c - (1 << (a2 - 1)) + 1;
+		int pre = q;
 		while (tree[p]) {
 			if (pre != tree[p]) {
 				a1++;
@@ -62,6 +58,7 @@ void query() {
 		std::cout << " can be ranked as high as " << a1;
 		std::cout << " or as low as " << a2 << ".\n";
 	}
+	std::cout << "\n";
 	return;
 }
 void solve() {
