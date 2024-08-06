@@ -44,7 +44,7 @@ void query() {
 		//
 		std::cin >> q;
 		int p = c + q;
-		while (tree[p] != q) {
+		while (tree[p] == q) {
 			a2++;
 			p >>= 1;
 		}
