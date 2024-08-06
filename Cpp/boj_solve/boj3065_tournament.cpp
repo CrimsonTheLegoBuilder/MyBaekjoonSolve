@@ -37,11 +37,27 @@ void query() {
 	std::cout << "\nDEBUG::\n";
 #endif
 
+	c = 1 << N;
 	std::cin >> Q;
 	while (Q--) {
-		int q, a1 = 0, a2 = 0;
+		int q, a1 = 1, a2 = 0;
 		//
 		std::cin >> q;
+		int p = c + q;
+		while (tree[p] != q) {
+			a2++;
+			p >>= 1;
+		}
+		a2 = c - (1 << a2) + 1;
+		int pre = tree[p];
+		p >>= 1;
+		while (tree[p]) {
+			if (pre != tree[p]) {
+				a1++;
+				pre = tree[p];
+			}
+			p >>= 1;
+		}
 		std::cout << "Player " << q;
 		std::cout << " can be ranked as high as " << a1;
 		std::cout << " or as low as " << a2 << ".\n";
