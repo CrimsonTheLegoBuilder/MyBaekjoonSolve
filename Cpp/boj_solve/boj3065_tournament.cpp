@@ -7,7 +7,7 @@ typedef long long ll;
 typedef std::vector<int> vint;
 const int LEN = 1 << 9;
 
-#define DEBUG
+//#define DEBUG
 
 int T, N, Q;
 int tree[LEN];
