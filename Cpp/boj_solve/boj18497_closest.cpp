@@ -11,7 +11,8 @@ const ll INF = 1e18;
 const int LEN = 300;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
-int N, M, E, order[LEN], idx[LEN], ANS[LEN][LEN];
+int N, M, E, order[LEN], idx[LEN];
+ld ANS[LEN][LEN];
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -90,15 +91,25 @@ void solve() {
 
 	M = 0;
 	E = 0;
-	ll MIN = INF, MAX = -INF;
 	for (int i = 0; i < N; i++) {
 		for (int j = i + 1; j < N; j++) {
+			ANS[i][j] = -INF;
 			events[E++] = Seg(i, j);
 			events[E++] = Seg(j, i);
 		}
 	}
-	std::sort(slopes, slopes + M);
 	std::sort(events, events + E);
+
+	ld ans = INF;
+	for (int i = 0; i < N; i++) {
+		for (int j = i - 1; j >= 0; j--) {
+			ANS[idx[i]][idx[j]] = ans;
+			ans = std::min(ans, (P[idx[i]] - P[idx[j]]).mag());
+		}
+	}
+
+	int cnt = 0;
+	ld total = 0;
 
 	for (int i = 0, j; i < M; i = j) {
 		j = i;
@@ -107,8 +118,6 @@ void solve() {
 			int u = slopes[j].u, v = slopes[j].v;
 			if (e < order[v]) e = order[v];
 			int ou = order[u], ov = order[v];
-			if (ou > 0) MIN = std::min(MIN, std::abs(cross(P[u], P[v], P[idx[ou - 1]])));
-			if (ov < N - 1) MIN = std::min(MIN, std::abs(cross(P[u], P[v], P[idx[ov + 1]])));
 			order[u] = ov; order[v] = ou;
 			idx[ou] = v; idx[ov] = u;
 			j++;
