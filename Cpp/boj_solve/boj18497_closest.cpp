@@ -11,7 +11,7 @@ const ll INF = 1e18;
 const int LEN = 300;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
-int N, M, order[LEN], idx[LEN], ANS[LEN][LEN];
+int N, M, E, order[LEN], idx[LEN], ANS[LEN][LEN];
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -48,17 +48,21 @@ const Pos O = { 0, 0 }, MAXL = { 0, INF }, MAXR = { INF, 0 }, pivot = { -1, -1 }
 bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 struct Seg {
-	Pos u, v;
-	Pos s() const { return v - u; }
-	int ccw(const Pos& p) const { return sign(cross(u, v, p)); }
+	//Pos u, v;
+	int u, v;//idx
+	Seg(int U = -1, int V = -1) : u(U), v(V) {}
+	Pos s() const { return P[v] - P[u]; }
+	Pos p() const { return Pos(u, v); }
+	int ccw(const Pos& p) const { return sign(cross(P[u], P[v], p)); }
 	bool operator < (const Seg& S) const {
 		bool f1 = O < s();
 		bool f2 = O < S.s();
 		if (f1 != f2) return f1;
 		ll CCW = s() / S.s();
-		return !CCW ? ccw(S.u) < 0 : CCW > 0;
+		return !CCW ? !ccw(S.u) ? p() < S.p(): ccw(S.u) < 0 : CCW > 0;
 	}
 	bool operator == (const Seg& S) const { return s() / S.s() == 0 && s() * S.s() > 0; }
+	ld ang(const Seg& S) const { return rad(S.s(), s()); }
 } events[LEN * LEN];
 struct Slope {//segment's two point and slope
 	int u, v;//idx
@@ -75,62 +79,42 @@ void solve() {
 	std::cout.tie(0);
 	//freopen("boj9484_triangle_in.txt", "r", stdin);
 	//freopen("boj9484_triangle_out.txt", "w", stdout);
-	while (1) {
-		memset(order, 0, LEN);
-		memset(idx, 0, LEN);
-		memset(P, 0, LEN);
-		std::cin >> N;
-		if (!N) return;
+	memset(order, 0, LEN);
+	memset(idx, 0, LEN);
+	memset(P, 0, LEN);
+	std::cin >> N;
 
-		for (int i = 0; i < N; i++) std::cin >> P[i].x >> P[i].y;
-		std::sort(P, P + N);
+	for (int i = 0; i < N; i++) std::cin >> P[i];
+	std::sort(P, P + N);
+	for (int i = 0; i < N; i++) order[i] = i, idx[i] = i;
 
-		for (int i = 0; i < N; i++) order[i] = i, idx[i] = i;
-		M = 0;
-		ll MIN = INF, MAX = -INF;
-		for (int i = 0; i < N; i++) {
-			for (int j = i + 1; j < N; j++) {
-				if (P[i].x == P[j].x) {
-					if (i > 0) {
-						MIN = std::min({ MIN, std::abs(cross(P[i], P[j], P[i - 1])) });
-						MAX = std::max({ MAX, std::abs(cross(P[i], P[j], P[0])) });
-					}
-					else if (j < N - 1) {
-						MIN = std::min({ MIN, std::abs(cross(P[i], P[j], P[j + 1])) });
-						MAX = std::max({ MAX, std::abs(cross(P[i], P[j], P[N - 1])) });
-					}
-				}
-				ll dx = P[j].x - P[i].x;
-				ll dy = P[j].y - P[i].y;
-				if (!dx) continue;
-				if (dx * dy >= 0) dx = std::abs(dx), dy = std::abs(dy);
-				else dx = std::abs(dx), dy = -std::abs(dy);
-				slopes[M++] = { i, j, dx, dy };
-			}
+	M = 0;
+	E = 0;
+	ll MIN = INF, MAX = -INF;
+	for (int i = 0; i < N; i++) {
+		for (int j = i + 1; j < N; j++) {
+			events[E++] = Seg(i, j);
+			events[E++] = Seg(j, i);
 		}
-		std::sort(slopes, slopes + M);
-
-		for (int i = 0, j; i < M; i = j) {
-			j = i;
-			int s = order[slopes[i].u], e = order[slopes[i].u];
-			while (j < M && slopes[i] == slopes[j]) {
-				int u = slopes[j].u, v = slopes[j].v;
-				if (e < order[v]) e = order[v];
-				int ou = order[u], ov = order[v];
-				if (ou > 0) MIN = std::min(MIN, std::abs(cross(P[u], P[v], P[idx[ou - 1]])));
-				if (ov < N - 1) MIN = std::min(MIN, std::abs(cross(P[u], P[v], P[idx[ov + 1]])));
-				order[u] = ov; order[v] = ou;
-				idx[ou] = v; idx[ov] = u;
-				j++;
-			}
-			if (s == 0 && e == N - 1) MAX = 0;
-			if (s > 0) MAX = std::max(MAX, std::abs(cross(P[idx[s]], P[idx[e]], P[idx[0]])));
-			if (e < N - 1) MAX = std::max(MAX, std::abs(cross(P[idx[s]], P[idx[e]], P[idx[N - 1]])));
-		}
-		//std::cout << N << "\n";
-		std::cout << (MIN >> 1) << '.' << (MIN & 1 ? "5 " : "0 ");
-		std::cout << (MAX >> 1) << '.' << (MAX & 1 ? "5\n" : "0\n");
 	}
+	std::sort(slopes, slopes + M);
+	std::sort(events, events + E);
+
+	for (int i = 0, j; i < M; i = j) {
+		j = i;
+		int s = order[slopes[i].u], e = order[slopes[i].u];
+		while (j < M && slopes[i] == slopes[j]) {
+			int u = slopes[j].u, v = slopes[j].v;
+			if (e < order[v]) e = order[v];
+			int ou = order[u], ov = order[v];
+			if (ou > 0) MIN = std::min(MIN, std::abs(cross(P[u], P[v], P[idx[ou - 1]])));
+			if (ov < N - 1) MIN = std::min(MIN, std::abs(cross(P[u], P[v], P[idx[ov + 1]])));
+			order[u] = ov; order[v] = ou;
+			idx[ou] = v; idx[ov] = u;
+			j++;
+		}
+	}
+	
 	return;
 }
-int main() { solve(); return 0; }//boj9484
+int main() { solve(); return 0; }//boj18497
