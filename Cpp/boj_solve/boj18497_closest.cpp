@@ -111,13 +111,16 @@ void solve() {
 	int cnt = 0;
 	ld total = 0;
 
-	for (int i = 0, j; i < M; i = j) {
+	for (int i = 0, j; i < E; i = j) {
 		j = i;
-		int s = order[slopes[i].u], e = order[slopes[i].u];
-		while (j < M && slopes[i] == slopes[j]) {
-			int u = slopes[j].u, v = slopes[j].v;
+		int s = order[events[i].u], e = order[events[i].u];
+		while (j < E && events[i] == events[j]) {
+			int u = events[j].u, v = events[j].v;
 			if (e < order[v]) e = order[v];
 			int ou = order[u], ov = order[v];
+
+
+
 			order[u] = ov; order[v] = ou;
 			idx[ou] = v; idx[ov] = u;
 			j++;
