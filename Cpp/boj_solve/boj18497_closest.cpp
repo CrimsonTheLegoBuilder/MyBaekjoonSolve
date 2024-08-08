@@ -109,7 +109,15 @@ void solve() {
 	}
 
 	int cnt = 0;
+	ld ans = INF;
 	ld total = 0;
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (1) cnt++;
+		}
+	}
+
 
 	for (int i = 0, j; i < E; i = j) {
 		j = i;
