@@ -168,8 +168,7 @@ void solve() {
 		}
 	}
 
-	total += cnt * rad(events[0].s(), events[E - 1].s());
-
+	Pos pre_s = events[E - 1].s();
 	for (int i = 0, j; i < E; i = j) {
 		j = i;
 		int s = order[events[i].u], e = order[events[i].u];
