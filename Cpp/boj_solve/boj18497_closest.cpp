@@ -20,7 +20,7 @@ inline void norm(ld x) {
 	return;
 }
 
-int N, M, E, order[LEN], idx[LEN];
+int N, M, E, order[LEN], Q[LEN];
 ld ANS[LEN][LEN];
 struct Pos {
 	ll x, y;
@@ -105,17 +105,18 @@ struct Slope {//segment's two point and slope
 	}
 	bool operator == (const Slope& s) const { return dy * s.dx == dx * s.dy; }
 } slopes[LEN * LEN];
+ld dist(const Pos& p, const Pos& q) { return (p - q).mag(); }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	memset(order, 0, sizeof order);
-	memset(idx, 0, sizeof idx);
+	memset(Q, 0, sizeof Q);
 	memset(P, 0, sizeof P);
 	std::cin >> N;
 
 	for (int i = 0; i < N; i++) std::cin >> P[i];
 	std::sort(P, P + N);
-	for (int i = 0; i < N; i++) order[i] = i, idx[i] = i;
+	for (int i = 0; i < N; i++) order[i] = i, Q[i] = i;
 
 	if (N == 2) { std::cout << "1.0000000\n"; return; }
 
@@ -148,14 +149,14 @@ void solve() {
 
 	U = P[events[0].u];
 	V = P[events[0].v];
-	std::sort(idx, idx + N, cmps);
-	for (int i = 0; i < N; i++) order[idx[i]] = i;
+	std::sort(Q, Q + N, cmps);
+	for (int i = 0; i < N; i++) order[Q[i]] = i;
 
 	ld ans = INF;
 	for (int i = 0; i < N; i++) {
 		for (int j = i - 1; j >= 0; j--) {
-			ANS[idx[i]][idx[j]] = ans;
-			ans = std::min(ans, (P[idx[i]] - P[idx[j]]).mag());
+			ANS[Q[i]][Q[j]] = ans;
+			ans = std::min(ans, dist(P[Q[i]], P[Q[j]]));
 		}
 	}
 
@@ -168,7 +169,7 @@ void solve() {
 		}
 	}
 
-	Pos pre_s = events[E - 1].s();
+	Pos pre_s = events[(E - 1 + E) % E].s();
 	for (int i = 0, j; i < E; i = j) {
 		j = i;
 		int s = order[events[i].u], e = order[events[i].u];
@@ -180,7 +181,7 @@ void solve() {
 
 
 			order[u] = ov; order[v] = ou;
-			idx[ou] = v; idx[ov] = u;
+			Q[ou] = v; Q[ov] = u;
 			j++;
 		}
 	}
