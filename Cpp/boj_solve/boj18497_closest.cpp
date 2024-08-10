@@ -96,7 +96,7 @@ struct Seg {
 	bool operator == (const Seg& S) const { return s() / S.s() == 0 && s() * S.s() > 0; }
 	ld ang(const Seg& S) const { return rad(S.s(), s()); }
 } events[LEN * LEN];
-struct Slope {//segment's two point and slope
+struct Slope {
 	Seg s;
 	ld ans;
 	Slope(Seg S = Seg(), ld a = 0) : s(S), ans(a) {}
@@ -112,16 +112,11 @@ void solve() {
 	memset(order, 0, sizeof order);
 	memset(slopes, 0, sizeof slopes);
 	std::cin >> N;
+	if (N == 2) { std::cout << "1.0000000\n"; return; }
 
 	for (int i = 0; i < N; i++) std::cin >> P[i];
 	std::sort(P, P + N);
 	for (int i = 0; i < N; i++) order[i] = i, Q[i] = i;
-
-	if (N == 2) { std::cout << "1.0000000\n"; return; }
-
-	for (int i = 0; i < N; i++)
-		for (int j = 0; j < N; j++)
-			ANS[i][j] = -INF;
 
 	E = 0;
 	for (int i = 0; i < N; i++) {
@@ -133,6 +128,8 @@ void solve() {
 	std::sort(events, events + E);
 
 	Pos U, V;
+	ld ans = INF;
+
 	auto cmps = [&](const int& p, const int& q) -> bool {
 		const Pos& p_ = P[p], & q_ = P[q];
 		ll tp = cross(U, V, p_), tq = cross(U, V, q_);
@@ -146,12 +143,15 @@ void solve() {
 		return tq / (U - V).mag();
 		};
 
-	U = P[events[0].u];
-	V = P[events[0].v];
-	std::sort(Q, Q + N, cmps);
-	for (int i = 0; i < N; i++) order[Q[i]] = i;
+	//U = P[events[0].u];
+	//V = P[events[0].v];
+	//std::sort(Q, Q + N, cmps);
+	//for (int i = 0; i < N; i++) order[Q[i]] = i;
 
-	ld ans = INF;
+	for (int i = 0; i < N; i++)
+		for (int j = 0; j < N; j++)
+			ANS[i][j] = -INF;
+
 	for (int i = 0; i < N; i++) {
 		for (int j = i - 1; j >= 0; j--) {
 			ANS[Q[i]][Q[j]] = ans;
@@ -168,23 +168,23 @@ void solve() {
 
 		ans = INF;
 		for (int j = 0; j < ov; j++) {
-			ANS[order[j]][v] = ans;
-			ans = std::min(ans, dist(P[order[j]], P[v]));
-			slopes[order[j]][v].push_back(Slope(Seg(u, v), ans));
+			ANS[Q[j]][u] = ans;
+			slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
+			ans = std::min(ans, dist(P[Q[j]], P[u]));
 		}
 		for (int j = ou; j < N; j++) {
-			ANS[u][order[j]] = ans;
-			ans = std::min(ans, dist(P[u], P[order[j]]));
-			slopes[u][order[j]].push_back(Slope(Seg(u, v), ans));
+			ANS[v][Q[j]] = ans;
+			slopes[v][Q[j]].push_back(Slope(Seg(u, v), ans));
+			ans = std::min(ans, dist(P[v], P[Q[j]]));
 		}
 
 		for (int j = 0; j < ou; j++) {
-			ANS[order[j]][u] = -INF;
-			slopes[order[j]][u].push_back(Slope(Seg(u, v), -INF));
+			ANS[Q[j]][v] = -INF;
+			slopes[Q[j]][v].push_back(Slope(Seg(u, v), -INF));
 		}
 		for (int j = ov; j < N; j++) {
-			ANS[v][order[j]] = -INF;
-			slopes[v][order[j]].push_back(Slope(Seg(u, v), -INF));
+			ANS[u][Q[j]] = -INF;
+			slopes[u][Q[j]].push_back(Slope(Seg(u, v), -INF));
 		}
 	}
 
