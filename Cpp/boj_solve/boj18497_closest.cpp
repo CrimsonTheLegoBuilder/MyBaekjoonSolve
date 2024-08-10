@@ -166,7 +166,7 @@ void solve() {
 		order[u] = ov; order[v] = ou;
 		Q[ou] = v; Q[ov] = u;
 
-		ans = INF;
+		ans = order[v] == 0 ? INF : ANS[Q[order[v] - 1]][v];
 		for (int j = 0; j < ov; j++) {
 			ANS[Q[j]][u] = ans;
 			slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
@@ -195,8 +195,8 @@ void solve() {
 			const vslope& SS = slopes[i][j];
 			const int sz = SS.size();
 			for (int k = 0; k < sz; k++) {
-				const Slope& S = SS[k];
-				U = P[S.s.u], V = P[S.s.v];
+				const Slope& S0 = SS[k], S1 = SS[(k + 1) % sz];
+				U = P[S0.s.u], V = P[S0.s.v];
 				ld x = x_dist(i, j);
 				total += PI;
 			}
