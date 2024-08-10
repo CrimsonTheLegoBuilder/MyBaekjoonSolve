@@ -90,7 +90,8 @@ struct Seg {
 		bool f2 = O < S.s();
 		if (f1 != f2) return f1;
 		ll CCW = s() / S.s();
-		return !CCW ? !S.ccw(P[u]) ? p() < S.p() : S.ccw(P[u]) > 0 : CCW > 0;
+		//return !CCW ? !S.ccw(P[u]) ? p() < S.p() : S.ccw(P[u]) > 0 : CCW > 0;
+		return !CCW ? !S.ccw(P[u]) ? p() < S.p() : S.ccw(P[u]) > 0 : CCW < 0;
 	}
 	bool operator == (const Seg& S) const { return s() / S.s() == 0 && s() * S.s() > 0; }
 	ld ang(const Seg& S) const { return rad(S.s(), s()); }
@@ -106,9 +107,10 @@ ld dist(const Pos& p, const Pos& q) { return (p - q).mag(); }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	memset(order, 0, sizeof order);
-	memset(Q, 0, sizeof Q);
 	memset(P, 0, sizeof P);
+	memset(Q, 0, sizeof Q);
+	memset(order, 0, sizeof order);
+	memset(slopes, 0, sizeof slopes);
 	std::cin >> N;
 
 	for (int i = 0; i < N; i++) std::cin >> P[i];
@@ -157,32 +159,47 @@ void solve() {
 		}
 	}
 
-	int cnt = 0;
-	ld total = 0;
+	for (int i = 0; i < E; i++) {
+		int u = events[i].u, v = events[i].v;
+		U = P[u], V = P[v];
+		int ou = order[u], ov = order[v];
+		order[u] = ov; order[v] = ou;
+		Q[ou] = v; Q[ov] = u;
 
+		ans = INF;
+		for (int j = 0; j < ov; j++) {
+			ANS[order[j]][v] = ans;
+			ans = std::min(ans, dist(P[order[j]], P[v]));
+			slopes[order[j]][v].push_back(Slope(Seg(u, v), ans));
+		}
+		for (int j = ou; j < N; j++) {
+			ANS[u][order[j]] = ans;
+			ans = std::min(ans, dist(P[u], P[order[j]]));
+			slopes[u][order[j]].push_back(Slope(Seg(u, v), ans));
+		}
+
+		for (int j = 0; j < ou; j++) {
+			ANS[order[j]][u] = -INF;
+			slopes[order[j]][u].push_back(Slope(Seg(u, v), -INF));
+		}
+		for (int j = ov; j < N; j++) {
+			ANS[v][order[j]] = -INF;
+			slopes[v][order[j]].push_back(Slope(Seg(u, v), -INF));
+		}
+	}
+
+	ld total = 0;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-			if (x_dist(i, j) < ANS[i][j]) cnt++;
+			if (i == j) continue;
+			vslope& SS = slopes[i][j];
+			int sz = SS.size();
+			for (int k = 0; k < sz; k++) {
+				total += PI;
+			}
+		
 		}
 	}
-
-	Pos pre_s = events[(E - 1 + E) % E].s();
-	for (int i = 0, j; i < E; i = j) {
-		j = i;
-		int s = order[events[i].u], e = order[events[i].u];
-		while (j < E && events[i] == events[j]) {
-			int u = events[j].u, v = events[j].v;
-			if (e < order[v]) e = order[v];
-			int ou = order[u], ov = order[v];
-
-
-
-			order[u] = ov; order[v] = ou;
-			Q[ou] = v; Q[ov] = u;
-			j++;
-		}
-	}
-
 	std::cout << total / (2 * PI) << "\n";
 	
 	return;
