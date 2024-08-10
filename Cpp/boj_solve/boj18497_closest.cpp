@@ -192,12 +192,14 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
-			vslope& SS = slopes[i][j];
-			int sz = SS.size();
+			const vslope& SS = slopes[i][j];
+			const int sz = SS.size();
 			for (int k = 0; k < sz; k++) {
+				const Slope& S = SS[k];
+				U = P[S.s.u], V = P[S.s.v];
+				ld x = x_dist(i, j);
 				total += PI;
 			}
-		
 		}
 	}
 	std::cout << total / (2 * PI) << "\n";
