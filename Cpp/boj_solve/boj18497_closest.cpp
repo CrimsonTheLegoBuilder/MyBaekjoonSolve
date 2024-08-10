@@ -96,15 +96,12 @@ struct Seg {
 	ld ang(const Seg& S) const { return rad(S.s(), s()); }
 } events[LEN * LEN];
 struct Slope {//segment's two point and slope
-	int u, v;//idx
-	ll dx, dy;
-	Pos p() const { return { u, v }; }
-	bool operator < (const Slope& s) const {
-		if (dy * s.dx == dx * s.dy) return p() < s.p();
-		return dy * s.dx < dx * s.dy;
-	}
-	bool operator == (const Slope& s) const { return dy * s.dx == dx * s.dy; }
-} slopes[LEN * LEN];
+	Seg s;
+	ld ans;
+	Slope(Seg S = Seg(), ld a = 0) : s(S), ans(a) {}
+};
+typedef std::vector<Slope> vslope;
+vslope slopes[LEN][LEN];
 ld dist(const Pos& p, const Pos& q) { return (p - q).mag(); }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
