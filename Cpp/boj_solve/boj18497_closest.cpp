@@ -80,16 +80,16 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const
 }
 struct Seg {
 	int u, v;//idx
-	Seg(int U = -1, int V = -1) : u(U), v(V) {}
+	Seg(int U = 0, int V = 0) : u(U), v(V) {}
 	Pos s() const { return P[v] - P[u]; }
 	Pos p() const { return Pos(u, v); }
-	int ccw(const Pos& p) const { return sign(cross(P[u], P[v], p)); }
+	int ccw(const Pos& p0) const { return sign(cross(P[u], P[v], p0)); }
 	bool operator < (const Seg& S) const {
+		assert(O != s()); assert(O != S.s());
 		bool f1 = O < s();
 		bool f2 = O < S.s();
-		if (f1 != f2) return f1;
+		if (f1 != f2) return f2;
 		ll CCW = s() / S.s();
-		//return !CCW ? !S.ccw(P[u]) ? p() < S.p() : S.ccw(P[u]) > 0 : CCW > 0;
 		return !CCW ? !S.ccw(P[u]) ? p() < S.p() : S.ccw(P[u]) > 0 : CCW < 0;
 	}
 	bool operator == (const Seg& S) const { return s() / S.s() == 0 && s() * S.s() > 0; }
@@ -107,7 +107,6 @@ ld sweep(const int& i, const int& j) {
 	Pos I, J;
 	I = P[i], J = P[j];
 	Pos U, V;
-
 	auto theta = [&](const Pos& vec) -> ld {
 		Pos K = -~(J - I);
 		return rad(K, vec);
@@ -127,7 +126,7 @@ ld sweep(const int& i, const int& j) {
 			total += hi - lo;
 			continue;
 		}
-		ld phi = acos(S0.ans / len);
+		ld phi = std::max(-(ld)1., std::min((ld)1., acos(S0.ans / len)));
 		if (sign(hi - phi) > 0) {
 			if (sign(lo - phi) > 0) total += hi - lo;
 			else total += hi - phi;
@@ -187,18 +186,17 @@ void solve() {
 		for (int j = 0; j < ov; j++) {
 			ANS[u][Q[j]] = ans;
 			slopes[u][Q[j]].push_back(Slope(Seg(u, v), ans));
-			ans = std::min(ans, dist(P[Q[j]], P[u]));
 		}
 		for (int j = ov; j < N; j++) {
 			ANS[u][Q[j]] = -INF;
 			slopes[u][Q[j]].push_back(Slope(Seg(u, v), -INF));
 		}
 
-		ans = order[u] <= 1 ? INF : ANS[u][Q[order[u] - 1]];
+		//ans = order[u] <= 1 ? INF : ANS[u][Q[order[u] - 1]];
+		ans = std::min(ans, dist(P[u], P[v]));
 		for (int j = 0; j < ou; j++) {
 			ANS[v][Q[j]] = ans;
 			slopes[v][Q[j]].push_back(Slope(Seg(u, v), ans));
-			ans = std::min(ans, dist(P[v], P[Q[j]]));
 		}
 		for (int j = ou; j < N; j++) {
 			ANS[v][Q[j]] = -INF;
