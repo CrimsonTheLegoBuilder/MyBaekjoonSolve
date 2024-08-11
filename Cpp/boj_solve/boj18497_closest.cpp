@@ -79,7 +79,6 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const
 	return (f1 && f2) || f3;
 }
 struct Seg {
-	//Pos u, v;
 	int u, v;//idx
 	Seg(int U = -1, int V = -1) : u(U), v(V) {}
 	Pos s() const { return P[v] - P[u]; }
@@ -104,6 +103,42 @@ struct Slope {
 typedef std::vector<Slope> vslope;
 vslope slopes[LEN][LEN];
 ld dist(const Pos& p, const Pos& q) { return (p - q).mag(); }
+ld sweep(const int& i, const int& j) {
+	Pos I, J;
+	I = P[i], J = P[j];
+	Pos U, V;
+
+	auto theta = [&](const Pos& vec) -> ld {
+		Pos K = -~(J - I);
+		return rad(K, vec);
+		};
+
+	const vslope& SS = slopes[i][j];
+	const int sz = SS.size();
+	ld total = 0;
+	ld the = 0;
+	for (int k = 0; k < sz; k++) {
+		const Slope& S0 = SS[k], S1 = SS[(k + 1) % sz];
+		if (sign(S0.ans) <= 0) continue;
+		ld len = (I - J).mag();
+		ld hi = theta(S0.s.s());
+		ld lo = theta(S1.s.s());
+		if (sign(S0.ans - len) >= 0) {
+			total += hi - lo;
+			continue;
+		}
+		ld phi = acos(S0.ans / len);
+		if (sign(hi - phi) > 0) {
+			if (sign(lo - phi) > 0) total += hi - lo;
+			else total += hi - phi;
+		}
+		if (sign(lo + phi) < 0) {
+			if (sign(hi + phi) < 0) total += -(lo - hi);
+			else total += -(lo + phi);
+		}
+	}
+	return total;
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -130,24 +165,6 @@ void solve() {
 	Pos U, V;
 	ld ans = INF;
 
-	auto cmps = [&](const int& p, const int& q) -> bool {
-		const Pos& p_ = P[p], & q_ = P[q];
-		ll tp = cross(U, V, p_), tq = cross(U, V, q_);
-		if (tp == tq) return dot(U, V, p_) < dot(U, V, q_);
-		return tp < tq;
-		};
-	auto x_dist = [&](const int& p, const int& q) -> ld {
-		const Pos& p_ = P[p], & q_ = P[q];
-		Pos vec = V - U;
-		ll tq = cross(p_, p_ + vec, q_);
-		return tq / (U - V).mag();
-		};
-
-	//U = P[events[0].u];
-	//V = P[events[0].v];
-	//std::sort(Q, Q + N, cmps);
-	//for (int i = 0; i < N; i++) order[Q[i]] = i;
-
 	for (int i = 0; i < N; i++)
 		for (int j = 0; j < N; j++)
 			ANS[i][j] = -INF;
@@ -166,25 +183,26 @@ void solve() {
 		order[u] = ov; order[v] = ou;
 		Q[ou] = v; Q[ov] = u;
 
-		ans = order[v] == 0 ? INF : ANS[Q[order[v] - 1]][v];
+		ans = order[v] <= 1 ? INF : ANS[v][Q[order[v] - 1]];
 		for (int j = 0; j < ov; j++) {
-			ANS[Q[j]][u] = ans;
-			slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
+			ANS[u][Q[j]] = ans;
+			slopes[u][Q[j]].push_back(Slope(Seg(u, v), ans));
 			ans = std::min(ans, dist(P[Q[j]], P[u]));
-		}
-		for (int j = ou; j < N; j++) {
-			ANS[v][Q[j]] = ans;
-			slopes[v][Q[j]].push_back(Slope(Seg(u, v), ans));
-			ans = std::min(ans, dist(P[v], P[Q[j]]));
-		}
-
-		for (int j = 0; j < ou; j++) {
-			ANS[Q[j]][v] = -INF;
-			slopes[Q[j]][v].push_back(Slope(Seg(u, v), -INF));
 		}
 		for (int j = ov; j < N; j++) {
 			ANS[u][Q[j]] = -INF;
 			slopes[u][Q[j]].push_back(Slope(Seg(u, v), -INF));
+		}
+
+		ans = order[u] <= 1 ? INF : ANS[u][Q[order[u] - 1]];
+		for (int j = 0; j < ou; j++) {
+			ANS[v][Q[j]] = ans;
+			slopes[v][Q[j]].push_back(Slope(Seg(u, v), ans));
+			ans = std::min(ans, dist(P[v], P[Q[j]]));
+		}
+		for (int j = ou; j < N; j++) {
+			ANS[v][Q[j]] = -INF;
+			slopes[v][Q[j]].push_back(Slope(Seg(u, v), -INF));
 		}
 	}
 
@@ -192,14 +210,7 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
-			const vslope& SS = slopes[i][j];
-			const int sz = SS.size();
-			for (int k = 0; k < sz; k++) {
-				const Slope& S0 = SS[k], S1 = SS[(k + 1) % sz];
-				U = P[S0.s.u], V = P[S0.s.v];
-				ld x = x_dist(i, j);
-				total += PI;
-			}
+			total += sweep(i, j);
 		}
 	}
 	std::cout << total / (2 * PI) << "\n";
