@@ -88,7 +88,7 @@ struct Seg {
 		assert(O != s()); assert(O != S.s());
 		bool f1 = O < s();
 		bool f2 = O < S.s();
-		if (f1 != f2) return f2;
+		if (f1 != f2) return f1;
 		ll CCW = s() / S.s();
 		return !CCW ? !S.ccw(P[u]) ? p() < S.p() : S.ccw(P[u]) > 0 : CCW < 0;
 	}
@@ -106,11 +106,11 @@ ld dist(const Pos& p, const Pos& q) { return (p - q).mag(); }
 ld sweep(const int& i, const int& j) {
 	Pos I, J;
 	I = P[i], J = P[j];
-	Pos U, V;
 	auto theta = [&](const Pos& vec) -> ld {
 		Pos K = -~(J - I);
 		return rad(K, vec);
 		};
+	std::cout << "DEBUG:: I:: " << I << " J:: " << J << "\n";
 
 	ld total = 0;
 	const vslope& SS = slopes[i][j];
@@ -119,11 +119,15 @@ ld sweep(const int& i, const int& j) {
 		const Slope& S0 = SS[k], S1 = SS[(k + 1) % sz];
 		std::cout << "FUCK:: ans:: " << S0.ans << "\n";
 		if (sign(S0.ans) <= 0) continue;
-		std::cout << "FUCK:: ang\n";
+		//std::cout << "FUCK:: ang\n";
 		ld len = (J - I).mag();
-		ld hi = theta(S0.s.s());
-		ld lo = theta(S1.s.s());
+		ld hi = std::min(theta(S0.s.s()), (ld)(PI * .5));
+		ld lo = std::max(theta(S1.s.s()), -(ld)(PI * .5));
+		std::cout << "DEBUG:: vec:: " << J - I << "\n";
+		std::cout << "DEBUG:: S0:: " << S0.s.s() << " S1:: " << S1.s.s() << "\n";
+		std::cout << "FUCK:: hi:: " << hi << " lo:: " << lo << "\n";
 		if (sign(S0.ans - len) >= 0) {
+			std::cout << "FUCK:: continue:: " << hi - lo << "\n";
 			total += hi - lo;
 			continue;
 		}
@@ -190,46 +194,30 @@ void solve() {
 		order[u] = ov; order[v] = ou;
 		Q[ou] = v; Q[ov] = u;
 
+		//std::cout << "FUCK:: P[u]:: " << P[u] << " P[v]:: " << P[v] << "\n";
+
 		ans = order[v] <= 1 ? INF : ANS[v][Q[order[v] - 1]];
 		if (order[v] >= 1) ans = std::min(ans, dist(P[Q[0]], P[v]));
-		std::cout << "DEBUG:: loop(" << i << ") ans:: " << ans << "\n";
 		for (int j = ou - 1; j >= 0; j--) {
-			//std::cout << "DEBUG:: loop::loop1(" << j << ")\n";
-			//std::cout << "DEBUG:: v:: " << v << " Q[j]:: "  << Q[j] << "\n";
-			//std::cout << "DEBUG:: P[v]:: " << P[v] << " P[Q[j]]:: "  << P[Q[j]] << "\n";
-			//std::cout << "DEBUG:: dist:: " << dist(P[v], P[Q[j]]) << "\n";
 			ANS[v][Q[j]] = ans;
-			//std::cout << "FUCK:: \n";
-			//for (auto s : slopes[v][Q[j]]) std::cout << s.ans << " ";
-			//std::cout << "\n";
-
-			//std::cout << slopes[v][Q[j]].size() << '\n';
-
 			slopes[u][Q[j]].push_back({ { u, v }, ans });
-			//std::cout << slopes[v][Q[j]].size() << '\n';
-
-			//std::cout << "FUCK:: \n";
 			ans = std::min(ans, dist(P[v], P[Q[j]]));
-			//std::cout << "FUCK:: \n";
 		}
 		for (int j = ou + 1; j < N; j++) {
-			//std::cout << "DEBUG:: loop::loop2(" << j << ")\n";
 			ANS[v][Q[j]] = -INF;
-			slopes[u][Q[j]].push_back({ { u, v }, -INF });
+			slopes[u][Q[j]].push_back({ { v, u }, -INF });
 		}
 
 		////ans = order[u] <= 1 ? INF : ANS[u][Q[order[u] - 1]];
 		//ans = std::min(ans, dist(P[u], P[v]));
 		for (int j = ov - 1; j >= 0; j--) {
-			//std::cout << "DEBUG:: loop::loop3(" << j << ")\n";
 			ANS[u][Q[j]] = ans;
 			slopes[u][Q[j]].push_back({ { u, v }, ans });
 			ans = std::min(ans, dist(P[u], P[Q[j]]));
 		}
 		for (int j = ov + 1; j < N; j++) {
-			//std::cout << "DEBUG:: loop::loop4(" << j << ")\n";
 			ANS[u][Q[j]] = -INF;
-			slopes[u][Q[j]].push_back({ { u, v }, -INF });
+			slopes[u][Q[j]].push_back({ { v, u }, -INF });
 		}
 	}
 	//std::cout << "FUCK:: ANS rotate\n";
