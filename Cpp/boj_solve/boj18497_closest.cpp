@@ -183,20 +183,22 @@ void solve() {
 		Q[ou] = v; Q[ov] = u;
 
 		ans = order[v] <= 1 ? INF : ANS[v][Q[order[v] - 1]];
-		for (int j = 0; j < ov; j++) {
+		for (int j = ov; j >= 0; j--) {
 			ANS[u][Q[j]] = ans;
 			slopes[u][Q[j]].push_back(Slope(Seg(u, v), ans));
+			ans = std::min(ans, dist(P[u], P[Q[j]]));
 		}
 		for (int j = ov; j < N; j++) {
 			ANS[u][Q[j]] = -INF;
 			slopes[u][Q[j]].push_back(Slope(Seg(u, v), -INF));
 		}
 
-		//ans = order[u] <= 1 ? INF : ANS[u][Q[order[u] - 1]];
-		ans = std::min(ans, dist(P[u], P[v]));
-		for (int j = 0; j < ou; j++) {
+		////ans = order[u] <= 1 ? INF : ANS[u][Q[order[u] - 1]];
+		//ans = std::min(ans, dist(P[u], P[v]));
+		for (int j = ou; j >= 0; j--) {
 			ANS[v][Q[j]] = ans;
 			slopes[v][Q[j]].push_back(Slope(Seg(u, v), ans));
+			ans = std::min(ans, dist(P[v], P[Q[j]]));
 		}
 		for (int j = ou; j < N; j++) {
 			ANS[v][Q[j]] = -INF;
