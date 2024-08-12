@@ -220,7 +220,7 @@ void solve() {
 			slopes[u][Q[j]].push_back({ { u, v }, -INF });
 		}
 	}
-	//std::cout << "FUCK:: ANS rotate\n";
+	std::cout << "FUCK:: ANS rotate\n";
 
 	ld total = 0;
 	for (int i = 0; i < N; i++) {
