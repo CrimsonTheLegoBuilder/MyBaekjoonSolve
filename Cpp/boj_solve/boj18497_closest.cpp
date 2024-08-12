@@ -200,12 +200,12 @@ void solve() {
 		if (order[v] >= 1) ans = std::min(ans, dist(P[Q[0]], P[v]));
 		for (int j = ou - 1; j >= 0; j--) {
 			ANS[v][Q[j]] = ans;
-			slopes[u][Q[j]].push_back({ { u, v }, ans });
+			slopes[v][Q[j]].push_back({ { u, v }, ans });
 			ans = std::min(ans, dist(P[v], P[Q[j]]));
 		}
 		for (int j = ou + 1; j < N; j++) {
 			ANS[v][Q[j]] = -INF;
-			slopes[u][Q[j]].push_back({ { v, u }, -INF });
+			slopes[v][Q[j]].push_back({ { u, v }, -INF });
 		}
 
 		////ans = order[u] <= 1 ? INF : ANS[u][Q[order[u] - 1]];
@@ -217,7 +217,7 @@ void solve() {
 		}
 		for (int j = ov + 1; j < N; j++) {
 			ANS[u][Q[j]] = -INF;
-			slopes[u][Q[j]].push_back({ { v, u }, -INF });
+			slopes[u][Q[j]].push_back({ { u, v }, -INF });
 		}
 	}
 	//std::cout << "FUCK:: ANS rotate\n";
