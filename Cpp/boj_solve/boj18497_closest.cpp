@@ -183,6 +183,7 @@ void solve() {
 		Q[ou] = v; Q[ov] = u;
 
 		ans = order[v] <= 1 ? INF : ANS[v][Q[order[v] - 1]];
+		if (order[v] > 1) ans = std::min(ans, dist(P[Q[order[v] - 1]], P[v]));
 		for (int j = ov; j >= 0; j--) {
 			ANS[u][Q[j]] = ans;
 			slopes[u][Q[j]].push_back(Slope(Seg(u, v), ans));
