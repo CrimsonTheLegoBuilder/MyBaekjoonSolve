@@ -194,7 +194,7 @@ void solve() {
 		order[u] = ov; order[v] = ou;
 		Q[ou] = v; Q[ov] = u;
 
-		//std::cout << "FUCK:: P[u]:: " << P[u] << " P[v]:: " << P[v] << "\n";
+		std::cout << "FUCK:: P[u]:: " << P[u] << " P[v]:: " << P[v] << "\n";
 
 		ans = order[v] <= 1 ? INF : ANS[v][Q[order[v] - 1]];
 		if (order[v] >= 1) ans = std::min(ans, dist(P[Q[0]], P[v]));
