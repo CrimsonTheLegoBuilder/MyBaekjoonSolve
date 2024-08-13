@@ -8,7 +8,7 @@
 typedef long long ll;
 typedef long double ld;
 const ll INF = 1e18;
-const int LEN = 50;
+const int LEN = 300;
 const ld TOL = 1e-9;
 const ld PI = acos(-1);
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
@@ -98,7 +98,6 @@ struct Seg {
 struct Slope {
 	Seg seg;
 	ld ans;
-	//Slope(Seg se, ld a) : seg(se), ans(a) {}
 	Slope(Seg se = Seg(0, 0), ld a = 0) : seg(se), ans(a) {}
 };
 typedef std::vector<Slope> vslope;
@@ -111,46 +110,47 @@ ld sweep(const int& i, const int& j) {
 		Pos K = -~(J - I);
 		return rad(K, vec);
 		};
-	std::cout << "\nDEBUG::\n";
-	std::cout << "DEBUG:: I:: " << I << " J:: " << J << "\n";
+	//std::cout << "\nDEBUG::\n";
+	//std::cout << "DEBUG:: I:: " << I << " J:: " << J << "\n";
 
 	ld total = 0;
 	ld pre = 0;
 	const vslope& SS = slopes[i][j];
+	//const vslope& SS = slp[hs(i, j)];
 	const int sz = SS.size();
 	for (int k = 0; k < sz; k++) {
 		const Slope& S0 = SS[k], S1 = SS[(k + 1) % sz];
-		std::cout << "FUCK:: ans:: " << S0.ans << "\n";
-		std::cout << "SLOPE:: S0:: " << S0.seg.s() << " S1:: " << S1.seg.s() << "\n";
+		//std::cout << "FUCK:: ans:: " << S0.ans << "\n";
+		//std::cout << "SLOPE:: S0:: " << S0.seg.s() << " S1:: " << S1.seg.s() << "\n";
 		if (sign(S0.ans) <= 0) continue;
-		std::cout << "FUCK:: angle cal::\n";
+		//std::cout << "FUCK:: angle cal::\n";
 		ld len = (J - I).mag();
 		ld hi = std::min(theta(S0.seg.s()), (ld)(PI * .5));
 		ld lo = std::max(theta(S1.seg.s()), -(ld)(PI * .5));
-		std::cout << "DEBUG:: vec:: " << J - I << "\n";
-		std::cout << "FUCK:: hi:: " << hi << " lo:: " << lo << "\n";
+		//std::cout << "DEBUG:: vec:: " << J - I << "\n";
+		//std::cout << "FUCK:: hi:: " << hi << " lo:: " << lo << "\n";
 		if (sign(S0.ans - len) >= 0) {
-			std::cout << "FUCK:: continue:: add:: " << hi - lo << "\n";
+			//std::cout << "FUCK:: continue:: add:: " << hi - lo << "\n";
 			total += hi - lo;
 			pre = total;
 			continue;
 		}
-		std::cout << "DEBUG:: cos(phi):: " << S0.ans / len << "\n";
+		//std::cout << "DEBUG:: cos(phi):: " << S0.ans / len << "\n";
 		ld ratio = std::max(-(ld)1., std::min((ld)1., (ld)(S0.ans / len)));
-		std::cout << "DEBUG:: ratio:: " << ratio << "\n";
+		//std::cout << "DEBUG:: ratio:: " << ratio << "\n";
 		ld phi = acos(ratio);
-		std::cout << "FUCK:: phi:: " << phi << "\n";
+		//std::cout << "FUCK:: phi:: " << phi << "\n";
 		if (sign(hi - phi) > 0) {
 			if (sign(lo - phi) > 0) total += hi - lo;
 			else total += hi - phi;
-			std::cout << "high:: " << total << "\n";
+			//std::cout << "high:: " << total << "\n";
 		}
 		if (sign(lo + phi) < 0) {
 			if (sign(hi + phi) < 0) total += -(lo - hi);
 			else total += -(lo + phi);
-			std::cout << "low :: " << total << "\n";
+			//std::cout << "low :: " << total << "\n";
 		}
-		std::cout << "FUCK:: add:: " << total - pre << "\n";
+		//std::cout << "FUCK:: add:: " << total - pre << "\n";
 		pre = total;
 	}
 	return total;
@@ -163,7 +163,6 @@ void solve() {
 	memset(P, 0, sizeof P);
 	memset(Q, 0, sizeof Q);
 	memset(order, 0, sizeof order);
-	memset(slopes, 0, sizeof slopes);
 	std::cin >> N;
 	if (N == 2) { std::cout << "1.0000000\n"; return; }
 
@@ -185,7 +184,7 @@ void solve() {
 
 	for (int i = 0; i < N; i++)
 		for (int j = 0; j < N; j++)
-			ANS[i][j] = -INF;
+			ANS[i][j] = -INF;// , slp[hs(i, j)].reserve(N * N * 2);
 	//std::cout << "FUCK:: ANS init\n";
 
 	ld ans = INF;
@@ -206,50 +205,50 @@ void solve() {
 		order[u] = ov; order[v] = ou;
 		Q[ou] = v; Q[ov] = u;
 
-		std::cout << "FUCK:: P[u]:: " << P[u] << " P[v]:: " << P[v] << "\n";
-
-		//if (order[u] > 0) {
-		//	if (order[u] > 1) ans = std::min((ld)INF, ANS[Q[order[u] - 1]][Q[order[u] - 2]]);
-		//	ans = std::min(ans, dist(P[u], P[v]));
-		//}
+		//std::cout << "FUCK:: P[u]:: " << P[u] << " P[v]:: " << P[v] << "\n";
 
 		ans = order[v] <= 1 ? INF : ANS[v][Q[order[v] - 1]];
+		Slope tmp;
 		if (order[v] >= 1) ans = std::min(ans, dist(P[Q[0]], P[v]));
 		for (int j = ou - 1; j >= 0; j--) {
 			ANS[v][Q[j]] = ans;
-			slopes[v][Q[j]].push_back({ { u, v }, ans });
+			tmp = Slope(Seg(u, v), ans);
+			slopes[v][Q[j]].push_back(tmp);
 			ans = std::min(ans, dist(P[v], P[Q[j]]));
 		}
 		for (int j = ou + 1; j < N; j++) {
 			ANS[v][Q[j]] = -INF;
-			slopes[v][Q[j]].push_back({ { u, v }, -INF });
+			tmp = Slope(Seg(u, v), -INF);
+			slopes[v][Q[j]].push_back(tmp);
 		}
 
+		ans = ans;
 		for (int j = ov - 1; j >= 0; j--) {
-			std::cout << "DEBUG:: " << P[Q[j]] << "\n";
 			ANS[u][Q[j]] = ans;
-			slopes[u][Q[j]].push_back({ { u, v }, ans });
+			tmp = Slope(Seg(u, v), ans);
+			slopes[u][Q[j]].push_back(tmp);
 			ans = std::min(ans, dist(P[u], P[Q[j]]));
 		}
 		for (int j = ov + 1; j < N; j++) {
 			ANS[u][Q[j]] = -INF;
-			slopes[u][Q[j]].push_back({ { u, v }, -INF });
+			tmp = Slope(Seg(u, v), -INF);
+			slopes[u][Q[j]].push_back(tmp);
 		}
 
 		//if (order[v] < N - 1) {
-		//	std::cout << "FUCKER::\n";
+		//	//std::cout << "FUCKER::\n";
 		//	for (int j = ov; j >= 0; j--) {
-		//		std::cout << "FUCKER:: " << P[Q[j]] << "\n";
+		//		//std::cout << "FUCKER:: " << P[Q[j]] << "\n";
 		//		ANS[Q[ov] + 1][Q[j]] = ans;
 		//		slopes[Q[ov] + 1][Q[j]].push_back({ { u, v }, ans });
 		//		ans = std::min(ans, dist(P[u], P[Q[j]]));
 		//	}
 		//	for (int j = ov + 2; j < N; j++) {
-		//		std::cout << "FUCKER:: " << P[Q[j]] << "\n";
+		//		//std::cout << "FUCKER:: " << P[Q[j]] << "\n";
 		//		ANS[Q[ov] + 1][Q[j]] = -INF;
 		//		slopes[Q[ov] + 1][Q[j]].push_back({ { u, v }, -INF });
 		//	}
-		//	std::cout << "SUCKER::\n";
+		//	//std::cout << "SUCKER::\n";
 		//}
 	}
 	//std::cout << "FUCK:: ANS rotate\n";
@@ -284,5 +283,41 @@ int main() { solve(); return 0; }//boj18497
 -9 4
 -5 0
 3.4242720
+
+
+
+30
+-938 702
+950 -131
+-649 190
+431 793
+29 606
+-887 -555
+742 265
+-972 419
+-28 -399
+-316 727
+-654 160
+-74 694
+168 438
+-997 604
+-430 -836
+809 -790
+-581 516
+677 -721
+947 976
+-559 -140
+-692 -902
+-828 927
+-562 711
+258 -715
+761 243
+143 -106
+803 -109
+-760 430
+-264 -146
+270 905
+
+21.4411311891
 
 */
