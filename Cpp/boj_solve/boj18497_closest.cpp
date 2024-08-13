@@ -110,7 +110,8 @@ ld sweep(const int& i, const int& j) {
 		Pos K = -~(J - I);
 		return rad(K, vec);
 		};
-	//std::cout << "DEBUG:: I:: " << I << " J:: " << J << "\n";
+	std::cout << "\nDEBUG::\n";
+	std::cout << "DEBUG:: I:: " << I << " J:: " << J << "\n";
 
 	ld total = 0;
 	ld pre = 0;
@@ -118,25 +119,25 @@ ld sweep(const int& i, const int& j) {
 	const int sz = SS.size();
 	for (int k = 0; k < sz; k++) {
 		const Slope& S0 = SS[k], S1 = SS[(k + 1) % sz];
-		//std::cout << "FUCK:: ans:: " << S0.ans << "\n";
-		//std::cout << "DEBUG:: S0:: " << S0.s.s() << " S1:: " << S1.s.s() << "\n";
+		std::cout << "FUCK:: ans:: " << S0.ans << "\n";
+		std::cout << "DEBUG:: S0:: " << S0.s.s() << " S1:: " << S1.s.s() << "\n";
 		if (sign(S0.ans) <= 0) continue;
-		//std::cout << "FUCK:: ang\n";
+		std::cout << "FUCK:: ang\n";
 		ld len = (J - I).mag();
 		ld hi = std::min(theta(S0.s.s()), (ld)(PI * .5));
 		ld lo = std::max(theta(S1.s.s()), -(ld)(PI * .5));
-		//std::cout << "DEBUG:: vec:: " << J - I << "\n";
-		//std::cout << "FUCK:: hi:: " << hi << " lo:: " << lo << "\n";
+		std::cout << "DEBUG:: vec:: " << J - I << "\n";
+		std::cout << "FUCK:: hi:: " << hi << " lo:: " << lo << "\n";
 		if (sign(S0.ans - len) >= 0) {
-			//std::cout << "FUCK:: continue:: " << hi - lo << "\n";
+			std::cout << "FUCK:: continue:: " << hi - lo << "\n";
 			total += hi - lo;
 			continue;
 		}
-		//std::cout << "DEBUG:: cos(phi):: " << S0.ans / len << "\n";
+		std::cout << "DEBUG:: cos(phi):: " << S0.ans / len << "\n";
 		ld ratio = std::max(-(ld)1., std::min((ld)1., (ld)(S0.ans / len)));
-		//std::cout << "DEBUG:: ratio:: " << ratio << "\n";
+		std::cout << "DEBUG:: ratio:: " << ratio << "\n";
 		ld phi = acos(ratio);
-		//std::cout << "FUCK:: phi:: " << phi << "\n";
+		std::cout << "FUCK:: phi:: " << phi << "\n";
 		if (sign(hi - phi) > 0) {
 			if (sign(lo - phi) > 0) total += hi - lo;
 			else total += hi - phi;
@@ -145,7 +146,7 @@ ld sweep(const int& i, const int& j) {
 			if (sign(hi + phi) < 0) total += -(lo - hi);
 			else total += -(lo + phi);
 		}
-		//std::cout << "FUCK:: add:: " << total - pre << "\n";
+		std::cout << "FUCK:: add:: " << total - pre << "\n";
 		pre = total;
 	}
 	return total;
