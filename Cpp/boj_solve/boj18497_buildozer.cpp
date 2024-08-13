@@ -6,7 +6,8 @@
 #include <vector>
 #include <cassert>
 typedef long long ll;
-typedef long double ld;
+//typedef long double ld;
+typedef double ld;
 const ll INF = 1e18;
 const int LEN = 300;
 const ld TOL = 1e-9;
@@ -207,11 +208,11 @@ void solve() {
 	for (int i = 0; i < N; i++) OD[i] = i, Q[i] = i;
 	//std::cout << "FUCK:: init\n";
 
-	std::cout << "DEBUG::\npos = [\n";
-	for (int i = 0; i < N; i++) {
-		std::cout << "    (" << P[i].x << ", " << P[i].y << "),\n";
-	}
-	std::cout << "]\n";
+	//std::cout << "DEBUG::\npos = [\n";
+	//for (int i = 0; i < N; i++) {
+	//	std::cout << "    (" << P[i].x << ", " << P[i].y << "),\n";
+	//}
+	//std::cout << "]\n";
 
 	E = 0;
 	for (int i = 0; i < N; i++) {
@@ -250,8 +251,12 @@ void solve() {
 		//std::cout << "FUCK:: P[u]:: " << P[u] << " P[v]:: " << P[v] << "\n";
 		//std::cout << "FUCK:: ou:: " << ou << " ov:: " << ov << "\n";
 
-		ans = ou <= 1 ? INF : ANS[Q[0]][Q[OD[v] - 1]];
+		//ans = ou <= 1 ? INF : ANS[Q[0]][Q[OD[v] - 1]];
+		ans = ou <= 1 ? INF : ANS[Q[OD[v] - 1]][Q[0]];
+		//std::cout << "SUCK:: Q[0]:: " << Q[0] << "\n";
 		if (ou >= 2) ans = std::min(ans, dist(P[Q[0]], P[Q[ou - 1]]));
+		//if (ou >= 2) std::cout << "FUCK:: Q[OD[v] - 1]:: " << Q[OD[v] - 1] << "\n";
+		//if (ou >= 2) std::cout << "FUCK:: ANS[Q[0]][Q[OD[v] - 1]]:: " << ANS[Q[0]][Q[OD[v] - 1]] << "\n";
 		for (int j = ou - 1; j >= 0; j--) {
 			ANS[v][Q[j]] = ans;
 			slopes[v][Q[j]].push_back(Slope(Seg(u, v), ans));
