@@ -251,16 +251,6 @@ void solve() {
 		//std::cout << "FUCK:: ou:: " << ou << " ov:: " << ov << "\n";
 
 		ans = ou <= 1 ? INF : ANS[Q[0]][Q[OD[v] - 1]];
-		//if (ou >= 2) {
-		//	ans = std::min(ans, dist(P[Q[0]], P[Q[ou - 1]]));
-		//	for (int j = ou - 2; j >= 0; j--) {
-		//		ANS[Q[ou - 1]][Q[j]] = ans;
-		//		slopes[Q[ou - 1]][Q[j]].push_back(Slope(Seg(u, v), ans));
-		//		ans = std::min(ans, dist(P[Q[ou - 1]], P[Q[j]]));
-		//		//std::cout << "BEBUG:: ANS[v - 1]:: " << ANS[Q[ou - 1]][Q[j]] << "\n";
-		//		//std::cout << "BEBUG:: slope :: " << Q[ou - 1] << " " << Q[j] << "\n";
-		//	}
-		//}
 		if (ou >= 2) ans = std::min(ans, dist(P[Q[0]], P[Q[ou - 1]]));
 		for (int j = ou - 1; j >= 0; j--) {
 			ANS[v][Q[j]] = ans;
@@ -276,28 +266,7 @@ void solve() {
 			//std::cout << "BEBUG:: ANS[u]:: " << ANS[u][Q[j]] << "\n";
 			//std::cout << "BEBUG:: slope :: " << u << " " << Q[j] << "\n";
 		}
-		//if (ov < N - 1) {
-		//	for (int j = ov; j >= 0; j--) {
-		//		//ANS[Q[j]][Q[ov + 1]] = ans;
-		//		//slopes[Q[j]][Q[ov + 1]].push_back(Slope(Seg(u, v), ans));
-		//		ANS[Q[j]][Q[ov + 1]] = ans;
-		//		slopes[Q[j]][Q[ov + 1]].push_back(Slope(Seg(u, v), ans));
-		//		ans = std::min(ans, dist(P[Q[j]], P[Q[ov + 1]]));
-		//		//std::cout << "BEBUG:: ANS[u + 1]:: " << ANS[Q[ov + 1]][Q[j]] << "\n";
-		//		//std::cout << "BEBUG:: slope :: " << Q[ov + 1] << " " << Q[j] << "\n";
-		//	}
-		//}
 
-		//std::cout << "SHIT\n";
-
-		//if (ou >= 2) {
-		//	for (int j = ou; j < N; j++) {
-		//		ANS[Q[ou - 1]][Q[j]] = -INF;
-		//		slopes[Q[ou - 1]][Q[j]].push_back(Slope(Seg(u, v), -INF));
-		//		//std::cout << "BEBUG:: ANS[v]:: -INF\n";
-		//		//std::cout << "BEBUG:: slope rvs:: " << Q[ou - 1] << " " << Q[j] << "\n";
-		//	}
-		//}
 		for (int j = ou + 1; j < N; j++) {
 			ANS[v][Q[j]] = -INF;
 			slopes[v][Q[j]].push_back(Slope(Seg(u, v), -INF));
@@ -309,6 +278,13 @@ void solve() {
 			slopes[u][Q[j]].push_back(Slope(Seg(u, v), -INF));
 			//std::cout << "BEBUG:: ANS[u]:: -INF\n";
 			//std::cout << "BEBUG:: slope rvs:: " << u << " " << Q[j] << "\n";
+		}
+
+		for (int j = ov + 1; j < N; j++) {
+			ans = std::min(ans, dist(P[u], P[Q[j]]));
+			slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
+			ans = std::min(ans, dist(P[v], P[Q[j]]));
+			slopes[Q[j]][v].push_back(Slope(Seg(u, v), ans));
 		}
 		//if (ov < N - 1) {
 		//	for (int j = ov + 2; j < N; j++) {
@@ -335,7 +311,7 @@ void solve() {
 	//std::cout << "FUCK:: sweep\n";
 
 	std::cout << total / (2 * PI) << "\n";
-	
+
 	return;
 }
 int main() { solve(); return 0; }//boj18497
