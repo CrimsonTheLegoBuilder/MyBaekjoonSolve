@@ -120,17 +120,18 @@ ld sweep(const int& i, const int& j) {
 	for (int k = 0; k < sz; k++) {
 		const Slope& S0 = SS[k], S1 = SS[(k + 1) % sz];
 		std::cout << "FUCK:: ans:: " << S0.ans << "\n";
-		std::cout << "DEBUG:: S0:: " << S0.s.s() << " S1:: " << S1.s.s() << "\n";
+		std::cout << "SLOPE:: S0:: " << S0.s.s() << " S1:: " << S1.s.s() << "\n";
 		if (sign(S0.ans) <= 0) continue;
-		std::cout << "FUCK:: ang\n";
+		std::cout << "FUCK:: angle cal::\n";
 		ld len = (J - I).mag();
 		ld hi = std::min(theta(S0.s.s()), (ld)(PI * .5));
 		ld lo = std::max(theta(S1.s.s()), -(ld)(PI * .5));
 		std::cout << "DEBUG:: vec:: " << J - I << "\n";
 		std::cout << "FUCK:: hi:: " << hi << " lo:: " << lo << "\n";
 		if (sign(S0.ans - len) >= 0) {
-			std::cout << "FUCK:: continue:: " << hi - lo << "\n";
+			std::cout << "FUCK:: continue:: add:: " << hi - lo << "\n";
 			total += hi - lo;
+			pre = total;
 			continue;
 		}
 		std::cout << "DEBUG:: cos(phi):: " << S0.ans / len << "\n";
@@ -141,10 +142,12 @@ ld sweep(const int& i, const int& j) {
 		if (sign(hi - phi) > 0) {
 			if (sign(lo - phi) > 0) total += hi - lo;
 			else total += hi - phi;
+			std::cout << "high:: " << total << "\n";
 		}
 		if (sign(lo + phi) < 0) {
 			if (sign(hi + phi) < 0) total += -(lo - hi);
 			else total += -(lo + phi);
+			std::cout << "low :: " << total << "\n";
 		}
 		std::cout << "FUCK:: add:: " << total - pre << "\n";
 		pre = total;
@@ -226,6 +229,10 @@ void solve() {
 		for (int j = ov + 1; j < N; j++) {
 			ANS[u][Q[j]] = -INF;
 			slopes[u][Q[j]].push_back({ { u, v }, -INF });
+		}
+
+		if (order[u] < N - 1) {
+			slopes[Q[order[u]] + 1][v].push_back({{ u, v }, ans});
 		}
 	}
 	//std::cout << "FUCK:: ANS rotate\n";
