@@ -281,10 +281,12 @@ void solve() {
 		}
 
 		for (int j = ov + 1; j < N; j++) {
-			ans = std::min(ans, dist(P[u], P[Q[j]]));
+			ANS[Q[j]][u] = ans;
 			slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
-			ans = std::min(ans, dist(P[v], P[Q[j]]));
+			ans = std::min(ans, dist(P[u], P[Q[j]]));
+			ANS[Q[j]][v] = ans;
 			slopes[Q[j]][v].push_back(Slope(Seg(u, v), ans));
+			ans = std::min(ans, dist(P[v], P[Q[j]]));
 		}
 		//if (ov < N - 1) {
 		//	for (int j = ov + 2; j < N; j++) {
