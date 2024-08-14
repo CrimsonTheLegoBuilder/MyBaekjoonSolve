@@ -174,7 +174,6 @@ void solve() {
 			ANS[Q[ov + 1]][v] = ans;
 			slope_push_back(Q[ov + 1], v, u, v, ans);
 			ans = std::min(ans, dist(P[v], P[Q[ov + 1]]));
-			ans = std::min(ans, ANS[Q[ov + 1]][Q[0]]);
 		}
 		for (int j = ov + 2; j < N; j++) {
 			ans = std::min(ans, ANS[Q[j]][Q[0]]);
