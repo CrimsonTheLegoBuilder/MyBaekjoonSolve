@@ -91,7 +91,8 @@ struct Seg {
 		bool f2 = O < S.s();
 		if (f1 != f2) return f1;
 		ll CCW = s() / S.s();
-		return !CCW ? !S.ccw(P[u]) ? p() < S.p() : S.ccw(P[u]) > 0 : CCW < 0;
+		return !CCW ? S.ccw(P[u]) > 0 : CCW < 0;
+		//return !CCW ? !S.ccw(P[u]) ? p() < S.p() : S.ccw(P[u]) > 0 : CCW < 0;
 	}
 	bool operator == (const Seg& S) const { return s() / S.s() == 0 && s() * S.s() > 0; }
 	ld ang(const Seg& S) const { return rad(S.s(), s()); }
@@ -141,8 +142,8 @@ ld dist(const Pos& p, const Pos& q) { return (p - q).mag(); }
 ld sweep(const int& i, const int& j) {
 	Pos I, J;
 	I = P[i], J = P[j];
+	Pos K = -~(J - I);
 	auto theta = [&](const Pos& vec) -> ld {
-		Pos K = -~(J - I);
 		return rad(K, vec);
 		};
 	std::cout << "\nDEBUG::\n";
@@ -152,15 +153,16 @@ ld sweep(const int& i, const int& j) {
 	ld pre = 0;
 	const vslope& SS = slopes[i][j];
 	const int sz = SS.size();
+	ld len = (J - I).mag();
 	for (int k = 0; k < sz; k++) {
 		const Slope& S0 = SS[k], S1 = SS[(k + 1) % sz];
+		std::cout << "FUCK:: len:: " << len << "\n";
 		std::cout << "FUCK:: ans:: " << S0.ans << "\n";
 		std::cout << "SUCK:: S0.u:: " << P[S0.seg.u] << " S0.v:: " << P[S0.seg.v] << "\n";
 		std::cout << "SUCK:: S1.u:: " << P[S1.seg.u] << " S1.v:: " << P[S1.seg.v] << "\n";
 		std::cout << "::SLOPE:: S0:: " << S0.seg.s() << " S1:: " << S1.seg.s() << "\n";
 		if (sign(S0.ans) <= 0) continue;
 		std::cout << "FUCK:: angle cal::\n";
-		ld len = (J - I).mag();
 		ld hi = std::min(theta(S0.seg.s()), (ld)(PI * .5));
 		ld lo = std::max(theta(S1.seg.s()), -(ld)(PI * .5));
 		std::cout << "DEBUG:: vec:: " << J - I << "\n";
@@ -252,7 +254,7 @@ void solve() {
 		//std::cout << "FUCK:: ou:: " << ou << " ov:: " << ov << "\n";
 
 		//ans = ou <= 1 ? INF : ANS[Q[0]][Q[OD[v] - 1]];
-		ans = ou <= 1 ? INF : ANS[Q[OD[v] - 1]][Q[0]];
+		ans = ou <= 1 ? INF : ANS[Q[ou - 1]][Q[0]];
 		//std::cout << "SUCK:: Q[0]:: " << Q[0] << "\n";
 		if (ou >= 2) ans = std::min(ans, dist(P[Q[0]], P[Q[ou - 1]]));
 		//if (ou >= 2) std::cout << "FUCK:: Q[OD[v] - 1]:: " << Q[OD[v] - 1] << "\n";
@@ -285,13 +287,19 @@ void solve() {
 			//std::cout << "BEBUG:: slope rvs:: " << u << " " << Q[j] << "\n";
 		}
 
+		//if (ov < N - 1) ans = std::min(ans, ANS[Q[ov + 1]][Q[0]]);
+		ld tmp = INF;
 		for (int j = ov + 1; j < N; j++) {
 			ANS[Q[j]][u] = ans;
 			slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
-			ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
+			//ans = std::min(ans, dist(P[u], P[Q[j]]));
+			//ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
+			ans = std::min({ ans, ANS[Q[j - 1]][Q[0]], dist(P[Q[j - 1]], P[Q[j]])});
 			ANS[Q[j]][v] = ans;
 			slopes[Q[j]][v].push_back(Slope(Seg(u, v), ans));
-			ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
+			//ans = std::min(ans, dist(P[v], P[Q[j]]));
+			//ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
+			ans = std::min({ ans, ANS[Q[j - 1]][Q[0]], dist(P[Q[j - 1]], P[Q[j]])});
 		}
 		//if (ov < N - 1) {
 		//	for (int j = ov + 2; j < N; j++) {
@@ -322,6 +330,7 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj18497
+//Petrozavodsk Programming Camp > Winter 2020 > Day 8: Almost Algoritmic Contest J
 
 /*
 
