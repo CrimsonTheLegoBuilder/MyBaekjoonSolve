@@ -288,19 +288,52 @@ void solve() {
 		}
 
 		//if (ov < N - 1) ans = std::min(ans, ANS[Q[ov + 1]][Q[0]]);
-		ld tmp = INF;
-		for (int j = ov + 1; j < N; j++) {
+		//if (ov < N - 1) {
+		//	ANS[Q[ov + 1]][u] = std::min(ANS[Q[ov + 1]][u], ans);
+		//	ans = std::min(ans, dist(P[u], P[Q[ov + 1]]));
+		//	ANS[Q[ov + 1]][v] = std::min(ANS[Q[ov + 1]][v], ans);
+		//	for (int j = ov + 1; j < N; j++) {
+		//		ANS[Q[j]][u] = ans;
+		//		slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
+		//		//ans = std::min(ans, dist(P[u], P[Q[j]]));
+		//		//ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
+		//		ans = std::min({ ans, ANS[Q[j - 1]][Q[0]], dist(P[Q[j - 1]], P[Q[j]]) });
+		//		ANS[Q[j]][v] = ans;
+		//		slopes[Q[j]][v].push_back(Slope(Seg(u, v), ans));
+		//		//ans = std::min(ans, dist(P[v], P[Q[j]]));
+		//		//ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
+		//		ans = std::min({ ans, ANS[Q[j - 1]][Q[0]], dist(P[Q[j - 1]], P[Q[j]]) });
+		//	}
+		//}
+		//for (int j = ov + 1; j < N; j++) {
+		//	ANS[Q[j]][u] = ans;
+		//	slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
+		//	//ans = std::min(ans, dist(P[u], P[Q[j]]));
+		//	//ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
+		//	ans = std::min({ ans, ANS[Q[j - 1]][Q[0]], dist(P[Q[j - 1]], P[Q[j]])});
+		//	ANS[Q[j]][v] = ans;
+		//	slopes[Q[j]][v].push_back(Slope(Seg(u, v), ans));
+		//	//ans = std::min(ans, dist(P[v], P[Q[j]]));
+		//	//ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
+		//	ans = std::min({ ans, ANS[Q[j - 1]][Q[0]], dist(P[Q[j - 1]], P[Q[j]])});
+		//}
+
+		if (ov < N - 1) {
+			ANS[Q[ov + 1]][u] = ans;
+			slopes[Q[ov + 1]][u].push_back(Slope(Seg(u, v), ans));
+			ans = std::min(ans, dist(P[u], P[Q[ov + 1]]));
+			ANS[Q[ov + 1]][v] = ans;
+			slopes[Q[ov + 1]][v].push_back(Slope(Seg(u, v), ans));
+		}
+		for (int j = ov + 2; j < N; j++) {
+			ans = std::min(ans, ANS[Q[j]][Q[ov + 1]]);
 			ANS[Q[j]][u] = ans;
 			slopes[Q[j]][u].push_back(Slope(Seg(u, v), ans));
-			//ans = std::min(ans, dist(P[u], P[Q[j]]));
-			//ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
-			ans = std::min({ ans, ANS[Q[j - 1]][Q[0]], dist(P[Q[j - 1]], P[Q[j]])});
+			ans = std::min(ans, dist(P[u], P[Q[j]]));
 			ANS[Q[j]][v] = ans;
 			slopes[Q[j]][v].push_back(Slope(Seg(u, v), ans));
-			//ans = std::min(ans, dist(P[v], P[Q[j]]));
-			//ans = std::min(ans, dist(P[Q[j - 1]], P[Q[j]]));
-			ans = std::min({ ans, ANS[Q[j - 1]][Q[0]], dist(P[Q[j - 1]], P[Q[j]])});
 		}
+
 		//if (ov < N - 1) {
 		//	for (int j = ov + 2; j < N; j++) {
 		//		//ANS[Q[j]][Q[ov + 1]] = -INF;
