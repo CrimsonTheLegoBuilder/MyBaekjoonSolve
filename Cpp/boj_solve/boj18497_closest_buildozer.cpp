@@ -33,7 +33,7 @@ struct Pos {
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
-	ll Euc() const { return (ll)x * x + y * y; }
+	ll Euc() const { return (ll)x * x + (ll)y * y; }
 	int Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
 	ld rad() const { return atan2(y, x); }
