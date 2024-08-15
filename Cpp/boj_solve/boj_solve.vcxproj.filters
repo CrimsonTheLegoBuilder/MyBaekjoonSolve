@@ -1278,10 +1278,7 @@
     <ClCompile Include="boj3065_tournament.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj18497_closest.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj18497_buildozer.cpp">
+    <ClCompile Include="boj18497_closest_bulldozer.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
