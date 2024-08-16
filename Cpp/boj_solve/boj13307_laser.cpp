@@ -98,7 +98,7 @@ void solve(Polygon& P) {
 	int cnt = 0;
 	for (const Pos& p : H) if (p.c == 2) { B = p; break; }
 	if (B == INVAL) {//all Pos are red in the convex hull
-		std::swap(P[0], *min_element(P.begin(), P.end()));
+		//std::swap(P[0], *min_element(P.begin(), P.end()));
 		pivot = P[0];
 		std::sort(P.begin() + 1, P.end(), cmpr);
 		Polygon U, L;
