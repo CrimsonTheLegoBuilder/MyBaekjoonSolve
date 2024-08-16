@@ -85,7 +85,8 @@ struct Pair {
 } ANS[LEN];
 void solve(Polygon& P) {
 	int sz = P.size();
-	assert(sz > 2);
+	assert(!(sz % 3));
+	if (!sz) return;
 	if (sz == 3) {
 		std::sort(P.begin(), P.end(), cmpc);
 		assert(P[0].c == 2); assert(P[1].c == -1); assert(P[2].c == -1);
@@ -96,7 +97,7 @@ void solve(Polygon& P) {
 	Pos B = INVAL;//blue
 	int cnt = 0;
 	for (const Pos& p : H) if (p.c == 2) { B = p; break; }
-	if (B == INVAL) {
+	if (B == INVAL) {//all Pos are red in the convex hull
 		std::swap(P[0], *min_element(P.begin(), P.end()));
 		pivot = P[0];
 		std::sort(P.begin() + 1, P.end(), cmpr);
@@ -121,8 +122,10 @@ void solve(Polygon& P) {
 				return;
 			}
 		}
+		F = 0;
+		return;
 	}
-	//else if B is in the convex hull
+	//else if at least 1 blue is in the convex hull
 	for (int i = 0; i < sz; i++) {
 		if (P[i] == B) {
 			std::swap(P[0], P[i]); break;
@@ -133,7 +136,7 @@ void solve(Polygon& P) {
 	Polygon U, M, L;
 	Pair cur;
 	int f = -1, pre = -1;
-	for (int i = 0; i < sz; i++) {
+	for (int i = 1; i < sz; i++) {
 		cnt += P[i].c;
 		if (cnt == -1 && f == -1) {
 			cur.j = P[i].i;
@@ -170,7 +173,7 @@ void solve() {
 	}
 	F = 1;
 	solve(P);
-	if (!F) std::cout << -1;
+	if (!F) std::cout << "-1\n";
 	else for (int i = 0; i < N; i++) std::cout << ANS[i] << "\n";
 	return;
 }
