@@ -1,30 +1,32 @@
 import matplotlib.pyplot as plt
 
-# 주어진 점 좌표 리스트
-pos = [
-    (-9, 4),
-    (-8, 6),
-    (-5, 0),
-    (-3, 0),
-    (4, -10),
-]
+# 파란 점(B)과 빨간 점(R)의 좌표 리스트
+B = [(1, 4), (5, 4), (9, 3)]
+R = [(7, 7), (11, 7), (15, 6), (7, 1), (10, 0), (15, 1)]
 
-# x, y 좌표 분리
-x_coords_pos, y_coords_pos = zip(*pos)
+# B와 R의 x, y 좌표 분리
+B_x, B_y = zip(*B)
+R_x, R_y = zip(*R)
 
-# 시각화
-plt.figure(figsize=(10, 10))
-plt.plot(x_coords_pos, y_coords_pos, 'ro-', label='Points pos')  # pos 점들 표시 (빨간색)
+# 그래프 그리기
+plt.figure(figsize=(8, 6))
+plt.scatter(B_x, B_y, color='blue', label='Blue Points (B)')
+plt.scatter(R_x, R_y, color='red', label='Red Points (R)')
 
-# 각 점에 번호 및 좌표 라벨 추가 (pos 점들)
-for i, (x, y) in enumerate(pos):
-    plt.text(x, y, f'pos{i+1} ({x}, {y})', fontsize=10, ha='right')
+# B 점에 번호 붙이기
+for i, (x, y) in enumerate(B):
+    plt.text(x, y, f'B{i+1}', fontsize=12, ha='right', color='blue')
 
-plt.xlabel('X coordinate')
-plt.ylabel('Y coordinate')
-plt.title('Scatter Plot of Given Points A and B')
-plt.grid(True)
+# R 점에 번호 붙이기
+for i, (x, y) in enumerate(R):
+    plt.text(x, y, f'R{i+1}', fontsize=12, ha='right', color='red')
+
+# 그래프 설정
+plt.title('Scatter Plot of Blue and Red Points with Labels')
+plt.xlabel('X')
+plt.ylabel('Y')
 plt.legend()
-plt.gca().set_aspect('equal', adjustable='box')
+plt.grid(True)
 
+# 그래프 출력
 plt.show()

@@ -98,7 +98,6 @@ void solve(Polygon& P) {
 	int cnt = 0;
 	for (const Pos& p : H) if (p.c == 2) { B = p; break; }
 	if (B == INVAL) {//all Pos are red in the convex hull
-		//std::swap(P[0], *min_element(P.begin(), P.end()));
 		pivot = P[0];
 		std::sort(P.begin() + 1, P.end(), cmpr);
 		Polygon U, L;
@@ -108,16 +107,21 @@ void solve(Polygon& P) {
 			if (!cnt) {
 				for (int j = 0; j <= i; j++) L.push_back(P[j]);
 				for (int j = i + 1; j < sz; j++) U.push_back(P[j]);
+				if (!U.size() || !L.size()) break;
+				std::vector<Pos>().swap(P);
 				solve(U); solve(L);
 				return;
 			}
 		}
+		U.clear();
+		L.clear();
 		cnt = -1;
 		for (int i = sz - 1; i > 0; i--) {
 			cnt += P[i].c;
 			if (!cnt) {
 				for (int j = 1; j < i; j++) L.push_back(P[j]);
 				for (int j = i; j <= sz; j++) U.push_back(P[j % sz]);
+				std::vector<Pos>().swap(P);
 				solve(U); solve(L);
 				return;
 			}
@@ -149,6 +153,7 @@ void solve(Polygon& P) {
 			for (int j = 1; j < pre; j++) L.push_back(P[j]);
 			for (int j = pre + 1; j < i; j++) M.push_back(P[j]);
 			for (int j = i + 1; j < sz; j++) U.push_back(P[j]);
+			std::vector<Pos>().swap(P);
 			solve(L); solve(M); solve(U);
 			return;
 		}
@@ -168,7 +173,7 @@ void solve() {
 	}
 	for (int i = N; i < N * 3; i++) {
 		std::cin >> P[i];
-		P[i].i = i;
+		P[i].i = i - N + 1;
 		P[i].c = -1;
 	}
 	F = 1;
