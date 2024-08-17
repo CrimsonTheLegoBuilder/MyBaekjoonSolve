@@ -121,6 +121,7 @@ void solve(Polygon& P) {
 			if (!cnt) {
 				for (int j = 1; j < i; j++) L.push_back(P[j]);
 				for (int j = i; j <= sz; j++) U.push_back(P[j % sz]);
+				if (!U.size() || !L.size()) break;
 				std::vector<Pos>().swap(P);
 				solve(U); solve(L);
 				return;
