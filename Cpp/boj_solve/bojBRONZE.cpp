@@ -5,14 +5,45 @@
 typedef long long ll;
 typedef long double ld;
 const ld TOL = 1e-6;
-int X, Y;
+int N;
 
 int main() {
-	std::cin >> X >> Y;
-	X -= 24;
-	Y -= 24;
-	for (int i = X; i <= Y; i += 60) {
-		//std::cout << "All positions change in year " << i + 24 << "\n";
+	std::cin >> N;
+	for (int j = 0; j < N; j++) {
+		for (int k = 0; k < N; k++) {
+			std::cout << "G";
+		}
+		for (int k = 0; k < N * 3; k++) {
+			std::cout << ".";
+		}
+		std::cout << "\n";
+	}
+	for (int j = 0; j < N; j++) {
+		for (int k = 0; k < N; k++) {
+			std::cout << ".";
+		}
+		for (int k = 0; k < N; k++) {
+			std::cout << "I";
+		}
+		for (int k = 0; k < N; k++) {
+			std::cout << ".";
+		}
+		for (int k = 0; k < N; k++) {
+			std::cout << "T";
+		}
+		std::cout << "\n";
+	}
+	for (int j = 0; j < N; j++) {
+		for (int k = 0; k < N * 2; k++) {
+			std::cout << ".";
+		}
+		for (int k = 0; k < N; k++) {
+			std::cout << "S";
+		}
+		for (int k = 0; k < N; k++) {
+			std::cout << ".";
+		}
+		//std::cout << "\n";
 	}
 	return 0;
 }
