@@ -13,7 +13,7 @@ const int LEN = 1500;
 const ld TOL = 1e-9;
 inline ll nCm(const int& n, const int& m) {
 	if (n < m) return 0;
-	if (n == 1) return n;
+	if (m == 1) return n;
 	if (m == 2) return (ll)n * (ll(n) - 1) / 2;
 	if (m == 3) return (ll)n * (ll(n) - 1) * ((ll)n - 2) / 6;
 	if (m == 4) return (ll)n * (ll(n) - 1) * ((ll)n - 2) * ((ll)n - 3) / 24;
@@ -62,10 +62,10 @@ void solve() {
 		std::sort(D.begin(), D.end(), cmpr);
 		int sz = N - 1;
 		for (int j = 0, k = 1; j < sz; j++) {
-			while (D[j] / D[k] > 0) k = (k + 1) / sz;
+			while (D[j] / D[k] > 0) k = (k + 1) % sz;
 			int r = k - j;
 			if (r < 0) r += sz;
-			r--;
+			//r--;
 			total += nCm(r, 2);
 		}
 	}
