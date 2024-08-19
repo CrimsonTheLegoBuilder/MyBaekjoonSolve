@@ -64,8 +64,8 @@ void solve() {
 		for (int j = 0, k = 1; j < sz; j++) {
 			while (D[j] / D[k] > 0) k = (k + 1) % sz;
 			int r = k - j;
-			if (r < 0) r += sz;
-			//r--;
+			if (r <= 0) r += sz;
+			r--;
 			total += nCm(r, 2);
 		}
 	}
