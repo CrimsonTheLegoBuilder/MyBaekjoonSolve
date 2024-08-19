@@ -14,9 +14,9 @@ const ld TOL = 1e-9;
 inline ll nCm(const int& n, const int& m) {
 	if (n < m) return 0;
 	if (m == 1) return n;
-	if (m == 2) return (ll)n * (ll(n) - 1) / 2;
-	if (m == 3) return (ll)n * (ll(n) - 1) * ((ll)n - 2) / 6;
-	if (m == 4) return (ll)n * (ll(n) - 1) * ((ll)n - 2) * ((ll)n - 3) / 24;
+	if (m == 2) return (ll)n * ((ll)n - 1) / 2;
+	if (m == 3) return (ll)n * ((ll)n - 1) * ((ll)n - 2) / 6;
+	if (m == 4) return (ll)n * ((ll)n - 1) * ((ll)n - 2) * ((ll)n - 3) / 24;
 	return -1;
 }
 
