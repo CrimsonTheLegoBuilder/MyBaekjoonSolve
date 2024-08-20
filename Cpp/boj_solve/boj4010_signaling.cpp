@@ -69,8 +69,8 @@ void solve() {
 			total += nCm(r, 2);
 		}
 	}
-	total += 2 * nCm(N, 4) - N * nCm(N - 1, 3) + 3 * nCm(N, 3);
-	ld ans = total / (ld)nCm(N, 3);
+	total += 2 * nCm(N, 4) - N * nCm(N - 1, 3);
+	ld ans = total / (ld)nCm(N, 3) + 3;
 	std::cout << ans << "\n";
 	return;
 }
