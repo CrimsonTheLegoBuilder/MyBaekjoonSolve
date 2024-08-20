@@ -20,16 +20,12 @@ inline ll nCm(const int& n, const int& m) {
 	return -1;
 }
 
-int N, M;
+int N;
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
-	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
-	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
 	ll Euc() const { return (ll)x * x + (ll)y * y; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
@@ -69,7 +65,7 @@ void solve() {
 			total += nCm(r, 2);
 		}
 	}
-	total += 2 * nCm(N, 4) - N * nCm(N - 1, 3);
+	total -= 2 * nCm(N, 4);
 	ld ans = total / (ld)nCm(N, 3) + 3;
 	std::cout << ans << "\n";
 	return;
