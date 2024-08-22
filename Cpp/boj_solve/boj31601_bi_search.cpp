@@ -7,8 +7,8 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-8;
 const ld PI = acos(-1);
@@ -79,14 +79,14 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int s = 0, e = sz - 1, m;
 	while (s + 1 < e) {
 		m = s + e >> 1;
-		if (cross(H[0], H[m], p) > 0) s = m;
+		if (sign(cross(H[0], H[m], p)) > 0) s = m;
 		else e = m;
 	}
 	//for (int i = (s - 1 + sz) % sz; i != (e + 2) % sz; i = (i + 1) % sz) {
 	//	int j = (i + 1) % sz;
 	//	if (on_seg_strong(H[i], H[j], p)) return 0;
 	//}
-	if (cross(H[s], H[e], p) > 0) return 1;
+	if (sign(cross(H[s], H[e], p)) > 0) return 1;
 	else if (on_seg_strong(H[s], H[e], p)) return 0;
 	return -1;
 }
