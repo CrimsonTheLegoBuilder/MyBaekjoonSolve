@@ -7,8 +7,8 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
@@ -48,8 +48,8 @@ struct Pos {
 typedef std::vector<Pos> Polygon;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3);  return ret; }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ld ret = cross(d1, d2, d3, d4); return sign(ret); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
@@ -107,7 +107,7 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int s = 0, e = sz - 1, m;
 	while (s + 1 < e) {
 		m = s + e >> 1;
-		if (cross(H[0], H[m], p) >= 0) s = m;
+		if (cross(H[0], H[m], p) > 0) s = m;
 		else e = m;
 	}
 	if (cross(H[s], H[e], p) > 0) return 1;
@@ -144,7 +144,7 @@ void solve() {
 	std::cin >> N;
 	Polygon C(N);
 	Vline L;
-	for (int i = 0; i < N; i++) std::cin >> C[i];
+	for (int i = 0; i < N; i++) std::cin >> C[i], C[i] *= 10;
 	for (int i = 0; i < N; i++) {
 		Pos& I = C[i];
 		for (int j = 0; j < N; j++) {
@@ -176,13 +176,23 @@ void solve() {
 		}
 		Polygon H = graham_scan(D);
 		ld tmp = -1;
-		for (int j = 0; j < N << 1; j++) {
-			if (inner_check_bi_search(H, D[j])) { tmp = INF; break; }
+		//for (int j = 0; j < (N << 1); j++) {
+		//	if (inner_check_bi_search(H, D[j])) { tmp = INF; break; }
+		//}
+		for (int j = 0; j < (N << 1); j++) {
+			bool f = 0;
+			for (int k = 0; k < H.size(); k++) {
+				Pos p1 = H[k], p2 = H[(k + 1) % H.size()];
+				if (on_seg_strong(p1, p2, D[j])) { f = 1; break; }
+			}
+			if (!f) { tmp = INF; break; }
 		}
+		//std::cout << "DEBUG:: f:: " << (tmp < 0 ? "YES\n" : "FUCK\n") << "\n";
 		if (tmp < 0) tmp = area(H);
 		ans = std::min(ans, tmp);
 	}
-	std::cout << (ans > 1e16 ? -1 : ans * .5) << "\n";
+	if (ans > 1e16) std::cout << "-1\n";
+	else std::cout << ans * .005 << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj31601 Symmetric Boundary
