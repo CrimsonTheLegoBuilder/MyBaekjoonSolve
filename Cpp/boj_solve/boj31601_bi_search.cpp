@@ -10,13 +10,13 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-8;
 const ld PI = acos(-1);
 const int LEN = 30;
+int N;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 
-int N;
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -67,6 +67,36 @@ ld area(const Polygon& H) {
 	ld ret = 0; int sz = H.size();
 	for (int i = 0; i < sz; i++) ret += H[i] / H[(i + 1) % sz];
 	return ret;
+}
+int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
+	int sz = H.size();
+	//if (!sz) return -1;
+	//if (sz == 1) return p == H[0] ? 0 : -1;
+	//if (sz == 2) return on_seg_strong(H[0], H[1], p) ? 0 : -1;
+	assert(sz >= 3);
+	if (sign(cross(H[0], H[1], p)) < 0 || sign(cross(H[0], H[sz - 1], p)) > 0) {
+		//std::cout << "H[0]:: " << H[0] << "\n";
+		//std::cout << "H[sz - 1]:: " << H[sz - 1] << "\n";
+		//std::cout << "p " << p << "\n";
+		//std::cout << cross(H[0], H[1], p) << "\n";
+		//std::cout << cross(H[0], H[sz - 1], p) << "\n";
+		return -1;
+	}
+	if (on_seg_strong(H[0], H[1], p) || on_seg_strong(H[0], H[sz - 1], p)) return 0;
+	int s = 0, e = sz - 1, m;
+	while (s + 1 < e) {
+		m = s + e >> 1;
+		if (cross(H[0], H[m], p) > 0) s = m;
+		else e = m;
+	}
+	for (int i = (s - 1 + sz) % sz; i != (e + 2) % sz; i = (i + 1) % sz) {
+		int j = (i + 1) % sz;
+		if (on_seg_strong(H[i], H[j], p)) return 0;
+	}
+	if (cross(H[s], H[e], p) > 0) return 1;
+	else if (on_seg_strong(H[s], H[e], p)) return 0;
+	//std::cout << cross(H[s], H[e], p) << "\n";
+	return -1;
 }
 Polygon graham_scan(Polygon& C) {
 	Polygon H;
@@ -129,15 +159,28 @@ void solve() {
 			D.push_back(X + vec);
 		}
 		Polygon H = graham_scan(D);
+		//std::cout << area(H) * .5 << "\n";
+		//if (!sign(48656796.696558475494 - area(H) * .5)) {
+		//	std::cout << "FUCK::FUCK::FUCK::FUCK::FUCK::\n";
+		//	for (int j = 0; j < (N << 1); j++) {
+		//		std::cout << "POS :: " << D[j] << "\n";
+		//		std::cout << inner_check_bi_search(H, D[j]) << "\n";
+		//	}
+		//}
+
 		ld tmp = -1;
 		for (int j = 0; j < (N << 1); j++) {
-			bool f = 0;
-			for (int k = 0; k < H.size(); k++) {
-				Pos p1 = H[k], p2 = H[(k + 1) % H.size()];
-				if (on_seg_strong(p1, p2, D[j])) { f = 1; break; }
-			}
-			if (!f) { tmp = INF; break; }
+			if (inner_check_bi_search(H, D[j])) { tmp = INF; break; }
 		}
+		//for (int j = 0; j < (N << 1); j++) {
+		//	bool f = 0;
+		//	for (int k = 0; k < H.size(); k++) {
+		//		Pos p1 = H[k], p2 = H[(k + 1) % H.size()];
+		//		if (on_seg_strong(p1, p2, D[j])) { f = 1; break; }
+		//	}
+		//	if (!f) { tmp = INF; break; }
+		//}
+		//std::cout << "DEBUG:: f:: " << (tmp < 0 ? "YES\n" : "FUCK\n") << "\n";
 		if (tmp < 0) tmp = area(H);
 		ans = std::min(ans, tmp);
 	}
