@@ -7,16 +7,16 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-8;
+const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 30;
-int N;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 
+int N;
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -48,7 +48,7 @@ struct Pos {
 typedef std::vector<Pos> Polygon;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3);  return ret; }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ld ret = cross(d1, d2, d3, d4); return sign(ret); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
@@ -82,10 +82,6 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 		if (sign(cross(H[0], H[m], p)) > 0) s = m;
 		else e = m;
 	}
-	//for (int i = (s - 1 + sz) % sz; i != (e + 2) % sz; i = (i + 1) % sz) {
-	//	int j = (i + 1) % sz;
-	//	if (on_seg_strong(H[i], H[j], p)) return 0;
-	//}
 	if (sign(cross(H[s], H[e], p)) > 0) return 1;
 	else if (on_seg_strong(H[s], H[e], p)) return 0;
 	return -1;
@@ -151,10 +147,9 @@ void solve() {
 			D.push_back(X + vec);
 		}
 		Polygon H = graham_scan(D);
+		if (sign(area(H) - ans) >= 0) continue;
 		ld tmp = -1;
-		for (int j = 0; j < (N << 1); j++) {
-			if (inner_check_bi_search(H, D[j])) { tmp = INF; break; }
-		}
+		for (int j = 0; j < (N << 1); j++) if (inner_check_bi_search(H, D[j])) { tmp = INF; break; }
 		if (tmp < 0) tmp = area(H);
 		ans = std::min(ans, tmp);
 	}
