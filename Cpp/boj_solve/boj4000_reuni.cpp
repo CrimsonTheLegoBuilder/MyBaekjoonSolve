@@ -19,6 +19,8 @@ inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
+#define WHAT_THE_FUCK
+
 bool ROUPH_CHECK;
 bool INNER_CHECK;
 int ai, bi;
@@ -324,7 +326,7 @@ public:
 		return p->i;
 	}
 } ST;
-bool polygon_cross_check(Polygon& H, int n) {
+bool polygon_cross_check(const Polygon& H, const int& n) {
 	memset(seg, 0, sizeof seg);
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) {
@@ -352,7 +354,7 @@ bool polygon_cross_check(Polygon& H, int n) {
 	}
 	return 1;
 }
-bool two_polygon_cross_check(Polygon& H1, Polygon& H2, int n1, int n2) {
+bool two_polygon_cross_check(const Polygon& H1, const Polygon& H2, const int& n1, const int& n2) {
 	memset(seg, 0, sizeof seg);
 	int sz1 = H1.size();
 	for (int i = 0; i < sz1; i++) {
@@ -391,7 +393,7 @@ bool two_polygon_cross_check(Polygon& H1, Polygon& H2, int n1, int n2) {
 	}
 	return 1;
 }
-bool two_polygon_cross_check(Polygon& H, std::vector<Bound>& B, int n1, int n2) {
+bool two_polygon_cross_check(const Polygon& H, const std::vector<Bound>& B, const int& n1, const int& n2) {
 	memset(seg, 0, sizeof seg);
 	ai = n1;
 	bi = n2;
