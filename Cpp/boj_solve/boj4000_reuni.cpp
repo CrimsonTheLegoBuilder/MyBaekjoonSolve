@@ -104,6 +104,18 @@ bool norm(Polygon& H) {
 	if (a < 0) std::reverse(H.begin(), H.end());
 	return 0;
 }
+int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+	int cnt = 0, sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (cur.y == nxt.y) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y <= p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return (cnt & 1) * 2;
+}
 struct Line {//ax + by = c
 	Pos s;
 	ll c;
@@ -534,6 +546,11 @@ bool solve() {
 	bnd_init(H[0], H[1], VS, 0, 1);
 	remove(VS, V, 1);
 	int sz = V.size();
+	if (sz == len[0] + len[1]) {
+		if (inner_check(H[0], H[1][0])) std::cout << "Aastria and Abstria intersect\n";
+		else std::cout << "The union of Aastria and Abstria is not equal to Aabstria\n";
+		return 0;
+	}
 	for (int i = 0; i < sz; i++) {
 		if (VS[i].i == 0) VA.push_back(V[i]);
 		if (VS[i].i == 1) VB.push_back(V[i]);
@@ -549,6 +566,11 @@ bool solve() {
 	INNER_CHECK = 1;
 	bool f23 = two_polygon_cross_check(H[0], VB, 0, 1);
 	bool f24 = two_polygon_cross_check(H[1], VA, 1, 0);
+	if (!f23 && !f24) {
+		if (inner_check(H[0], H[1][0])) std::cout << "Aastria and Abstria intersect\n";
+		else std::cout << "The union of Aastria and Abstria is not equal to Aabstria\n";
+		return 0;
+	}
 	if (f23 || f24) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
 
 	bnd_init(H[2], H[3], VAB);
