@@ -12,13 +12,15 @@ typedef long long ll;
 typedef double ld;
 typedef std::pair<int, int> pi;
 const ll INF = 1e17;
-const int LEN = 2e5 + 1;
+const int LEN = 1e4 + 5;
 const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
+#define STRONG 1
+#define WEAK 0
 #define WHAT_THE_FUCK
 
 bool ROUPH_CHECK;
@@ -26,7 +28,7 @@ bool INNER_CHECK;
 int ai, bi;
 
 int N, M, K, T, Q;
-bool F[LEN << 2];
+bool F[LEN];
 struct Pos {
 	int x, y;
 	int i, d;
@@ -34,7 +36,11 @@ struct Pos {
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-	inline bool operator < (const Pos& p) const { return x == p.x ? y == p.y ? d < p.d : y < p.y : x < p.x; }
+	inline bool operator < (const Pos& p) const {
+		return x == p.x ? y == p.y ?
+			((ROUPH_CHECK) ? d < p.d : d > p.d)
+			: y < p.y : x < p.x;
+	}
 	inline bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	inline Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	inline Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -68,22 +74,15 @@ inline ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) 
 //ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 inline ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 //ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ll ret = cross(d1, d2, d3);
-	return !ret ? 0 : ret > 0 ? 1 : -1;
-}
-inline bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0;
-}
-inline bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-	return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0;
-}
-inline bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool f = 0) {
+inline int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return !ret ? 0 : ret > 0 ? 1 : -1; }
+inline bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
+inline bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0; }
+inline bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool weak = 0) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
 	if (ROUPH_CHECK) return f1 && f2;
 	bool f3;
-	if (f) f3 = on_seg_weak(s1, s2, d1) ||
+	if (weak) f3 = on_seg_weak(s1, s2, d1) ||
 		on_seg_weak(s1, s2, d2) ||
 		on_seg_weak(d1, d2, s1) ||
 		on_seg_weak(d1, d2, s2);
@@ -146,7 +145,7 @@ struct Bound {
 	Line l;
 	Pos s, e;
 	int i;
-	Bound(Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : s(S), e(E) { l = L(S, E); i = 0; }
+	Bound(Pos S = Pos(0, 0), Pos E = Pos(0, 0), int I = -1) : s(S), e(E), i(I) { l = L(S, E); }
 	bool operator == (const Bound& S) const { return l == S.l && s == S.s && e == S.e; }
 	bool operator != (const Bound& S) const { return !(*this == S); }
 	bool operator < (const Bound& S) const { return (l == S.l) ? (s == S.s) ? e < S.e : s < S.s : l < S.l; }
@@ -155,8 +154,8 @@ struct Bound {
 		return os;
 	}
 };
-bool idx_check(const int& i, const int& j, const int& h) { return (i == (j + 1) % h) || (i == (j - 1 + h) % h); }
-inline bool intersect(const int& a, const int& b) {
+inline bool idx_check(const int& i, const int& j, const int& h) { return (i == (j + 1) % h) || (i == (j - 1 + h) % h); }
+bool intersect(const int& a, const int& b) {
 	if (INNER_CHECK) {
 		Seg A = seg[a], B = seg[b];
 		if (A.h == B.h) return;
@@ -185,10 +184,10 @@ inline bool intersect(const int& a, const int& b) {
 		}
 	}
 	const Pos& d1 = seg[a].s, & d2 = seg[a].e, & d3 = seg[b].s, & d4 = seg[b].e;
-	if (ROUPH_CHECK) return intersect(d1, d2, d3, d4);
-	if (seg[a].h != seg[b].h) return intersect(d1, d2, d3, d4, 1);
-	if (!idx_check(seg[a].i, seg[b].i, len[seg[a].h])) return intersect(d1, d2, d3, d4, 0);
-	else return intersect(d1, d2, d3, d4, 1);
+	if (ROUPH_CHECK) return intersect(d1, d2, d3, d4, WEAK);
+	if (seg[a].h != seg[b].h) return intersect(d1, d2, d3, d4, STRONG);
+	if (!idx_check(seg[a].i, seg[b].i, len[seg[a].h])) return intersect(d1, d2, d3, d4, WEAK);
+	else return intersect(d1, d2, d3, d4, STRONG);
 }
 class SplayTree {
 	struct Node {
@@ -328,6 +327,7 @@ public:
 } ST;
 bool polygon_cross_check(const Polygon& H, const int& n) {
 	memset(seg, 0, sizeof seg);
+	memset(pos, 0, sizeof pos);
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos s = H[i], e = H[(i + 1) % sz];
@@ -336,10 +336,10 @@ bool polygon_cross_check(const Polygon& H, const int& n) {
 		seg[i].e = e;
 		seg[i].h = n;
 		seg[i].i = i;
-		seg[i].s.i = seg[i].e.i = i;
-		seg[i].s.d = 1, seg[i].e.d = -1;
-		pos[i << 1] = seg[i].s;
-		pos[i << 1 | 1] = seg[i].e;
+		s.i = e.i = i;
+		s.d = 1, e.d = -1;
+		pos[i << 1] = s;
+		pos[i << 1 | 1] = e;
 	}
 	sz <<= 1;
 	std::sort(pos, pos + sz);
@@ -356,6 +356,7 @@ bool polygon_cross_check(const Polygon& H, const int& n) {
 }
 bool two_polygon_cross_check(const Polygon& H1, const Polygon& H2, const int& n1, const int& n2) {
 	memset(seg, 0, sizeof seg);
+	memset(pos, 0, sizeof pos);
 	int sz1 = H1.size();
 	for (int i = 0; i < sz1; i++) {
 		Pos s = H1[i], e = H1[(i + 1) % sz1];
@@ -363,10 +364,11 @@ bool two_polygon_cross_check(const Polygon& H1, const Polygon& H2, const int& n1
 		seg[i].s = s;
 		seg[i].e = e;
 		seg[i].h = n1;
-		seg[i].s.i = seg[i].e.i = i;
-		seg[i].s.d = 1, seg[i].e.d = -1;
-		pos[i << 1] = seg[i].s;
-		pos[i << 1 | 1] = seg[i].e;
+		seg[i].i = i;
+		s.i = e.i = i;
+		s.d = 1, e.d = -1;
+		pos[i << 1] = s;
+		pos[i << 1 | 1] = e;
 	}
 	int sz2 = H2.size();
 	for (int i = 0; i < sz2; i++) {
@@ -375,10 +377,11 @@ bool two_polygon_cross_check(const Polygon& H1, const Polygon& H2, const int& n1
 		seg[i + sz1].s = s;
 		seg[i + sz1].e = e;
 		seg[i + sz1].h = n2;
-		seg[i + sz1].s.i = seg[i + sz1].e.i = i;
-		seg[i + sz1].s.d = 1, seg[i + sz1].e.d = -1;
-		pos[(i + sz1) << 1] = seg[i + sz1].s;
-		pos[(i + sz1) << 1 | 1] = seg[i + sz1].e;
+		seg[i + sz1].i = i;
+		s.i = e.i = i;
+		s.d = 1, e.d = -1;
+		pos[(i + sz1) << 1] = s;
+		pos[(i + sz1) << 1 | 1] = e;
 	}
 	int sz = (sz1 + sz2) << 1;
 	std::sort(pos, pos + sz);
@@ -395,6 +398,7 @@ bool two_polygon_cross_check(const Polygon& H1, const Polygon& H2, const int& n1
 }
 bool two_polygon_cross_check(const Polygon& H, const std::vector<Bound>& B, const int& n1, const int& n2) {
 	memset(seg, 0, sizeof seg);
+	memset(pos, 0, sizeof pos);
 	ai = n1;
 	bi = n2;
 	int sz1 = H.size();
@@ -404,10 +408,11 @@ bool two_polygon_cross_check(const Polygon& H, const std::vector<Bound>& B, cons
 		seg[i].s = s;
 		seg[i].e = e;
 		seg[i].h = n1;
-		seg[i].s.i = seg[i].e.i = i;
-		seg[i].s.d = 1, seg[i].e.d = -1;
-		pos[i << 1] = seg[i].s;
-		pos[i << 1 | 1] = seg[i].e;
+		seg[i].i = i;
+		s.i = e.i = i;
+		s.d = 1, e.d = -1;
+		pos[i << 1] = s;
+		pos[i << 1 | 1] = e;
 	}
 	int sz2 = B.size();
 	for (int i = 0; i < sz2; i++) {
@@ -416,10 +421,10 @@ bool two_polygon_cross_check(const Polygon& H, const std::vector<Bound>& B, cons
 		seg[i + sz1].s = s;
 		seg[i + sz1].e = e;
 		seg[i + sz1].h = n2;
-		seg[i + sz1].s.i = seg[i + sz1].e.i = i;
-		seg[i + sz1].s.d = 1, seg[i + sz1].e.d = -1;
-		pos[(i + sz1) << 1] = seg[i + sz1].s;
-		pos[(i + sz1) << 1 | 1] = seg[i + sz1].e;
+		s.i = e.i = i;
+		s.d = 1, e.d = -1;
+		pos[(i + sz1) << 1] = s;
+		pos[(i + sz1) << 1 | 1] = e;
 	}
 	int sz = (sz1 + sz2) << 1;
 	std::sort(pos, pos + sz);
@@ -434,18 +439,18 @@ bool two_polygon_cross_check(const Polygon& H, const std::vector<Bound>& B, cons
 	}
 	return 1;
 }
-void make_bnd(std::vector<Bound>& V, const Pos& x1, const Pos& x2) {
+void make_bnd(std::vector<Bound>& V, const Pos& x1, const Pos& x2, const int& n) {
 	Pos d1 = x1, d2 = x2;
 	assert(d2 != d1);
 	if (d2 < d1) std::swap(d1, d2);
-	V.push_back(Bound(d1, d2));
+	V.push_back(Bound(d1, d2, n));
 	return;
 }
-void bnd_init(Polygon& h1, Polygon& h2, std::vector<Bound>& V) {
+void bnd_init(Polygon& h1, Polygon& h2, std::vector<Bound>& V, const int& n1 = -1, const int& n2 = -1) {
 	int sz1 = h1.size();
 	int sz2 = h2.size();
-	for (int i = 0; i < sz1; i++) make_bnd(V, h1[i], h1[(i + 1) % sz1]);
-	for (int j = 0; j < sz2; j++) make_bnd(V, h2[j], h2[(j + 1) % sz2]);
+	for (int i = 0; i < sz1; i++) make_bnd(V, h1[i], h1[(i + 1) % sz1], n1);
+	for (int j = 0; j < sz2; j++) make_bnd(V, h2[j], h2[(j + 1) % sz2], n2);
 	std::sort(V.begin(), V.end());
 	return;
 }
@@ -460,12 +465,16 @@ void remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool f = 0) {
 			else if (V[k].e == V[nxt].s) {
 				if (f) continue;
 				std::swap(V[k].s, V[nxt].s);
-				V[nxt].i = -1;
 			}
 			else if (V[nxt].e < V[k].e) {
+				int s = V[k].s.i;
+				int e = V[k].e.i;
 				std::swap(V[k].e, V[nxt].e);
 				std::swap(V[k].e, V[nxt].s);
-				std::swap(V[k].e.i, V[nxt].s.i);
+				if (f) continue;
+				V[nxt].i = V[k].i;
+				V[k].s.i = V[nxt].s.i = s;
+				V[k].e.i = V[nxt].e.i = s;
 			}
 			else if (V[k].e <= V[nxt].e) {
 				std::swap(V[k].e, V[nxt].s);
@@ -492,12 +501,12 @@ bool solve() {
 	for (int j = 0; j < 3; j++) {
 		int x = -1;
 		std::cin >> len[j];
-		H[0].resize(len[j]);
+		H[j].resize(len[j]);
 		memset(F, 0, sizeof F);
 		for (int i = 0; i < len[j]; i++) std::cin >> H[j][i];
 		for (int i = 0; i < len[j]; i++)
-			if (!ccw(H[j][(i - 1 + N) % N], H[j][i], H[j][(i + 1) % len[j]]) &&
-				dot(H[j][(i - 1 + N) % N], H[j][i], H[j][(i + 1) % len[j]]) <= 0) {
+			if (!ccw(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) &&
+				dot(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) <= 0) {
 				x = i; break;
 			}
 		for (int i = 0; i < len[j]; i++)
@@ -512,17 +521,17 @@ bool solve() {
 			std::cout << "stria is not a polygon\n";
 			return 0;
 		}
-		for (int i = 0; i < N; i++) H[0][i].i = i;
+		for (int i = 0; i < len[j]; i++) H[j][i].i = i;
 		Polygon().swap(H[3]);
 	}
 
 	ROUPH_CHECK = 1;
 	bool f22 = two_polygon_cross_check(H[0], H[1], 0, 1);
 	if (f22) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
-
 	ROUPH_CHECK = 0;
+
 	std::vector<Bound> VS, V, VA, VB, VAB;
-	bnd_init(H[0], H[1], VS);
+	bnd_init(H[0], H[1], VS, 0, 1);
 	remove(VS, V, 1);
 	int sz = V.size();
 	for (int i = 0; i < sz; i++) {
@@ -542,7 +551,7 @@ bool solve() {
 	bool f24 = two_polygon_cross_check(H[1], VA, 1, 0);
 	if (f23 || f24) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
 
-	bnd_init(H[2], H[4], VAB);
+	bnd_init(H[2], H[3], VAB);
 	bool eq = two_polygon_equal_check(V, VAB);
 	if (eq) std::cout << "OK\n";
 	else std::cout << "The union of Aastria and Abstria is not equal to Aabstria\n";
