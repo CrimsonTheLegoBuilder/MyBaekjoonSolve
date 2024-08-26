@@ -546,11 +546,6 @@ bool solve() {
 	bnd_init(H[0], H[1], VS, 0, 1);
 	remove(VS, V, 1);
 	int sz = V.size();
-	if (sz == len[0] + len[1]) {
-		if (inner_check(H[0], H[1][0])) std::cout << "Aastria and Abstria intersect\n";
-		else std::cout << "The union of Aastria and Abstria is not equal to Aabstria\n";
-		return 0;
-	}
 	for (int i = 0; i < sz; i++) {
 		if (VS[i].i == 0) VA.push_back(V[i]);
 		if (VS[i].i == 1) VB.push_back(V[i]);
