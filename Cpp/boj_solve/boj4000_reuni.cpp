@@ -174,7 +174,7 @@ inline bool idx_check(const int& i, const int& j, const int& h) { return (i == (
 bool intersect(const int& a, const int& b) {
 	if (INNER_CHECK) {
 		Seg A = seg[a], B = seg[b];
-		if (A.h == B.h) return;
+		if (A.h == B.h) return 0;
 		if (A.h != ai) std::swap(A, B);
 		if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
 		if (B.e.i != (B.s.i + 1) % len[B.h]) std::swap(B.s, B.e);
@@ -470,7 +470,7 @@ void bnd_init(Polygon& h1, Polygon& h2, std::vector<Bound>& V, const int& n1 = -
 	std::sort(V.begin(), V.end());
 	return;
 }
-void remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool f = 0) {
+void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool f = 0) {
 	int sz = V.size();
 	for (int i = 0, j; i < sz; i = j) {
 		j = i;
@@ -548,7 +548,7 @@ bool solve() {
 
 	std::vector<Bound> VS, V, VA, VB, VAB;
 	bnd_init(H[0], H[1], VS, 0, 1);
-	remove(VS, V, 1);
+	bnd_remove(VS, V, 1);
 	int sz = V.size();
 	for (int i = 0; i < sz; i++) {
 		if (VS[i].i == 0) VA.push_back(V[i]);
@@ -558,7 +558,7 @@ bool solve() {
 	std::vector<Bound>().swap(VS);
 	std::vector<Bound>().swap(V);
 	bnd_init(H[0], H[1], VS);
-	remove(VS, V);
+	bnd_remove(VS, V);
 	sz = V.size();
 	if (!sz) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
 	
