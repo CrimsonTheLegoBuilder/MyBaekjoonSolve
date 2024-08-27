@@ -147,6 +147,10 @@ struct Seg {
 	bool operator != (const Seg& S) const { return !(*this == S); }
 	//bool operator < (const Seg& S) const { return (s == S.s) ? e < S.e : s < S.s; }
 	bool operator < (const Seg& rhs) const {
+		if (ROUPH_CHECK) {
+			if (on_seg_weak(rhs.s, rhs.e, s)) return cross(rhs.s, rhs.e, e) < 0;
+			if (on_seg_weak(s, e, rhs.s)) return cross(s, e, rhs.e) > 0;
+		}
 		if (rhs.s < s) return cross(rhs.s, rhs.e, s) < 0;
 		//if (rhs.s == s) return cross(rhs.s, rhs.e, e) < 0;
 		return cross(rhs.s, rhs.e, e) < 0;
