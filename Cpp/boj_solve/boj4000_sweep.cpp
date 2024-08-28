@@ -500,15 +500,15 @@ bool inner_check(const Polygon& A, const int& a, const Polygon& B, const int& b)
 	
 	CCW = ccw(a0, a1, a2);
 	if (CCW > 0 && ccw(a1, a0, b0) < 0 && ccw(a1, a2, b0) > 0) return 1;
-	if (CCW < 0 && !(ccw(a1, a0, b0) > 0 && ccw(a1, a2, b0) < 0)) return 1;
+	if (CCW < 0 && !(ccw(a1, a0, b0) >= 0 && ccw(a1, a2, b0) <= 0)) return 1;
 	if (CCW > 0 && ccw(a1, a0, b2) < 0 && ccw(a1, a2, b2) > 0) return 1;
-	if (CCW < 0 && !(ccw(a1, a0, b2) > 0 && ccw(a1, a2, b2) < 0)) return 1;
+	if (CCW < 0 && !(ccw(a1, a0, b2) >= 0 && ccw(a1, a2, b2) <= 0)) return 1;
 
 	CCW = ccw(b0, b1, b2);
 	if (CCW > 0 && ccw(b1, b0, a0) < 0 && ccw(b1, b2, a0) > 0) return 1;
-	if (CCW < 0 && !(ccw(b1, b0, a0) > 0 && ccw(b1, b2, a0) < 0)) return 1;
+	if (CCW < 0 && !(ccw(b1, b0, a0) >= 0 && ccw(b1, b2, a0) <= 0)) return 1;
 	if (CCW > 0 && ccw(b1, b0, a2) < 0 && ccw(b1, b2, a2) > 0) return 1;
-	if (CCW < 0 && !(ccw(b1, b0, a2) > 0 && ccw(b1, b2, a2) < 0)) return 1;
+	if (CCW < 0 && !(ccw(b1, b0, a2) >= 0 && ccw(b1, b2, a2) <= 0)) return 1;
 
 	return 0;
 }
