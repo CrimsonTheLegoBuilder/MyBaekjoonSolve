@@ -43,7 +43,7 @@ struct Pos {
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-	bool operator < (const Pos& r) const { x == r.x ? y == r.y ? d < r.d : y < r.y : x < r.x; }
+	bool operator < (const Pos& r) const { return x == r.x ? y == r.y ? d < r.d : y < r.y : x < r.x; }
 	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
