@@ -73,12 +73,12 @@ struct Pos {
 	//	return os;
 	//}
 } pos[LEN << 2]; const Pos O = Pos(0, 0);
-struct PosHash { std::size_t operator() (const Pos& p) const { return (ll)p.x << 31 + p.y; } };
+struct PosHash { std::size_t operator() (const Pos& p) const { return ((ll)(p.x + 100000) << 32) | (ll)(p.y + 100000); } };
 typedef std::unordered_set<Pos, PosHash> SetPos;
 typedef std::vector<Pos> Polygon;
 int len[4];
 Polygon H[4];
-ll hash(const Pos& p) { return (ll)p.x << 31 + p.y; }
+ll hash(const Pos& p) { return ((ll)(p.x + 100000) << 32) | (ll)(p.y + 100000); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -542,7 +542,8 @@ std::string solve(const std::string& input_file) {
 		H[j] = H[3];
 		len[j] = (int)H[j].size();
 		for (int i = 0; i < len[j]; i++) S.insert(hash(H[j][i]));
-		if (x != -1 || len[j] != S.size() || !polygon_cross_check(H[j], j) || norm(H[j])) {
+		//std::cout << "len[j]:: " << len[j] << " S.sz:: " << S.size() << "\n";
+		if (x != -1 || len[j] != S.size() || polygon_cross_check(H[j], j) || norm(H[j])) {
 			//Line segments intersect each other.
 			return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
 		}
@@ -640,20 +641,20 @@ int main(int argc, char* argv[]) {
 		std::getline(output_stream, answer);
 		std::string result;
 
-		std::cout << "solve run\n";
+		//std::cout << "solve run\n";
 
 		result = solve(input_file);
 
-		std::cout << "solve done\n";
+		//std::cout << "solve done\n";
 
-		std::cout << input_file << ' ' << output_file << '\n';
+		//std::cout << input_file << ' ' << output_file << '\n';
 
 		std::cout << answer << ' ' << result << ' ' << (answer == result) << '\n';
 		if (answer != result) {
-			std::cout << "what the fuck?! wrong answer is returned!!\n";
-			std::cout << "the file name is... ";
-			std::cout << input_file << ", you idiot.\n";
-			result_file << input_file << '\n';
+			//std::cout << "what the fuck?! wrong answer is returned!!\n";
+			//std::cout << "the file name is... ";
+			//std::cout << input_file << ", you idiot.\n";
+			//result_file << input_file << '\n';
 			result_file << "ANS:: " << answer << " RET:: " << result << '\n';
 		}
 	}
