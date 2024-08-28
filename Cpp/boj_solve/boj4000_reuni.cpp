@@ -21,7 +21,12 @@ int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
 #define STRONG 1
 #define WEAK 0
+#define AUTO_CHECK
 #define WHAT_THE_FUCK
+
+#ifdef AUTO_CHECK
+#include <fstream>
+#endif
 
 bool ROUPH_CHECK;
 bool INNER_CHECK;
@@ -180,10 +185,10 @@ bool intersect(const int& a, const int& b) {
 	if (INNER_CHECK) {
 		Seg A = seg[a], B = seg[b];
 		if (A.h == B.h) {
-			std::cout << "MASAKA???::\n";
+			//std::cout << "MASAKA???::\n";
 			return 0;
 		}
-		std::cout << "NO MASAKA::\n";
+		//std::cout << "NO MASAKA::\n";
 		if (A.h != ai) std::swap(A, B);
 		if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
 		if (B.e.i != (B.s.i + 1) % len[B.h]) std::swap(B.s, B.e);
@@ -417,7 +422,7 @@ bool two_polygon_cross_check(const Polygon& H1, const Polygon& H2, const int& n1
 	std::sort(pos, pos + sz);
 	ST.clear();
 	for (int i = 0; i < sz; i++) {
-		std::cout << "DEBUG:: pos[" << i << "]:: " << pos[i] << "\n";
+		//std::cout << "DEBUG:: pos[" << i << "]:: " << pos[i] << "\n";
 		if (~pos[i].d) {
 			if (ST.insert(pos[i].i)) { return 0; }
 		}
@@ -519,11 +524,129 @@ void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool f = 0) {
 }
 bool two_polygon_equal_check(std::vector<Bound>& V1, std::vector<Bound>& V2) {
 	int sz = V1.size();
-	std::cout << "WTF:: v1.sz:: " << sz << " v2.sz:: " << V2.size() << "\n";
+	//std::cout << "WTF:: v1.sz:: " << sz << " v2.sz:: " << V2.size() << "\n";
 	if (sz != V2.size()) { return 0; }
 	for (int i = 0; i < sz; i++) if (V1[i] != V2[i]) { return 0; }
 	return 1;
 }
+#ifdef AUTO_CHECK
+std::string solve(const std::string& input_file) {
+	std::ifstream input(input_file);
+	ROUPH_CHECK = 0;
+	INNER_CHECK = 0;
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+
+	for (int j = 0; j < 3; j++) {
+		int x = -1;
+		std::cin >> len[j];
+		H[j].resize(len[j]);
+		memset(F, 0, sizeof F);
+		for (int i = 0; i < len[j]; i++) std::cin >> H[j][i];
+		for (int i = 0; i < len[j]; i++)
+			if (!ccw(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) &&
+				dot(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) <= 0) {
+				x = i; break;
+			}
+		for (int i = 0; i < len[j]; i++)
+			if (!ccw(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]))
+				F[i] = 1;
+		for (int i = 0; i < len[j]; i++) if (!F[i]) H[3].push_back(H[j][i]);
+		H[j] = H[3];
+		len[j] = (int)H[j].size();
+		if (x != -1 || !polygon_cross_check(H[j], j) || norm(H[j])) {
+			//std::cout << "A";
+			//std::cout << (j == 0 ? "a" : j == 1 ? "b" : "ab");
+			//std::cout << "stria is not a polygon\n";
+			//return 0;
+			return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
+		}
+		for (int i = 0; i < len[j]; i++) H[j][i].i = i;
+		Polygon().swap(H[3]);
+	}
+
+	ROUPH_CHECK = 1;
+	bool f22 = two_polygon_cross_check(H[0], H[1], 0, 1);
+	//if (f22) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+	if (!f22) { return "Aastria and Abstria intersect"; }
+	ROUPH_CHECK = 0;
+
+	std::vector<Bound> VS, V, VA, VB, VAB;
+	bnd_init(H[0], H[1], VS, 0, 1);
+	bnd_remove(VS, V, 1);
+	int sz = V.size();
+	for (int i = 0; i < sz; i++) {
+		if (VS[i].i == 0) VA.push_back(V[i]);
+		if (VS[i].i == 1) VB.push_back(V[i]);
+	}
+
+	std::vector<Bound>().swap(VS);
+	std::vector<Bound>().swap(V);
+	bnd_init(H[0], H[1], VS);
+	bnd_remove(VS, V);
+	sz = V.size();
+	//if (!sz) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+	if (!sz) { return "Aastria and Abstria intersect"; }
+
+	INNER_CHECK = 1;
+	bool f23 = two_polygon_cross_check(H[0], VB, 0, 1);
+	bool f24 = two_polygon_cross_check(H[1], VA, 1, 0);
+	if (f23 && f24) {
+		//if (inner_check(H[0], H[1][0])) { std::cout << "Aastria and Abstria intersect\n"; return 0;; }
+		if (inner_check(H[0], H[1][0]) == 2) { return "Aastria and Abstria intersect";
+		}
+	}
+	//if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+	if (!f23 || !f24) { return "Aastria and Abstria intersect"; }
+
+	bnd_init(H[2], H[3], VAB);
+	bool eq = two_polygon_equal_check(V, VAB);
+	if (eq) return "OK";
+	return "The union of Aastria and Abstria is not equal to Aabstria";
+}
+std::vector<std::string> file_names;
+int main(int argc, char* argv[]) {
+	if (argc < 2) {
+		std::cerr << "Usage: " << argv[0] << " <input_file>" << std::endl;
+		return 1;
+	}
+
+	std::ifstream file_list(argv[1]);
+	std::vector<std::string> file_names;
+	std::string file_name;
+	while (file_list >> file_name) {
+		// fuck
+		file_names.push_back(file_name);
+	}
+
+	std::ofstream result_file("fucked_results.txt");  
+	
+	for (int i = 0; i < file_names.size(); i += 2) {
+		std::string output_file = file_names[i];
+		std::string input_file = file_names[i + 1];
+
+		std::ifstream output_stream(output_file);
+		std::string answer;
+		output_stream >> answer;
+
+		std::string result;
+		result = solve(input_file);
+
+		std::cout << input_file << ' ' << output_file << '\n';
+
+		std::cout << answer << ' ' << result << ' ' << (answer == result) << '\n';
+		if (answer != result) {
+			std::cout << "what the fuck?! wrong answer is returned!!\n";
+			std::cout << "the file name is...\n";
+			std::cout << "	" + input_file << ", you idiot.\n";
+			result_file << input_file << ' ' << N << '\n';
+			result_file << answer << ' ' << result << '\n';
+		}
+	}
+	result_file.close();
+	return 0;
+}//boj4000 Kingdom Reunion
+#else
 bool solve() {
 	ROUPH_CHECK = 0;
 	INNER_CHECK = 0;
@@ -559,8 +682,8 @@ bool solve() {
 
 	ROUPH_CHECK = 1;
 	bool f22 = two_polygon_cross_check(H[0], H[1], 0, 1);
-	//if (f22) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
-	if (!f22) { std::cout << "Aastria and Abstria intersect FUCK::\n"; return 0; }
+	if (f22) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+	//if (!f22) { std::cout << "Aastria and Abstria intersect FUCK::\n"; return 0; }
 	ROUPH_CHECK = 0;
 
 	std::vector<Bound> VS, V, VA, VB, VAB;
@@ -577,18 +700,18 @@ bool solve() {
 	bnd_init(H[0], H[1], VS);
 	bnd_remove(VS, V);
 	sz = V.size();
-	//if (!sz) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
-	if (!sz) { std::cout << "Aastria and Abstria intersect SUCK::\n"; return 0; }
-	
+	if (!sz) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+	//if (!sz) { std::cout << "Aastria and Abstria intersect SUCK::\n"; return 0; }
+
 	INNER_CHECK = 1;
 	bool f23 = two_polygon_cross_check(H[0], VB, 0, 1);
 	bool f24 = two_polygon_cross_check(H[1], VA, 1, 0);
 	if (f23 && f24) {
-		//if (inner_check(H[0], H[1][0])) { std::cout << "Aastria and Abstria intersect\n"; return 0;; }
-		if (inner_check(H[0], H[1][0]) == 2) { std::cout << "Aastria and Abstria intersect SEX::\n"; return 0;; }
+		if (inner_check(H[0], H[1][0]) == 2) { std::cout << "Aastria and Abstria intersect\n"; return 0;; }
+		//if (inner_check(H[0], H[1][0]) == 2) { std::cout << "Aastria and Abstria intersect SEX::\n"; return 0;; }
 	}
-	//if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
-	if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect OR\n"; return 0; }
+	if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+	//if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect OR\n"; return 0; }
 
 	bnd_init(H[2], H[3], VAB);
 	bool eq = two_polygon_equal_check(V, VAB);
@@ -597,3 +720,4 @@ bool solve() {
 	return 0;
 }
 int main() { solve(); return 0; }//boj4000 Kingdom Reunion
+#endif
