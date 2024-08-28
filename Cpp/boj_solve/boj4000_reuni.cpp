@@ -33,7 +33,7 @@ bool INNER_CHECK;
 int ai, bi;
 
 int N, M, K, T, Q;
-bool F[LEN];
+bool F[LEN << 2];
 struct Pos {
 	int x, y;
 	int i, d;
@@ -534,15 +534,16 @@ std::string solve(const std::string& input_file) {
 	std::ifstream input(input_file);
 	ROUPH_CHECK = 0;
 	INNER_CHECK = 0;
+	ai = bi = -1;
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 
 	for (int j = 0; j < 3; j++) {
 		int x = -1;
-		std::cin >> len[j];
+		input >> len[j];
 		H[j].resize(len[j]);
 		memset(F, 0, sizeof F);
-		for (int i = 0; i < len[j]; i++) std::cin >> H[j][i];
+		for (int i = 0; i < len[j]; i++) input >> H[j][i];
 		for (int i = 0; i < len[j]; i++)
 			if (!ccw(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) &&
 				dot(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) <= 0) {
@@ -622,15 +623,20 @@ int main(int argc, char* argv[]) {
 	std::ofstream result_file("fucked_results.txt");  
 	
 	for (int i = 0; i < file_names.size(); i += 2) {
-		std::string output_file = file_names[i];
-		std::string input_file = file_names[i + 1];
+		std::string input_file = file_names[i];
+		std::string output_file = file_names[i + 1];
 
 		std::ifstream output_stream(output_file);
 		std::string answer;
 		output_stream >> answer;
 
 		std::string result;
+
+		std::cout << "solve run\n";
+
 		result = solve(input_file);
+
+		std::cout << "solve done\n";
 
 		std::cout << input_file << ' ' << output_file << '\n';
 
@@ -650,6 +656,7 @@ int main(int argc, char* argv[]) {
 bool solve() {
 	ROUPH_CHECK = 0;
 	INNER_CHECK = 0;
+	ai = bi = -1;
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 
