@@ -585,7 +585,7 @@ bool solve() {
 	bool f24 = two_polygon_cross_check(H[1], VA, 1, 0);
 	if (f23 && f24) {
 		//if (inner_check(H[0], H[1][0])) { std::cout << "Aastria and Abstria intersect\n"; return 0;; }
-		if (inner_check(H[0], H[1][0])) { std::cout << "Aastria and Abstria intersect SEX::\n"; return 0;; }
+		if (inner_check(H[0], H[1][0]) == 2) { std::cout << "Aastria and Abstria intersect SEX::\n"; return 0;; }
 	}
 	//if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
 	if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect OR\n"; return 0; }
