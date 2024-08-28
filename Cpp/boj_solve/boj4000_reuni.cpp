@@ -21,7 +21,7 @@ int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
 #define STRONG 1
 #define WEAK 0
-#define AUTO_CHECK
+//#define AUTO_CHECK
 #define WHAT_THE_FUCK
 
 #ifdef AUTO_CHECK
@@ -567,7 +567,7 @@ std::string solve(const std::string& input_file) {
 
 	ROUPH_CHECK = 1;
 	bool f22 = two_polygon_cross_check(H[0], H[1], 0, 1);
-	//if (f22) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+	//if (!f22) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
 	if (!f22) { return "Aastria and Abstria intersect"; }
 	ROUPH_CHECK = 0;
 
@@ -593,7 +593,7 @@ std::string solve(const std::string& input_file) {
 	bool f24 = two_polygon_cross_check(H[1], VA, 1, 0);
 	if (f23 && f24) {
 		//if (inner_check(H[0], H[1][0])) { std::cout << "Aastria and Abstria intersect\n"; return 0;; }
-		if (inner_check(H[0], H[1][0]) == 2) { return "Aastria and Abstria intersect";
+		if (inner_check(H[0], H[1][0]) == 2 || inner_check(H[1], H[0][0]) == 2) { return "Aastria and Abstria intersect";
 		}
 	}
 	//if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
@@ -682,7 +682,7 @@ bool solve() {
 
 	ROUPH_CHECK = 1;
 	bool f22 = two_polygon_cross_check(H[0], H[1], 0, 1);
-	if (f22) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+	if (!f22) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
 	//if (!f22) { std::cout << "Aastria and Abstria intersect FUCK::\n"; return 0; }
 	ROUPH_CHECK = 0;
 
@@ -707,8 +707,8 @@ bool solve() {
 	bool f23 = two_polygon_cross_check(H[0], VB, 0, 1);
 	bool f24 = two_polygon_cross_check(H[1], VA, 1, 0);
 	if (f23 && f24) {
-		if (inner_check(H[0], H[1][0]) == 2) { std::cout << "Aastria and Abstria intersect\n"; return 0;; }
-		//if (inner_check(H[0], H[1][0]) == 2) { std::cout << "Aastria and Abstria intersect SEX::\n"; return 0;; }
+		if (inner_check(H[0], H[1][0]) == 2 || inner_check(H[1], H[0][0]) == 2) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
+		//if (inner_check(H[0], H[1][0]) == 2 || inner_check(H[1], H[0][0]) == 2) { std::cout << "Aastria and Abstria intersect SEX::\n"; return 0; }
 	}
 	if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect\n"; return 0; }
 	//if (!f23 || !f24) { std::cout << "Aastria and Abstria intersect OR\n"; return 0; }
