@@ -73,6 +73,7 @@ struct Pos {
 	//	return os;
 	//}
 } pos[LEN << 2]; const Pos O = Pos(0, 0);
+bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
 struct PosHash { std::size_t operator() (const Pos& p) const { return ((ll)(p.x + 100000) << 32) | (ll)(p.y + 100000); } };
 typedef std::unordered_set<Pos, PosHash> SetPos;
 typedef std::vector<Pos> Polygon;
@@ -131,8 +132,8 @@ struct Line {//ax + by = c
 	Line(Pos V = Pos(0, 0), ll C = 0) : s(V), c(C) {}
 	bool operator == (const Line& l) const { return s == l.s && c == l.c; }
 	bool operator < (const Line& l) const {
-		bool f1 = O < s;
-		bool f2 = O < l.s;
+		bool f1 = cmpx(O, s);
+		bool f2 = cmpx(O, l.s);
 		if (f1 != f2) return f1;
 		ll CCW = s / l.s;
 		return !CCW ? c < l.c : CCW > 0;
@@ -169,7 +170,8 @@ struct Bound {
 	Bound(Pos S = Pos(0, 0), Pos E = Pos(0, 0), int I = -1) : s(S), e(E), i(I) { l = L(S, E); }
 	bool operator == (const Bound& S) const { return l == S.l && s == S.s && e == S.e; }
 	bool operator != (const Bound& S) const { return !(*this == S); }
-	bool operator < (const Bound& S) const { return (l == S.l) ? (s == S.s) ? e < S.e : s < S.s : l < S.l; }
+	//bool operator < (const Bound& S) const { return (l == S.l) ? (s == S.s) ? e < S.e : s < S.s : l < S.l; }
+	bool operator < (const Bound& S) const { return (l == S.l) ? (s == S.s) ? cmpx(e, S.e) : cmpx(s, S.s) : l < S.l; }
 	friend std::ostream& operator << (std::ostream& os, const Bound& S) {
 		os << "DEBUG::Seg l: " << S.l << " | s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n";
 		return os;
@@ -521,10 +523,9 @@ std::string solve(const std::string& input_file) {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 
-	std::unordered_set<ll> S;
-	SetPos SA, SB;
-	for (int i = 0; i < 4; i++) H[i].clear();
+	for (int i = 0; i < 4; i++) Polygon().swap(H[i]);
 	for (int j = 0; j < 3; j++) {
+		std::unordered_set<ll> S;
 		int x = -1;
 		input >> len[j];
 		H[j].resize(len[j]);
@@ -539,6 +540,7 @@ std::string solve(const std::string& input_file) {
 			if (!ccw(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]))
 				F[i] = 1;
 		for (int i = 0; i < len[j]; i++) if (!F[i]) H[3].push_back(H[j][i]);
+		Polygon().swap(H[j]);
 		H[j] = H[3];
 		len[j] = (int)H[j].size();
 		for (int i = 0; i < len[j]; i++) S.insert(hash(H[j][i]));
@@ -549,7 +551,6 @@ std::string solve(const std::string& input_file) {
 		}
 		for (int i = 0; i < len[j]; i++) H[j][i].i = i;
 		Polygon().swap(H[3]);
-		S.clear();
 	}
 
 	ll aa = area(H[0]), ba = area(H[1]), aba = area(H[2]);
@@ -567,17 +568,21 @@ std::string solve(const std::string& input_file) {
 
 	//The union of two polygons is the same as the merged polygon
 	if (aeq && seq) return "OK";
+	if (!aeq && seq) return "Aastria and Abstria intersect";
 
-	N = len[0];
-	M = len[1];
 	const Polygon& A = H[0];
 	const Polygon& B = H[1];
+	N = A.size();
+	M = B.size();
+	len[0] = N;
+	len[1] = M;
 
 	EDGE_IGNORE = 1;
 	//There are line segments that completely intersect
 	if (two_polygon_cross_check(A, B, 0, 1)) return "Aastria and Abstria intersect";
 	EDGE_IGNORE = 0;
 
+	SetPos SA, SB;
 	for (int b = 0; b < M; b++) SB.insert(B[b]);
 	for (int a = 0; a < N; a++) {
 		auto p = SB.find(A[a]);
@@ -652,8 +657,8 @@ int main(int argc, char* argv[]) {
 		std::cout << answer << ' ' << result << ' ' << (answer == result) << '\n';
 		if (answer != result) {
 			//std::cout << "what the fuck?! wrong answer is returned!!\n";
-			//std::cout << "the file name is... ";
-			//std::cout << input_file << ", you idiot.\n";
+			std::cout << "the file name is... ";
+			std::cout << input_file << ", you idiot.\n";
 			//result_file << input_file << '\n';
 			result_file << "ANS:: " << answer << " RET:: " << result << '\n';
 		}
