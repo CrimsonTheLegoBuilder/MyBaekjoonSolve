@@ -185,11 +185,11 @@ bool intersect(const int& a, const int& b) {
 		if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
 		assert((A.s.i + 1) % len[A.h] == A.e.i);
 		if (B.e.i != (B.s.i + 1) % len[B.h]) std::swap(B.s, B.e);
-		assert((B.s.i + 1) % len[B.h] == B.e.i);
+		//assert((B.s.i + 1) % len[B.h] == B.e.i);
 		if (on_seg_weak(B.s, B.e, A.s)) return ccw(B.s, B.e, A.e) > 0;
 		if (on_seg_weak(B.s, B.e, A.e)) return ccw(B.s, B.e, A.s) > 0;
-		if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
-		if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
+		//if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
+		//if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
 		return 0;
 	}
 	const Pos& d1 = seg[a].s, & d2 = seg[a].e, & d3 = seg[b].s, & d4 = seg[b].e;
@@ -466,7 +466,7 @@ void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 				int e = V[k].e.i;
 				std::swap(V[k].e, V[nxt].e);
 				std::swap(V[k].e, V[nxt].s);
-				if (!merge) continue;
+				//if (!merge) continue;
 				V[nxt].i = V[k].i;
 				V[k].s.i = V[nxt].s.i = s;
 				V[k].e.i = V[nxt].e.i = s;
