@@ -2,20 +2,22 @@ import matplotlib.pyplot as plt
 
 # Define the points for each set
 A = [
-  (4, 3),
-  (2, 4),
-  (2, 1),
+  (2, 6),
+  (0, 4),
+  (8, 0)
 ]
 B = [
-  (2, 4),
-  (2, 2),
-  (1, 0),
+  (4, 6),
+  (9, 4),
+  (7, 1),
+  (9, 7),
+  (2, 6),
+  (5, 5),
 ]
 AB = [
-  (3, 3),
-  (2, 4),
-  (0, 5),
-  (1, 0),
+  (7, 1),
+  (0, 4),
+  (8, 0),
 ]
 # Function to plot a polygon given a set of points
 def plot_polygon(points, color, label):

@@ -6,9 +6,6 @@
 #include <string>
 #include <cassert>
 #include <vector>
-#include <random>
-#include <array>
-#include <tuple>
 #include <unordered_set>
 typedef long long ll;
 typedef double ld;
@@ -16,18 +13,20 @@ typedef std::pair<int, int> pi;
 const ll INF = 1e17;
 const int LEN = 1e4 + 5;
 const ld TOL = 1e-7;
-const ll MOD = 1'000'000'007;
+//const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
+//#define AUTO_CHECK
+
 #define STRONG 1
 #define WEAK 0
-#define AUTO_CHECK
-#define WHAT_THE_FUCK
+#define NO_MERGE 0
 
 #ifdef AUTO_CHECK
 #include <fstream>
+#define WHAT_THE_FUCK
 #endif
 
 bool INNER_CHECK;
@@ -72,14 +71,14 @@ struct Pos {
 	//	os << " ::DEBUG:: " << p.i  << " " << p.d;
 	//	return os;
 	//}
-} pos[LEN << 2]; const Pos O = Pos(0, 0);
+} pos[LEN << 3]; const Pos O = Pos(0, 0);
 bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
-struct PosHash { std::size_t operator() (const Pos& p) const { return ((ll)(p.x + 100000) << 32) | (ll)(p.y + 100000); } };
+struct PosHash { std::size_t operator() (const Pos& p) const { return (((ll)p.x + 100000) << 32) | ((ll)p.y + 100000); } };
 typedef std::unordered_set<Pos, PosHash> SetPos;
 typedef std::vector<Pos> Polygon;
 int len[4];
 Polygon H[4];
-ll hash(const Pos& p) { return ((ll)(p.x + 100000) << 32) | (ll)(p.y + 100000); }
+ll hash(const Pos& p) { return (((ll)p.x + 100000) << 32) | ((ll)p.y + 100000); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -162,7 +161,7 @@ struct Seg {
 		return cross(rhs.s, rhs.e, e) < 0;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) { os << "DEBUG::Seg s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n"; return os; }
-} seg[LEN << 2];
+} seg[LEN << 3];
 struct Bound {
 	Line l;
 	Pos s, e;
@@ -177,7 +176,6 @@ struct Bound {
 		return os;
 	}
 };
-//bool idx_check(const int& i, const int& j, const int& h) { return i == (j + 1) % h || j == (i + 1) % h; }
 bool intersect(const int& a, const int& b) {
 	if (INNER_CHECK) {
 		Seg A = seg[a], B = seg[b];
@@ -185,7 +183,9 @@ bool intersect(const int& a, const int& b) {
 		if (!intersect(A.s, A.e, B.s, B.e)) return 0;
 		if (A.h != ai) std::swap(A, B);
 		if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
+		assert((A.s.i + 1) % len[A.h] == A.e.i);
 		if (B.e.i != (B.s.i + 1) % len[B.h]) std::swap(B.s, B.e);
+		assert((B.s.i + 1) % len[B.h] == B.e.i);
 		if (on_seg_weak(B.s, B.e, A.s)) return ccw(B.s, B.e, A.e) > 0;
 		if (on_seg_weak(B.s, B.e, A.e)) return ccw(B.s, B.e, A.s) > 0;
 		if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
@@ -194,11 +194,6 @@ bool intersect(const int& a, const int& b) {
 	}
 	const Pos& d1 = seg[a].s, & d2 = seg[a].e, & d3 = seg[b].s, & d4 = seg[b].e;
 	return intersect(d1, d2, d3, d4, WEAK);
-	//const Pos& d1 = seg[a].s, & d2 = seg[a].e, & d3 = seg[b].s, & d4 = seg[b].e;
-	//std::cout << "itx:: d1:: " << d1 << " d2:: " << d2 << " d3:: " << d3 << " d4:: " << d4 << "\n";
-	//if (seg[a].h != seg[b].h) return intersect(d1, d2, d3, d4, STRONG);
-	//if (!idx_check(seg[a].i, seg[b].i, len[seg[a].h])) return intersect(d1, d2, d3, d4, WEAK);
-	//else return intersect(d1, d2, d3, d4, WEAK);
 }
 class SplayTree {
 	struct Node {
@@ -337,6 +332,7 @@ public:
 		return p->i;
 	}
 } ST;
+void mirror(Polygon& H) { for (Pos& p : H) p.x *= -1; }
 bool sweep(const int& sz) {
 	for (int i = 0; i < sz; i++) {
 		if (~pos[i].d) {
@@ -517,6 +513,9 @@ bool inner_check(const Polygon& A, const int& a, const Polygon& B, const int& b)
 #ifdef AUTO_CHECK
 std::string solve(const std::string& input_file) {
 	std::ifstream input(input_file);
+#else
+std::string solve() {
+#endif
 	INNER_CHECK = 0;
 	EDGE_IGNORE = 0;
 	ai = bi = -1;
@@ -527,10 +526,16 @@ std::string solve(const std::string& input_file) {
 	for (int j = 0; j < 3; j++) {
 		std::unordered_set<ll> S;
 		int x = -1;
+		memset(F, 0, sizeof F);
+#ifdef AUTO_CHECK
 		input >> len[j];
 		H[j].resize(len[j]);
-		memset(F, 0, sizeof F);
 		for (int i = 0; i < len[j]; i++) input >> H[j][i];
+#else
+		std::cin >> len[j];
+		H[j].resize(len[j]);
+		for (int i = 0; i < len[j]; i++) std::cin >> H[j][i];
+#endif
 		for (int i = 0; i < len[j]; i++)
 			if (!ccw(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) &&
 				dot(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) <= 0) {
@@ -545,13 +550,26 @@ std::string solve(const std::string& input_file) {
 		len[j] = (int)H[j].size();
 		for (int i = 0; i < len[j]; i++) S.insert(hash(H[j][i]));
 		//std::cout << "len[j]:: " << len[j] << " S.sz:: " << S.size() << "\n";
-		if (x != -1 || len[j] != S.size() || polygon_cross_check(H[j], j) || norm(H[j])) {
-			//Line segments intersect each other.
-			return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
+		if (x != -1 || len[j] != S.size()) return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
+		for (int k = 0; k < 2; k++) {
+			if (polygon_cross_check(H[j], j)) return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
+			mirror(H[j]);
 		}
+		if (norm(H[j])) return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
 		for (int i = 0; i < len[j]; i++) H[j][i].i = i;
 		Polygon().swap(H[3]);
 	}
+
+	//Python debug
+	//std::cout << "A = [\n";
+	//for (Pos& p : H[0]) std::cout << "  (" << p.x << ", " << p.y << "),\n";
+	//std::cout << "]\n";
+	//std::cout << "B = [\n";
+	//for (Pos& p : H[1]) std::cout << "  (" << p.x << ", " << p.y << "),\n";
+	//std::cout << "]\n";
+	//std::cout << "AB = [\n";
+	//for (Pos& p : H[2]) std::cout << "  (" << p.x << ", " << p.y << "),\n";
+	//std::cout << "]\n";
 
 	ll aa = area(H[0]), ba = area(H[1]), aba = area(H[2]);
 	bool aeq = aa + ba == aba;
@@ -568,6 +586,7 @@ std::string solve(const std::string& input_file) {
 
 	//The union of two polygons is the same as the merged polygon
 	if (aeq && seq) return "OK";
+	//It's the same, but something is strange
 	if (!aeq && seq) return "Aastria and Abstria intersect";
 
 	const Polygon& A = H[0];
@@ -582,7 +601,7 @@ std::string solve(const std::string& input_file) {
 	if (two_polygon_cross_check(A, B, 0, 1)) return "Aastria and Abstria intersect";
 	EDGE_IGNORE = 0;
 
-	SetPos SA, SB;
+	SetPos SB;
 	for (int b = 0; b < M; b++) SB.insert(B[b]);
 	for (int a = 0; a < N; a++) {
 		auto p = SB.find(A[a]);
@@ -597,7 +616,7 @@ std::string solve(const std::string& input_file) {
 	std::vector<Bound>().swap(VS);
 	std::vector<Bound>().swap(V);
 	bnd_init(H[0], H[1], VS, 0, 0);
-	bnd_remove(VS, V, 1);
+	bnd_remove(VS, V, NO_MERGE);
 	int sz = V.size();
 	for (int i = 0; i < sz; i++) {
 		if (V[i].i == 0) VA.push_back(V[i]);
@@ -608,17 +627,17 @@ std::string solve(const std::string& input_file) {
 	INNER_CHECK = 0;
 
 	//Check if there is a point on a line segment
+	//if (fa || fb) return "Aastria and Abstria intersect FUCK";
 	if (fa || fb) return "Aastria and Abstria intersect";
 
 	//One polygon completely contains another polygon
-	if (inner_check(A, B[0]) == 2 ||
-		inner_check(B, A[0]) == 2) {
-		return "Aastria and Abstria intersect";
-	}
-
+	if (inner_check(A, B[0]) == 2 || inner_check(B, A[0]) == 2) return "Aastria and Abstria intersect";
+	
 	//If all conditions are met, the union of the two polygons and the answer are different.
 	return "The union of Aastria and Abstria is not equal to Aabstria";
 }
+
+#ifdef AUTO_CHECK
 std::vector<std::string> file_names;
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
@@ -629,13 +648,12 @@ int main(int argc, char* argv[]) {
 	std::ifstream file_list(argv[1]);
 	std::vector<std::string> file_names;
 	std::string file_name;
-	while (file_list >> file_name) {
-		// fuck
+	while (file_list >> file_name) {//fuck
 		file_names.push_back(file_name);
 	}
 
 	std::ofstream result_file("fucked_results.txt");
-
+	bool F = 1;
 	for (int i = 0; i < file_names.size(); i += 2) {
 		std::string input_file = file_names[i];
 		std::string output_file = file_names[i + 1];
@@ -654,37 +672,20 @@ int main(int argc, char* argv[]) {
 
 		//std::cout << input_file << ' ' << output_file << '\n';
 
-		std::cout << answer << ' ' << result << ' ' << (answer == result) << '\n';
+		std::cout << answer << " " << result << " " << (answer == result) << "\n";
 		if (answer != result) {
+			F = 0;
 			//std::cout << "what the fuck?! wrong answer is returned!!\n";
 			std::cout << "the file name is... ";
 			std::cout << input_file << ", you idiot.\n";
 			//result_file << input_file << '\n';
-			result_file << "ANS:: " << answer << " RET:: " << result << '\n';
+			result_file << "ANS:: " << answer << " RET:: " << result << "\n";
 		}
 	}
+	if (F) result_file << "Accepted\n";
 	result_file.close();
 	return 0;
 }//boj4000 Kingdom Reunion
 #else
-std::string solve() {
-	INNER_CHECK = 0;
-	ai = bi = -1;
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-
-	std::unordered_set<ll> S;
-	SetPos SA, SB;
-	for (int i = 0; i < 4; i++) H[i].clear();
-	for (int j = 0; j < 3; j++) {
-		int x = -1;
-		std::cin >> len[j];
-		H[j].resize(len[j]);
-		memset(F, 0, sizeof F);
-		for (int i = 0; i < len[j]; i++) std::cin >> H[j][i];
-
-	}
-	return "FUCK";
-}
 int main() { std::cout << solve() << "\n"; return 0; }//boj4000 Kingdom Reunion
 #endif
