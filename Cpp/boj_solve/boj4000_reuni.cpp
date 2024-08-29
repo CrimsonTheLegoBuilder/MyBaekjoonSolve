@@ -522,10 +522,6 @@ std::string solve() {
 	INNER_CHECK = 0;
 	EDGE_IGNORE = 0;
 	ai = bi = -1;
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-
-	for (int i = 0; i < 4; i++) Polygon().swap(H[i]);
 	for (int j = 0; j < 3; j++) {
 		std::unordered_set<ll> S;
 		int x = -1;
@@ -536,9 +532,9 @@ std::string solve() {
 		for (int i = 0; i < len[j]; i++) input >> H[j][i];
 #else
 		//std::cin >> len[j];
-		if (!(std::cin >> len[j])) return "";
-		H[j].resize(len[j]);
-		for (int i = 0; i < len[j]; i++) std::cin >> H[j][i];
+		//if (!(std::cin >> len[j])) return "";
+		//H[j].resize(len[j]);
+		//for (int i = 0; i < len[j]; i++) std::cin >> H[j][i];
 #endif
 		for (int i = 0; i < len[j]; i++)
 			if (!ccw(H[j][(i - 1 + len[j]) % len[j]], H[j][i], H[j][(i + 1) % len[j]]) &&
@@ -554,33 +550,12 @@ std::string solve() {
 		len[j] = (int)H[j].size();
 		for (int i = 0; i < len[j]; i++) S.insert(hash(H[j][i]));
 		//std::cout << "len[j]:: " << len[j] << " S.sz:: " << S.size() << "\n";
-		if (x != -1 || len[j] != S.size()) {
-			for (int k = j + 1; k < 3; k++) {
-				std::cin >> len[k];
-				H[k].resize(len[k]);
-				for (int i = 0; i < len[k]; i++) std::cin >> H[k][i];
-			}
-			return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
-		}
+		if (x != -1 || len[j] != S.size()) return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
 		for (int k = 0; k < 2; k++) {
-			if (polygon_cross_check(H[j], j)) {
-				for (int l = j + 1; l < 3; l++) {
-					std::cin >> len[l];
-					H[l].resize(len[l]);
-					for (int i = 0; i < len[l]; i++) std::cin >> H[l][i];
-				}
-				return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
-			}
+			if (polygon_cross_check(H[j], j)) return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
 			mirror(H[j]);
 		}
-		if (norm(H[j])) {
-			for (int k = j + 1; k < 3; k++) {
-				std::cin >> len[k];
-				H[k].resize(len[k]);
-				for (int i = 0; i < len[k]; i++) std::cin >> H[k][i];
-			}
-			return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
-		}
+		if (norm(H[j])) return "A" + (j == 0 ? std::string("a") : j == 1 ? std::string("b") : std::string("ab")) + "stria is not a polygon";
 		for (int i = 0; i < len[j]; i++) H[j][i].i = i;
 		Polygon().swap(H[3]);
 	}
@@ -662,6 +637,25 @@ std::string solve() {
 	return "The union of Aastria and Abstria is not equal to Aabstria";
 }
 
+void fuck() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	int x = 0;
+	int N;
+	while (std::cin >> N) {
+		len[x] = N;
+		H[x].resize(N);
+		for (int i = 0; i < N; i++) std::cin >> H[x][i];
+		x++;
+		if (x == 3) {
+			x = 0;
+			std::cout << solve() << "\n";
+			for (int i = 0; i < 4; i++) Polygon().swap(H[i]);
+		}
+	}
+	return;
+}
+
 #ifdef AUTO_CHECK
 std::vector<std::string> file_names;
 int main(int argc, char* argv[]) {
@@ -712,12 +706,5 @@ int main(int argc, char* argv[]) {
 	return 0;
 }//boj4000 Kingdom Reunion
 #else
-int main() {
-	while (true) {
-		std::string result = solve();
-		if (result.empty()) break;
-		std::cout << result << "\n";
-	}
-	return 0;
-}//boj4000 Kingdom Reunion
+int main() { fuck(); return 0; }//boj4000 Kingdom Reunion
 #endif
