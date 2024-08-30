@@ -188,11 +188,11 @@ bool intersect(const int& a, const int& b) {
 		if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
 		assert((A.s.i + 1) % len[A.h] == A.e.i);
 		if (B.e.i != (B.s.i + 1) % len[B.h]) std::swap(B.s, B.e);
-		//assert((B.s.i + 1) % len[B.h] == B.e.i);
+		assert((B.s.i + 1) % len[B.h] == B.e.i);
 		if (on_seg_weak(B.s, B.e, A.s)) return ccw(B.s, B.e, A.e) > 0;
 		if (on_seg_weak(B.s, B.e, A.e)) return ccw(B.s, B.e, A.s) > 0;
-		//if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
-		//if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
+		if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
+		if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
 		return 0;
 	}
 	const Pos& d1 = seg[a].s, & d2 = seg[a].e, & d3 = seg[b].s, & d4 = seg[b].e;
@@ -615,7 +615,7 @@ std::string solve() {
 	INNER_CHECK = 1;
 	std::vector<Bound>().swap(VS);
 	std::vector<Bound>().swap(V);
-	bnd_init(H[0], H[1], VS, 0, 0);
+	bnd_init(H[0], H[1], VS, 0, 1);
 	bnd_remove(VS, V, NO_MERGE);
 	int sz = V.size();
 	for (int i = 0; i < sz; i++) {
