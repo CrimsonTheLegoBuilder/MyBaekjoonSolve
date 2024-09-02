@@ -9,8 +9,8 @@
 #include <array>
 #include <tuple>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
@@ -50,6 +50,13 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
+bool cmpr(const Pos& p, const Pos& q) {
+	bool f1 = O < p;
+	bool f2 = O < q;
+	if (f1 != f2) return f1;
+	ld CCW = p / q;
+	return zero(CCW) ? p.Euc() < q.Euc() : sign(CCW) > 0;
+}
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
@@ -143,6 +150,26 @@ bool brute_check(const Polygon& H, Circle& ec, const ld& r, const int& in) {//O(
 	}
 	return 0;
 }
+bool check(const Polygon& H, Circle& ec, const ld& r, const int& in) {
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Polygon EV;
+		for (int j = 0; j < sz; j++) {
+			if (i == j) continue;
+			Pos tmp = H[j] - H[i];
+			if (sign(r - tmp.mag()) >= 0) EV.push_back(tmp);
+		}
+		std::sort(EV.begin(), EV.end(), cmpr);
+		int esz = EV.size();
+		for (int j = 0; j < esz; j++) EV.push_back(EV[j]);
+		Pos s = H[0], e = H[0];
+		esz <<= 1;
+		int cnt = 0;
+		for (int j = 0; j < esz; j++) {
+
+		}
+	}
+}
 Circle bi_search(Polygon& H, const int& in) {//O(N^3 * log(MEC.R))
 	int sz = H.size();
 	assert(in > 1);
@@ -152,7 +179,9 @@ Circle bi_search(Polygon& H, const int& in) {//O(N^3 * log(MEC.R))
 	if (sz == in) return mec;
 	ld s = 0, e = mec.r + TOL, m = 0;
 	Circle ec = INVAL;
+	int cnt = 30;
 	while (!zero(e - s)) {
+	//while (cnt--) {
 		m = (e + s) * .5;
 		if (brute_check(H, ec, m, in)) e = m;
 		else s = m;
