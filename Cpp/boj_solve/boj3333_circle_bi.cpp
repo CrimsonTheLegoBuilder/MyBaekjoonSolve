@@ -102,7 +102,7 @@ Disks enclose_circle(const Pos& u, const Pos& v, const ld& r) {
 	ld h = (u - v).mag() * .5;
 	if (sign(h - r) > 0) return {};
 	Pos m = (u + v) * .5;
-	//if (zero(h - r)) return { Circle(m, r) };
+	if (zero(h - r)) return { Circle(m, r) };
 	Pos vec = ~(u - v).unit();
 	ld w = sqrt(r * r - h * h);
 	return { Circle(m + vec * w, r), Circle(m - vec * w, r) };
@@ -166,7 +166,7 @@ bool check(const Polygon& H, Circle& ec, const ld& r, const int& in) {
 			Disks ecs = enclose_circle(O, tmp, r);
 			int esz = ecs.size();
 			if (!esz) continue;
-			Pos s = ecs[0].c, e = ecs[1].c;
+			Pos s = ecs[0].c, e = ecs.back().c;
 			if (sign(ccw(O, s, e)) < 0) std::swap(s, e);
 			s.f = 1; EV.push_back(s);
 			e.f = -1; EV.push_back(e);
@@ -175,18 +175,19 @@ bool check(const Polygon& H, Circle& ec, const ld& r, const int& in) {
 		Pos fst = EV[0];
 		Circle F = Circle(fst, r);
 		int cnt = 0;
-		for (int j = 0; j < sz; j++) if (F >= H[j]) cnt++;
-		if (cnt >= in) return 1;
-		if (fst.f == -1) cnt--;
+		for (int j = 0; j < sz; j++) if (F >= (H[j] - H[i])) cnt++;
+		if (cnt >= in) { ec = Circle(fst + H[i], r); return 1; }
 		int esz = EV.size();
-		for (int j = 1; j < esz; j++) {
-			cnt += EV[j].f;
-			if (cnt >= in) return 1;
+		int p = 0;
+		while (p < esz && EV[p] == fst && EV[p].f == 1) p++;
+		for (p; p < esz; p++) {
+			cnt += EV[p].f;
+			if (cnt >= in) { ec = Circle(EV[p] + H[i], r); return 1; }
 		}
 	}
 	return 0;
 }
-Circle bi_search(Polygon& H, const int& in) {//O(N^3 * log(MEC.R))
+Circle bi_search(Polygon& H, const int& in) {//O(N^2log(N) * log(MEC.R))
 	int sz = H.size();
 	assert(in > 1);
 	assert(in <= sz);
@@ -194,10 +195,9 @@ Circle bi_search(Polygon& H, const int& in) {//O(N^3 * log(MEC.R))
 	Circle mec = minimum_enclose_circle(H);
 	if (sz == in) return mec;
 	ld s = 0, e = mec.r + TOL, m = 0;
-	Circle ec = INVAL;
-	int cnt = 30;
+	Circle ec = mec;
 	while (!zero(e - s)) {
-	//while (cnt--) {
+	//int cnt = 30; while (cnt--) {
 		m = (e + s) * .5;
 		//if (brute_check(H, ec, m, in)) e = m;
 		if (check(H, ec, m, in)) e = m;
