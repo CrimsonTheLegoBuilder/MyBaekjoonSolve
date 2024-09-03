@@ -9,8 +9,8 @@
 #include <array>
 #include <tuple>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
@@ -172,12 +172,13 @@ bool check(const Polygon& H, Circle& ec, const ld& r, const int& in) {
 			e.f = -1; EV.push_back(e);
 		}
 		std::sort(EV.begin(), EV.end(), cmpr);
+		int esz = EV.size();
+		if (!esz) continue;
 		Pos fst = EV[0];
 		Circle F = Circle(fst, r);
 		int cnt = 0;
 		for (int j = 0; j < sz; j++) if (F >= (H[j] - H[i])) cnt++;
 		if (cnt >= in) { ec = Circle(fst + H[i], r); return 1; }
-		int esz = EV.size();
 		int p = 0;
 		while (p < esz && EV[p] == fst && EV[p].f == 1) p++;
 		for (p; p < esz; p++) {
