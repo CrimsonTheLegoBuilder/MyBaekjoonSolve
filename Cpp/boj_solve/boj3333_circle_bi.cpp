@@ -21,7 +21,8 @@ inline bool zero(const ld& x) { return !sign(x); }
 int N, K;
 struct Pos {
 	ld x, y;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	int f;
+	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { f = 0; }
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -54,8 +55,13 @@ bool cmpr(const Pos& p, const Pos& q) {
 	bool f1 = O < p;
 	bool f2 = O < q;
 	if (f1 != f2) return f1;
-	ld CCW = p / q;
-	return zero(CCW) ? p.Euc() < q.Euc() : sign(CCW) > 0;
+	int f3 = sign(p.Euc() < q.Euc());
+	int CCW = sign(p / q);
+	if (!CCW) {
+		if (!f3) return p.f > q.f;
+		return f3 > 0;
+	}
+	return CCW > 0;
 }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
@@ -96,7 +102,7 @@ Disks enclose_circle(const Pos& u, const Pos& v, const ld& r) {
 	ld h = (u - v).mag() * .5;
 	if (sign(h - r) > 0) return {};
 	Pos m = (u + v) * .5;
-	if (zero(h - r)) return { Circle(m, r) };
+	//if (zero(h - r)) return { Circle(m, r) };
 	Pos vec = ~(u - v).unit();
 	ld w = sqrt(r * r - h * h);
 	return { Circle(m + vec * w, r), Circle(m - vec * w, r) };
@@ -157,18 +163,28 @@ bool check(const Polygon& H, Circle& ec, const ld& r, const int& in) {
 		for (int j = 0; j < sz; j++) {
 			if (i == j) continue;
 			Pos tmp = H[j] - H[i];
-			if (sign(r - tmp.mag()) >= 0) EV.push_back(tmp);
+			Disks ecs = enclose_circle(O, tmp, r);
+			int esz = ecs.size();
+			if (!esz) continue;
+			Pos s = ecs[0].c, e = ecs[1].c;
+			if (sign(ccw(O, s, e)) < 0) std::swap(s, e);
+			s.f = 1; EV.push_back(s);
+			e.f = -1; EV.push_back(e);
 		}
 		std::sort(EV.begin(), EV.end(), cmpr);
-		int esz = EV.size();
-		for (int j = 0; j < esz; j++) EV.push_back(EV[j]);
-		Pos s = H[0], e = H[0];
-		esz <<= 1;
+		Pos fst = EV[0];
+		Circle F = Circle(fst, r);
 		int cnt = 0;
-		for (int j = 0; j < esz; j++) {
-
+		for (int j = 0; j < sz; j++) if (F >= H[j]) cnt++;
+		if (cnt >= in) return 1;
+		if (fst.f == -1) cnt--;
+		int esz = EV.size();
+		for (int j = 1; j < esz; j++) {
+			cnt += EV[j].f;
+			if (cnt >= in) return 1;
 		}
 	}
+	return 0;
 }
 Circle bi_search(Polygon& H, const int& in) {//O(N^3 * log(MEC.R))
 	int sz = H.size();
@@ -183,7 +199,8 @@ Circle bi_search(Polygon& H, const int& in) {//O(N^3 * log(MEC.R))
 	while (!zero(e - s)) {
 	//while (cnt--) {
 		m = (e + s) * .5;
-		if (brute_check(H, ec, m, in)) e = m;
+		//if (brute_check(H, ec, m, in)) e = m;
+		if (check(H, ec, m, in)) e = m;
 		else s = m;
 	}
 	return ec;
