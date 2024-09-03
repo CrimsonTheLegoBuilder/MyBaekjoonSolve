@@ -5,9 +5,6 @@
 #include <cmath>
 #include <cstring>
 #include <cassert>
-#include <random>
-#include <array>
-#include <tuple>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -18,12 +15,12 @@ const int LEN = 505;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
+inline ll nC2(const ll& n) { return (n - 1) * n >> 1; }
 
-int Z, N, Q;
+int Z, N, M, Q;
 struct Pos {
 	int x, y;
-	short int i1, i2, i3, i4;
-	Pos(int X = 0, int Y = 0) : x(X), y(Y) { i1 = i2 = i3 = i4 = 0; }
+	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -56,6 +53,10 @@ struct Pos {
 typedef std::vector<Pos> Polygon;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return sign(ret); }
+bool cmpt(const Pos& p, const Pos& q) {
+	if (!(p / q)) return p.Euc() < q.Euc();
+	return p / q > 0;
+}
 Polygon graham_scan(Polygon& C) {
 	Polygon H;
 	if (C.size() < 3) {
@@ -80,48 +81,58 @@ Polygon graham_scan(Polygon& C) {
 }
 bool inner_check(const Polygon& H, const Pos& p) {
 	int sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		const Pos& cur = H[i], nxt = H[(i + 1) % sz];
-		if (ccw(cur, nxt, p) < 0) return 0;
-	}
+	for (int i = 0; i < sz; i++) if (cross(H[i], H[(i + 1) % sz], p) < 0) return 0;
 	return 1;
 }
-ll conquer(Polygon& H, int l, int m, int r) {
+ll conquer(Polygon& C, int l, int m, int r) {
 	int i = l, j = r, k = 0;
 	Polygon tmp(r - l + 1); 
 	ll cnt = 0;
-	auto cmpt = [&](const Pos& p, const Pos& q) -> bool {
-		if (!(p / q)) return p.Euc() < q.Euc();
-		return p / q > 0;
-		};
 	while (i <= m && j <= r) {
-		if (cmpt(H[i], H[j])) tmp[k++] = H[i++];
-		else tmp[k++] = H[j++], cnt += ((ll)m + 1 - i);
+		if (cmpt(C[i], C[j])) tmp[k++] = C[i++];
+		else tmp[k++] = C[j++], cnt += ((ll)m + 1 - i);
 	}
-	while (i <= m) tmp[k++] = H[i++];
-	while (j <= r) tmp[k++] = H[j++];
-	for (i = l, k = 0; i <= r; i++, k++) H[i] = tmp[k];
+	while (i <= m) tmp[k++] = C[i++];
+	while (j <= r) tmp[k++] = C[j++];
+	for (i = l, k = 0; i <= r; i++, k++) C[i] = tmp[k];
 	return cnt;
 }
-ll divide(Polygon& H, int l, int r) {
+ll divide(Polygon& C, int l, int r) {
 	ll cnt = 0;
 	if (l < r) {
 		int m = l + r >> 1;
-		cnt += divide(H, l, m);
-		cnt += divide(H, m + 1, r);
-		cnt += conquer(H, l, m, r);
+		cnt += divide(C, l, m);
+		cnt += divide(C, m + 1, r);
+		cnt += conquer(C, l, m, r);
 	}
 	return cnt;
 }
-ll merge_sort(Polygon& H) { return divide(H, 0, H.size() - 1); }
-void query(Polygon& H) {
+ll merge_sort(Polygon& C) { return divide(C, 0, C.size() - 1); }
+ll inv_count(Polygon& C) { ll inv = merge_sort(C); return inv; }
+ll inv_count(Polygon& C, const Pos& a, const Pos& b) {
+	int sz = C.size();
+	ll all = nC2((ll)sz);
+	for (int i = 0; i < sz; i++) C[i] -= a;
+	std::sort(C.begin(), C.end(), cmpt);
+	for (int i = 0; i < sz; i++) C[i] += a - b;
+	ll ret = all - inv_count(C);
+	for (int i = 0; i < sz; i++) C[i] += b;
+	return ret;
+}
+void query(const Polygon& H, const Polygon& A) {
 	int a_, b_;
-	int sz = H.size();
 	std::cin >> a_ >> b_;
+	int sz = H.size();
 	Pos a0 = H[a_], a = H[(a_ + 1) % sz], b = H[b_], b0 = H[(b_ + 1) % sz];
-	Polygon S = { a, a0, b, b0 }, P;
+	/*
+	   a --- b         a == b      a - b
+	   |     |   ||   / \      ||   \ /
+	   a0 -- b0      a0 b0           a0 == b0 
+	*/
+	Polygon S = { a0, a, b, b0 }, P;
 	Polygon B = graham_scan(S);
-	for (int i = 0; i < sz; i++) if (inner_check(B, H[i])) P.push_back(H[i]);
+	sz = A.size();
+	for (int i = 0; i < sz; i++) if (inner_check(B, A[i])) P.push_back(A[i]);
 	Polygon ab, a0b, ab0;
 	sz = P.size();
 	for (int i = 0; i < sz; i++) {
@@ -129,22 +140,29 @@ void query(Polygon& H) {
 		if (ccw(b0, a, P[i]) >= 0) ab0.push_back(P[i]);
 		if (ccw(b, a0, P[i]) >= 0) a0b.push_back(P[i]);
 	}
-
+	ll ans = inv_count(ab, a, b) - inv_count(ab0, a, b0) - inv_count(a0b, a0, b);
+	std::cout << ans << " ";
+	return;
 }
 void query() {
 	std::cin >> N;
 	Polygon H(N);
 	for (int i = 0; i < N; i++) std::cin >> H[i];
+	std::cin >> M;
+	Polygon A(M);
+	for (int j = 0; j < M; j++) std::cin >> A[j];
 	std::cin >> Q;
-	while (Q--) query(H);
+	while (Q--) query(H, A);
+	std::cout << "\n";
 	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	std::cout << std::fixed;
-	std::cout.precision(9);
+	//std::cout << std::fixed;
+	//std::cout.precision(9);
 	std::cin >> Z;
 	while (Z--) query();
 	return;
 }
+int main() { solve(); return 0; }//boj18051
