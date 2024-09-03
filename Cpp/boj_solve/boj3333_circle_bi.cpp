@@ -55,7 +55,7 @@ bool cmpr(const Pos& p, const Pos& q) {
 	bool f1 = O < p;
 	bool f2 = O < q;
 	if (f1 != f2) return f1;
-	int f3 = sign(p.Euc() < q.Euc());
+	int f3 = sign(q.Euc() - p.Euc());
 	int CCW = sign(p / q);
 	if (!CCW) {
 		if (!f3) return p.f > q.f;
