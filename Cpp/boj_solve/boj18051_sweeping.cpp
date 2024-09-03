@@ -54,28 +54,82 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
-bool cmpr(const Pos& p, const Pos& q) {
-	bool f1 = O < p;
-	bool f2 = O < q;
-	if (f1 != f2) return f1;
-	int f3 = sign(q.Euc() - p.Euc());
-	int CCW = sign(p / q);
-	return !CCW ? f3 : CCW > 0;
-}
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return sign(ret); }
-void query(Polygon& H) {
-	int a, b;
-	int sz = H.size();
-	std::cin >> a >> b;
-	Pos L = H[a], I = H[(a + 1) % sz], J = H[b], K = H[(b + 1) % sz];
-	Polygon S = { I, J, K, L };
-	for (int j = 0; j < 4; j++) {
-		for (int i = 0; i < N; i++) H[i] -= S[j];
-		std::sort(H.begin(), H.end(), cmpr);
-		if (i < 2) std::reverse(H.begin(), H.end());
-		for (int i = 0; i < N; i++) H[i] += S[j];
+Polygon graham_scan(Polygon& C) {
+	Polygon H;
+	if (C.size() < 3) {
+		std::sort(C.begin(), C.end());
+		return C;
 	}
+	std::swap(C[0], *min_element(C.begin(), C.end()));
+	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
+		int ret = ccw(C[0], p, q);
+		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
+		return ret > 0;
+		}
+	);
+	C.erase(unique(C.begin(), C.end()), C.end());
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
+			H.pop_back();
+		H.push_back(C[i]);
+	}
+	return H;
+}
+bool inner_check(const Polygon& H, const Pos& p) {
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		const Pos& cur = H[i], nxt = H[(i + 1) % sz];
+		if (ccw(cur, nxt, p) < 0) return 0;
+	}
+	return 1;
+}
+ll conquer(Polygon& H, int l, int m, int r) {
+	int i = l, j = r, k = 0;
+	Polygon tmp(r - l + 1); 
+	ll cnt = 0;
+	auto cmpt = [&](const Pos& p, const Pos& q) -> bool {
+		if (!(p / q)) return p.Euc() < q.Euc();
+		return p / q > 0;
+		};
+	while (i <= m && j <= r) {
+		if (cmpt(H[i], H[j])) tmp[k++] = H[i++];
+		else tmp[k++] = H[j++], cnt += ((ll)m + 1 - i);
+	}
+	while (i <= m) tmp[k++] = H[i++];
+	while (j <= r) tmp[k++] = H[j++];
+	for (i = l, k = 0; i <= r; i++, k++) H[i] = tmp[k];
+	return cnt;
+}
+ll divide(Polygon& H, int l, int r) {
+	ll cnt = 0;
+	if (l < r) {
+		int m = l + r >> 1;
+		cnt += divide(H, l, m);
+		cnt += divide(H, m + 1, r);
+		cnt += conquer(H, l, m, r);
+	}
+	return cnt;
+}
+ll merge_sort(Polygon& H) { return divide(H, 0, H.size() - 1); }
+void query(Polygon& H) {
+	int a_, b_;
+	int sz = H.size();
+	std::cin >> a_ >> b_;
+	Pos a0 = H[a_], a = H[(a_ + 1) % sz], b = H[b_], b0 = H[(b_ + 1) % sz];
+	Polygon S = { a, a0, b, b0 }, P;
+	Polygon B = graham_scan(S);
+	for (int i = 0; i < sz; i++) if (inner_check(B, H[i])) P.push_back(H[i]);
+	Polygon ab, a0b, ab0;
+	sz = P.size();
+	for (int i = 0; i < sz; i++) {
+		if (ccw(b, a, P[i]) >= 0) ab.push_back(P[i]);
+		if (ccw(b0, a, P[i]) >= 0) ab0.push_back(P[i]);
+		if (ccw(b, a0, P[i]) >= 0) a0b.push_back(P[i]);
+	}
+
 }
 void query() {
 	std::cin >> N;
