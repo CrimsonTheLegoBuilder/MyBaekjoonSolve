@@ -13,12 +13,14 @@ const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e5 + 5;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return !sign(x); }
 inline ll nC2(const ll& n) { return (n - 1) * n >> 1; }
 
 #define LOW 1
 #define UPPER -1
 
-int N, cnt;
+int N;
 ld A, x1, x2, y1, y2;
 struct Pos {
 	int x, y;
@@ -58,8 +60,54 @@ std::vector<Pos> monotone_chain(std::vector<Pos>& C, int f = LOW) {
 	}
 	return H;
 }
+int idx_bi_search(const Polygon& H, const ld& x) {
+	int s = 1, e = H.size() - 1;
+	if (sign(H[1].x - x) >= 0) return 0;
+	if (sign(H[2].x - x) >= 0) return 1;
+	int cnt = 70;
+	while (cnt--) {
+		int m = s + e >> 1;
+		if (sign(H[m].x - x) >= 0) s = m;
+		else e = m;
+	}
+	return s;
+}
+ld height_bi_search(const ld& x, const ld& w) {
+	int l1, l2, u1, u2;
+	l1 = idx_bi_search(L, x);
+	l2 = idx_bi_search(L, x + w);
+	u1 = idx_bi_search(U, x);
+	u2 = idx_bi_search(U, x + w);
+	return 0;
+}
+ld area_ternary_search(const ld& w) {
+	ld s = L[0].x, e = L.back().x - w;
+	ld x1, x2, h;
+	int cnt = 100;
+	while (cnt--) {
+		x1 = (s + s + e) / 3;
+		x2 = (s + e + e) / 3;
+		ld h1 = height_bi_search(x1, w);
+		ld h2 = height_bi_search(x2, w);
+		ld a1 = w * h1, a2 = w * h2;
+		if (sign(a2 - a1) >= 0) h = h2, s = x1;
+		else h = h1, e = x2;
+	}
+	return s * h;
+}
 void area_ternary_search() {
-
+	ld s = 0, e = L.back().x - L[0].x;
+	ld w1, w2;
+	int cnt = 100;
+	while (cnt--) {
+		w1 = (s + s + e) / 3;
+		w2 = (s + e + e) / 3;
+		ld a1 = area_ternary_search(w1);
+		ld a2 = area_ternary_search(w2);
+		if (sign(a2 - a1) >= 0) s = w1;
+		else e = w2;
+	}
+	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
