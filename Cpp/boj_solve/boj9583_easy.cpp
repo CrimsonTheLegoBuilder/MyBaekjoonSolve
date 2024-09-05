@@ -6,10 +6,10 @@
 #include <cstring>
 #include <cassert>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-11;
+const ld TOL = 1e-9;
 const ld PI = acos(-1);
 const int LEN = 1e5 + 5;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
@@ -71,16 +71,18 @@ int idx_bi_search(const Polygon& H, const ld& x) {
 	if (H[2].x > x) return 1;
 	if (!sign(H.back().x - x)) return e;
 	while (s < e) {
-		int m = s + e >> 1;
-		if (sign(H[m].x - x) < 0) s = m + 1;
-		else e = m;
+		int m = s + e + 1 >> 1;//refer to tourist
+		if (sign(H[m].x - x) == 0) return m;
+		if (sign(H[m].x - x) < 0) s = m;
+		else e = m - 1;
 	}
 	return s;
 }
 ld height_search(const ld& x, const ld& w, bool f = 0) {
 	auto cal_y = [&](const Polygon& V, const int i, const ld& x_, ld& y_) -> void {
-		ll den = V[i + 1].x - V[i].x;
-		ll num = V[i + 1].y - V[i].y;
+		int nxt = std::min(i + 1, (int)V.size() - 1);
+		ll den = V[nxt].x - V[i].x;
+		ll num = V[nxt].y - V[i].y;
 		y_ = (ld)V[i].y + (x_ - V[i].x) * (ld)num / den;
 		};
 	int l1, l2, u1, u2;
@@ -108,7 +110,7 @@ ld area_ternary_search(const ld& w) {
 	ld s = L[0].x, e = L.back().x - w;
 	ld x1, x2;
 	//while (sign(e - s) > 0) {
-	int cnt = 100; while (cnt--) {
+	int cnt = 200; while (cnt--) {
 		x1 = (s + s + e) / 3;
 		x2 = (s + e + e) / 3;
 		ld h1 = height_search(x1, w);
@@ -124,7 +126,7 @@ void area_ternary_search() {
 	ld s = 0, e = L.back().x - L[0].x;
 	ld w1, w2;
 	//while (sign(e - s) > 0) {
-	int cnt = 100; while (cnt--) {
+	int cnt = 200; while (cnt--) {
 		w1 = (s + s + e) / 3;
 		w2 = (s + e + e) / 3;
 		ld a1 = area_ternary_search(w1);
