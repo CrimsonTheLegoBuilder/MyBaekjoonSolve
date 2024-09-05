@@ -21,7 +21,7 @@ inline ll nC2(const ll& n) { return (n - 1) * n >> 1; }
 #define UPPER -1
 
 int N;
-ld A, x1, x2, y1, y2;
+ld X1, X2, Y1, Y2;
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -48,52 +48,75 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2,
 std::vector<Pos> monotone_chain(std::vector<Pos>& C, int f = LOW) {
 	std::vector<Pos> H;
 	std::sort(C.begin(), C.end());
+	if (f == UPPER) std::reverse(C.begin(), C.end());
 	//C.erase(unique(C.begin(), C.end()), C.end());
 	if (C.size() <= 2) {
 		for (const Pos& pos : C) H.push_back(pos);
 		return H;
 	}
 	for (int i = 0; i < C.size(); i++) {
-		while (H.size() > 1 && f * ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
+		while (H.size() > 1 && ccw(H[H.size() - 2], H[H.size() - 1], C[i]) <= 0)
 			H.pop_back();
 		H.push_back(C[i]);
 	}
+	int sz = H.size();
+	if (H[sz - 2].x == H[sz - 1].x) H.pop_back();
+	if (f == UPPER) std::reverse(H.begin(), H.end());
 	return H;
 }
 int idx_bi_search(const Polygon& H, const ld& x) {
 	int s = 1, e = H.size() - 1;
-	if (sign(H[1].x - x) >= 0) return 0;
-	if (sign(H[2].x - x) >= 0) return 1;
-	int cnt = 70;
-	while (cnt--) {
+	if (sign(H[1].x - x) > 0) return 0;
+	if (sign(H[2].x - x) > 0) return 1;
+	if (sign(H.back().x - x) == 0) return e;
+	while (s < e) {
 		int m = s + e >> 1;
-		if (sign(H[m].x - x) >= 0) s = m;
+		if (sign(H[m].x - x) > 0) s = m + 1;
 		else e = m;
 	}
 	return s;
 }
-ld height_bi_search(const ld& x, const ld& w) {
+ld height_search(const ld& x, const ld& w, bool f = 0) {
+	auto cal_x_y = [&](const Polygon& V, const int i, const ld& x_, ld& y_) -> void {
+		ll den = V[i + 1].x - V[i].x;
+		ll num = V[i + 1].y - V[i].y;
+		y_ = (ld)V[i].y + (x_ - V[i].x) * (ld)num / den;
+		};
 	int l1, l2, u1, u2;
 	l1 = idx_bi_search(L, x);
 	l2 = idx_bi_search(L, x + w);
 	u1 = idx_bi_search(U, x);
 	u2 = idx_bi_search(U, x + w);
-	return 0;
+	ld x1 = x, x2 = x + w;
+	ld y1, y2, y3, y4;
+	if (zero(L[l1].x - x1)) y1 = L[l1].y;
+	else cal_x_y(L, l1, x1, y1);
+	if (zero(U[u1].x - x1)) y2 = U[u1].y;
+	else cal_x_y(U, u1, x1, y2);
+	if (zero(L[l2].x - x2)) y3 = L[l2].y;
+	else cal_x_y(L, l2, x2, y3);
+	if (zero(U[u2].x - x2)) y4 = U[u2].y;
+	else cal_x_y(U, u2, x2, y4);
+	ld yu = std::min(y2, y4);
+	ld yl = std::max(y1, y3);
+	if (f) X1 = x, X2 = x + w, Y1 = yl, Y2 = yu;
+	return std::max(yu - yl, (ld)0);
 }
 ld area_ternary_search(const ld& w) {
 	ld s = L[0].x, e = L.back().x - w;
-	ld x1, x2, h;
+	ld x1, x2;
 	int cnt = 100;
 	while (cnt--) {
 		x1 = (s + s + e) / 3;
 		x2 = (s + e + e) / 3;
-		ld h1 = height_bi_search(x1, w);
-		ld h2 = height_bi_search(x2, w);
+		ld h1 = height_search(x1, w);
+		ld h2 = height_search(x2, w);
 		ld a1 = w * h1, a2 = w * h2;
-		if (sign(a2 - a1) >= 0) h = h2, s = x1;
-		else h = h1, e = x2;
+		if (sign(a2 - a1) > 0) s = x1;
+		else e = x2;
 	}
-	return s * h;
+	height_search(s, w, 1);
+	return (X2 - X1) * (Y2 - Y1);
 }
 void area_ternary_search() {
 	ld s = 0, e = L.back().x - L[0].x;
@@ -119,7 +142,7 @@ void solve() {
 	L = monotone_chain(H, LOW);
 	U = monotone_chain(H, UPPER);
 	area_ternary_search();
-	std::cout << x1 << " " << y1 << " " << x2 << " " << y2 << "\n";
+	std::cout << X1 << " " << Y1 << " " << X2 << " " << Y2 << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj9583
