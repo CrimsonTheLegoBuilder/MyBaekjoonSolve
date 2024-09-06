@@ -15,7 +15,6 @@ const int LEN = 1e5 + 5;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
-inline ll nC2(const ll& n) { return (n - 1) * n >> 1; }
 
 #define LOW 1
 #define UPPER -1
@@ -78,16 +77,12 @@ int idx_bi_search(const Polygon& H, const ld& x) {
 	}
 	return s;
 }
-ld height_search(const ld& x, const ld& w, bool f = 0) {
+ld height_search(const ld& x, const ld& w) {
 	auto cal_y = [&](const Polygon& V, const int i, const ld& x_, ld& y_) -> void {
 		int nxt = std::min(i + 1, (int)V.size() - 1);
 		ll den = V[nxt].x - V[i].x;
 		ll num = V[nxt].y - V[i].y;
 		y_ = (ld)V[i].y + (x_ - V[i].x) * (ld)num / den;
-		//ll a = V[i + 1].y - V[i].y;
-		//ll b = V[i].x - V[i + 1].x;
-		//ll c = -a * V[i].x - b * V[i].y;
-		//y_ = 1.0 * (-a * x_ - c) / b;
 		};
 	int l1, l2, u1, u2;
 	l1 = idx_bi_search(L, x);
@@ -106,7 +101,6 @@ ld height_search(const ld& x, const ld& w, bool f = 0) {
 	else cal_y(U, u2, x2, y4);
  	ld yu = std::min(y2, y4);
 	ld yl = std::max(y1, y3);
-	if (f && sign(yu - yl) > 0) X1 = x, X2 = x + w, Y1 = yl, Y2 = yu;
 	X1 = x, X2 = x + w, Y1 = yl, Y2 = yu;
 	return std::max(yu - yl, (ld)0);
 }
@@ -114,7 +108,7 @@ ld area_ternary_search(const ld& w) {
 	ld s = L[0].x, e = L.back().x - w;
 	ld x1, x2;
 	//while (sign(e - s) > 0) {
-	int cnt = 200; while (cnt--) {
+	int cnt = 70; while (cnt--) {
 		x1 = (s + s + e) / 3;
 		x2 = (s + e + e) / 3;
 		ld h1 = height_search(x1, w);
@@ -123,15 +117,14 @@ ld area_ternary_search(const ld& w) {
 		if (sign(a2 - a1) > 0) s = x1;
 		else e = x2;
 	}
-	//height_search(s, w, 1);
-	height_search((s + e) * .5, w, 1);
+	height_search((s + e) * .5, w);
 	return (X2 - X1) * (Y2 - Y1);
 }
 void area_ternary_search() {
 	ld s = 0, e = L.back().x - L[0].x;
 	ld w1, w2;
 	//while (sign(e - s) > 0) {
-	int cnt = 200; while (cnt--) {
+	int cnt = 70; while (cnt--) {
 		w1 = (s + s + e) / 3;
 		w2 = (s + e + e) / 3;
 		ld a1 = area_ternary_search(w1);
