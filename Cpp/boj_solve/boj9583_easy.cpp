@@ -78,25 +78,23 @@ int idx_bi_search(const Polygon& H, const ld& x) {
 	return s;
 }
 ld height_search(const ld& x, const ld& w) {
-	auto cal_y = [&](const Polygon& V, const int i, const ld& x_, ld& y_) -> void {
-		if (zero(V[i].x - x_)) { y_ = V[i].y; return; }
+	auto cal_y = [&](const Polygon& V, const int i, const ld& x_) -> ld {
+		if (zero(V[i].x - x_)) return V[i].y;
 		int nxt = std::min(i + 1, (int)V.size() - 1);
 		ll den = V[nxt].x - V[i].x;
 		ll num = V[nxt].y - V[i].y;
-		y_ = (ld)V[i].y + (x_ - V[i].x) * (ld)num / den;
-		return;
+		return (ld)V[i].y + (x_ - V[i].x) * (ld)num / den;;
 		};
 	int l1, l2, u1, u2;
-	l1 = idx_bi_search(L, x);
-	l2 = idx_bi_search(L, x + w);
-	u1 = idx_bi_search(U, x);
-	u2 = idx_bi_search(U, x + w);
 	ld x1 = x, x2 = x + w;
-	ld y1, y2, y3, y4;
-	cal_y(L, l1, x1, y1);
-	cal_y(U, u1, x1, y2);
-	cal_y(L, l2, x2, y3);
-	cal_y(U, u2, x2, y4);
+	l1 = idx_bi_search(L, x1);
+	l2 = idx_bi_search(L, x2);
+	u1 = idx_bi_search(U, x1);
+	u2 = idx_bi_search(U, x2);
+	ld y1 = cal_y(L, l1, x1);
+	ld y2 = cal_y(U, u1, x1);
+	ld y3 = cal_y(L, l2, x2);
+	ld y4 = cal_y(U, u2, x2);
  	ld yu = std::min(y2, y4), yl = std::max(y1, y3);
 	X1 = x, X2 = x + w, Y1 = yl, Y2 = yu;
 	return std::max(yu - yl, (ld)0);
@@ -105,7 +103,7 @@ ld area_ternary_search(const ld& w) {
 	ld s = L[0].x, e = L.back().x - w;
 	ld x1, x2;
 	//while (sign(e - s) > 0) {
-	int cnt = 70; while (cnt--) {
+	int cnt = 50; while (cnt--) {
 		x1 = (s + s + e) / 3;
 		x2 = (s + e + e) / 3;
 		ld h1 = height_search(x1, w);
@@ -121,7 +119,7 @@ void area_ternary_search() {
 	ld s = 0, e = L.back().x - L[0].x;
 	ld w1, w2;
 	//while (sign(e - s) > 0) {
-	int cnt = 70; while (cnt--) {
+	int cnt = 50; while (cnt--) {
 		w1 = (s + s + e) / 3;
 		w2 = (s + e + e) / 3;
 		ld a1 = area_ternary_search(w1);
