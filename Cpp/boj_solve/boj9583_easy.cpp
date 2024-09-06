@@ -84,6 +84,10 @@ ld height_search(const ld& x, const ld& w, bool f = 0) {
 		ll den = V[nxt].x - V[i].x;
 		ll num = V[nxt].y - V[i].y;
 		y_ = (ld)V[i].y + (x_ - V[i].x) * (ld)num / den;
+		//ll a = V[i + 1].y - V[i].y;
+		//ll b = V[i].x - V[i + 1].x;
+		//ll c = -a * V[i].x - b * V[i].y;
+		//y_ = 1.0 * (-a * x_ - c) / b;
 		};
 	int l1, l2, u1, u2;
 	l1 = idx_bi_search(L, x);
@@ -119,7 +123,8 @@ ld area_ternary_search(const ld& w) {
 		if (sign(a2 - a1) > 0) s = x1;
 		else e = x2;
 	}
-	height_search(s, w, 1);
+	//height_search(s, w, 1);
+	height_search((s + e) * .5, w, 1);
 	return (X2 - X1) * (Y2 - Y1);
 }
 void area_ternary_search() {
