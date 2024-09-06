@@ -16,7 +16,7 @@ inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 
-#define LOW 1
+#define LOWER 1
 #define UPPER -1
 
 int N;
@@ -44,7 +44,7 @@ typedef std::vector<Pos> Polygon;
 Polygon U, L;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
-Polygon monotone_chain(Polygon& C, int f = LOW) {
+Polygon monotone_chain(Polygon& C, int f = LOWER) {
 	Polygon H;
 	std::sort(C.begin(), C.end());
 	if (f == UPPER) std::reverse(C.begin(), C.end());
@@ -79,10 +79,12 @@ int idx_bi_search(const Polygon& H, const ld& x) {
 }
 ld height_search(const ld& x, const ld& w) {
 	auto cal_y = [&](const Polygon& V, const int i, const ld& x_, ld& y_) -> void {
+		if (zero(V[i].x - x_)) { y_ = V[i].y; return; }
 		int nxt = std::min(i + 1, (int)V.size() - 1);
 		ll den = V[nxt].x - V[i].x;
 		ll num = V[nxt].y - V[i].y;
 		y_ = (ld)V[i].y + (x_ - V[i].x) * (ld)num / den;
+		return;
 		};
 	int l1, l2, u1, u2;
 	l1 = idx_bi_search(L, x);
@@ -91,16 +93,11 @@ ld height_search(const ld& x, const ld& w) {
 	u2 = idx_bi_search(U, x + w);
 	ld x1 = x, x2 = x + w;
 	ld y1, y2, y3, y4;
-	if (zero(L[l1].x - x1)) y1 = L[l1].y;
-	else cal_y(L, l1, x1, y1);
-	if (zero(U[u1].x - x1)) y2 = U[u1].y;
-	else cal_y(U, u1, x1, y2);
-	if (zero(L[l2].x - x2)) y3 = L[l2].y;
-	else cal_y(L, l2, x2, y3);
-	if (zero(U[u2].x - x2)) y4 = U[u2].y;
-	else cal_y(U, u2, x2, y4);
- 	ld yu = std::min(y2, y4);
-	ld yl = std::max(y1, y3);
+	cal_y(L, l1, x1, y1);
+	cal_y(U, u1, x1, y2);
+	cal_y(L, l2, x2, y3);
+	cal_y(U, u2, x2, y4);
+ 	ld yu = std::min(y2, y4), yl = std::max(y1, y3);
 	X1 = x, X2 = x + w, Y1 = yl, Y2 = yu;
 	return std::max(yu - yl, (ld)0);
 }
@@ -146,7 +143,7 @@ void solve() {
 	std::cin >> N;
 	Polygon H(N);
 	for (int i = 0; i < N; i++) std::cin >> H[i];
-	L = monotone_chain(H, LOW);
+	L = monotone_chain(H, LOWER);
 	U = monotone_chain(H, UPPER);
 	area_ternary_search();
 	std::cout << X1 << " " << Y1 << " " << X2 << " " << Y2 << "\n";
