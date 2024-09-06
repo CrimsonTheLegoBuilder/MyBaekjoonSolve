@@ -139,6 +139,7 @@ void area_ternary_search() {
 		if (sign(a2 - a1) > 0) s = w1;
 		else e = w2;
 	}
+	area_ternary_search((s + e) * .5);
 	return;
 }
 void solve() {
@@ -146,13 +147,16 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
+	//const std::string TASKNAME = "easy";
+	//freopen((TASKNAME + ".in").c_str(), "r", stdin);
+	//freopen((TASKNAME + ".out").c_str(), "w", stdout);
 	std::cin >> N;
 	Polygon H(N);
 	for (int i = 0; i < N; i++) std::cin >> H[i];
 	L = monotone_chain(H, LOW);
 	U = monotone_chain(H, UPPER);
 	area_ternary_search();
-	std::cout << X1 << " " << Y1 << "\n" << X2 << " " << Y2 << "\n";
+	std::cout << X1 << " " << Y1 << " " << X2 << " " << Y2 << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj9583
@@ -179,4 +183,174 @@ int main() { solve(); return 0; }//boj9583
 -707706.1603165409 -587886.2601078567
 386264.71217350144 636116.556677073
 
+10
+-91594 46960
+-76949 84667
+-66236 100000
+43979 -24439
+77627 -66150
+100000 -98953
+56673 -99689
+-27595 -100000
+-69277 -31494
+-100000 24687
+-27749.993634482 -99745.261889453
+41428.379741335 -21559.204741932
+-27749.99363549359986791 -99745.26188779030053411
+41428.38019192011415726 -21559.20525066774280276
+
+*/
+
+
+/*
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <set>
+#include <vector>
+#include <map>
+#include <cmath>
+#include <algorithm>
+#include <memory.h>
+#include <string>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <cassert>
+#include <sstream>
+
+using namespace std;
+
+#define x1 _x1
+#define y1 _y1
+#define left _left
+#define right _right
+
+const string TASKNAME = "easy";
+
+const int N = 1000010;
+
+int x[N], y[N];
+int right, n;
+double xa, ya, xb, yb, xc, yc, ans, opt_w, opt_h;
+bool bad;
+
+void get_ys(double xx, double& y1, double& y2) {
+    if (x[0] >= xx || x[right] <= xx) {
+        bad = true;
+        return;
+    }
+    {
+        int ll = 0, rr = right;
+        while (ll < rr) {
+            int mid = (ll + rr + 1) >> 1;
+            if (x[mid] < xx) ll = mid;
+            else rr = mid - 1;
+        }
+        long long a = y[ll + 1] - y[ll];
+        long long b = x[ll] - x[ll + 1];
+        long long c = -a * x[ll] - b * y[ll];
+        if (b == 0) y2 = (y[ll] > y[ll + 1] ? y[ll] : y[ll + 1]);
+        else y2 = 1.0 * (-a * xx - c) / b;
+    }
+    {
+        int ll = right, rr = n - 1;
+        while (ll < rr) {
+            int mid = (ll + rr + 1) >> 1;
+            if (x[mid] > xx) ll = mid;
+            else rr = mid - 1;
+        }
+        long long a = y[ll + 1] - y[ll];
+        long long b = x[ll] - x[ll + 1];
+        long long c = -a * x[ll] - b * y[ll];
+        if (b == 0) y1 = (y[ll] < y[ll + 1] ? y[ll] : y[ll + 1]);
+        else y1 = 1.0 * (-a * xx - c) / b;
+    }
+}
+
+double mh;
+int it2;
+
+double get_h(double w, double xx) {
+    double y1, y2, y3, y4;
+    bad = false;
+    get_ys(xx, y1, y2);
+    get_ys(xx + w, y3, y4);
+    if (bad) return 0.0;
+    if (y3 > y1) y1 = y3;
+    if (y4 < y2) y2 = y4;
+    if (y1 < y2) {
+        if (y2 - y1 > mh && it2 > 150) {
+            mh = y2 - y1;
+            yc = y1;
+        }
+        return y2 - y1;
+    }
+    return 0;
+}
+
+double get_w_h(double w) {
+    double lx = 1e9;
+    for (int i = 0; i < n; i++)
+        if (x[i] < lx) lx = x[i];
+    double rx = 1e9;
+    mh = 0.0;
+    for (it2 = 0; it2 < 200; it2++) {
+        double x1 = (2 * lx + rx) / 3;
+        double x2 = (lx + 2 * rx) / 3;
+        double h1 = get_h(w, x1);
+        double h2 = get_h(w, x2);
+        if (h2 == 0.0) rx = x2; else
+            if (h2 < h1) rx = x2;
+            else lx = x1;
+    }
+    xc = 0.5 * (lx + rx);
+    if (mh * w > ans) {
+        ans = mh * w;
+        opt_w = w;
+        opt_h = mh;
+        xa = xc;
+        ya = yc;
+    }
+    return mh * w;
+}
+
+int new_x[N], new_y[N];
+
+int main() {
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) scanf("%d %d", x + i, y + i);
+    int left = 0;
+    for (int i = 1; i < n; i++)
+        if (x[i] < x[left]) left = i;
+    for (int i = 0; i < n; i++) {
+        new_x[i] = x[left];
+        new_y[i] = y[left];
+        left = (left + 1) % n;
+    }
+    for (int i = 0; i < n; i++) {
+        x[i] = new_x[i];
+        y[i] = new_y[i];
+    }
+    x[n] = x[0];
+    y[n] = y[0];
+    right = 0;
+    for (int i = 1; i < n; i++)
+        if (x[i] > x[right]) right = i;
+    double lw = 0, hw = 2e9;
+    ans = 0.0;
+    for (int it = 0; it < 200; it++) {
+        double w1 = (2 * lw + hw) / 3;
+        double w2 = (lw + 2 * hw) / 3;
+        double q1 = get_w_h(w1);
+        double q2 = get_w_h(w2);
+        if (q2 == 0.0 || q2 < q1) hw = w2;
+        else lw = w1;
+    }
+    xb = xa + opt_w;
+    yb = ya + opt_h;
+    printf("%.17lf %.17lf %.17lf %.17lf\n", xa, ya, xb, yb);
+    return 0;
+}
 */
