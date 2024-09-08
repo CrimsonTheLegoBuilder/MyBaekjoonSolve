@@ -70,6 +70,9 @@
     <Filter Include="소스 파일\string">
       <UniqueIdentifier>{84287d39-9226-4423-aeda-618ebb578fb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\_MatKorCupOpen">
+      <UniqueIdentifier>{512719e2-e282-4c4e-b0e9-d201dd6055e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="boj28401_cnvxhull.cpp">
@@ -1313,6 +1316,12 @@
     </ClCompile>
     <ClCompile Include="boj9583_easy.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="MKC_A.cpp">
+      <Filter>소스 파일\_MatKorCupOpen</Filter>
+    </ClCompile>
+    <ClCompile Include="MKC_B.cpp">
+      <Filter>소스 파일\_MatKorCupOpen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
