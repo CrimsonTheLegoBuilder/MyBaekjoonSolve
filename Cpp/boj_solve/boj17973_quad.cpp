@@ -100,7 +100,7 @@ void solve() {
 				if (MIN > A) MIN = A, cnt = 0;
 				else if (MIN == A) {
 					cnt++;
-					if (ccw(P[Q[j]], P[Q[k]], P[Q[ov]]) == ccw(P[Q[j]], P[Q[k]], P[Q[ou]])) cnt++;
+					if (ccw(P[Q[j]], P[Q[k]], P[Q[ov]]) != ccw(P[Q[j]], P[Q[k]], P[Q[ou]])) cnt++;
 				}
 			}
 		}
