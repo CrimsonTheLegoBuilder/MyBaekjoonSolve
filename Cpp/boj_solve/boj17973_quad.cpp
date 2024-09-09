@@ -93,14 +93,14 @@ void solve() {
 		j = std::max(0, ou - 3);
 		J = ou;
 		k = ov + 1;
-		K = std::min(N, ov + 3);
+		K = std::min(N, ov + 4);
 		for (j; j < J; j++) {
 			for (k; k < K; k++) {
 				ll A = std::abs(cross(P[Q[j]], P[Q[ou]], P[Q[ov]])) + std::abs(cross(P[Q[k]], P[Q[ou]], P[Q[ov]]));
 				if (MIN > A) MIN = A, cnt = 0;
 				else if (MIN == A) {
 					cnt++;
-					if (cross(P[Q[j]], P[Q[k]], P[Q[ov]]) > 0 == cross(P[Q[j]], P[Q[k]], P[Q[ou]]) > 0) cnt++;
+					if (ccw(P[Q[j]], P[Q[k]], P[Q[ov]]) == ccw(P[Q[j]], P[Q[k]], P[Q[ou]])) cnt++;
 				}
 			}
 		}
