@@ -9,7 +9,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ll INF = 1e18;
-const int LEN = 250;
+const int LEN = 1e3;
 const ld TOL = 1e-9;
 const ld PI = acos(-1);
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
@@ -78,7 +78,9 @@ void solve() {
 	std::sort(P, P + N);
 	for (int i = 0; i < N; i++) OD[i] = i, Q[i] = i;
 	E = 0;
-	for (int i = 0; i < N; i++) for (int j = i + 1; j < N; j++) events[E++] = Seg(i, j);
+	for (int i = 0; i < N; i++)
+		for (int j = i + 1; j < N; j++)
+			events[E++] = Seg(i, j);
 	std::sort(events, events + E);
 	ll quad = 0, cnt = 0;
 	ll MIN = INF;
@@ -88,19 +90,19 @@ void solve() {
 		OD[u] = ov; OD[v] = ou;
 		Q[ou] = v; Q[ov] = u;
 		assert(ov - ou == 1);
-		quad += 1ll * ou * (N - 1ll - ov);
+		quad += (ll)ou * (N - 1ll - ov);
 		int j, k, J, K;
-		j = std::max(0, ou - 3);
+		j = std::max(0, ou - 2);
 		J = ou;
 		k = ov + 1;
-		K = std::min(N, ov + 4);
-		for (j; j < J; j++) {
-			for (k; k < K; k++) {
+		K = std::min(N, ov + 3);
+		for (; j < J; j++) {
+			for (; k < K; k++) {
 				ll A = std::abs(cross(P[Q[j]], P[Q[ou]], P[Q[ov]])) + std::abs(cross(P[Q[k]], P[Q[ou]], P[Q[ov]]));
 				if (MIN > A) MIN = A, cnt = 0;
-				else if (MIN == A) {
+				if (MIN == A) {
 					cnt++;
-					if (ccw(P[Q[j]], P[Q[k]], P[Q[ov]]) != ccw(P[Q[j]], P[Q[k]], P[Q[ou]])) cnt++;
+					if (ccw(P[Q[j]], P[Q[k]], P[Q[ov]]) == ccw(P[Q[j]], P[Q[k]], P[Q[ou]])) cnt++;
 				}
 			}
 		}
@@ -108,4 +110,4 @@ void solve() {
 	std::cout << quad + cnt << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj18497
+int main() { solve(); return 0; }//boj17973 Quadrilaterals  refer to JusticeHui
