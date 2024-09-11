@@ -123,7 +123,8 @@ bool inner_check(const Polygon& H, const Pii& p) {
 }
 struct Pos {
 	ld x, y;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	int i;
+	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { i = -1; }
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -221,8 +222,22 @@ int sweep(const Polygonf& HF, const int& xs, const int& ys) {
 		cnt = 0;
 		y = 0;
 		norm(y, tmp[i].y, ys);
+		if (sign(tmp[i].y - y) > 0) y += ys;
+		if (tmp[i].y > y) y += ys;
 		for (int k = i; k < j; k++) {
+			cnt++;
+			if (k < j - 1 && zero(tmp[k].y - tmp[k + 1].y)) continue;
+			if (sign(y - tmp[k].y) >= 0) continue;
+			y += ys;
+			if (!(cnt % 2)) continue;
+			if (cnt == 1) {
+				if (tmp[k].i != -1) {
 
+				}
+				else {
+					S.insert(Pii((int)tmp[k].x + 1e-1, y));
+				}
+			}
 		}
 	}
 	return (int)S.size();
@@ -294,11 +309,11 @@ void solve() {
 		}
 	}
 	Polygonf HF(N);
-	for (int i = 0; i < N; i++) HF[i] = P(H[i]);
+	for (int i = 0; i < N; i++) HF[i] = P(H[i]), HF[i].i = i;
 	std::sort(V.begin(), V.end());
 	V.erase(unique(V.begin(), V.end()), V.end());
 	int sz = V.size();
-	int cnt = 1e5;
+	int cnt = 1e6;
 	for (int z = 0; z < sz; z++) {
 		Pos s = V[z];
 		Polygonf C = HF;
