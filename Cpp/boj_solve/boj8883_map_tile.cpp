@@ -75,7 +75,7 @@ bool intersect(const Pii& s1, const Pii& s2, const Pii& d1, const Pii& d2, const
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-ll area(Polygon& H) {
+ll area(const Polygon& H) {
 	ll ret = 0;
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) ret += H[i] / H[(i + 1) % sz];
@@ -115,7 +115,7 @@ bool inner_check(const Polygon& H, const Pii& p) {
 	for (int i = 0; i < sz; i++) if (ccw(H[i], H[(i + 1) % sz], p) < 0) return 0;
 	return 1;
 }
-int bfs(int x, int y, const int& val) {
+int bfs(const int& x, const int& y, const int& val) {
 	Pii DRC[4] = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
 	std::queue<Pii> Q;
 	Q.push(Pii(x, y));
@@ -316,8 +316,8 @@ int sweep(const Polygonf& HF, const int& xs, const int& ys) {
 	MINX = (int)lx / xs;
 	MAXY = (int)uy / ys;
 	MINY = (int)ly / ys;
-	MAXX++;
-	MAXY++;
+	MAXX += 2;
+	MAXY += 2;
 	for (int i = MINY; i < MAXY; i++) {
 		for (int j = MINX; j < MAXX; j++) {
 			if (!board[i][j]) {
@@ -341,8 +341,8 @@ void solve() {
 	for (int i = 0; i < N; i++) std::cin >> H[i], H[i] += Pii(100, 100);
 	norm(H);
 	Pii S = H[0];
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
+	for (int i = 0; i < N; i++) {//O(50)
+		for (int j = 0; j < N; j++) {//O(50 * 50)
 			Pii I = H[i], J = H[j], K = H[(j + 1) % N];
 			int x = I.x, y = J.y;
 			Pii s = S - Pii(x, y);
@@ -355,7 +355,7 @@ void solve() {
 			int kx = I.x;
 			norm(kx, K.x, xs);
 			Pii vec = K - J;
-			for (int kw = jx; kw <= kx; kw += xs) {
+			for (int kw = jx; kw <= kx; kw += xs) {//O(50 * 50 * 20)
 				int cur = kw * xs + I.x;
 				if (J.x > cur || cur > K.x) continue;
 				ld yh = J.y + ((ld)kw - J.x) * vec.y / vec.x;
