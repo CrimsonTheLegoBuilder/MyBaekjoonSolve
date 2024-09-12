@@ -9,6 +9,7 @@
 #include <array>
 #include <tuple>
 #include <unordered_set>
+#include <queue>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -24,6 +25,8 @@ inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
 
 int N, xs, ys;
+short int board[30][30];
+ll MAXX, MAXY, MINX, MINY;
 struct Pii {
 	int x, y;
 	Pii(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -120,6 +123,25 @@ bool inner_check(const Polygon& H, const Pii& p) {
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) if (ccw(H[i], H[(i + 1) % sz], p) < 0) return 0;
 	return 1;
+}
+Pii DRC[4] = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
+std::queue<Pii> Q;
+int bfs(int x, int y, const int& val) {
+	Q.push(Pii(x, y));
+	board[y][x] = val;
+	int cnt = 1;
+	while (Q.size()) {
+		Pii p = Q.front(); Q.pop();
+		for (int i = 0; i < 4; i++) {
+			Pii w = p + DRC[i];
+			if ((MINX <= w.x) && (w.x <= MAXX) && (MINY <= w.y) && (w.y <= MAXY) && !board[w.y][w.x]) {
+				Q.push(w);
+				board[w.y][w.x] = val;
+				cnt++;
+			}
+		}
+	}
+	return cnt;
 }
 struct Pos {
 	ld x, y;
@@ -241,6 +263,72 @@ int sweep(const Polygonf& HF, const int& xs, const int& ys) {
 		}
 	}
 	return (int)S.size();
+}
+void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {
+	int sx = 0, ex = 0, sy = 0, ey = 0;
+	norm(sx, cur.x, xs);
+	norm(ex, nxt.x, xs);
+	norm(sy, cur.y, ys);
+	norm(ey, nxt.y, ys);
+	Pos d = nxt - cur;
+	if (!(sx - ex)) {
+		if (d.y > 0) for (int i = cur.y; i < nxt.y; i++) board[i][sx % xs + 1] = 1;
+		else if (d.y < 0) for (int i = nxt.y; i < cur.y; i++) board[i][sx % xs] = 1;
+		return;
+	}
+	if (!(sy - ey)) {
+		if (d.x > 0) for (int j = cur.x; j < nxt.x; j++) board[sy % ys][j] = 1;
+		else if (d.x < 0) for (int j = nxt.x; j < cur.x; j++) board[sy % ys][j] = 1;
+		return;
+	}
+	Pos s = cur, e = nxt;
+	if (e < s) std::swap(s, e);
+	int j = s.x, i = s.y;
+	if (std::abs(s.x - e.x) >= std::abs(s.y - e.y)) {
+		if (s.y < e.y) {
+			while (i < e.y) {
+				while (j < e.x && cross(s, e, Pos(j, i + 1)) > 0 && cross(s, e, Pos(j + 1, i)) < 0) {
+					board[i][j] = 1;
+					j++;
+				}
+				if (cross(s, e, Pos(j - 1, i + 2)) > 0 && cross(s, e, Pos(j, i + 1)) < 0) j--;
+				i++;
+			}
+		}
+		if (s.y > e.y) {
+			while (i > e.y) {
+				while (j < e.x && cross(s, e, Pos(j + 1, i)) > 0 && cross(s, e, Pos(j, i - 1)) < 0) {
+					board[i - 1][j] = 1;
+					j++;
+				}
+				if (cross(s, e, Pos(j, i - 1)) > 0 && cross(s, e, Pos(j - 1, i - 2)) < 0) j--;
+				i--;
+			}
+		}
+	}
+	else {
+		if (s.y < e.y) {
+			while (j < e.x) {
+				while (i < e.y && cross(s, e, Pos(j, i + 1)) > 0 && cross(s, e, Pos(j + 1, i)) < 0) {
+					board[i][j] = 1;
+					i++;
+				}
+				if (cross(s, e, Pos(j + 1, i)) > 0 && cross(s, e, Pos(j + 2, i - 1)) < 0) i--;
+				j++;
+			}
+		}
+		if (s.y > e.y) {
+			while (j < e.x) {
+				while (i > e.y && cross(s, e, Pos(j + 1, i)) > 0 && cross(s, e, Pos(j, i - 1)) < 0) {
+					board[i - 1][j] = 1;
+					i--;
+				}
+				if (cross(s, e, Pos(j + 2, i + 1)) > 0 && cross(s, e, Pos(j + 1, i)) < 0) i++;
+				j++;
+			}
+		}
+	}
+	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
