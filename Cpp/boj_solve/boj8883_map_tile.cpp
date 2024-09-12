@@ -195,6 +195,18 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ld ret = c
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) > 0; }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
+bool inner_check(std::vector<Pos>& H, const Pos& p) {
+	int sz = H.size(), cnt = 0;
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (cur.y == nxt.y) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return cnt & 1;
+}
 Pos P(const Pii& p) { return Pos((ld)p.x, (ld)p.y); }
 Pii P(const Pos& p) { return Pii(p.x + TOL, p.y + TOL); }
 void norm(int& x, const int& vx, const int& xs) {
@@ -208,61 +220,12 @@ void norm(int& x, const ld& vx, const int& xs) {
 	return;
 }
 int sweep(const Polygonf& HF, const int& xs, const int& ys) {
-	SetPii S;
-	Polygonf tmp;
+	memset(board, 0, sizeof board);
 	int sz = HF.size();
 	for (int i = 0; i < sz; i++) {
-		const Pos& I1 = HF[i], & I2 = HF[(i + 1) % sz];
-		Pos s = I1, e = I2;
-		norm(s, xs, ys);
-		if (zero(s.x)) tmp.push_back(I1);
-		norm(e, xs, ys);
-		if (zero(e.x)) {
-			const Pos& I3 = HF[(i + 2) % sz];
-			Pos I0 = I2 + Pos(0, 1);
-			if (ccw(I0, I2, I1) == ccw(I0, I2, I3)) tmp.push_back(I2);
-		}
-		if (zero(I1.x - I2.x)) continue;
-		int lx = 0, rx = 0;
-		ld minx = std::min(I1.x, I2.x), maxx = std::max(I1.x, I2.x);
-		ld miny = std::min(I1.y, I2.y), maxy = std::max(I1.y, I2.y);
-		norm(lx, minx, xs);
-		norm(rx, maxx, xs);
-		if (zero(lx - minx)) lx += xs;
-		if (zero(rx - maxx)) rx -= xs;
-		for (int x = lx; x <= rx; x += xs) {
-			Pos ix = intersection(I1, I2, Pos(x, miny), Pos(x, maxy));
-			tmp.push_back(ix);
-		}
+		Pos cur = HF[i], nxt = HF[(i + 1) % sz];
+		sweep(cur, nxt, xs, ys);
 	}
-	std::sort(tmp.begin(), tmp.end());
-	int szt = tmp.size(), cnt;
-	int y;
-	for (int i = 0, j = 0; i < szt; i = j) {
-		ld x = tmp[i].x;
-		while (j < szt && zero(x - tmp[j].x)) j++;
-		cnt = 0;
-		y = 0;
-		norm(y, tmp[i].y, ys);
-		if (sign(tmp[i].y - y) > 0) y += ys;
-		if (tmp[i].y > y) y += ys;
-		for (int k = i; k < j; k++) {
-			cnt++;
-			if (k < j - 1 && zero(tmp[k].y - tmp[k + 1].y)) continue;
-			if (sign(y - tmp[k].y) >= 0) continue;
-			y += ys;
-			if (!(cnt % 2)) continue;
-			if (cnt == 1) {
-				if (tmp[k].i != -1) {
-
-				}
-				else {
-					S.insert(Pii((int)tmp[k].x + 1e-1, y));
-				}
-			}
-		}
-	}
-	return (int)S.size();
 }
 void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {
 	int sx = 0, ex = 0, sy = 0, ey = 0;
@@ -272,30 +235,51 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {
 	norm(ey, nxt.y, ys);
 	Pos d = nxt - cur;
 	if (!(sx - ex)) {
-		if (d.y > 0) for (int i = cur.y; i < nxt.y; i++) board[i][sx % xs + 1] = 1;
-		else if (d.y < 0) for (int i = nxt.y; i < cur.y; i++) board[i][sx % xs] = 1;
+		if (sign(d.y) >= 0) {
+			if (zero(ey - nxt.y)) ey -= ys;
+			if (zero(cur.x - sx) && zero(nxt.x - ex)) for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs - 1] = 1;
+			else for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs] = 1;
+		}
+		else if (sign(d.y) < 0) {
+			if (zero(sy - cur.y)) sy -= ys;
+			for (int i = ey; i <= sy; i++) board[i / ys][sx / xs] = 1;
+		}
 		return;
 	}
 	if (!(sy - ey)) {
-		if (d.x > 0) for (int j = cur.x; j < nxt.x; j++) board[sy % ys][j] = 1;
-		else if (d.x < 0) for (int j = nxt.x; j < cur.x; j++) board[sy % ys][j] = 1;
+		if (sign(d.x) >= 0) {
+			if (zero(ex - nxt.x)) ex -= xs;
+			if (zero(cur.y - sy) && zero(nxt.y - ey)) for (int i = sx; i <= ex; i + xs) board[sy / ys - 1][i / xs] = 1;
+			else for (int i = sx; i <= ex; i + xs) board[sy / ys][i / xs] = 1;
+		}
+		else if (sign(d.x) < 0) {
+			if (zero(sx - cur.x)) sx -= xs;
+			for (int i = ex; i <= sx; i++) board[sy / ys][i / xs] = 1;
+		}
 		return;
 	}
 	Pos s = cur, e = nxt;
-	if (e < s) std::swap(s, e);
-	int j = s.x, i = s.y;
-	if (std::abs(s.x - e.x) >= std::abs(s.y - e.y)) {
+	if (e < s) std::swap(s, e), std::swap(sx, ex), std::swap(sy, ey);
+	int j = sx, i = sy;
+	if (zero(e.x - ex)) ex -= xs;
+	if (zero(e.y - ey)) ey -= ys;
+	if (sign(std::abs(e.x - s.x) - std::abs(e.y - s.y)) >= 0) {
 		if (s.y < e.y) {
-			while (i < e.y) {
-				while (j < e.x && cross(s, e, Pos(j, i + 1)) > 0 && cross(s, e, Pos(j + 1, i)) < 0) {
-					board[i][j] = 1;
-					j++;
+			if (zero(e.x - ex)) ex -= xs;
+			if (zero(e.y - ey)) ey -= ys;
+			board[i / ys][j / xs] = 1;
+			//for ()
+			while (i <= ey) {
+				while (j <= ex && cross(s, e, Pos(j, i + 1)) > 0 && cross(s, e, Pos(j + 1, i)) < 0) {
+					board[i / ys][j / xs] = 1;
+					j += xs;
 				}
 				if (cross(s, e, Pos(j - 1, i + 2)) > 0 && cross(s, e, Pos(j, i + 1)) < 0) j--;
-				i++;
+				i += ys;
 			}
 		}
-		if (s.y > e.y) {
+		else if (s.y > e.y) {
+			board[i / ys - zero(s.y - sy)][j / xs] = 1;
 			while (i > e.y) {
 				while (j < e.x && cross(s, e, Pos(j + 1, i)) > 0 && cross(s, e, Pos(j, i - 1)) < 0) {
 					board[i - 1][j] = 1;
@@ -407,6 +391,11 @@ void solve() {
 		Polygonf C = HF;
 		Pos v = s - HF[0];
 		for (int i = 0; i < N; i++) HF[i] += v;
+		ld miny = 1e9;
+		for (int i = 0; i < N; i++) miny = std::min(miny, HF[i].y);
+		int y = 0;
+		norm(y, miny, ys);
+		if (y != 0) for (int i = 0; i < N; i++) HF[i].y -= miny;
 		cnt = std::min(cnt, sweep(HF, xs, ys));
 	}
 	std::cout << cnt << "\n";
