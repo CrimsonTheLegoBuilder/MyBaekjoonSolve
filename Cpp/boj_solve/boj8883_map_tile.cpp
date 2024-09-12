@@ -261,54 +261,47 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {
 	Pos s = cur, e = nxt;
 	if (e < s) std::swap(s, e), std::swap(sx, ex), std::swap(sy, ey);
 	int j = sx, i = sy;
-	if (zero(e.x - ex)) ex -= xs;
-	if (zero(e.y - ey)) ey -= ys;
 	if (sign(std::abs(e.x - s.x) - std::abs(e.y - s.y)) >= 0) {
+		if (zero(e.x - ex)) ex -= xs;
 		if (s.y < e.y) {
-			if (zero(e.x - ex)) ex -= xs;
-			if (zero(e.y - ey)) ey -= ys;
 			board[i / ys][j / xs] = 1;
-			//for ()
-			while (i <= ey) {
-				while (j <= ex && cross(s, e, Pos(j, i + 1)) > 0 && cross(s, e, Pos(j + 1, i)) < 0) {
-					board[i / ys][j / xs] = 1;
-					j += xs;
-				}
-				if (cross(s, e, Pos(j - 1, i + 2)) > 0 && cross(s, e, Pos(j, i + 1)) < 0) j--;
-				i += ys;
+			for (j; j <= ex; j += xs) {
+				Pos ip = intersection(s, e, Pos(j, sy), Pos(j, ey));
+				int y = sy;
+				norm(y, ip.y, ys);
+				board[y / ys][j / xs] = 1;
 			}
 		}
 		else if (s.y > e.y) {
 			board[i / ys - zero(s.y - sy)][j / xs] = 1;
-			while (i > e.y) {
-				while (j < e.x && cross(s, e, Pos(j + 1, i)) > 0 && cross(s, e, Pos(j, i - 1)) < 0) {
-					board[i - 1][j] = 1;
-					j++;
-				}
-				if (cross(s, e, Pos(j, i - 1)) > 0 && cross(s, e, Pos(j - 1, i - 2)) < 0) j--;
-				i--;
+			for (j; j <= ex; j += xs) {
+				Pos ip = intersection(s, e, Pos(j, sy), Pos(j, ey));
+				int y = sy;
+				norm(y, ip.y, ys);
+				board[y / ys - zero(ip.y - sy)][j / xs] = 1;
 			}
 		}
 	}
 	else {
 		if (s.y < e.y) {
-			while (j < e.x) {
-				while (i < e.y && cross(s, e, Pos(j, i + 1)) > 0 && cross(s, e, Pos(j + 1, i)) < 0) {
-					board[i][j] = 1;
-					i++;
-				}
-				if (cross(s, e, Pos(j + 1, i)) > 0 && cross(s, e, Pos(j + 2, i - 1)) < 0) i--;
-				j++;
+			if (zero(e.y - ey)) ey -= ys;
+			board[i / ys][j / xs] = 1;
+			for (i; i <= ey; i += ys) {
+				Pos ip = intersection(s, e, Pos(sx, i), Pos(ex, i));
+				int x = sx;
+				norm(x, ip.x, xs);
+				board[i / ys][x / xs] = 1;
 			}
 		}
 		if (s.y > e.y) {
-			while (j < e.x) {
-				while (i > e.y && cross(s, e, Pos(j + 1, i)) > 0 && cross(s, e, Pos(j, i - 1)) < 0) {
-					board[i - 1][j] = 1;
-					i--;
-				}
-				if (cross(s, e, Pos(j + 2, i + 1)) > 0 && cross(s, e, Pos(j + 1, i)) < 0) i++;
-				j++;
+			if (zero(s.y - sy)) sy -= ys;
+			i = sy;
+			board[i / ys - zero(s.x - sx)][j / xs] = 1;
+			for (i; i >= ey; i -= ys) {
+				Pos ip = intersection(s, e, Pos(sx, i), Pos(ex, i));
+				int x = sx;
+				norm(x, ip.x, xs);
+				board[i / ys - zero(ip.x - sx)][x / xs] = 1;
 			}
 		}
 	}
