@@ -221,12 +221,21 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {
 	norm(ey, nxt.y, ys);
 	Pos d = nxt - cur;
 	if (!(sx - ex)) {
-		if (sign(d.y) >= 0) {
+		if (sign(nxt.x - cur.x) == 0 && sign(d.y) > 0) {
 			if (zero(ey - nxt.y)) ey -= ys;
 			if (zero(cur.x - sx) && zero(nxt.x - ex)) for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs - 1] = 1;
 			else for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs] = 1;
 		}
-		else if (sign(d.y) < 0) {
+		else if (sign(nxt.x - cur.x) < 0 && sign(d.y) == 0) {
+			if (zero(cur.y - sy) && zero(nxt.y - ey)) board[sy / ys - 1][ex / xs] = 1;
+			else board[sy / ys][ex / xs] = 1;
+		}
+		else if (sign(d.y) > 0) {
+			if (zero(ey - nxt.y)) ey -= ys;
+			if (zero(cur.x - sx) && zero(nxt.x - ex)) for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs - 1] = 1;
+			else for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs] = 1;
+		}
+		else if (sign(d.y) <= 0) {
 			if (zero(sy - cur.y)) sy -= ys;
 			for (int i = ey; i <= sy; i++) board[i / ys][sx / xs] = 1;
 		}
@@ -327,7 +336,7 @@ int sweep(const Polygonf& HF, const int& xs, const int& ys) {
 		}
 	}
 	int cnt = 0;
-	for (int i = MINY; i < MAXY; i++) for (int j = MINX; j < MAXX; j++) if (board[i][j]) cnt++;
+	for (int i = MINY; i < MAXY; i++) for (int j = MINX; j < MAXX; j++) if (board[i][j] == 1) cnt++;
 	return cnt;
 }
 void solve() {
