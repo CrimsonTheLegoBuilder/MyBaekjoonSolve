@@ -251,6 +251,7 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 		if (zero(e.x - ex)) ex -= xs;
 		if (s.y < e.y) {
 			board[i / ys][j / xs] = 1;
+			if (zero(e.y - ey)) ey -= ys;
 			while (i <= ey) {
 				while (j <= ex && ccw(s, e, Pos(j, (ld)i + ys)) > 0 && ccw(s, e, Pos((ld)j + xs, i)) < 0) {
 					board[i / ys][j / xs] = 1;
@@ -288,12 +289,11 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 			}
 		}
 		else if (s.y > e.y) {
-			board[i / ys - zero(s.x - sx)][j / xs] = 1;
-			if (zero(s.y - sy)) sy -= ys;
-			i -= sy;
+			board[i / ys - zero(s.y - sy)][j / xs] = 1;
+			if (!zero(s.y - sy)) sy += ys;
 			while (j <= ex) {
 				while (i >= ey && ccw(s, e, Pos((ld)j + xs, (ld)i)) > 0 && ccw(s, e, Pos((ld)j, (ld)i - ys)) < 0) {
-					board[i - 1][j] = 1;
+					board[i / ys - 1][j / xs] = 1;
 					i -= ys;
 				}
 				if (ccw(s, e, Pos((ld)j + 2. * xs, (ld)i + ys)) > 0 && ccw(s, e, Pos((ld)j + xs, (ld)i)) < 0) i += ys;
