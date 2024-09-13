@@ -213,43 +213,34 @@ void norm(int& x, const ld& vx, const int& xs) {
 	while (sign(x - (vx + xs)) >= 0) x -= xs;
 	return;
 }
-void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {
+void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from 6632 arable
 	int sx = 0, ex = 0, sy = 0, ey = 0;
 	norm(sx, cur.x, xs);
 	norm(ex, nxt.x, xs);
 	norm(sy, cur.y, ys);
 	norm(ey, nxt.y, ys);
 	Pos d = nxt - cur;
-	if (!(sx - ex)) {
-		if (sign(nxt.x - cur.x) == 0 && sign(d.y) > 0) {
+	if (zero(d.x)) {
+		if (sign(d.y) > 0) {
 			if (zero(ey - nxt.y)) ey -= ys;
 			if (zero(cur.x - sx) && zero(nxt.x - ex)) for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs - 1] = 1;
 			else for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs] = 1;
 		}
-		else if (sign(nxt.x - cur.x) < 0 && sign(d.y) == 0) {
-			if (zero(cur.y - sy) && zero(nxt.y - ey)) board[sy / ys - 1][ex / xs] = 1;
-			else board[sy / ys][ex / xs] = 1;
-		}
-		else if (sign(d.y) > 0) {
-			if (zero(ey - nxt.y)) ey -= ys;
-			if (zero(cur.x - sx) && zero(nxt.x - ex)) for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs - 1] = 1;
-			else for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs] = 1;
-		}
-		else if (sign(d.y) <= 0) {
+		else if (sign(d.y) < 0) {
 			if (zero(sy - cur.y)) sy -= ys;
-			for (int i = ey; i <= sy; i++) board[i / ys][sx / xs] = 1;
+			for (int i = ey; i <= sy; i += xs) board[i / ys][sx / xs] = 1;
 		}
 		return;
 	}
-	if (!(sy - ey)) {
-		if (sign(d.x) >= 0) {
+	if (zero(d.y)) {
+		if (sign(d.x) > 0) {
 			if (zero(ex - nxt.x)) ex -= xs;
-			if (zero(cur.y - sy) && zero(nxt.y - ey)) for (int i = sx; i <= ex; i + xs) board[sy / ys - 1][i / xs] = 1;
 			else for (int i = sx; i <= ex; i + xs) board[sy / ys][i / xs] = 1;
 		}
 		else if (sign(d.x) < 0) {
 			if (zero(sx - cur.x)) sx -= xs;
-			for (int i = ex; i <= sx; i++) board[sy / ys][i / xs] = 1;
+			if (zero(cur.y - sy) && zero(nxt.y - ey)) for (int i = ex; i <= sx; i += xs) board[sy / ys - 1][i / xs] = 1;
+			for (int i = ex; i <= sx; i += xs) board[sy / ys][i / xs] = 1;
 		}
 		return;
 	}
@@ -260,50 +251,53 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {
 		if (zero(e.x - ex)) ex -= xs;
 		if (s.y < e.y) {
 			board[i / ys][j / xs] = 1;
-			j += xs;
-			for (j; j <= ex; j += xs) {
-				Pos ip = intersection(s, e, Pos(j, sy), Pos(j, ey));
-				int y = sy;
-				norm(y, ip.y, ys);
-				board[y / ys][j / xs] = 1;
-				if (j / xs > 0 && intersect(s, e, Pos((ld)j - xs, y), Pos(j, y))) board[y / ys][j / xs - 1] = 1;
+			while (i <= ey) {
+				while (j <= ex && ccw(s, e, Pos(j, (ld)i + ys)) > 0 && ccw(s, e, Pos((ld)j + xs, i)) < 0) {
+					board[i / ys][j / xs] = 1;
+					j += xs;
+				}
+				if (ccw(s, e, Pos((ld)j - xs, (ld)i + 2. * ys)) > 0 && ccw(s, e, Pos(j, (ld)i + ys)) < 0) j -= xs;
+				i += ys;
 			}
 		}
 		else if (s.y > e.y) {
 			board[i / ys - zero(s.y - sy)][j / xs] = 1;
-			j += xs;
-			for (j; j <= ex; j += xs) {
-				Pos ip = intersection(s, e, Pos(j, sy), Pos(j, ey));
-				int y = sy;
-				norm(y, ip.y, ys);
-				board[y / ys - zero(ip.y - sy)][j / xs] = 1;
-				if (j / xs > 0 && intersect(s, e, Pos((ld)j - xs, y), Pos(j, y))) board[y / ys][j / xs - 1] = 1;
+			if (!zero(s.y - sy)) sy += ys;
+			while (i >= ey) {
+				while (j <= ex && ccw(s, e, Pos((ld)j + xs, i)) > 0 && ccw(s, e, Pos(j, (ld)i - ys)) < 0) {
+					board[i / ys - 1][j / xs] = 1;
+					j += xs;
+				}
+				if (ccw(s, e, Pos(j, (ld)i - ys)) > 0 && ccw(s, e, Pos((ld)j - xs, (ld)i - 2. * ys)) < 0) j -= xs;
+				i -= ys;
 			}
 		}
 	}
 	else {
+		if (zero(e.x - ex)) ex -= xs;
 		if (s.y < e.y) {
-			if (zero(e.y - ey)) ey -= ys;
 			board[i / ys][j / xs] = 1;
-			i += ys;
-			for (i; i <= ey; i += ys) {
-				Pos ip = intersection(s, e, Pos(sx, i), Pos(ex, i));
-				int x = sx;
-				norm(x, ip.x, xs);
-				board[i / ys][x / xs] = 1;
-				if (i / ys > 0 && intersect(s, e, Pos(x, (ld)i - ys), Pos(x, i))) board[i / ys - 1][x / xs] = 1;
+			if (zero(e.y - ey)) ey -= ys;
+			while (j <= ex) {
+				while (i <= ey && ccw(s, e, Pos((ld)j, (ld)i + ys)) > 0 && ccw(s, e, Pos((ld)j + xs, (ld)i)) < 0) {
+					board[i / ys][j / xs] = 1;
+					i += ys;
+				}
+				if (ccw(s, e, Pos((ld)j + xs, (ld)i)) > 0 && ccw(s, e, Pos((ld)j + 2. * xs, (ld)i - ys)) < 0) i -= ys;
+				j += xs;
 			}
 		}
-		if (s.y > e.y) {
-			if (zero(s.y - sy)) sy -= ys;
+		else if (s.y > e.y) {
 			board[i / ys - zero(s.x - sx)][j / xs] = 1;
+			if (zero(s.y - sy)) sy -= ys;
 			i -= sy;
-			for (i; i >= ey; i -= ys) {
-				Pos ip = intersection(s, e, Pos(sx, i), Pos(ex, i));
-				int x = sx;
-				norm(x, ip.x, xs);
-				board[i / ys - zero(ip.x - sx)][x / xs] = 1;
-				if (i / ys < ey / ys && intersect(s, e, Pos(x, i), Pos(x, (ld)i + ys))) board[i / ys + 1][x / xs] = 1;
+			while (j <= ex) {
+				while (i >= ey && ccw(s, e, Pos((ld)j + xs, (ld)i)) > 0 && ccw(s, e, Pos((ld)j, (ld)i - ys)) < 0) {
+					board[i - 1][j] = 1;
+					i -= ys;
+				}
+				if (ccw(s, e, Pos((ld)j + 2. * xs, (ld)i + ys)) > 0 && ccw(s, e, Pos((ld)j + xs, (ld)i)) < 0) i += ys;
+				j += xs;
 			}
 		}
 	}
@@ -428,3 +422,103 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj8883
+
+
+
+
+//void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {
+//	int sx = 0, ex = 0, sy = 0, ey = 0;
+//	norm(sx, cur.x, xs);
+//	norm(ex, nxt.x, xs);
+//	norm(sy, cur.y, ys);
+//	norm(ey, nxt.y, ys);
+//	Pos d = nxt - cur;
+//	if (!(sx - ex)) {
+//		if (sign(nxt.x - cur.x) == 0 && sign(d.y) > 0) {
+//			if (zero(ey - nxt.y)) ey -= ys;
+//			if (zero(cur.x - sx) && zero(nxt.x - ex)) for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs - 1] = 1;
+//			else for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs] = 1;
+//		}
+//		else if (sign(nxt.x - cur.x) < 0 && sign(d.y) == 0) {
+//			if (zero(cur.y - sy) && zero(nxt.y - ey)) board[sy / ys - 1][ex / xs] = 1;
+//			else board[sy / ys][ex / xs] = 1;
+//		}
+//		else if (sign(d.y) > 0) {
+//			if (zero(ey - nxt.y)) ey -= ys;
+//			if (zero(cur.x - sx) && zero(nxt.x - ex)) for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs - 1] = 1;
+//			else for (int i = sy; i <= ey; i += ys) board[i / ys][sx / xs] = 1;
+//		}
+//		else if (sign(d.y) <= 0) {
+//			if (zero(sy - cur.y)) sy -= ys;
+//			for (int i = ey; i <= sy; i++) board[i / ys][sx / xs] = 1;
+//		}
+//		return;
+//	}
+//	if (!(sy - ey)) {
+//		if (sign(d.x) >= 0) {
+//			if (zero(ex - nxt.x)) ex -= xs;
+//			if (zero(cur.y - sy) && zero(nxt.y - ey)) for (int i = sx; i <= ex; i + xs) board[sy / ys - 1][i / xs] = 1;
+//			else for (int i = sx; i <= ex; i + xs) board[sy / ys][i / xs] = 1;
+//		}
+//		else if (sign(d.x) < 0) {
+//			if (zero(sx - cur.x)) sx -= xs;
+//			for (int i = ex; i <= sx; i++) board[sy / ys][i / xs] = 1;
+//		}
+//		return;
+//	}
+//	Pos s = cur, e = nxt;
+//	if (e < s) std::swap(s, e), std::swap(sx, ex), std::swap(sy, ey);
+//	int j = sx, i = sy;
+//	if (sign(std::abs(e.x - s.x) - std::abs(e.y - s.y)) >= 0) {
+//		if (zero(e.x - ex)) ex -= xs;
+//		if (s.y < e.y) {
+//			board[i / ys][j / xs] = 1;
+//			j += xs;
+//			for (j; j <= ex; j += xs) {
+//				Pos ip = intersection(s, e, Pos(j, sy), Pos(j, ey));
+//				int y = sy;
+//				norm(y, ip.y, ys);
+//				board[y / ys][j / xs] = 1;
+//				if (j / xs > 0 && intersect(s, e, Pos((ld)j - xs, y), Pos(j, y))) board[y / ys][j / xs - 1] = 1;
+//			}
+//		}
+//		else if (s.y > e.y) {
+//			board[i / ys - zero(s.y - sy)][j / xs] = 1;
+//			j += xs;
+//			for (j; j <= ex; j += xs) {
+//				Pos ip = intersection(s, e, Pos(j, sy), Pos(j, ey));
+//				int y = sy;
+//				norm(y, ip.y, ys);
+//				board[y / ys - zero(ip.y - sy)][j / xs] = 1;
+//				if (j / xs > 0 && intersect(s, e, Pos((ld)j - xs, y), Pos(j, y))) board[y / ys][j / xs - 1] = 1;
+//			}
+//		}
+//	}
+//	else {
+//		if (s.y < e.y) {
+//			if (zero(e.y - ey)) ey -= ys;
+//			board[i / ys][j / xs] = 1;
+//			i += ys;
+//			for (i; i <= ey; i += ys) {
+//				Pos ip = intersection(s, e, Pos(sx, i), Pos(ex, i));
+//				int x = sx;
+//				norm(x, ip.x, xs);
+//				board[i / ys][x / xs] = 1;
+//				if (i / ys > 0 && intersect(s, e, Pos(x, (ld)i - ys), Pos(x, i))) board[i / ys - 1][x / xs] = 1;
+//			}
+//		}
+//		if (s.y > e.y) {
+//			if (zero(s.y - sy)) sy -= ys;
+//			board[i / ys - zero(s.x - sx)][j / xs] = 1;
+//			i -= sy;
+//			for (i; i >= ey; i -= ys) {
+//				Pos ip = intersection(s, e, Pos(sx, i), Pos(ex, i));
+//				int x = sx;
+//				norm(x, ip.x, xs);
+//				board[i / ys - zero(ip.x - sx)][x / xs] = 1;
+//				if (i / ys < ey / ys && intersect(s, e, Pos(x, i), Pos(x, (ld)i + ys))) board[i / ys + 1][x / xs] = 1;
+//			}
+//		}
+//	}
+//	return;
+//}
