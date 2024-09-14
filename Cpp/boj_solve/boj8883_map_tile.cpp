@@ -40,7 +40,6 @@ struct Pii {
 	Pii operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pii& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pii& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	Pii operator ^ (const Pii& p) const { return { x * p.x, y * p.y }; }
 	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
 	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
 	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
