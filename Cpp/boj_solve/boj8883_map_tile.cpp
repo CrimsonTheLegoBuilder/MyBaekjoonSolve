@@ -115,7 +115,7 @@ bool inner_check(const Polygon& H, const Pii& p) {
 	for (int i = 0; i < sz; i++) if (ccw(H[i], H[(i + 1) % sz], p) < 0) return 0;
 	return 1;
 }
-int bfs(const int& x, const int& y, const int& val) {
+int bfs(const int& x, const int& y, const int& val) {//flood fill
 	Pii DRC[4] = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
 	std::queue<Pii> Q;
 	Q.push(Pii(x, y));
@@ -247,8 +247,8 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 	Pos s = cur, e = nxt;
 	if (e < s) std::swap(s, e), std::swap(sx, ex), std::swap(sy, ey);
 	int j = sx, i = sy;
+	if (zero(e.x - ex)) ex -= xs;
 	if (sign(std::abs(e.x - s.x) - std::abs(e.y - s.y)) >= 0) {
-		if (zero(e.x - ex)) ex -= xs;
 		if (s.y < e.y) {
 			board[i / ys][j / xs] = 1;
 			if (zero(e.y - ey)) ey -= ys;
@@ -263,8 +263,8 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 		}
 		else if (s.y > e.y) {
 			board[i / ys - zero(s.y - sy)][j / xs] = 1;
-			if (!zero(s.y - sy)) sy += ys;
-			while (i >= ey) {
+			if (!zero(s.y - sy)) sy += ys, i += ys;
+			while (i > ey) {
 				while (j <= ex && ccw(s, e, Pos((ld)j + xs, i)) > 0 && ccw(s, e, Pos(j, (ld)i - ys)) < 0) {
 					board[i / ys - 1][j / xs] = 1;
 					j += xs;
@@ -275,7 +275,7 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 		}
 	}
 	else {
-		if (zero(e.x - ex)) ex -= xs;
+		//if (zero(e.x - ex)) ex -= xs;
 		if (s.y < e.y) {
 			board[i / ys][j / xs] = 1;
 			if (zero(e.y - ey)) ey -= ys;
@@ -290,9 +290,9 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 		}
 		else if (s.y > e.y) {
 			board[i / ys - zero(s.y - sy)][j / xs] = 1;
-			if (!zero(s.y - sy)) sy += ys;
+			if (!zero(s.y - sy)) sy += ys, i += ys;
 			while (j <= ex) {
-				while (i >= ey && ccw(s, e, Pos((ld)j + xs, (ld)i)) > 0 && ccw(s, e, Pos((ld)j, (ld)i - ys)) < 0) {
+				while (i > ey && ccw(s, e, Pos((ld)j + xs, (ld)i)) > 0 && ccw(s, e, Pos((ld)j, (ld)i - ys)) < 0) {
 					board[i / ys - 1][j / xs] = 1;
 					i -= ys;
 				}
