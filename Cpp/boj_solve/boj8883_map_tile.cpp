@@ -82,7 +82,7 @@ ll area(const Polygon& H) {
 	return ret;
 }
 void norm(Polygon& H) {
-	ll A = area(H);
+	ll A = area(H); assert(A);
 	if (A < 0) std::reverse(H.begin(), H.end());
 	auto s = std::min_element(H.begin(), H.end());
 	std::rotate(H.begin(), s, H.end());
@@ -161,13 +161,6 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygonf;
-Pos norm(Pos& p, const int& x, const int& y) {
-	while (sign(x - p.x) >= 0) p.x -= x;
-	while (sign(p.x) < 0) p.x += x;
-	while (sign(y - p.y) >= 0) p.y -= y;
-	while (sign(p.y) < 0) p.y += y;
-	return p;
-}
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -188,7 +181,7 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+bool inner_check(const Polygonf& H, const Pos& p) {//concave
 	int sz = H.size(), cnt = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
@@ -203,6 +196,13 @@ bool inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 Pos P(const Pii& p) { return Pos((ld)p.x, (ld)p.y); }
 Pii P(const Pos& p) { return Pii(p.x + TOL, p.y + TOL); }
 Pos cen(const int& i, const int& j, const int& xs, const int& ys) { return Pos(xs * (j + .5), ys * (i + .5)); }
+Pos norm(Pos& p, const int& x, const int& y) {//fit in tile (0, 0), (xs, ys)
+	while (sign(p.x) < 0) p.x += x;
+	while (sign(x - p.x) >= 0) p.x -= x;
+	while (sign(p.y) < 0) p.y += y;
+	while (sign(y - p.y) >= 0) p.y -= y;
+	return p;
+}
 void norm(int& x, const int& vx, const int& xs) {
 	while (x < vx) x += xs;
 	while (x >= (vx + xs)) x -= xs;
@@ -348,8 +348,7 @@ void solve() {
 		for (int j = 0; j < N; j++) {//O(50 * 50)
 			Pii I = H[i], J = H[j], K = H[(j + 1) % N];
 			int x = I.x, y = J.y;
-			Pii s = S - Pii(x, y);
-			Pos v = P(s);
+			Pos v = P(S - Pii(x, y));
 			V.push_back(norm(v, xs, ys));
 			if (J.x == K.x) continue;
 			if (J.x > K.x) std::swap(J, K);
@@ -359,22 +358,23 @@ void solve() {
 			norm(kx, K.x, xs);
 			Pii vec = K - J;
 			for (int kw = jx; kw <= kx; kw += xs) {//O(50 * 50 * 20)
-				int cur = kw * xs + I.x;
-				if (J.x > cur || cur > K.x) continue;
+				if (kw < J.x || K.x < kw) continue;
 				ld yh = J.y + ((ld)kw - J.x) * vec.y / vec.x;
 				v = P(S) - Pos(I.x, yh);
 				V.push_back(norm(v, xs, ys));
 			}
 		}
 	}
+	std::sort(V.begin(), V.end());
+	V.erase(unique(V.begin(), V.end()), V.end());
 	for (int i = 0; i < N; i++) {//O(50)
 		Pii I1 = H[i], I2 = H[(i + 1) % N];
 		for (int j = 0; j < N; j++) {//O(50 * 50)
 			Pii J1 = H[j], J2 = H[(j + 1) % N];
 			if (i == j || !cross(I1, I1, J1, J2)) continue;
+			Pii vec = I2 - I1;
 			if (I2 < I1) std::swap(I1, I2);
 			if (J2 < J1) std::swap(J1, J2);
-			Pii vec = I2 - I1;
 			Polygon box = { J1, J1 - vec, J2, J2 - vec };
 			box = graham_scan(box);
 			int lx = 1e9, rx = -1e9, ly = 1e9, uy = -1e9;
@@ -399,10 +399,10 @@ void solve() {
 			}
 		}
 	}
-	Polygonf HF(N);
-	for (int i = 0; i < N; i++) HF[i] = P(H[i]);
 	std::sort(V.begin(), V.end());
 	V.erase(unique(V.begin(), V.end()), V.end());
+	Polygonf HF(N);
+	for (int i = 0; i < N; i++) HF[i] = P(H[i]);
 	int sz = V.size();
 	int cnt = 1e6;
 	for (int z = 0; z < sz; z++) {
