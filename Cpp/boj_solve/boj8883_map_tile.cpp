@@ -345,7 +345,7 @@ void solve() {
 	std::cin >> N >> xs >> ys;
 	Polygon H(N);
 	Polygonf V;//All possible point
-	for (int i = 0; i < N; i++) std::cin >> H[i], H[i] += Pii(100, 100);
+	for (int i = 0; i < N; i++) std::cin >> H[i];// , H[i] += Pii(100, 100);
 	norm(H);
 	Pii S = H[0];
 	for (int i = 0; i < N; i++) {//O(50)
