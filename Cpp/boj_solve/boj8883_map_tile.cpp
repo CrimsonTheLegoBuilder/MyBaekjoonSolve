@@ -197,9 +197,9 @@ Pii P(const Pos& p) { return Pii(p.x + TOL, p.y + TOL); }
 Pos cen(const int& i, const int& j, const int& xs, const int& ys) { return Pos(xs * (j + .5), ys * (i + .5)); }
 Pos norm(Pos& p, const int& x, const int& y) {//fit in tile (0, 0), (xs, ys)
 	while (sign(p.x) < 0) p.x += x;
-	while (sign(x - p.x) >= 0) p.x -= x;
+	while (sign(p.x - x) >= 0) p.x -= x;
 	while (sign(p.y) < 0) p.y += y;
-	while (sign(y - p.y) >= 0) p.y -= y;
+	while (sign(p.y - y) >= 0) p.y -= y;
 	return p;
 }
 void norm(int& x, const int& vx, const int& xs) {
