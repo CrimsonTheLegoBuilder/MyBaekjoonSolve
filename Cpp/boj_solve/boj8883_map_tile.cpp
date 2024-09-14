@@ -235,12 +235,12 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 	if (zero(d.y)) {
 		if (sign(d.x) > 0) {
 			if (zero(ex - nxt.x)) ex -= xs;
-			else for (int i = sx; i <= ex; i + xs) board[sy / ys][i / xs] = 1;
+			for (int i = sx; i <= ex; i += xs) board[sy / ys][i / xs] = 1;
 		}
 		else if (sign(d.x) < 0) {
 			if (zero(sx - cur.x)) sx -= xs;
 			if (zero(cur.y - sy) && zero(nxt.y - ey)) for (int i = ex; i <= sx; i += xs) board[sy / ys - 1][i / xs] = 1;
-			for (int i = ex; i <= sx; i += xs) board[sy / ys][i / xs] = 1;
+			else for (int i = ex; i <= sx; i += xs) board[sy / ys][i / xs] = 1;
 		}
 		return;
 	}
