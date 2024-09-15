@@ -336,7 +336,6 @@ void solve() {
 			Pii J1 = H[j], J2 = H[(j + 1) % N];
 			if (i == j || !cross(I1, I2, J1, J2)) continue;
 			Pii vec = I2 - I1;
-			if (J2 < J1) std::swap(J1, J2);
 			Polygon box = { J1, J1 - vec, J2, J2 - vec };
 			box = graham_scan(box);
 			assert(box.size() == 4);

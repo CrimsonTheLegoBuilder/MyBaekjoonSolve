@@ -1,17 +1,18 @@
 #include <iostream>
 #include <algorithm>
-#include <cmath>
+#include <cstring>
 #include <vector>
-#include <unordered_set>
+#include <cmath>
+typedef long long ll;
+typedef long double ld;
+const ld METER = 1609.344;
+const ld LITER = 3.785411784;
+ld A;
 
-int N, A, B, ans = 2001;
 int main() {
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cin >> N;
-	while (N--) {
-		std::cin >> A >> B;
-		if (A <= B) ans = std::min(ans, B);
-	}
-	//std::cout << (ans != 2001 ? ans : -1) << "\n";
+	std::cout << std::fixed;
+	std::cout.precision(7);
+	std::cin >> A;
+	std::cout << 100000. / (A / LITER * METER) << "\n";
 	return 0;
 }
