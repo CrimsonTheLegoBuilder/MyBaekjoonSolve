@@ -1,3 +1,4 @@
+/*
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
@@ -96,12 +97,40 @@ void solve() {
 		std::cout << total << "\n";
 		if (zero(total)) std::cout << total << "\n";
 		else std::cout << total / ratio << "\n";
-		/*
-		1.2282858792
-		1.214890
-		하 ㅅㅂ 이거 암만 봐도 사이클로이드인데
-		*/
 	}
 	return;
 }
 int main() { solve(); return 0; }
+*/
+
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+typedef long double ld;
+//typedef double ld;
+
+// Hyperbolic distance formula using Poincare Half-Upper Plane model
+ld hyperbolic_distance(ld x1, ld y1, ld x2, ld y2) {
+	if (y1 > y2) {
+		std::swap(x1, x2);
+		std::swap(y1, y2);
+	}
+	return acosh(1 + ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) / (2 * y1 * y2));
+}
+
+int main() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(9);
+	int T;
+	std::cin >> T;
+	while (T--) {
+		ld x1, y1, x2, y2;
+		std::cin >> x1 >> y1 >> x2 >> y2;
+		std::cout << hyperbolic_distance(x1, y1, x2, y2) << "\n";
+	}
+
+	return 0;
+}
+//chat gpt ga puleojum www
