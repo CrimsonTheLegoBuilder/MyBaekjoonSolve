@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <string>
 #include <cassert>
 #include <vector>
 #include <random>
@@ -23,6 +24,15 @@ const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
+
+//#define DEBUG
+#define AUTO_CHECK
+
+#ifdef AUTO_CHECK
+#include <fstream>
+#define WHAT_THE_FUCK
+#endif
+
 
 int N, xs, ys;
 int MAXX, MAXY, MINX, MINY;
@@ -203,13 +213,13 @@ Pos norm(Pos& p, const int& x, const int& y) {//fit in tile (0, 0), (xs, ys)
 	return p;
 }
 void norm(int& x, const int& vx, const int& xs) {
-	while (x < vx) x += xs;
-	while (x >= (vx + xs)) x -= xs;
+	while (x <= (vx - xs)) x += xs;
+	while (x > vx) x -= xs;
 	return;
 }
 void norm(int& x, const ld& vx, const int& xs) {
-	while (sign(x - vx) < 0) x += xs;
-	while (sign(x - (vx + xs)) >= 0) x -= xs;
+	while (sign(x - (vx - xs)) <= 0) x += xs;
+	while (sign(x - vx) > 0) x -= xs;
 	return;
 }
 void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from 6632 arable
@@ -252,7 +262,7 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 			board[i / ys][j / xs] = 1;
 			if (zero(e.y - ey)) ey -= ys;
 			while (i <= ey) {
-				while (j <= ex && ccw(s, e, Pos(j, (ld)i + ys)) > 0 && ccw(s, e, Pos((ld)j + xs, i)) < 0) {
+				while (j <= ex && ccw(s, e, Pos((ld)j, (ld)i + ys)) > 0 && ccw(s, e, Pos((ld)j + xs, (ld)i)) < 0) {
 					board[i / ys][j / xs] = 1;
 					j += xs;
 				}
@@ -324,7 +334,7 @@ int sweep(const Polygonf& HF, const int& xs, const int& ys) {
 		for (int j = MINX; j <= MAXX; j++) {
 			if (!board[i][j]) {
 				if (inner_check(HF, cen(i, j, xs, ys))) bfs(j, i, 1);
-				else bfs(j, i, -1);
+				else bfs(j, i, 2);
 			}
 		}
 	}
@@ -335,19 +345,57 @@ int sweep(const Polygonf& HF, const int& xs, const int& ys) {
 			if (board[i][j] == 1) cnt++;
 		}
 	}
+#ifdef DEBUG2
+	if (cnt > 0) return cnt;
+	std::cout << "HF = [\n";
+	for (int i = 0; i < N; i++) {
+		std::cout << "    (" << HF[i].x << ", " << HF[i].y << "), \n";
+	}
+	std::cout << "]\n";
+	for (int i = MAXY; i >= MINY; i--) {
+		for (int j = MINX; j <= MAXX; j++) {
+			std::cout << board[i][j];
+		}
+		std::cout << "\n";
+	}
+	std::cout << "\n";
+#endif
 	return cnt;
 }
+#ifdef AUTO_CHECK
+int solve(const std::string& input_file) {
+	std::ifstream input(input_file);
+#else
 void solve() {
+#endif
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(7);
+#ifdef AUTO_CHECK
+	input >> N >> xs >> ys;
+#else
+	std::cin >> N >> xs >> ys;
+#endif
 	std::cin >> N >> xs >> ys;
 	Polygon H(N);
 	Polygonf V;//All possible point
+
+#ifdef AUTO_CHECK
+	for (int i = 0; i < N; i++) input >> H[i];// , H[i] += Pii(100, 100);
+#else
 	for (int i = 0; i < N; i++) std::cin >> H[i];// , H[i] += Pii(100, 100);
+#endif
+	//for (int i = 0; i < N; i++) std::cin >> H[i];// , H[i] += Pii(100, 100);
 	norm(H);
 	Pii S = H[0];
+#ifdef DEBUG
+	std::cout << "H = [\n";
+	for (int i = 0; i < N; i++) {
+		std::cout << "    (" << H[i].x << ", " << H[i].y << "), \n";
+	}
+	std::cout << "]\n";
+#endif
 	for (int i = 0; i < N; i++) {//O(50)
 		for (int j = 0; j < N; j++) {//O(50 * 50)
 			Pii I = H[i], J = H[j], K = H[(j + 1) % N];
@@ -420,7 +468,62 @@ void solve() {
 		for (int i = 0; i < N; i++) HF[i].y -= y, HF[i] += Pos(xs, ys);
 		cnt = std::min(cnt, sweep(HF, xs, ys));
 	}
+#ifndef AUTO_CHECK
 	std::cout << cnt << "\n";
 	return;
+#else
+	return cnt;
+#endif
 }
+#ifdef AUTO_CHECK
+std::vector<std::string> file_names;
+int main(int argc, char* argv[]) {
+	if (argc < 2) {
+		std::cerr << "Usage: " << argv[0] << " <input_file>" << std::endl;
+		return 1;
+	}
+
+	std::ifstream file_list(argv[1]);
+	std::vector<std::string> file_names;
+	std::string file_name;
+	while (file_list >> file_name) {//fuck
+		file_names.push_back(file_name);
+	}
+
+	std::ofstream result_file("fucked_results.txt");
+	bool F = 1;
+	for (int i = 0; i < file_names.size(); i += 2) {
+		std::string output_file = file_names[i];
+		std::string input_file = file_names[i + 1];
+
+		std::ifstream output_stream(output_file);
+		std::string answer;
+
+		std::getline(output_stream, answer);
+		std::string result;
+
+		//std::cout << "solve run\n";
+
+		result = solve(input_file);
+
+		//std::cout << "solve done\n";
+
+		//std::cout << input_file << ' ' << output_file << '\n';
+
+		std::cout << answer << " " << result << " " << (answer == result) << "\n";
+		if (answer != result) {
+			F = 0;
+			//std::cout << "what the fuck?! wrong answer is returned!!\n";
+			std::cout << "the file name is... ";
+			std::cout << input_file << ", you idiot.\n";
+			//result_file << input_file << '\n';
+			result_file << "ANS:: " << answer << " RET:: " << result << "\n";
+		}
+	}
+	if (F) result_file << "Accepted\n";
+	result_file.close();
+	return 0;
+}//boj8883
+#else
 int main() { solve(); return 0; }//boj8883
+#endif

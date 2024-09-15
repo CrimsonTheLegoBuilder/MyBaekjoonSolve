@@ -1,32 +1,37 @@
 import matplotlib.pyplot as plt
 
-# 파란 점(B)과 빨간 점(R)의 좌표 리스트
-B = [(1, 4), (5, 4), (9, 3)]
-R = [(7, 7), (11, 7), (15, 6), (7, 1), (10, 0), (15, 1)]
+# Define the points
+points = [
+    (1, 8), (14, 8), (14, 0), (22, 8), (20, 12), (29, 18),
+    (30, 23), (23, 24), (19, 31), (9, 29), (6, 16), (1, 16)
+]
 
-# B와 R의 x, y 좌표 분리
-B_x, B_y = zip(*B)
-R_x, R_y = zip(*R)
+# Extract x and y coordinates
+x_coords, y_coords = zip(*points)
 
-# 그래프 그리기
-plt.figure(figsize=(8, 6))
-plt.scatter(B_x, B_y, color='blue', label='Blue Points (B)')
-plt.scatter(R_x, R_y, color='red', label='Red Points (R)')
+# Define dx and dy for the grid spacing
+dx = 9  # Interval for x-axis
+dy = 9  # Interval for y-axis
 
-# B 점에 번호 붙이기
-for i, (x, y) in enumerate(B):
-    plt.text(x, y, f'B{i+1}', fontsize=12, ha='right', color='blue')
+# Create the plot
+plt.figure(figsize=(10, 8))
 
-# R 점에 번호 붙이기
-for i, (x, y) in enumerate(R):
-    plt.text(x, y, f'R{i+1}', fontsize=12, ha='right', color='red')
+# Plot the points and connect them in order, including closing the loop
+plt.plot(x_coords + (x_coords[0],), y_coords + (y_coords[0],), marker='o', color='blue', linestyle='-', markersize=6)
 
-# 그래프 설정
-plt.title('Scatter Plot of Blue and Red Points with Labels')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.legend()
-plt.grid(True)
+# Label each point with its index
+for i, (x, y) in enumerate(points):
+    plt.text(x, y, f'{i+1}', fontsize=12, ha='right', color='red')
 
-# 그래프 출력
+# Set grid with specific intervals
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.xticks(range(min(x_coords) - 1, max(x_coords) + 2, dx))
+plt.yticks(range(min(y_coords) - 1, max(y_coords) + 2, dy))
+
+# Set axis labels and title
+plt.title('Points with Custom Grid Spacing')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+
+# Show the plot
 plt.show()
