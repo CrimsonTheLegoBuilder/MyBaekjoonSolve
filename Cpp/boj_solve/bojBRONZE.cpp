@@ -13,6 +13,6 @@ int main() {
 	std::cout << std::fixed;
 	std::cout.precision(7);
 	std::cin >> A;
-	std::cout << 100000. / (A / LITER * METER) << "\n";
+	//std::cout << 100000. / (A / LITER * METER) << "\n";
 	return 0;
 }
