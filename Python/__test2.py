@@ -2,16 +2,25 @@ import matplotlib.pyplot as plt
 
 # Define the points
 points = [
-    (1, 8), (14, 8), (14, 0), (22, 8), (20, 12), (29, 18),
-    (30, 23), (23, 24), (19, 31), (9, 29), (6, 16), (1, 16)
+    (129, 217),
+    (169, 217),
+    (169, 157),
+    (219, 157),
+    (219, 197),
+    (259, 217),
+    (209, 317),
+    (169, 317),
+    (169, 287),
+    (149, 247),
+    (129, 247),
 ]
 
 # Extract x and y coordinates
 x_coords, y_coords = zip(*points)
 
 # Define dx and dy for the grid spacing
-dx = 9  # Interval for x-axis
-dy = 9  # Interval for y-axis
+dx = 40  # Interval for x-axis
+dy = 60  # Interval for y-axis
 
 # Create the plot
 plt.figure(figsize=(10, 8))

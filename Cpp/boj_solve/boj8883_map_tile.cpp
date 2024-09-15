@@ -12,8 +12,8 @@
 #include <unordered_set>
 #include <queue>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
@@ -25,14 +25,15 @@ inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
 
-//#define DEBUG
-#define AUTO_CHECK
+#define DEBUG
+//#define AUTO_CHECK
 
 #ifdef AUTO_CHECK
 #include <fstream>
 #define WHAT_THE_FUCK
 #endif
 
+#define __FUCK__ ;
 
 int N, xs, ys;
 int MAXX, MAXY, MINX, MINY;
@@ -86,7 +87,7 @@ bool intersect(const Pii& s1, const Pii& s2, const Pii& d1, const Pii& d2, const
 }
 ll area(const Polygon& H) {
 	ll ret = 0;
-	int sz = H.size();
+	int sz = H.size() __FUCK__
 	for (int i = 0; i < sz; i++) ret += H[i] / H[(i + 1) % sz];
 	return ret;
 }
@@ -345,8 +346,8 @@ int sweep(const Polygonf& HF, const int& xs, const int& ys) {
 			if (board[i][j] == 1) cnt++;
 		}
 	}
-#ifdef DEBUG2
-	if (cnt > 0) return cnt;
+#ifdef DEBUG
+	if (cnt > 9) return cnt;
 	std::cout << "HF = [\n";
 	for (int i = 0; i < N; i++) {
 		std::cout << "    (" << HF[i].x << ", " << HF[i].y << "), \n";
@@ -377,7 +378,7 @@ void solve() {
 #else
 	std::cin >> N >> xs >> ys;
 #endif
-	std::cin >> N >> xs >> ys;
+	//std::cin >> N >> xs >> ys;
 	Polygon H(N);
 	Polygonf V;//All possible point
 
@@ -497,21 +498,24 @@ int main(int argc, char* argv[]) {
 		std::string input_file = file_names[i + 1];
 
 		std::ifstream output_stream(output_file);
-		std::string answer;
+		int answer;
+		//std::getline(output_stream, answer);
+		output_stream >> answer;
 
-		std::getline(output_stream, answer);
-		std::string result;
+		int result;
 
-		//std::cout << "solve run\n";
+		std::cout << "solve run\n";
 
 		result = solve(input_file);
-
-		//std::cout << "solve done\n";
 
 		//std::cout << input_file << ' ' << output_file << '\n';
 
 		std::cout << answer << " " << result << " " << (answer == result) << "\n";
+		
+		std::cout << "solve done\n";
+		
 		if (answer != result) {
+			result_file << input_file << ' ' << output_file << '\n';
 			F = 0;
 			//std::cout << "what the fuck?! wrong answer is returned!!\n";
 			std::cout << "the file name is... ";
