@@ -12,8 +12,8 @@
 #include <unordered_set>
 #include <queue>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
@@ -25,7 +25,7 @@ inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
 
-#define DEBUG
+//#define DEBUG
 //#define AUTO_CHECK
 
 #ifdef AUTO_CHECK
@@ -87,7 +87,7 @@ bool intersect(const Pii& s1, const Pii& s2, const Pii& d1, const Pii& d2, const
 }
 ll area(const Polygon& H) {
 	ll ret = 0;
-	int sz = H.size() __FUCK__
+	int sz = H.size();
 	for (int i = 0; i < sz; i++) ret += H[i] / H[(i + 1) % sz];
 	return ret;
 }
@@ -223,6 +223,11 @@ void norm(int& x, const ld& vx, const int& xs) {
 	while (sign(x - vx) > 0) x -= xs;
 	return;
 }
+//bool crossed(const Pos& p1, const Pos& p2, const Pos& p3, const Pos& p4) {
+//	ld d1 = cross(p1, p2, p3) / (p1 - p2).mag();
+//	ld d2 = cross(p1, p2, p4) / (p1 - p2).mag();
+//	return std::abs(d1) > 1e-05 && std::abs(d2) > 1e-05;
+//}
 void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from 6632 arable
 	int sx = 0, ex = 0, sy = 0, ey = 0;
 	norm(sx, cur.x, xs);
@@ -275,7 +280,7 @@ void sweep(const Pos& cur, const Pos& nxt, const int& xs, const int& ys) {//from
 			board[i / ys - zero(s.y - sy)][j / xs] = 1;
 			if (!zero(s.y - sy)) sy += ys, i += ys;
 			while (i > ey) {
-				while (j <= ex && ccw(s, e, Pos((ld)j + xs, i)) > 0 && ccw(s, e, Pos(j, (ld)i - ys)) < 0) {
+				while (j <= ex && ccw(s, e, Pos((ld)j + xs, (ld)i)) > 0 && ccw(s, e, Pos(j, (ld)i - ys)) < 0) {
 					board[i / ys - 1][j / xs] = 1;
 					j += xs;
 				}
@@ -378,7 +383,6 @@ void solve() {
 #else
 	std::cin >> N >> xs >> ys;
 #endif
-	//std::cin >> N >> xs >> ys;
 	Polygon H(N);
 	Polygonf V;//All possible point
 
@@ -387,7 +391,6 @@ void solve() {
 #else
 	for (int i = 0; i < N; i++) std::cin >> H[i];// , H[i] += Pii(100, 100);
 #endif
-	//for (int i = 0; i < N; i++) std::cin >> H[i];// , H[i] += Pii(100, 100);
 	norm(H);
 	Pii S = H[0];
 #ifdef DEBUG
@@ -403,18 +406,40 @@ void solve() {
 			int x = I.x, y = J.y;
 			Pos v = P(S - Pii(x, y));
 			V.push_back(norm(v, xs, ys));
-			if (J.x == K.x) continue;
-			if (J.x > K.x) std::swap(J, K);
-			int jx = I.x;
-			norm(jx, J.x, xs);
-			int kx = I.x;
-			norm(kx, K.x, xs);
-			Pii vec = K - J;
-			for (int kw = jx; kw <= kx; kw += xs) {//O(50 * 50 * 20)
-				if (kw < J.x || K.x < kw) continue;
-				ld yh = J.y + ((ld)kw - J.x) * vec.y / vec.x;
-				v = P(S) - Pos(I.x, yh);
-				V.push_back(norm(v, xs, ys));
+			//if (J.x == K.x) continue;
+			if (J.x != K.x) {
+				if (J.x > K.x) std::swap(J, K);
+				int jx = I.x;
+				norm(jx, J.x, xs);
+				int kx = I.x;
+				norm(kx, K.x, xs);
+				Pii vec = K - J;
+				for (int kw = jx; kw <= kx; kw += xs) {//O(50 * 50 * 20)
+					if (kw < J.x || K.x < kw) continue;
+					ld yh = J.y + ((ld)kw - J.x) * vec.y / vec.x;
+					v = P(S) - Pos(I.x, yh);
+					V.push_back(norm(v, xs, ys));
+				}
+			}
+
+			I = H[i], J = H[j], K = H[(j + 1) % N];
+			x = J.x, y = I.y;
+			v = P(S - Pii(x, y));
+			V.push_back(norm(v, xs, ys));
+			//if (J.y == K.y) continue;
+			if (J.y != K.y) {
+				if (J.y > K.y) std::swap(J, K);
+				int jy = I.y;
+				norm(jy, J.y, ys);
+				int ky = I.y;
+				norm(ky, K.y, ys);
+				Pii vec = K - J;
+				for (int kh = jy; kh <= ky; kh += ys) {//O(50 * 50 * 20)
+					if (kh < J.y || K.y < kh) continue;
+					ld yw = J.x + ((ld)kh - J.y) * vec.x / vec.y;
+					v = P(S) - Pos(yw, I.y);
+					V.push_back(norm(v, xs, ys));
+				}
 			}
 		}
 	}
@@ -424,14 +449,13 @@ void solve() {
 		Pii I1 = H[i], I2 = H[(i + 1) % N];
 		for (int j = 0; j < N; j++) {//O(50 * 50)
 			Pii J1 = H[j], J2 = H[(j + 1) % N];
-			if (i == j || !cross(I1, I1, J1, J2)) continue;
+			if (i == j || !cross(I1, I2, J1, J2)) continue;
 			Pii vec = I2 - I1;
-			if (I2 < I1) std::swap(I1, I2);
 			if (J2 < J1) std::swap(J1, J2);
 			Polygon box = { J1, J1 - vec, J2, J2 - vec };
 			box = graham_scan(box);
-			int lx = 1e9, rx = -1e9, ly = 1e9, uy = -1e9;
 			assert(box.size() == 4);
+			int lx = 1e9, rx = -1e9, ly = 1e9, uy = -1e9;
 			for (int k = 0; k < 4; k++) {
 				lx = std::min(lx, box[k].x);
 				rx = std::max(rx, box[k].x);
