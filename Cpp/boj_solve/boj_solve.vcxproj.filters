@@ -1317,10 +1317,10 @@
     <ClCompile Include="boj9583_easy.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="MKC_A.cpp">
+    <ClCompile Include="MKC5_A.cpp">
       <Filter>소스 파일\_MatKorCupOpen</Filter>
     </ClCompile>
-    <ClCompile Include="MKC_B.cpp">
+    <ClCompile Include="MKC5_B.cpp">
       <Filter>소스 파일\_MatKorCupOpen</Filter>
     </ClCompile>
     <ClCompile Include="boj17973_quad.cpp">
