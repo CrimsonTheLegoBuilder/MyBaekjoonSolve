@@ -226,7 +226,7 @@ void solve() {
 		for (int j = 0; j < sz; j += 2) {
 			Pos cur = v[(j - 1) % sz], nxt = v[j];
 			assert(cur.rv != nxt.rv);
-			GS[cur.i].push_back(nxt.i);
+			GS[nxt.i].push_back(cur.i);
 		}
 	}
 	memset(V, 0, sizeof V);
