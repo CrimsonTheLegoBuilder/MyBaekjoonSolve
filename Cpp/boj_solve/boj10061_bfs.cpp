@@ -273,9 +273,10 @@ void solve() {
 		}
 		else {
 			for (int j = 0; j < ci; j++) {
-				if (i == j || sign(A[j] < 0)) continue;
-				if (find(i) == find(j)) continue;
+				if (sign(A[j] < 0)) continue;
+				if (i == j || find(i) == find(j)) continue;
 				if (out >= 0 && find(out) == find(j)) continue;
+				if (out >= 0 && (A[out] < A[j])) continue;
 				if (inner_check(cell[j], cell[i][0])) {
 					if (out < 0 || (A[out] > A[j])) out = j;
 				}
