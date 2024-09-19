@@ -286,6 +286,7 @@ void solve() {
 		else GC[i].push_back(Info(out, 0));
 	}
 	memset(V, -1, sizeof V);
+	if (s == e) { std::cout << "0\n"; return; }
 	std::cout << bfs(s, e) << "\n";
 	return;
 }
