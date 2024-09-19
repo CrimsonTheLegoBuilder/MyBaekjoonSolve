@@ -110,7 +110,7 @@ struct Seg {
 	//		});
 	//	INX.erase(unique(INX.begin(), INX.end()), INX.end());
 	//}
-} seg[LEN], frag[LEN * LEN + 10];
+} seg[LEN], frag[LEN * LEN * 10];
 Polygon INX[LEN];
 void inx_sort(Polygon& INX, const Pos& a) {
 	std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
