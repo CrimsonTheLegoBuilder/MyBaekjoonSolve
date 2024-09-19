@@ -132,8 +132,8 @@ bool join(int i, int j) {
 	else P[j] += P[i], P[i] = j;
 	return 1;
 }
-int V[LEN * LEN + 10];
-Vint GS[LEN * LEN + 10];
+int V[LEN * LEN * 10];
+Vint GS[LEN * LEN * 10];
 void dfs(const int& i, int v) {
 	V[v] = 1;
 	cell[i].push_back(seg[v].a);
@@ -148,7 +148,7 @@ struct Info {
 	int i, c;
 	Info(int i_ = 0, int c_ = 0) : i(i_), c(c_) {}
 };
-std::vector<Info> GC[LEN * LEN + 10];
+std::vector<Info> GC[LEN * LEN * 10];
 int bfs(int v, int g) {
 	std::queue<Info> Q;
 	Q.push(Info(v, 0));
