@@ -156,7 +156,7 @@ int bfs(int v, int g) {
 	while (Q.size()) {
 		Info p = Q.front(); Q.pop();
 		if (p.i == g) return V[g];
-		for (const Info& w : GS[p.i]) {
+		for (const Info& w : GC[p.i]) {
 			if (!~V[w.i]) {
 				Q.push(w);
 				V[w.i] = V[p.i] + w.c;
@@ -171,7 +171,7 @@ void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(7);
 	std::cin >> M >> p0 >> p1;
-	if (p0 == p1) { std::cout << "0\n"; return; }
+	if (M <= 2 || p0 == p1) { std::cout << "0\n"; return; }
 	for (int i = 0; i < M; i++) {
 		std::cin >> seg[i].a >> seg[i].b;
 		seg[i].i = i;
