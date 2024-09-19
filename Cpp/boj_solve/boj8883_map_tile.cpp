@@ -436,8 +436,8 @@ void solve() {
 				Pii vec = K - J;
 				for (int kh = jy; kh <= ky; kh += ys) {//O(50 * 50 * 20)
 					if (kh < J.y || K.y < kh) continue;
-					ld yw = J.x + ((ld)kh - J.y) * vec.x / vec.y;
-					v = P(S) - Pos(yw, I.y);
+					ld xw = J.x + ((ld)kh - J.y) * vec.x / vec.y;
+					v = P(S) - Pos(xw, I.y);
 					V.push_back(norm(v, xs, ys));
 				}
 			}

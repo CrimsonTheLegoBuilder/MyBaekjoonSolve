@@ -5,10 +5,10 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <unordered_set>
+#include <set>
 typedef long long ll;
 typedef std::vector<int> Vint;
-typedef std::unordered_set<int> USint;
+typedef std::set<int> Sint;
 const int LEN = 1e5 + 10;
 
 #define ADD 1
@@ -46,7 +46,7 @@ struct V_event {
 } V[LEN << 1]; int vp;
 int xi, yi;
 int hi_y[LEN];//highest y coord' of vertical event
-USint inxs[LEN << 4];//seg_tree
+Sint inxs[LEN << 4];//seg_tree
 int seg_v[LEN << 4];//seg_tree
 int seg_p[LEN << 4];//seg_tree
 void update_vertical(const int& x, const int& ev, const int& idx, int s = 0, int e = xi - 1, int i = 1) {
