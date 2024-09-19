@@ -260,6 +260,7 @@ void solve() {
 					GC[i].push_back(Info(j, 1));
 					GC[j].push_back(Info(i, 1));
 					join(i, j);
+					break;
 				}
 			}
 		}
