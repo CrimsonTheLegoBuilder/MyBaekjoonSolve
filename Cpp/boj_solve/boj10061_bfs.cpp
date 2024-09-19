@@ -165,6 +165,23 @@ int bfs(int v, int g) {
 	}
 	return V[g];
 }
+int zero_one_bfs(int v, int g) {
+	std::deque<Info> DQ;
+	DQ.push_front(Info(v, 0));
+	V[v] = 0;
+	while (DQ.size()) {
+		Info p = DQ.front(); DQ.pop_front();
+		if (p.i == g) return V[g];
+		for (const Info& w : GC[p.i]) {
+			if (!~V[w.i]) {
+				if (w.c) DQ.push_back(w);
+				else if (!w.c) DQ.push_front(w);
+				V[w.i] = V[p.i] + w.c;
+			}
+		}
+	}
+	return V[g];
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -273,7 +290,7 @@ void solve() {
 			if (inner_check(cell[i], p1)) e = i;
 		}
 		else {
-			for (int j = 0; j < ci; j++) {
+			for (int j = 0; j < ci; j++) {//O(5051 * 20000)
 				if (sign(A[j] < 0)) continue;
 				if (i == j || find(i) == find(j)) continue;
 				if (out >= 0 && find(out) == find(j)) continue;
@@ -288,7 +305,7 @@ void solve() {
 	}
 	memset(V, -1, sizeof V);
 	if (s == e) { std::cout << "0\n"; return; }
-	std::cout << bfs(s, e) << "\n";
+	std::cout << zero_one_bfs(s, e) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj10061
