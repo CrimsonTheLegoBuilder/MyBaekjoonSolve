@@ -275,6 +275,7 @@ void solve() {
 		if (!~out) GC[i].push_back(Info(I, 0));
 		else GC[i].push_back(Info(out, 0));
 	}
+	memset(V, -1, sizeof V);
 	std::cout << bfs(s, e) << "\n";
 	return;
 }
