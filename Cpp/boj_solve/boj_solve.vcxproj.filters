@@ -1335,7 +1335,13 @@
     <ClCompile Include="boj10049_cut.cpp">
       <Filter>소스 파일\segment_tree</Filter>
     </ClCompile>
+    <ClCompile Include="boj10061_x.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
     <ClCompile Include="boj10061_wire.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj10061_bfs.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
