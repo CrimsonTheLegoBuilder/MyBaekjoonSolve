@@ -70,6 +70,16 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) > 0; }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
+	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	//return f1 && f2;
+	bool f3 = on_seg_strong(s1, s2, d1) ||
+		on_seg_strong(s1, s2, d2) ||
+		on_seg_strong(d1, d2, s1) ||
+		on_seg_strong(d1, d2, s2);
+	return (f1 && f2) || f3;
+}
 bool inner_check(const Polygon& H, const Pos& p) {//concave
 	int sz = H.size(), cnt = 0;
 	for (int i = 0; i < sz; i++) {
@@ -100,7 +110,7 @@ struct Seg {
 	//		});
 	//	INX.erase(unique(INX.begin(), INX.end()), INX.end());
 	//}
-} seg[LEN], frag[LEN * LEN * LEN];
+} seg[LEN], frag[LEN * LEN + 10];
 Polygon INX[LEN];
 void inx_sort(Polygon& INX, const Pos& a) {
 	std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
@@ -113,7 +123,6 @@ std::map<Pos, Polygon> map_pos;
 ld A[LEN * LEN + 10];
 Polygon cell[LEN * LEN + 10]; int ci;
 std::set<int> cell_i[LEN * LEN + 10];
-
 int P[LEN * LEN + 10];//disjoint set
 int find(int i) { return P[i] < 0 ? i : P[i] = find(P[i]); }
 bool join(int i, int j) {
@@ -156,7 +165,6 @@ int bfs(int v, int g) {
 	}
 	return V[g];
 }
-
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -168,24 +176,25 @@ void solve() {
 		std::cin >> seg[i].a >> seg[i].b;
 		seg[i].i = i;
 	}
+	bool f0 = 1;
 	Polygon INXS;
 	for (int i = 0; i < M; i++) {
+		if (intersect(p0, p1, seg[i].a, seg[i].b)) f0 = 0;
 		for (int j = i + 1; j < M; j++) {
-			Pos X = seg[i].inx(seg[j]);
-			//seg[i].INX.push_back(X);
-			INX[i].push_back(X);
-			//seg[j].INX.push_back(X);
-			INX[j].push_back(X);
-			INXS.push_back(X);
+			if (intersect(seg[i].a, seg[i].b, seg[j].a, seg[j].b)) {
+				Pos X = seg[i].inx(seg[j]);
+				INX[i].push_back(X);
+				INX[j].push_back(X);
+				INXS.push_back(X);
+			}
 		}
 	}
+	if (f0) { std::cout << "0\n"; return; }
 	std::sort(INXS.begin(), INXS.end());
 	INXS.erase(unique(INXS.begin(), INXS.end()), INXS.end());
 	I = 0;
 	for (int i = 0; i < M; i++) {
-		//seg[i].inx_sort();
 		inx_sort(INX[i], seg[i].a);
-		//Polygon& v = seg[i].INX;
 		Polygon& v = INX[i];
 		int sz = v.size();
 		for (int j = 0; j < sz - 1; j++) {
@@ -196,7 +205,6 @@ void solve() {
 	}
 	I0 = I;
 	for (int i = 0; i < M; i++) {
-		//Polygon& v = seg[i].INX;
 		Polygon& v = INX[i];
 		int sz = v.size();
 		for (int j = 0; j < sz - 1; j++) {
