@@ -264,8 +264,8 @@ void solve() {
 			if (inner_check(cell[i], p1)) e = i;
 		}
 		else {
-			for (int j = i + 1; j < ci; j++) {
-				if (sign(A[j] < 0)) continue;
+			for (int j = 0; j < ci; j++) {
+				if (i == j || sign(A[j] < 0)) continue;
 				if (find(i) == find(j)) continue;
 				if (inner_check(cell[j], cell[i][0])) {
 					if (out < 0 || (A[out] > A[j])) out = j;
