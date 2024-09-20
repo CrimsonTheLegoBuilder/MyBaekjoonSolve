@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <cstdio>
 #include <cassert>
 #include <vector>
 #include <queue>
@@ -10,17 +11,18 @@
 #include <map>
 #include <set>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 const ll INF = 1e17;
 const int LEN = 105;
-const ld TOL = 1e-7;
+const ld TOL = 1e-8;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 
 #define __FUCK__ ;
+#define DEBUG
 
 int N, M;
 struct Pos {
@@ -57,6 +59,9 @@ struct Pos {
 } p0, p1, key, vec; const Pos O = Pos(0, 0); const Pos INVAL = Pos(INF, INF);
 typedef std::vector<Pos> Polygon;
 typedef std::deque<Pos> PosDeque;
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
 bool cmpr(const Pos& p, const Pos& q) {
 	bool f1 = O < p;
 	bool f2 = O < q;
@@ -64,9 +69,6 @@ bool cmpr(const Pos& p, const Pos& q) {
 	int tq = ccw(O, p, q);
 	return !tq ? p.rv > q.rv : tq > 0;
 }
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) > 0; }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
@@ -101,15 +103,8 @@ ld area(const Polygon& H) {
 struct Seg {
 	Pos a, b;
 	int i;
-	//Polygon INX;//intersections
-	Seg(Pos A = Pos(), Pos B = Pos()) : a(A), b(B) { i = -1; }//INX.clear();
+	Seg(Pos A = Pos(), Pos B = Pos()) : a(A), b(B) { i = -1; }
 	Pos inx(const Seg& o) const { return intersection(a, b, o.a, o.b); }
-	//void inx_sort() {
-	//	std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
-	//		return (a - p).Euc() < (a - q).Euc();
-	//		});
-	//	INX.erase(unique(INX.begin(), INX.end()), INX.end());
-	//}
 } seg[LEN], frag[LEN * LEN * 10];
 Polygon INX[LEN];
 void inx_sort(Polygon& INX, const Pos& a) {
@@ -136,7 +131,7 @@ int V[LEN * LEN * 10];
 Vint GS[LEN * LEN * 10];
 void dfs(const int& i, int v) {
 	V[v] = 1;
-	cell[i].push_back(seg[v].a);
+	cell[i].push_back(frag[v].a);
 	cell_i[i].insert(v);
 	for (const int& w : GS[v]) {
 		if (V[w]) continue;
@@ -150,6 +145,7 @@ struct Info {
 };
 std::vector<Info> GC[LEN * LEN * 10];
 int bfs(int v, int g) {
+	memset(V, -1, sizeof V);
 	std::queue<Info> Q;
 	Q.push(Info(v, 0));
 	V[v] = 0;
@@ -166,6 +162,7 @@ int bfs(int v, int g) {
 	return V[g];
 }
 int zero_one_bfs(int v, int g) {
+	memset(V, -1, sizeof V);
 	std::deque<Info> DQ;
 	DQ.push_front(Info(v, 0));
 	V[v] = 0;
@@ -180,18 +177,24 @@ int zero_one_bfs(int v, int g) {
 			}
 		}
 	}
+#ifdef DEBUG
+	std::cout << "I am stupid\n";
+	assert(~V[g]);
+#endif
 	return V[g];
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(7);
+	std::cout.precision(9);
 	std::cin >> M >> p0 >> p1;
 	if (M <= 2 || p0 == p1) { std::cout << "0\n"; return; }
 	for (int i = 0; i < M; i++) {
 		std::cin >> seg[i].a >> seg[i].b;
 		seg[i].i = i;
+		seg[i].a.i = i;
+		seg[i].b.i = i;
 	}
 	bool f0 = 1;
 	Polygon INXS;
@@ -247,9 +250,13 @@ void solve() {
 		Polygon& v = map_pos[key];
 		std::sort(v.begin(), v.end(), cmpr);
 		int sz = v.size();
+#ifdef DEBUG
+		std::cout << "DEBUG:: key:: " << key << "\n";
+		std::cout << "DEBUG:: sz:: " << sz << "\n";
+#endif
 		assert(!(sz & 1));
 		for (int j = 0; j < sz; j += 2) {
-			Pos cur = v[(j - 1) % sz], nxt = v[j];
+			Pos cur = v[(j - 1 + sz) % sz], nxt = v[j];
 			assert(cur.rv != nxt.rv);
 			GS[nxt.i].push_back(cur.i);
 		}
@@ -257,15 +264,22 @@ void solve() {
 	memset(V, 0, sizeof V);
 	ci = 0;
 	for (int i = 0; i < I; i++) {
-		if (!V[i]) dfs(ci, i);
-		A[ci] = area(cell[ci]);
-		if (zero(A[ci])) {
-			cell[ci].clear();
-			cell_i[ci].clear();
-			A[ci] = 0;
-			ci--;
+		if (!V[i]) {
+			dfs(ci, i);
+			A[ci] = area(cell[ci]);
+#ifdef DEBUG
+			std::cout << "FUCK:: i:: " << i << " sz:: " << cell[ci].size() << "\n";
+			//for (const Pos& p : cell[ci]) std::cout << p << "\n";
+			std::cout << "FUCK:: A[" << ci << "]:: " << A[ci] << "\n";
+#endif
+			if (zero(A[ci])) {
+				cell[ci].clear();
+				cell_i[ci].clear();
+				A[ci] = 0;
+				ci--;
+			}
+			ci++;
 		}
-		ci++;
 	}
 	memset(P, -1, sizeof P);
 	for (int i = 0; i < ci; i++) {
@@ -282,12 +296,21 @@ void solve() {
 			}
 		}
 	}
-	int s = I, e = I;
+#ifdef DEBUG
+	std::cout << "FUCK::\n";
+	for (int i = 0; i < ci; i++) {
+		std::cout << "cell[" << i << "]\n";
+		for (const Pos& p : cell[i]) std::cout << p << "\n";
+	}
+	std::cout << "FUCK::\n";
+#endif
+	int s = ci, e = ci;
 	for (int i = 0; i < ci; i++) {
 		int out = -1;
 		if (sign(A[i]) > 0) {
 			if (inner_check(cell[i], p0)) s = i;
 			if (inner_check(cell[i], p1)) e = i;
+			continue;
 		}
 		else {
 			for (int j = 0; j < ci; j++) {//O(5051 * 20000)
@@ -300,12 +323,34 @@ void solve() {
 				}
 			}
 		}
-		if (!~out) GC[i].push_back(Info(I, 0));
+		if (!~out) GC[i].push_back(Info(ci, 0));
 		else GC[i].push_back(Info(out, 0));
 	}
-	memset(V, -1, sizeof V);
+#ifdef DEBUG
+	std::cout << "FUCK::\n";
+	for (int i = 0; i < ci; i++) {
+		std::cout << "GC[" << i << "]\n";
+		for (const Info& p : GC[i]) std::cout << p.i << " " << p.c << "\n";
+	}
+	std::cout << "FUCK::\n";
+	std::cout << "s, e:: " << s << " " << e << "\n";
+#endif
 	if (s == e) { std::cout << "0\n"; return; }
 	std::cout << zero_one_bfs(s, e) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj10061
+
+/*
+
+8 3 3 19 3
+0 1 22 1
+0 5 22 5
+1 0 1 6
+5 0 5 6
+9 0 9 6
+13 0 13 6
+17 0 17 6
+21 0 21 6
+
+*/

@@ -3,63 +3,93 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <cstdio>
 #include <cassert>
 #include <vector>
 #include <queue>
+#include <deque>
 #include <map>
 #include <set>
 typedef long long ll;
 typedef long double ld;
 //typedef double ld;
+typedef std::vector<int> Vint;
+typedef std::vector<ll> Vll;
 const ll INF = 1e17;
 const int LEN = 105;
-const ld TOL = 1e-7;
+const ld TOL = 1e-20;
+inline int sign(const ll& x) { return x < 0 ? -1 : x > 0; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
+ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 
 #define __FUCK__ ;
+#define WHAT_THE_FUCK
+//#define DEBUG
 
-int P[LEN * LEN * LEN];//disjoint set
-int find(int i) { return P[i] < 0 ? i : P[i] = find(P[i]); }
-bool join(int i, int j) {
-	i = find(i), j = find(j);
-	if (i == j) return 0;
-	if (P[i] < P[j]) P[i] += P[j], P[j] = i;
-	else P[j] += P[i], P[i] = j;
-	return 1;
-}
 int N, M;
-struct Pii {
-	int x, y;
-	int i;
-	Pii(int X = 0, int Y = 0) : x(X), y(Y) { i = -1; }
-	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
-	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
-	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
-	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
-	Pii operator * (const int& n) const { return { x * n, y * n }; }
-	Pii operator / (const int& n) const { return { x / n, y / n }; }
-	ll operator * (const Pii& p) const { return (ll)x * p.x + (ll)y * p.y; }
-	ll operator / (const Pii& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
-	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
-	ll Euc() const { return (ll)x * x + (ll)y * y; }
-	friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << "(" << p.x << ", " << p.y << ")"; return os; }
-}; const Pii Oii = Pii(0, 0);
-typedef std::vector<Pii> Polygon;
-Pii p0, p1;
-ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
-ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
-int ccw(const Pii& d1, const Pii& d2, const Pii& d3) { ll ret = cross(d1, d2, d3); return ret < 0 ? -1 : !!ret; }
+struct BigPos {//what the fuck??? holly shit fucking floating point accuracy error!!
+	ll x, y, den;
+	BigPos(ll X = 0, ll Y = 0, ll D = 1) : x(X), y(Y), den(D) {}
+	bool operator == (const BigPos& p) const { return x == p.x && y == p.y; }
+	bool operator != (const BigPos& p) const { return x != p.x || y != p.y; }
+	bool operator < (const BigPos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	BigPos operator + (const BigPos& p) const { return { x + p.x, y + p.y }; }
+	BigPos operator - (const BigPos& p) const { return { x - p.x, y - p.y }; }
+	BigPos operator * (const ll& n) const { return { x * n, y * n }; }
+	BigPos operator / (const ll& n) const { return { x / n, y / n }; }
+	ll operator * (const BigPos& p) const { return x * p.x + y * p.y; }
+	ll operator / (const BigPos& p) const { return x * p.y - y * p.x; }
+	ll Euc() const { return x * x + y * y; }
+	friend std::istream& operator >> (std::istream& is, BigPos& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const BigPos& p) { os << "(" << p.x << ", " << p.y << ")"; return os; }
+} bp0, bp1; const BigPos BO = { 0, 0, 1 }; const BigPos BINVAL = { 0, 0, 0 };
+ll cross(const BigPos& d1, const BigPos& d2, const BigPos& d3) { return (d2 - d1) / (d3 - d2); }
+ll dot(const BigPos& d1, const BigPos& d2, const BigPos& d3) { return (d2 - d1) * (d3 - d2); }
+int ccw(const BigPos& d1, const BigPos& d2, const BigPos& d3) { ll ret = cross(d1, d2, d3); return sign(ret); }
+bool on_seg_strong(const BigPos& d1, const BigPos& d2, const BigPos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
+bool intersect(const BigPos& s1, const BigPos& s2, const BigPos& d1, const BigPos& d2) {
+	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
+	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	bool f3 = on_seg_strong(s1, s2, d1) ||
+		on_seg_strong(s1, s2, d2) ||
+		on_seg_strong(d1, d2, s1) ||
+		on_seg_strong(d1, d2, s2);
+	return (f1 && f2) || f3;
+}
+BigPos intersection(const BigPos& p1, const BigPos& p2, const BigPos& q1, const BigPos& q2) {
+	if (p1 == q1 || p1 == q2) return p1;
+	if (p2 == q1 || p2 == q2) return p2;
+	ll a1 = cross(q1, q2, p1);
+	ll a2 = -cross(q1, q2, p2);
+	ll x = p1.x * a2 + p2.x * a1;
+	ll y = p1.y * a2 + p2.y * a1;
+	ll den = a1 + a2;
+	ll gcd_ = gcd(std::abs(x), std::abs(den));
+	gcd_ = gcd(std::abs(y), gcd_);
+	x /= gcd_; y /= gcd_; den /= gcd_;
+	return BigPos(x, y, den);
+}
+struct BigSeg {
+	BigPos a, b;
+	friend std::istream& operator >> (std::istream& is, BigSeg& s) { is >> s.a >> s.b; return is; }
+} B[LEN];
+bool intersect(const BigSeg& s1, const BigSeg& s2) { intersect(s1.a, s1.b, s2.a, s2.b); }
+BigPos intersection(const BigSeg& s1, const BigSeg& s2) {
+	if (!intersect(s1.a, s1.b, s2.a, s2.b)) return BINVAL;
+	return intersection(s1.a, s1.b, s2.a, s2.b);
+}
 struct Pos {
 	ld x, y;
-	int pi, si;
+	int i;
 	bool rv;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { pi = -1, si = -1, rv = 0; }
-	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
+	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { i = -1, rv = 0; }
+	/*bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
-	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }*/
+	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
+	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
+	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -80,25 +110,45 @@ struct Pos {
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
 	Pos unit() const { return *this / mag(); }
-	ld rad() const { return atan2(y, x); }
+	ld rad() const { return atan2l(y, x); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << "(" << p.x << ", " << p.y << ")"; return os; }
-}; const Pos O = Pos(0, 0); const Pos INVAL = Pos(INF, INF);
-typedef std::vector<Pos> Polygonf;
-bool cmpr(const Pos& p, const Pos& q) {
-	bool f1 = O < p;
-	bool f2 = O < q;
-	if (f1 != f2) return f1;
-	int tq = ccw(O, p, q);
-	return !tq ? p.rv > q.rv : tq > 0;
+} p0, p1, key, vec; const Pos O = Pos(0, 0); const Pos INVAL = Pos(INF, INF);
+typedef std::vector<Pos> Polygon;
+typedef std::deque<Pos> PosDeque;
+Pos conv(const BigPos& b) {
+	ld x = 1. * b.x / b.den;
+	ld y = 1. * b.y / b.den;
+	return Pos(x, y);
 }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
+bool cmpr(const Pos& p, const Pos& q) {
+	//bool f1 = O < p;
+	//bool f2 = O < q;
+	//if (f1 != f2) return f1;
+	//int tq = ccw(O, p, q);
+	//return !tq ? p.rv > q.rv : tq > 0;
+
+	ld tp = p.rad();
+	ld tq = q.rad();
+	return tp == tq ? p.rv > q.rv : tp < tq;
+}
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = dot(d1, d3, d2); return !ccw(d1, d2, d3) && sign(ret) > 0; }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
-bool inner_check(const Polygonf& H, const Pos& p) {//concave
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
+	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	//return f1 && f2;
+	bool f3 = on_seg_strong(s1, s2, d1) ||
+		on_seg_strong(s1, s2, d2) ||
+		on_seg_strong(d1, d2, s1) ||
+		on_seg_strong(d1, d2, s2);
+	return (f1 && f2) || f3;
+}
+bool inner_check(const Polygon& H, const Pos& p) {//concave
 	int sz = H.size(), cnt = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
@@ -108,103 +158,280 @@ bool inner_check(const Polygonf& H, const Pos& p) {//concave
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
-	return cnt & 1;
+	return (cnt & 1) * 2;
 }
-inline Pos conv(const Pii& p) { return Pos((ld)p.x, (ld)p.y); }
-inline Pii conv(const Pos& p) { return Pii(p.x + TOL, p.y + TOL); }
-struct Segi {
-	Pii a, b;
-	int i;
-	Polygonf INX;//intersections
-	Segi(Pii A = Pii(), Pii B = Pii()) : a(A), b(B) { i = -1, INX.clear(); }
-	Pos inx(const Segi& o) const {
-		Pos x = intersection(conv(a), conv(b), conv(o.a), conv(o.b));
-		if (on_seg_strong(conv(a), conv(b), x) || on_seg_strong(conv(o.a), conv(o.b), x)) return x;
-		return INVAL;
-	}
-	void inx_sort() {
-		std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
-			return (conv(a) - p).Euc() < (conv(a) - q).Euc();
-			});
-		INX.erase(unique(INX.begin(), INX.end()), INX.end());
-	}
-} segi[LEN];
+ld area(const Polygon& H) {
+	ld ret = 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) ret += H[i] / H[(i + 1) % sz];
+	return ret;
+}
 struct Seg {
 	Pos a, b;
-	int i, si;
-	Polygonf INX;//intersections
-	Seg(Pos A = Pos(), Pos B = Pos()) : a(A), b(B) { i = -1, si = -1, INX.clear(); }
+	int i;
+	Seg(Pos A = Pos(), Pos B = Pos()) : a(A), b(B) { i = -1; }
 	Pos inx(const Seg& o) const { return intersection(a, b, o.a, o.b); }
-	void inx_sort() {
-		std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
-			return (a - p).Euc() < (a - q).Euc();
-			});
-		INX.erase(unique(INX.begin(), INX.end()), INX.end());
+} seg[LEN], frag[LEN * LEN * 10];
+Polygon INX[LEN];
+void inx_sort(Polygon& INX, const Pos& a) {
+	std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
+		return (a - p).Euc() < (a - q).Euc();
+		});
+	INX.erase(unique(INX.begin(), INX.end()), INX.end());
+}
+inline ld intersection(const Seg& s1, const Seg& s2) {
+	const Pos& p1 = s1.a, p2 = s1.b, q1 = s2.a, q2 = s2.b;
+	ld det = (q2 - q1) / (p2 - p1);
+	if (zero(det)) return -1;
+	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
+	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
+	if (-TOL < a1 && a1 < 1 + TOL && -TOL < a2 && a2 < 1 + TOL) return a1;
+	return -1;
+}
+int I, I0;
+std::map<Pos, Polygon> map_pos;
+ld A[LEN * LEN + 10];
+Polygon cell[LEN * LEN + 10]; int ci;
+std::set<int> cell_i[LEN * LEN + 10];
+int P[LEN * LEN + 10];//disjoint set
+int find(int i) { return P[i] < 0 ? i : P[i] = find(P[i]); }
+bool join(int i, int j) {
+	i = find(i), j = find(j);
+	if (i == j) return 0;
+	if (P[i] < P[j]) P[i] += P[j], P[j] = i;
+	else P[j] += P[i], P[i] = j;
+	return 1;
+}
+int V[LEN * LEN * 10];
+Vint GS[LEN * LEN * 10];
+void dfs(const int& i, int v) {
+	V[v] = 1;
+	cell[i].push_back(frag[v].a);
+	cell_i[i].insert(v);
+	for (const int& w : GS[v]) {
+		if (V[w]) continue;
+		dfs(i, w);
 	}
-} seg[LEN * LEN * LEN], border = Seg(Pos(-1e5 - 1, -1e5 - 1), Pos(-1e5 - 1, +1e5 + 1));
-int I;
-std::map<Pos, Polygonf> map_pos;
+	return;
+}
+struct Info {
+	int i, c;
+	Info(int i_ = 0, int c_ = 0) : i(i_), c(c_) {}
+};
+std::vector<Info> GC[LEN * LEN * 10];
+int zero_one_bfs(int v, int g) {
+	memset(V, -1, sizeof V);
+	std::deque<Info> DQ;
+	DQ.push_front(Info(v, 0));
+	V[v] = 0;
+	while (DQ.size()) {
+		Info p = DQ.front(); DQ.pop_front();
+		if (p.i == g) return V[g];
+		for (const Info& w : GC[p.i]) {
+			if (!~V[w.i]) {
+				if (w.c) DQ.push_back(w);
+				else if (!w.c) DQ.push_front(w);
+				V[w.i] = V[p.i] + w.c;
+			}
+		}
+	}
+#ifdef DEBUG
+	std::cout << "I am stupid\n";
+	assert(~V[g]);
+#endif
+	return V[g];
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(7);
-	std::cin >> M >> p0 >> p1;
+	std::cout.precision(15);
+	std::cin >> M >> bp0 >> bp1;
+	bp0.den = 1; p0 = conv(bp0);
+	bp1.den = 1; p1 = conv(bp1);
+	if (M <= 2 || bp0 == bp1) { std::cout << "0\n"; return; }
 	for (int i = 0; i < M; i++) {
-		std::cin >> segi[i].a >> segi[i].b;
-		segi[i].i = i;
+		std::cin >> B[i];
+		B[i].a.den = B[i].b.den = 1;
+		seg[i].a = conv(B[i].a);
+		seg[i].b = conv(B[i].b);
+		seg[i].i = i;
+		seg[i].a.i = i;
+		seg[i].b.i = i;
 	}
-	Polygonf INXS;
+	bool f0 = 1;
+	Polygon INXS;
 	for (int i = 0; i < M; i++) {
+		if (intersect(bp0, bp1, B[i].a, B[i].b)) f0 = 0;
 		for (int j = i + 1; j < M; j++) {
-			Pos X = segi[i].inx(segi[j]);
-			segi[i].INX.push_back(X);
-			segi[j].INX.push_back(X);
-			INXS.push_back(X);
+			BigPos inx = intersection(B[i], B[j]);
+			if (inx.den) {
+#ifdef DEBUG
+				std::cout << "FUUUUCK!!!\n";
+				std::cout << "FUCK:: S[i].a:: " << B[i].a << " S[i].b:: " << B[i].b << "\n";
+				std::cout << "FUCK:: S[j].a:: " << B[j].a << " S[j].b:: " << B[j].b << "\n";
+				std::cout << "FUCK:: inx:: " << conv(inx) << "\n";
+				std::cout << "FUUUUCK!!!\n";
+#endif
+				Pos X = conv(inx);
+				INX[i].push_back(X);
+				INX[j].push_back(X);
+				INXS.push_back(X);
+			}
 		}
 	}
+	if (f0) { std::cout << "0\n"; return; }
 	std::sort(INXS.begin(), INXS.end());
 	INXS.erase(unique(INXS.begin(), INXS.end()), INXS.end());
 	I = 0;
 	for (int i = 0; i < M; i++) {
-		segi[i].inx_sort();
-		Polygonf& V = segi[i].INX;
-		int sz = V.size();
+		inx_sort(INX[i], seg[i].a);
+		Polygon& v = INX[i];
+		int sz = v.size();
 		for (int j = 0; j < sz - 1; j++) {
-			seg[I] = Seg(V[j], V[j + 1]);
-			seg[I].i = I;
-			seg[I].si = i;
-			I++;
-			seg[I] = Seg(V[j + 1], V[j]);
-			seg[I].i = I;
-			seg[I].si = i;
+			frag[I] = Seg(v[j], v[j + 1]);
+			frag[I].i = I;
 			I++;
 		}
 	}
+	I0 = I;
+	for (int i = 0; i < M; i++) {
+		Polygon& v = INX[i];
+		int sz = v.size();
+		for (int j = 0; j < sz - 1; j++) {
+			frag[I] = Seg(v[j + 1], v[j]);
+			frag[I].i = I;
+			I++;
+		}
+	}
+
 	for (int i = 0; i < I; i++) {
-		Pos key = seg[i].a;
-		Pos vec = seg[i].b - seg[i].a;
-		vec.pi = seg[i].i;
-		vec.si = seg[i].si;
+		key = frag[i].a;
+		vec = frag[i].b - frag[i].a;
+		vec.i = frag[i].i;
 		map_pos[key].push_back(vec);
 
-		key = seg[i].b;
-		vec = seg[i].a - seg[i].b;
-		vec.pi = seg[i].i;
-		vec.si = seg[i].si;
+		key = frag[i].b;
+		vec = frag[i].a - frag[i].b;
+		vec.i = frag[i].i;
 		vec.rv = 1;
 		map_pos[key].push_back(vec);
 	}
-	memset(P, -1, sizeof P);
 	for (const Pos& key : INXS) {
-		Polygonf& V = map_pos[key];
-		std::sort(V.begin(), V.end(), cmpr);
-		int sz = V.size();
+		Polygon& v = map_pos[key];
+		std::sort(v.begin(), v.end(), cmpr);
+		int sz = v.size();
+#ifdef DEBUG
+		std::cout << "DEBUG:: key:: " << key << "\n";
+		std::cout << "DEBUG:: sz:: " << sz << "\n";
+		for (int k = 0; k < sz; k++) {
+			std::cout << "v[" << k << "]:: "  << v[k] << " i:: " << v[k].i << " rv:: " << v[k].rv << "\n";
+		}
+		std::cout << "FUCK::\n";
+#endif
+		assert(!(sz & 1));
 		for (int j = 0; j < sz; j += 2) {
-			Pos cur = V[(j - 1) % sz], nxt = V[j];
-			join(cur.pi, nxt.pi);
+			Pos cur = v[(j - 1 + sz) % sz], nxt = v[j];
+			assert(cur.rv != nxt.rv);
+			GS[nxt.i].push_back(cur.i);
 		}
 	}
+	memset(V, 0, sizeof V);
+	ci = 0;
+	for (int i = 0; i < I; i++) {
+		if (!V[i]) {
+			dfs(ci, i);
+			A[ci] = area(cell[ci]);
+#ifdef DEBUG
+			std::cout << "FUCK:: i:: " << i << " sz:: " << cell[ci].size() << "\n";
+			//for (const Pos& p : cell[ci]) std::cout << p << "\n";
+			std::cout << "FUCK:: A[" << ci << "]:: " << A[ci] << "\n";
+#endif
+			if (0 == A[ci]) {
+				cell[ci].clear();
+				cell_i[ci].clear();
+				A[ci] = 0;
+				ci--;
+			}
+			ci++;
+		}
+	}
+	memset(P, -1, sizeof P);
+	for (int i = 0; i < ci; i++) {
+		std::set<int>& CUR = cell_i[i];
+		for (int j = i + 1; j < ci; j++) {
+			std::set<int>& NXT = cell_i[j];
+			for (const int& idx : CUR) {
+				if (NXT.count(idx + I0) || NXT.count(idx - I0)) {
+					GC[i].push_back(Info(j, 1));
+					GC[j].push_back(Info(i, 1));
+					join(i, j);
+					break;
+				}
+			}
+		}
+	}
+#ifdef DEBUG
+	std::cout << "FUCK::\n";
+	for (int i = 0; i < ci; i++) {
+		std::cout << "cell[" << i << "]\n";
+		for (const Pos& p : cell[i]) std::cout << p << "\n";
+	}
+	std::cout << "FUCK::\n";
+#endif
+	int s = ci, e = ci;
+	for (int i = 0; i < ci; i++) {
+		int out = -1;
+		if (sign(A[i]) > 0) {
+			if (inner_check(cell[i], p0)) s = i;
+			if (inner_check(cell[i], p1)) e = i;
+			continue;
+		}
+		else {
+			for (int j = 0; j < ci; j++) {//O(5051 * 20000)
+				if (sign(A[j]) < 0) continue;
+				if (i == j || find(i) == find(j)) continue;
+				if (out >= 0 && find(out) == find(j)) continue;
+				if (out >= 0 && (A[out] < A[j])) continue;
+				if (inner_check(cell[j], cell[i][0]) == 2) {
+					if (out < 0 || (A[out] > A[j])) out = j;
+				}
+			}
+		}
+		if (!~out) {
+			GC[i].push_back(Info(ci, 0));
+			GC[ci].push_back(Info(i, 0));
+		}
+		else {
+			GC[i].push_back(Info(out, 0));
+			GC[out].push_back(Info(i, 0));
+		}
+	}
+#ifdef DEBUG
+	std::cout << "FUCK::\n";
+	for (int i = 0; i <= ci; i++) {
+		std::cout << "GC[" << i << "] A:: " << A[i] << "\n";
+		for (const Info& p : GC[i]) std::cout << p.i << " " << p.c << "\n";
+	}
+	std::cout << "FUCK::\n";
+	std::cout << "s, e:: " << s << " " << e << "\n";
+#endif
+	if (s == e) { std::cout << "0\n"; return; }
+	std::cout << zero_one_bfs(s, e) << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj8883
+int main() { solve(); return 0; }//boj10061
+
+/*
+
+8 3 3 19 3
+0 1 22 1
+0 5 22 5
+1 0 1 6
+5 0 5 6
+9 0 9 6
+13 0 13 6
+17 0 17 6
+21 0 21 6
+
+*/
