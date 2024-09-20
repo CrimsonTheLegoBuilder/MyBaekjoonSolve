@@ -11,13 +11,13 @@
 #include <map>
 #include <set>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 const ll INF = 1e17;
 const int LEN = 105;
-const ld TOL = 1e-20;
+const ld TOL = 1e-25;
 inline int sign(const ll& x) { return x < 0 ? -1 : x > 0; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -28,7 +28,7 @@ ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 //#define DEBUG
 
 int N, M;
-struct BigPos {//what the fuck??? holly shit fucking floating point accuracy error!!
+struct BigPos {//what the fuck??? holy shit fucking floating point accuracy error!!
 	ll x, y, den;
 	BigPos(ll X = 0, ll Y = 0, ll D = 1) : x(X), y(Y), den(D) {}
 	bool operator == (const BigPos& p) const { return x == p.x && y == p.y; }
@@ -84,9 +84,9 @@ struct Pos {
 	int i;
 	bool rv;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { i = -1, rv = 0; }
-	/*bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
-	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
-	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }*/
+	//bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
+	//bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
+	//bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -115,7 +115,6 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << "(" << p.x << ", " << p.y << ")"; return os; }
 } p0, p1, key, vec; const Pos O = Pos(0, 0); const Pos INVAL = Pos(INF, INF);
 typedef std::vector<Pos> Polygon;
-typedef std::deque<Pos> PosDeque;
 Pos conv(const BigPos& b) {
 	ld x = 1. * b.x / b.den;
 	ld y = 1. * b.y / b.den;
@@ -130,7 +129,6 @@ bool cmpr(const Pos& p, const Pos& q) {
 	//if (f1 != f2) return f1;
 	//int tq = ccw(O, p, q);
 	//return !tq ? p.rv > q.rv : tq > 0;
-
 	ld tp = p.rad();
 	ld tq = q.rad();
 	return tp == tq ? p.rv > q.rv : tp < tq;
@@ -148,14 +146,14 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-bool inner_check(const Polygon& H, const Pos& p) {//concave
+int inner_check(const Polygon& H, const Pos& p) {//concave
 	int sz = H.size(), cnt = 0;
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
 		if (on_seg_strong(cur, nxt, p)) return 1;
 		if (cur.y == nxt.y) continue;
 		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		if (nxt.y <= p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
 	return (cnt & 1) * 2;
@@ -375,16 +373,18 @@ void solve() {
 	std::cout << "FUCK::\n";
 	for (int i = 0; i < ci; i++) {
 		std::cout << "cell[" << i << "]\n";
+		std::cout << "A[" << i << "]:: " << A[i] << "\n";
 		for (const Pos& p : cell[i]) std::cout << p << "\n";
 	}
 	std::cout << "FUCK::\n";
 #endif
 	int s = ci, e = ci;
+	ld sa = INF, ea = INF;
 	for (int i = 0; i < ci; i++) {
 		int out = -1;
 		if (sign(A[i]) > 0) {
-			if (inner_check(cell[i], p0)) s = i;
-			if (inner_check(cell[i], p1)) e = i;
+			if (sa > A[i] && inner_check(cell[i], p0)) { s = i; sa = A[i]; }
+			if (ea > A[i] && inner_check(cell[i], p1)) { e = i; ea = A[i]; }
 			continue;
 		}
 		else {
@@ -420,18 +420,4 @@ void solve() {
 	std::cout << zero_one_bfs(s, e) << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj10061
-
-/*
-
-8 3 3 19 3
-0 1 22 1
-0 5 22 5
-1 0 1 6
-5 0 5 6
-9 0 9 6
-13 0 13 6
-17 0 17 6
-21 0 21 6
-
-*/
+int main() { solve(); return 0; }//boj10061 Wire Crossing
