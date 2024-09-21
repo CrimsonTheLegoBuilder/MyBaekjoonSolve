@@ -74,7 +74,6 @@ struct BigSeg {
 	BigPos a, b;
 	friend std::istream& operator >> (std::istream& is, BigSeg& s) { is >> s.a >> s.b; return is; }
 } B[LEN];
-bool intersect(const BigSeg& s1, const BigSeg& s2) { intersect(s1.a, s1.b, s2.a, s2.b); }
 BigPos intersection(const BigSeg& s1, const BigSeg& s2) {
 	if (!intersect(s1.a, s1.b, s2.a, s2.b)) return BINVAL;
 	return intersection(s1.a, s1.b, s2.a, s2.b);
@@ -176,15 +175,6 @@ void inx_sort(Polygon& INX, const Pos& a) {
 		return (a - p).Euc() < (a - q).Euc();
 		});
 	INX.erase(unique(INX.begin(), INX.end()), INX.end());
-}
-inline ld intersection(const Seg& s1, const Seg& s2) {
-	const Pos& p1 = s1.a, p2 = s1.b, q1 = s2.a, q2 = s2.b;
-	ld det = (q2 - q1) / (p2 - p1);
-	if (zero(det)) return -1;
-	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
-	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
-	if (-TOL < a1 && a1 < 1 + TOL && -TOL < a2 && a2 < 1 + TOL) return a1;
-	return -1;
 }
 int I, I0;
 std::map<Pos, Polygon> map_pos;
@@ -302,7 +292,6 @@ void solve() {
 			I++;
 		}
 	}
-
 	for (int i = 0; i < I; i++) {
 		key = frag[i].a;
 		vec = frag[i].b - frag[i].a;
@@ -323,7 +312,7 @@ void solve() {
 		std::cout << "DEBUG:: key:: " << key << "\n";
 		std::cout << "DEBUG:: sz:: " << sz << "\n";
 		for (int k = 0; k < sz; k++) {
-			std::cout << "v[" << k << "]:: "  << v[k] << " i:: " << v[k].i << " rv:: " << v[k].rv << "\n";
+			std::cout << "v[" << k << "]:: " << v[k] << " i:: " << v[k].i << " rv:: " << v[k].rv << "\n";
 		}
 		std::cout << "FUCK::\n";
 #endif
@@ -397,14 +386,14 @@ void solve() {
 					if (out < 0 || (A[out] > A[j])) out = j;
 				}
 			}
-		}
-		if (!~out) {
-			GC[i].push_back(Info(ci, 0));
-			GC[ci].push_back(Info(i, 0));
-		}
-		else {
-			GC[i].push_back(Info(out, 0));
-			GC[out].push_back(Info(i, 0));
+			if (!~out) {
+				GC[i].push_back(Info(ci, 0));
+				GC[ci].push_back(Info(i, 0));
+			}
+			else {
+				GC[i].push_back(Info(out, 0));
+				GC[out].push_back(Info(i, 0));
+			}
 		}
 	}
 #ifdef DEBUG
