@@ -1347,6 +1347,9 @@
     <ClCompile Include="seonrinpc02_A.cpp">
       <Filter>소스 파일\_SeonrinPC</Filter>
     </ClCompile>
+    <ClCompile Include="boj10135_solar.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
