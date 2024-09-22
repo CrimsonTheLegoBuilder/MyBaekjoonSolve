@@ -73,6 +73,9 @@
     <Filter Include="소스 파일\_MatKorCupOpen">
       <UniqueIdentifier>{512719e2-e282-4c4e-b0e9-d201dd6055e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\_SPC">
+      <UniqueIdentifier>{ebee3793-a330-4b5c-9b88-2816ed0091f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="boj28401_cnvxhull.cpp">
@@ -1337,6 +1340,12 @@
     </ClCompile>
     <ClCompile Include="boj10061_wire.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="spc02_E.cpp">
+      <Filter>소스 파일\_SPC</Filter>
+    </ClCompile>
+    <ClCompile Include="spc02_A.cpp">
+      <Filter>소스 파일\_SPC</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
