@@ -153,7 +153,6 @@ int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	}
 	return (cnt & 1) * 2;
 }
-ld cal_theta(const Pos& i0, const Pos& i1, const Pos& j0, const Pos& j1) { return rad(j1 - j0, i0 - i1); }
 Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t) {
 	int sz = B.size();
 	for (int j = 0; j < sz; j++) B[j].rot(t);
@@ -632,7 +631,7 @@ void solve() {
 		Pos& I0 = A[i], & I1 = A[(i + 1) % N];
 		for (int j = 0; j < M; j++) {
 			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
-			ld t = cal_theta(I0, I1, J0, J1);
+			ld t = rad(J0 - J1, I1 - I0);
 			Polygon B2 = rotate_and_norm(B, j, A, i, t);
 			ret = std::max(ret, sweep(A, B2, I1 - J1));
 		}
