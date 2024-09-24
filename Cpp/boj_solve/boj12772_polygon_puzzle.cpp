@@ -12,8 +12,11 @@ typedef long long ll;
 //typedef double ld;
 typedef long double ld;
 typedef std::pair<int, int> pi;
-const ll INF = 1e17;
-const int LEN = 1e4 + 5;
+typedef std::vector<int> Vint;
+typedef std::vector<ll> Vll;
+typedef std::vector<ld> Vld;
+const ll INF = 1e17;		  
+const int LEN = 105;
 const ld TOL = 1e-7;
 //const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -77,8 +80,8 @@ ll hash(const Pos& p) { return (((ll)p.x + 100000) << 32) | ((ll)p.y + 100000); 
 struct PosHash { std::size_t operator() (const Pos& p) const { return hash(p); } };
 typedef std::set<Pos> SetPos;
 typedef std::vector<Pos> Polygon;
-int len[4];
-Polygon H[4];
+int len[10];
+Polygon H[10];
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -88,6 +91,7 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = c
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
 bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
+Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool weak = WEAK) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
@@ -102,6 +106,28 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool 
 		on_seg_strong(d1, d2, s1) ||
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
+}
+Polygon graham_scan(Polygon& C) {
+	Polygon H;
+	if (C.size() < 3) {
+		std::sort(C.begin(), C.end());
+		return C;
+	}
+	std::swap(C[0], *min_element(C.begin(), C.end()));
+	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
+		int ret = ccw(C[0], p, q);
+		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
+		return ret > 0;
+		}
+	);
+	C.erase(unique(C.begin(), C.end()), C.end());
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
+			H.pop_back();
+		H.push_back(C[i]);
+	}
+	return H;
 }
 ld area(const Polygon& H) {
 	ld ret = 0;
@@ -128,35 +154,12 @@ int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	return (cnt & 1) * 2;
 }
 ld cal_theta(const Pos& i0, const Pos& i1, const Pos& j0, const Pos& j1) { return rad(j1 - j0, i0 - i1); }
-Polygon rotate(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t) {
+Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t) {
 	int sz = B.size();
 	for (int j = 0; j < sz; j++) B[j].rot(t);
 	Pos v = A[i0] - B[j0];
 	for (int j = 0; j < sz; j++) B[j] += v;
 	return B;
-}
-struct Line {//ax + by = c
-	Pos s;
-	ll c;
-	inline Line(Pos V = Pos(0, 0), ll C = 0) : s(V), c(C) {}
-	inline bool operator == (const Line& l) const { return s == l.s && c == l.c; }
-	inline bool operator < (const Line& l) const {
-		bool f1 = cmpx(O, s);
-		bool f2 = cmpx(O, l.s);
-		if (f1 != f2) return f1;
-		ll CCW = s / l.s;
-		return !CCW ? c < l.c : CCW > 0;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Line& l) { os << l.s.x << " " << l.s.x << " " << l.c; return os; }
-};
-Line L(const Pos& s, const Pos& e) {
-	int dy, dx; ll c;
-	dy = e.y - s.y;
-	dx = s.x - e.x;
-	int _gcd = gcd(std::abs(dy), std::abs(dx));
-	dy /= _gcd; dx /= _gcd;
-	c = (ll)dy * s.x + (ll)dx * s.y;
-	return Line(Pos(dy, dx), c);
 }
 struct Seg {
 	Pos s, e;
@@ -359,27 +362,6 @@ inline bool sweep(const int& sz) {
 	}
 	return 0;
 }
-bool polygon_cross_check(const Polygon& H, const int& n) {
-	memset(seg, 0, sizeof seg);
-	memset(pos, 0, sizeof pos);
-	int sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		Pos s = H[i], e = H[(i + 1) % sz];
-		if (e < s) std::swap(s, e);
-		seg[i].s = s;
-		seg[i].e = e;
-		seg[i].h = n;
-		seg[i].i = i;
-		s.i = e.i = i;
-		s.d = 1, e.d = -1;
-		pos[i << 1] = s;
-		pos[i << 1 | 1] = e;
-	}
-	sz <<= 1;
-	std::sort(pos, pos + sz);
-	ST.clear();
-	return sweep(sz);
-}
 bool two_polygon_cross_check(const Polygon& H1, const Polygon& H2, const int& n1, const int& n2) {
 	memset(seg, 0, sizeof seg);
 	memset(pos, 0, sizeof pos);
@@ -520,12 +502,34 @@ inline bool inner_check(const Polygon& A, const int& a, const Polygon& B, const 
 
 	return 0;
 }
-ld polygon_cross_check(Polygon A, Polygon B) {
+void cross_check(const Polygon& H, const Pos& p, const Pos& q, Polygon& inx) {
+	bool fp = 1, fq = 1;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		const Pos& cur = H[i], & nxt = H[(i + 1) % sz];
+		if (intersect(cur, nxt, p, q, STRONG)) {
+			if (!collinear(cur, nxt, p, q)) inx.push_back(intersection(cur, nxt, p, q));
+			else {
+				if (on_seg_strong(p, q, cur)) inx.push_back(cur);
+				if (on_seg_strong(p, q, nxt)) inx.push_back(nxt);
+				if (on_seg_strong(cur, nxt, p))inx.push_back(p);
+				if (on_seg_strong(cur, nxt, q))inx.push_back(q);
+			}
+		}
+		if (ccw(cur, nxt, p) < 0) fp = 0;
+		if (ccw(cur, nxt, q) < 0) fq = 0;
+	}
+	if (fp) inx.push_back(p);
+	if (fq) inx.push_back(q);
+	std::sort(inx.begin(), inx.end());
+	inx.erase(unique(inx.begin(), inx.end()), inx.end());
+	return;
+}
+ld polygon_cross_check(const Polygon& A, const Polygon& B) {
+	ld ret;
 	INNER_CHECK = 0;
 	EDGE_IGNORE = 0;
 	ai = bi = -1;
-	N = A.size();
-	M = B.size();
 	len[0] = N;
 	len[1] = M;
 
@@ -544,32 +548,69 @@ ld polygon_cross_check(Polygon A, Polygon B) {
 	}
 
 	std::vector<Bound> VS, V, VA, VB;
-	INNER_CHECK = 1;
 	std::vector<Bound>().swap(VS);
 	std::vector<Bound>().swap(V);
 	bnd_init(H[0], H[1], VS, 0, 1);
-	bnd_remove(VS, V, NO_MERGE);
+	ret = bnd_remove(VS, V, NO_MERGE);
+
+	INNER_CHECK = 1;
 	int sz = V.size();
-	for (int i = 0; i < sz; i++) {
-		if (V[i].i == 1) VB.push_back(V[i]);
-	}
-	bool fa = two_polygon_cross_check(A, VB, 0, 1);
+	for (int i = 0; i < sz; i++) if (V[i].i == 1) VB.push_back(V[i]);
+	if (two_polygon_cross_check(A, VB, 0, 1)) return -1.;
 	INNER_CHECK = 0;
 
-	if (fa) return -1;
+	//if (inner_check(A, B[0]) == 2 || inner_check(B, A[0]) == 2) return -1.;
 
-	if (inner_check(A, B[0]) == 2 || inner_check(B, A[0]) == 2) return -1;
-
-	return 1;
+	return ret;
 }
 ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 	ld ret = 0;
-	for (int i = 0; i < N; i++) {
-		const Pos& I0 = A[i], & I1 = A[(i + 1) % N];
-		for (int j = 0; j < M; j++) {
-			const Pos& J0 = B[j], & J1 = B[(j + 1) % M];
-			if (intersect(I0, I1, J1, J0)) ret = std::max(ret, polygon_cross_check(A, B));
+	bool prl = 0;
+	Vld V;
+	Polygon inx;
+	for (int j = 0; j < M; j++) {
+		prl = 0;
+		Pos J0 = B[j], J1 = B[(j + 1) % M];
+		ld tq = v / (J0 - J1);
+		ld h = std::abs(tq / v.mag());
+		if (zero(tq)) prl = 1;
+		Polygon box = { J0, J1, J0 + v, J1 + v };
+		box = graham_scan(box);
+		for (int i = 0; i < N; i++) {
+			Pos I0 = A[i], I1 = A[(i + 1) % N];
+			if (prl && collinear(I0, I1, J0, J1)) {
+				if (dot(I0, I1, J0, J1) > 0) continue;
+				inx.clear();
+				if (v * (J0 - J1) < 0) std::swap(J0, J1);
+				Pos J2 = J1 + v;
+				if (on_seg_strong(J1, J2, I0)) inx.push_back(I0);
+				if (on_seg_strong(J1, J2, I1)) inx.push_back(I1);
+				if (on_seg_strong(I0, I1, J1)) inx.push_back(J1);
+				if (on_seg_strong(I0, I1, J2)) inx.push_back(J2);
+				for (const Pos& p : inx) {
+					V.push_back(std::abs((J1 -p).mag()));
+				}
+
+			}
+			else if (!prl) {
+				inx.clear();
+				cross_check(box, I0, I1, inx);
+				for (const Pos& p : inx) {
+					ld tmp = cross(J0, J1, p);
+					V.push_back(std::abs(tmp / h));
+				}
+			}
 		}
+	}
+	std::sort(V.begin(), V.end());
+	V.erase(unique(V.begin(), V.end()), V.end());
+	int sz = V.size();
+	for (const ld& d : V) {
+		Pos vec = v.unit() * d;
+		Polygon B2;
+		for (const Pos& p : B) B2.push_back(p + vec);
+		T = 0; for (Pos& p : B2) p.i = T, T++, p.d = 1;
+		ret = std::max(ret, polygon_cross_check(A, B2));
 	}
 	return ret;
 }
@@ -580,6 +621,8 @@ void solve() {
 	std::cin >> N;  Polygon A(N);
 	for (Pos& p : A) std::cin >> p;
 	norm(A);
+	T = 0; for (Pos& p : A) p.i = T, T++, p.d = 0;
+
 	std::cin >> M; Polygon B(M);
 	for (Pos& p : B) std::cin >> p;
 	norm(B);
@@ -590,7 +633,7 @@ void solve() {
 		for (int j = 0; j < M; j++) {
 			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
 			ld t = cal_theta(I0, I1, J0, J1);
-			Polygon B2 = rotate(B, j, A, i, t);
+			Polygon B2 = rotate_and_norm(B, j, A, i, t);
 			ret = std::max(ret, sweep(A, B2, I1 - J1));
 		}
 	}
