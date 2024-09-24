@@ -7,6 +7,7 @@
 #include <cassert>
 #include <vector>
 #include <set>
+#include <map>
 typedef long long ll;
 //typedef double ld;
 typedef long double ld;
@@ -83,8 +84,10 @@ ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ll ret = cross(d1, d2, d3); return sign(ret); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { ll ret = cross(d1, d2, d3, d4); return sign(ret); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
+bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool weak = WEAK) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
@@ -170,19 +173,28 @@ struct Seg {
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) { os << "DEBUG::Seg s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n"; return os; }
 } seg[LEN << 3];
 struct Bound {
-	Line l;
 	Pos s, e;
 	int i;
-	Bound(Pos S = Pos(0, 0), Pos E = Pos(0, 0), int I = -1) : s(S), e(E), i(I) { l = L(S, E); }
-	bool operator == (const Bound& S) const { return l == S.l && s == S.s && e == S.e; }
+	Bound(Pos S = Pos(0, 0), Pos E = Pos(0, 0), int I = -1) : s(S), e(E), i(I) {}
+	bool operator == (const Bound& S) const { return s == S.s && e == S.e; }
 	bool operator != (const Bound& S) const { return !(*this == S); }
-	//bool operator < (const Bound& S) const { return (l == S.l) ? (s == S.s) ? e < S.e : s < S.s : l < S.l; }
-	bool operator < (const Bound& S) const { return (l == S.l) ? (s == S.s) ? cmpx(e, S.e) : cmpx(s, S.s) : l < S.l; }
+	bool operator < (const Bound& S) const {
+		int tq = ccw(s, e, S.s, S.e);
+		if (!tq) {
+			if (collinear(s, e, S.s, S.e)) {
+				if (s == S.s) return e < S.e;
+				return s < S.s;
+			}
+			return ccw(s, e, S.s) > 0;
+		}
+		return tq > 0;
+	}
 	friend std::ostream& operator << (std::ostream& os, const Bound& S) {
-		os << "DEBUG::Seg l: " << S.l << " | s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n";
+		os << "DEBUG::Seg:: s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n";
 		return os;
 	}
 };
+bool collinear(const Bound& a, const Bound& b) { return collinear(a.s, a.e, b.s, b.e); }
 bool intersect(const int& a, const int& b) {
 	if (INNER_CHECK) {
 		Seg A = seg[a], B = seg[b];
@@ -444,7 +456,7 @@ void make_bnd(std::vector<Bound>& V, const Pos& x1, const Pos& x2, const int& n)
 	V.push_back(Bound(d1, d2, n));
 	return;
 }
-void bnd_init(Polygon& h1, Polygon& h2, std::vector<Bound>& V, const int& n1 = -1, const int& n2 = -1) {
+void bnd_init(const Polygon& h1, const Polygon& h2, std::vector<Bound>& V, const int& n1 = -1, const int& n2 = -1) {
 	int sz1 = h1.size();
 	int sz2 = h2.size();
 	for (int i = 0; i < sz1; i++) make_bnd(V, h1[i], h1[(i + 1) % sz1], n1);
@@ -452,11 +464,12 @@ void bnd_init(Polygon& h1, Polygon& h2, std::vector<Bound>& V, const int& n1 = -
 	std::sort(V.begin(), V.end());
 	return;
 }
-void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
+ld bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
+	ld rmv = 0;
 	int sz = V.size();
 	for (int i = 0, j; i < sz; i = j) {
 		j = i;
-		while (j < sz && V[i].l == V[j].l) j++;
+		while (j < sz && collinear(V[i], V[j])) j++;
 		for (int k = i; k < j - 1; k++) {
 			int nxt = k + 1;
 			if (V[k].e < V[nxt].s) continue;
@@ -465,6 +478,7 @@ void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 				std::swap(V[k].s, V[nxt].s);
 			}
 			else if (V[nxt].e < V[k].e) {
+				rmv += (V[nxt].e - V[nxt].s).mag();
 				int s = V[k].s.i;
 				int e = V[k].e.i;
 				std::swap(V[k].e, V[nxt].e);
@@ -474,6 +488,7 @@ void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 				V[k].e.i = V[nxt].e.i = e;
 			}
 			else if (V[k].e <= V[nxt].e) {
+				rmv += (V[k].e - V[nxt].s).mag();
 				std::swap(V[k].e, V[nxt].s);
 				std::swap(V[k].e.i, V[nxt].s.i);
 			}
@@ -481,13 +496,7 @@ void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
 	}
 	//std::sort(V2.begin(), V2.end());
-	return;
-}
-inline bool two_polygon_equal_check(std::vector<Bound>& V1, std::vector<Bound>& V2) {
-	int sz = V1.size();
-	if (sz != V2.size()) { return 0; }
-	for (int i = 0; i < sz; i++) if (V1[i] != V2[i]) { return 0; }
-	return 1;
+	return rmv;
 }
 inline bool inner_check(const Polygon& A, const int& a, const Polygon& B, const int& b) {
 	int sza = A.size();
@@ -511,35 +520,17 @@ inline bool inner_check(const Polygon& A, const int& a, const Polygon& B, const 
 
 	return 0;
 }
-int polygon_cross_check(Polygon A, Polygon B) {
+ld polygon_cross_check(Polygon A, Polygon B) {
 	INNER_CHECK = 0;
 	EDGE_IGNORE = 0;
 	ai = bi = -1;
-
-	ll aa = area(H[0]), ba = area(H[1]), aba = area(H[2]);
-	bool aeq = aa + ba == aba;
-
-	std::vector<Bound> VS, V, VA, VB, VAB;
-	bnd_init(H[0], H[1], VS);
-	bnd_remove(VS, V);
-	bnd_init(H[2], H[3], VAB);
-
-	if (V.empty()) return -1;
-
-	bool seq = two_polygon_equal_check(V, VAB);
-
-	if (aeq && seq) return 0;
-	if (!aeq && seq) return -1;
-
-	const Polygon& A = H[0];
-	const Polygon& B = H[1];
 	N = A.size();
 	M = B.size();
 	len[0] = N;
 	len[1] = M;
 
 	EDGE_IGNORE = 1;
-	if (two_polygon_cross_check(A, B, 0, 1)) return -1;
+	if (two_polygon_cross_check(A, B, 0, 1)) return -1.;
 	EDGE_IGNORE = 0;
 
 	SetPos SB;
@@ -548,17 +539,20 @@ int polygon_cross_check(Polygon A, Polygon B) {
 		auto p = SB.find(A[a]);
 		if (p != SB.end()) {
 			int b = p->i;
-			if (inner_check(A, a, B, b)) return -1;
+			if (inner_check(A, a, B, b)) return -1.;
 		}
 	}
 
+	std::vector<Bound> VS, V, VA, VB;
 	INNER_CHECK = 1;
 	std::vector<Bound>().swap(VS);
 	std::vector<Bound>().swap(V);
 	bnd_init(H[0], H[1], VS, 0, 1);
 	bnd_remove(VS, V, NO_MERGE);
 	int sz = V.size();
-	for (int i = 0; i < sz; i++) if (V[i].i == 1) VB.push_back(V[i]);
+	for (int i = 0; i < sz; i++) {
+		if (V[i].i == 1) VB.push_back(V[i]);
+	}
 	bool fa = two_polygon_cross_check(A, VB, 0, 1);
 	INNER_CHECK = 0;
 
@@ -568,15 +562,16 @@ int polygon_cross_check(Polygon A, Polygon B) {
 
 	return 1;
 }
-ld sweep(const Polygon& A, const Polygon& B) {
+ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
+	ld ret = 0;
 	for (int i = 0; i < N; i++) {
 		const Pos& I0 = A[i], & I1 = A[(i + 1) % N];
 		for (int j = 0; j < M; j++) {
 			const Pos& J0 = B[j], & J1 = B[(j + 1) % M];
-
+			if (intersect(I0, I1, J1, J0)) ret = std::max(ret, polygon_cross_check(A, B));
 		}
 	}
-	return 0;
+	return ret;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -596,7 +591,7 @@ void solve() {
 			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
 			ld t = cal_theta(I0, I1, J0, J1);
 			Polygon B2 = rotate(B, j, A, i, t);
-			ret = std::max(ret, sweep(A, B2));
+			ret = std::max(ret, sweep(A, B2, I1 - J1));
 		}
 	}
 	std::cout << ret << "n";
