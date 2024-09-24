@@ -46,7 +46,9 @@ struct Pos {
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { i = 0, d = 0; }
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
-	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	//bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	//bool operator < (const Pos& r) const { return x == r.x ? y == r.y ? d < r.d : y < r.y : x < r.x; }
+	bool operator < (const Pos& r) const { return zero(x - r.x) ? zero(y - r.y) ? d < r.d : y < r.y : x < r.x; }
 	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -79,6 +81,7 @@ typedef std::set<Pos> SetPos;
 typedef std::vector<Pos> Polygon;
 int len[10];
 Polygon H[10];
+bool cmpx(const Pos& p, const Pos& q) { return zero(p.x - q.x) ? p.y < q.y : p.x < q.y; }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -518,7 +521,7 @@ void cross_check(const Polygon& H, const Pos& p, const Pos& q, Polygon& inx) {
 	}
 	if (fp) inx.push_back(p);
 	if (fq) inx.push_back(q);
-	std::sort(inx.begin(), inx.end());
+	std::sort(inx.begin(), inx.end(), cmpx);
 	inx.erase(unique(inx.begin(), inx.end()), inx.end());
 	return;
 }
