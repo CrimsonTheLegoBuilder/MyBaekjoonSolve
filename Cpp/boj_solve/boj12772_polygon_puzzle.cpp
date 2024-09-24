@@ -75,9 +75,6 @@ struct Pos {
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 } pos[LEN << 3]; const Pos O = Pos(0, 0);
-bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
-ll hash(const Pos& p) { return (((ll)p.x + 100000) << 32) | ((ll)p.y + 100000); }
-struct PosHash { std::size_t operator() (const Pos& p) const { return hash(p); } };
 typedef std::set<Pos> SetPos;
 typedef std::vector<Pos> Polygon;
 int len[10];
@@ -148,7 +145,8 @@ int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 		if (on_seg_strong(cur, nxt, p)) return 1;
 		if (cur.y == nxt.y) continue;
 		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y <= p.y || cur.y > p.y) continue;
+		//if (nxt.y <= p.y || cur.y > p.y) continue;
+		if (nxt.y < p.y + TOL || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
 	return (cnt & 1) * 2;
@@ -353,7 +351,7 @@ public:
 		return p->i;
 	}
 } ST;
-inline void mirror(Polygon& H) { for (Pos& p : H) p.x *= -1; }
+//void mirror(Polygon& H) { for (Pos& p : H) p.x *= -1; }
 inline bool sweep(const int& sz) {
 	for (int i = 0; i < sz; i++) {
 		if (~pos[i].d) { if (ST.insert(pos[i].i)) { return 1; } }
@@ -479,7 +477,7 @@ ld bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 	//std::sort(V2.begin(), V2.end());
 	return rmv;
 }
-inline bool inner_check(const Polygon& A, const int& a, const Polygon& B, const int& b) {
+bool inner_check(const Polygon& A, const int& a, const Polygon& B, const int& b) {
 	int sza = A.size();
 	int szb = B.size();
 	int CCW;
@@ -525,7 +523,7 @@ void cross_check(const Polygon& H, const Pos& p, const Pos& q, Polygon& inx) {
 	return;
 }
 ld polygon_cross_check(const Polygon& A, const Polygon& B) {
-	ld ret;
+	ld ret = -1.;
 	INNER_CHECK = 0;
 	EDGE_IGNORE = 0;
 	ai = bi = -1;
@@ -576,28 +574,23 @@ ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 		Polygon box = { J0, J1, J0 + v, J1 + v };
 		box = graham_scan(box);
 		for (int i = 0; i < N; i++) {
+			inx.clear();
 			Pos I0 = A[i], I1 = A[(i + 1) % N];
 			if (prl && collinear(I0, I1, J0, J1)) {
-				if (dot(I0, I1, J0, J1) > 0) continue;
-				inx.clear();
+				if (sign(dot(I0, I1, J0, J1)) > 0) continue;
 				if (v * (J0 - J1) < 0) std::swap(J0, J1);
+				if (v * (I0 - I1) > 0) std::swap(I0, I1);
 				Pos J2 = J1 + v;
+				Pos vec = J0 - J1;
 				if (on_seg_strong(J1, J2, I0)) inx.push_back(I0);
-				if (on_seg_strong(J1, J2, I1)) inx.push_back(I1);
-				if (on_seg_strong(I0, I1, J1)) inx.push_back(J1);
-				if (on_seg_strong(I0, I1, J2)) inx.push_back(J2);
-				for (const Pos& p : inx) {
-					V.push_back(std::abs((J1 -p).mag()));
-				}
-
+				//if (on_seg_strong(J1, J2, I0 - vec)) inx.push_back(I0 - vec);
+				//if (on_seg_strong(J1, J2, I1)) inx.push_back(I1);
+				if (on_seg_strong(J1, J2, I1 - vec)) inx.push_back(I1 - vec);
+				for (const Pos& p : inx) V.push_back(std::abs((p - J1).mag()));
 			}
 			else if (!prl) {
-				inx.clear();
 				cross_check(box, I0, I1, inx);
-				for (const Pos& p : inx) {
-					ld tmp = cross(J0, J1, p);
-					V.push_back(std::abs(tmp / h));
-				}
+				for (const Pos& p : inx) V.push_back(std::abs(cross(J0, J1, p) / h));
 			}
 		}
 	}
@@ -608,7 +601,7 @@ ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 		Pos vec = v.unit() * d;
 		Polygon B2;
 		for (const Pos& p : B) B2.push_back(p + vec);
-		T = 0; for (Pos& p : B2) p.i = T, T++, p.d = 1;
+		T = 0; for (Pos& p : B2) p.i = T, T++;
 		ret = std::max(ret, polygon_cross_check(A, B2));
 	}
 	return ret;
@@ -617,10 +610,10 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 
-	std::cin >> N;  Polygon A(N);
+	std::cin >> N; Polygon A(N);
 	for (Pos& p : A) std::cin >> p;
 	norm(A);
-	T = 0; for (Pos& p : A) p.i = T, T++, p.d = 0;
+	T = 0; for (Pos& p : A) p.i = T, T++;
 
 	std::cin >> M; Polygon B(M);
 	for (Pos& p : B) std::cin >> p;
@@ -639,4 +632,41 @@ void solve() {
 	std::cout << ret << "n";
 	return;
 }
-int main() { return 0; }//boj4000 Kingdom Reunion
+int main() { solve(); return 0; }//boj12772 Polygonal Puzzle
+
+/*
+
+8
+0 0
+0 10
+10 10
+15 15
+24 6
+24 10
+30 10
+30 0
+7
+-5 0
+-5 10
+10 10
+15 5
+20 10
+35 10
+35 0
+
+30.142135624
+
+
+
+3
+1 0
+0 30
+40 0
+3
+1 0
+0 30
+40 0
+
+50
+
+*/
