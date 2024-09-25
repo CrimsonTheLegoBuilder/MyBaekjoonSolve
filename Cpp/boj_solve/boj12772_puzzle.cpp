@@ -442,14 +442,14 @@ inline bool sweep(const int& sz) {
 //	ST.clear();
 //	return sweep(sz);
 //}
-bool two_polygon_cross_check(const Polygon& H, const std::vector<Bound>& B, const int& n1, const int& n2) {
+bool two_polygon_cross_check(const Polygon& A, const std::vector<Bound>& B, const int& n1, const int& n2) {
 	memset(seg, 0, sizeof seg);
 	memset(pos, 0, sizeof pos);
 	ai = n1;
 	bi = n2;
-	int sz1 = H.size();
+	int sz1 = A.size();
 	for (int i = 0; i < sz1; i++) {
-		Pos s = H[i], e = H[(i + 1) % sz1];
+		Pos s = A[i], e = A[(i + 1) % sz1];
 		if (e < s) std::swap(s, e);
 		seg[i].s = s;
 		seg[i].e = e;
