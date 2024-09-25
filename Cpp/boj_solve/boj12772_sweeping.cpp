@@ -217,9 +217,6 @@ struct Seg {
 	bool operator != (const Seg& S) const { return !(*this == S); }
 	//bool operator < (const Seg& S) const { return (s == S.s) ? e < S.e : s < S.s; }
 	bool operator < (const Seg& rhs) const {
-		//if (rhs.s == s) return cross(rhs.s, rhs.e, e) < 0;
-		//if (rhs.s < s) return cross(rhs.s, rhs.e, s) < 0;
-		//return cross(rhs.s, rhs.e, e) < 0;
 		if (rhs.s == s) return ccw(rhs.s, rhs.e, e) < 0;
 		if (rhs.s < s) return ccw(rhs.s, rhs.e, s) < 0;
 		return ccw(rhs.s, rhs.e, e) < 0;
@@ -259,18 +256,6 @@ bool intersect(const int& a, const int& b) {
 	assert((A.s.i + 1) % len[A.h] == A.e.i);
 	if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
 	if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
-	//if (!B.s.d) {
-	//	if (B.s == A.s && inner_check(H[ai], A.s.i, H[bi], B.s.i)) return 1;
-	//	if (B.s == A.e && inner_check(H[ai], A.e.i, H[bi], B.s.i)) return 1;
-	//}
-	//if (!B.e.d) {
-	//	if (B.e == A.s && inner_check(H[ai], A.s.i, H[bi], B.e.i)) return 1;
-	//	if (B.e == A.e && inner_check(H[ai], A.e.i, H[bi], B.e.i)) return 1;
-	//}
-	//if (B.e.i != (B.s.i + 1) % len[B.h]) std::swap(B.s, B.e);
-	//assert((B.s.i + 1) % len[B.h] == B.e.i);
-	//if (on_seg_weak(B.s, B.e, A.s)) return ccw(B.s, B.e, A.e) > 0;
-	//if (on_seg_weak(B.s, B.e, A.e)) return ccw(B.s, B.e, A.s) > 0;
 	return 0;
 }
 struct Event {
@@ -364,28 +349,10 @@ public:
 		*pp = x;
 		splay(x);
 
-		//if (ST_DEBUG) {
-		//	std::cout << x->i << ' ';
-		//	//std::cout << seg[x->i].s << " " << seg[x->i].e << "\n";
-		//}
-
 		if (x->l) {
 			Node* l = x->l;
 			while (l->r) l = l->r;
-			//if (ST_DEBUG) {
-			//	std::cout << l->i << ' ';
-			//}
 			if (intersect(l->i, i)) {
-				//if (ST_DEBUG) {
-				//	std::cout << seg[x->i].s.i << " " << seg[x->i].s << " " << seg[x->i].e.i << " " << seg[x->i].e << "\n";
-				//	std::cout << seg[l->i].s.i << " " << seg[l->i].s << " " << seg[l->i].e.i << " " << seg[l->i].e << "\n";
-				//	std::cout << intersect(seg[x->i].s, seg[x->i].e, seg[l->i].s, seg[l->i].e, WEAK, EDGE_IGNORE) << "\n";
-				//	std::cout << cross(seg[x->i].s, seg[x->i].e, seg[l->i].s) << "\n";
-				//	std::cout << cross(seg[x->i].s, seg[x->i].e, seg[l->i].e) << "\n";
-				//	std::cout << cross(seg[l->i].s, seg[l->i].e, seg[x->i].s) << "\n";
-				//	std::cout << cross(seg[l->i].s, seg[l->i].e, seg[x->i].e) << "\n";
-				//	std::cout << "I was stupid... intersect\n";
-				//}
 				return 1;
 			}
 			splay(l);
@@ -394,26 +361,11 @@ public:
 		if (x->r) {
 			Node* r = x->r;
 			while (r->l) r = r->l;
-			//if (ST_DEBUG) {
-			//	std::cout << r->i << ' ';
-			//}
 			if (intersect(r->i, i)) {
-				//if (ST_DEBUG) {
-				//	std::cout << seg[x->i].s.i << " " << seg[x->i].s << " " << seg[x->i].e.i << " " << seg[x->i].e << "\n";
-				//	std::cout << seg[r->i].s.i << " " << seg[r->i].s << " " << seg[r->i].e.i << " " << seg[r->i].e << "\n";
-				//	std::cout << intersect(seg[x->i].s, seg[x->i].e, seg[r->i].s, seg[r->i].e, WEAK, EDGE_IGNORE) << "\n";
-				//	std::cout << cross(seg[x->i].s, seg[x->i].e, seg[r->i].s) << "\n";
-				//	std::cout << cross(seg[x->i].s, seg[x->i].e, seg[r->i].e) << "\n";
-				//	std::cout << cross(seg[r->i].s, seg[r->i].e, seg[x->i].s) << "\n";
-				//	std::cout << cross(seg[r->i].s, seg[r->i].e, seg[x->i].e) << "\n";
-				//	std::cout << "I was stupid... intersect\n";
-				//}
 				return 1;
 			}
 			splay(r);
 		}
-
-		//if (ST_DEBUG) std::cout << "inserted successfully, you idiot\n";
 
 		splay(x);
 		return 0;
@@ -464,7 +416,6 @@ public:
 		return p->i;
 	}
 } ST;
-//void mirror(Polygon& H) { for (Pos& p : H) p.x *= -1; }
 inline bool sweep(const int& sz) {
 	for (int i = 0; i < sz; i++) {
 		if (~pos[i].d) { if (ST.insert(pos[i].i)) { return 1; } }
@@ -472,40 +423,6 @@ inline bool sweep(const int& sz) {
 	}
 	return 0;
 }
-//bool two_polygon_cross_check(const Polygon& H1, const Polygon& H2, const int& n1, const int& n2) {
-//	memset(seg, 0, sizeof seg);
-//	memset(pos, 0, sizeof pos);
-//	int sz1 = H1.size();
-//	for (int i = 0; i < sz1; i++) {
-//		Pos s = H1[i], e = H1[(i + 1) % sz1];
-//		if (e < s) std::swap(s, e);
-//		seg[i].s = s;
-//		seg[i].e = e;
-//		seg[i].h = n1;
-//		seg[i].i = i;
-//		s.i = e.i = i;
-//		s.d = 1, e.d = -1;
-//		pos[i << 1] = s;
-//		pos[i << 1 | 1] = e;
-//	}
-//	int sz2 = H2.size();
-//	for (int i = 0; i < sz2; i++) {
-//		Pos s = H2[i], e = H2[(i + 1) % sz2];
-//		if (e < s) std::swap(s, e);
-//		seg[i + sz1].s = s;
-//		seg[i + sz1].e = e;
-//		seg[i + sz1].h = n2;
-//		seg[i + sz1].i = i;
-//		s.i = e.i = i + sz1;
-//		s.d = 1, e.d = -1;
-//		pos[(i + sz1) << 1] = s;
-//		pos[(i + sz1) << 1 | 1] = e;
-//	}
-//	int sz = (sz1 + sz2) << 1;
-//	std::sort(pos, pos + sz);
-//	ST.clear();
-//	return sweep(sz);
-//}
 bool two_polygon_cross_check(const Polygon& A, const std::vector<Bound>& B, const int& n1, const int& n2) {
 	memset(seg, 0, sizeof seg);
 	memset(pos, 0, sizeof pos);
@@ -613,17 +530,6 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 			if (inner_check(A, tmp[i].i, B, tmp[i + 1].i)) return -1;
 		}
 	}
-
-	//if (zero(40 - ret)) {
-	//	ST_DEBUG = __FUCK_YOU__;
-	//	std::cout << "A = [ \n";
-	//	for (const Pos& p : A) std::cout << p << ",\n";
-	//	std::cout << "]\n";
-	//	std::cout << "B = [ \n";
-	//	for (const Pos& p : B) std::cout << p << ",\n";
-	//	std::cout << "]\n";
-	//}
-	//else ST_DEBUG = __WHAT_THE__ __FUCK_YOU__;
 
 	sz = V.size();
 	for (int i = 0; i < sz; i++) {
@@ -740,7 +646,6 @@ void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v, const 
 					Pos J0_ = J0 + vec * d, J1_ = J1 + vec * d;
 					Pos Jpre_ = Jpre + vec * d;
 					if (ccw(I0, I1, Jpre_) <= 0 && ccw(I0, I1, J1_) <= 0) V.push_back(d);
-					//inx.push_back(intersection(J0, J2, I0, I1));
 				}
 				if (!collinear(J1, J3, I0, I1) && intersect(J1, J3, I0, I1, STRONG)) {
 					Pos p = intersection(J1, J3, I0, I1);
@@ -748,10 +653,7 @@ void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v, const 
 					Pos J0_ = J0 + vec * d, J1_ = J1 + vec * d;
 					Pos Jnxt_ = Jnxt + vec * d;
 					if (ccw(I0, I1, Jnxt_) <= 0 && ccw(I0, I1, J0_) <= 0) V.push_back(d);
-					//inx.push_back(intersection(J1, J3, I0, I1));
 				}
-				//cross_check(box, I0, I1, inx);
-				//for (const Pos& p : inx) V.push_back(std::abs(cross(J0, J1, p) / h));
 			}
 		}
 	}
