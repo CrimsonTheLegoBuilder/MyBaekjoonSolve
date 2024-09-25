@@ -24,6 +24,7 @@ inline bool zero(const ld& x) { return !sign(x); }
 int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
 //#define AUTO_CHECK
+//#define DEBUG
 
 #define STRONG 1
 #define WEAK 0
@@ -75,12 +76,11 @@ struct Pos {
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << "(" << p.x << ", " << p.y << ")"; return os; }
 } pos[LEN << 3]; const Pos O = Pos(0, 0);
 typedef std::set<Pos> SetPos;
 typedef std::vector<Pos> Polygon;
 int len[10];
-Polygon H[10];
 bool cmpx(const Pos& p, const Pos& q) { return zero(p.x - q.x) ? p.y < q.y : p.x < q.x; }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
@@ -156,7 +156,7 @@ int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 }
 Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t) {
 	int sz = B.size();
-	for (int j = 0; j < sz; j++) B[j].rot(t);
+	for (int j = 0; j < sz; j++) B[j] = B[j].rot(t);
 	Pos v = A[i0] - B[j0];
 	for (int j = 0; j < sz; j++) B[j] += v;
 	return B;
@@ -535,7 +535,9 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 
 	EDGE_IGNORE = 1;
 	if (two_polygon_cross_check(A, B, 0, 1)) {
+#ifdef DEBUG
 		std::cout << "FUCK:: 1::\n";
+#endif
 		return -1.;
 	}
 	EDGE_IGNORE = 0;
@@ -547,7 +549,9 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 		if (p != SB.end()) {
 			int b = p->i;
 			if (inner_check(A, a, B, b)) {
+#ifdef DEBUG
 				std::cout << "FUCK:: 2::\n";
+#endif
 				return -1.;
 			}
 		}
@@ -556,20 +560,25 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	std::vector<Bound> VS, V, VA, VB;
 	std::vector<Bound>().swap(VS);
 	std::vector<Bound>().swap(V);
-	bnd_init(H[0], H[1], VS, 0, 1);
+	bnd_init(A, B, VS, 0, 1);
 	ret = bnd_remove(VS, V, NO_MERGE);
 
 	INNER_CHECK = 1;
 	int sz = V.size();
 	for (int i = 0; i < sz; i++) if (V[i].i == 1) VB.push_back(V[i]);
 	if (two_polygon_cross_check(A, VB, 0, 1)) {
+#ifdef DEBUG
 		std::cout << "FUCK:: 3::\n";
+#endif
 		return -1.;
 	}
 	INNER_CHECK = 0;
 
 	//if (inner_check(A, B[0]) == 2 || inner_check(B, A[0]) == 2) return -1.;
 
+#ifdef DEBUG
+	std::cout << "WHAT THE FUCK::\n";
+#endif
 	return ret;
 }
 ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
@@ -609,7 +618,10 @@ ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 	std::sort(V.begin(), V.end());
 	V.erase(unique(V.begin(), V.end()), V.end());
 	int sz = V.size();
+#ifdef DEBUG
+	std::cout << "FUCK::\n";
 	std::cout << "sz:: " << sz << "\n";
+#endif
 	for (const ld& d : V) {
 		Pos vec = v.unit() * d;
 		Polygon B2;
@@ -641,7 +653,18 @@ void solve() {
 			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
 			ld t = rad(J0 - J1, I1 - I0);
 			Polygon B2 = rotate_and_norm(B, j, A, i, t);
-			ret = std::max(ret, sweep(A, B2, I1 - J1));
+			ret = std::max(ret, sweep(A, B2, A[(i + 1) % N] - B2[(j + 1) % M]));
+#ifdef DEBUG
+			std::cout << "FUCK::\n";
+			std::cout << "theta:: " << t << "\n";
+			std::cout << "A = [ \n";
+			for (Pos& p : A) std::cout << p << "\n";
+			std::cout << "]\n";
+			std::cout << "B2 = [ \n";
+			for (Pos& p : B2) std::cout << p << "\n";
+			std::cout << "]\n";
+			std::cout << "ret:: " << ret << "\n";
+#endif
 		}
 	}
 	std::cout << ret << "\n";
