@@ -17,7 +17,7 @@ typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
 const ll INF = 1e17;
 const int LEN = 105;
-const ld TOL = 1e-15;
+const ld TOL = 1e-8;
 //const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -29,6 +29,8 @@ int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 #define STRONG 1
 #define WEAK 0
 #define NO_MERGE 0
+#define EDGE 1
+#define EDGE_IGNORE 0
 
 #ifdef AUTO_CHECK
 #include <fstream>
@@ -36,7 +38,6 @@ int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 #endif
 
 bool INNER_CHECK;
-bool EDGE_IGNORE;
 int ai, bi;
 
 int N, M, K, T, Q;
@@ -93,10 +94,10 @@ bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
 bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
-bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool weak = WEAK) {
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool weak = WEAK, bool edge = EDGE) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	if (EDGE_IGNORE) return f1 && f2;
+	if (edge = EDGE_IGNORE) return f1 && f2;
 	bool f3;
 	if (weak == WEAK) f3 = on_seg_weak(s1, s2, d1) ||
 		on_seg_weak(s1, s2, d2) ||
@@ -155,6 +156,28 @@ int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	}
 	return (cnt & 1) * 2;
 }
+bool inner_check(const Polygon& A, const int& a, const Polygon& B, const int& b) {
+	int sza = A.size();
+	int szb = B.size();
+	int CCW;
+
+	const Pos& a0 = A[(a - 1 + sza) % sza], & a1 = A[a], & a2 = A[(a + 1) % sza];
+	const Pos& b0 = B[(b - 1 + szb) % szb], & b1 = B[b], & b2 = B[(b + 1) % szb];
+
+	CCW = ccw(a0, a1, a2);
+	if (CCW > 0 && ccw(a1, a0, b0) < 0 && ccw(a1, a2, b0) > 0) return 1;
+	if (CCW < 0 && !(ccw(a1, a0, b0) >= 0 && ccw(a1, a2, b0) <= 0)) return 1;
+	if (CCW > 0 && ccw(a1, a0, b2) < 0 && ccw(a1, a2, b2) > 0) return 1;
+	if (CCW < 0 && !(ccw(a1, a0, b2) >= 0 && ccw(a1, a2, b2) <= 0)) return 1;
+
+	CCW = ccw(b0, b1, b2);
+	if (CCW > 0 && ccw(b1, b0, a0) < 0 && ccw(b1, b2, a0) > 0) return 1;
+	if (CCW < 0 && !(ccw(b1, b0, a0) >= 0 && ccw(b1, b2, a0) <= 0)) return 1;
+	if (CCW > 0 && ccw(b1, b0, a2) < 0 && ccw(b1, b2, a2) > 0) return 1;
+	if (CCW < 0 && !(ccw(b1, b0, a2) >= 0 && ccw(b1, b2, a2) <= 0)) return 1;
+
+	return 0;
+}
 Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t) {
 	int sz = B.size();
 	for (int j = 0; j < sz; j++) B[j] = B[j].rot(t);
@@ -206,7 +229,8 @@ bool intersect(const int& a, const int& b) {
 	if (INNER_CHECK) {
 		Seg A = seg[a], B = seg[b];
 		if (A.h == B.h) return 0;
-		if (!intersect(A.s, A.e, B.s, B.e)) return 0;
+		if (intersect(A.s, A.e, B.s, B.e, WEAK, EDGE_IGNORE)) return 1;
+		if (!intersect(A.s, A.e, B.s, B.e, STRONG)) return 0;
 		if (A.h != ai) std::swap(A, B);
 		if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
 		assert((A.s.i + 1) % len[A.h] == A.e.i);
@@ -220,6 +244,19 @@ bool intersect(const int& a, const int& b) {
 	}
 	const Pos& d1 = seg[a].s, & d2 = seg[a].e, & d3 = seg[b].s, & d4 = seg[b].e;
 	return intersect(d1, d2, d3, d4, WEAK);
+}
+struct Event {
+	ld t;
+	Pos v;
+	Event(ld t_ = 0, Pos v_ = Pos()) : t(t_), v(v_) {}
+	bool operator < (const Event& e) const { return zero(t - e.t) ? v < e.v : t < e.t; }
+	bool operator == (const Event& e) const { return zero(t - e.t) && v == e.v; }
+};
+std::vector<Event> events;
+inline void move(const Polygon& B, const Event& E, Polygon& B2) {
+	for (Pos p : B) B2.push_back(p.rot(E.t) + E.v);
+	T = 0; for (Pos& p : B2) p.i = T, T++, p.d = 0;
+	return;
 }
 class SplayTree {
 	struct Node {
@@ -472,11 +509,13 @@ ld bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 				V[nxt].i = V[k].i;
 				V[k].s.i = V[nxt].s.i = s;
 				V[k].e.i = V[nxt].e.i = e;
+				V[k].e.d = V[nxt].s.d = 1;
 			}
 			else if (V[k].e <= V[nxt].e) {
 				rmv += (V[k].e - V[nxt].s).mag();
 				std::swap(V[k].e, V[nxt].s);
 				std::swap(V[k].e.i, V[nxt].s.i);
+				V[k].e.d = V[nxt].s.d = 1;
 			}
 		}
 		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
@@ -531,35 +570,34 @@ void cross_check(const Polygon& H, const Pos& p, const Pos& q, Polygon& inx) {
 }
 ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	ld ret = -1.;
-	INNER_CHECK = 0;
-	EDGE_IGNORE = 0;
+	INNER_CHECK = 1;
 	ai = bi = -1;
 	len[0] = N;
 	len[1] = M;
 
-	EDGE_IGNORE = 1;
-	if (two_polygon_cross_check(A, B, 0, 1)) {
-#ifdef DEBUG
-		std::cout << "FUCK:: 2::\n";
-#endif
-		return -1.;
-	}
-	EDGE_IGNORE = 0;
+	//	EDGE_IGNORE = 1;
+	//	if (two_polygon_cross_check(A, B, 0, 1)) {
+	//#ifdef DEBUG
+	//		std::cout << "FUCK:: 2::\n";
+	//#endif
+	//		return -1.;
+	//	}
+	//	EDGE_IGNORE = 0;
 
-	SetPos SB;
-	for (int b = 0; b < M; b++) SB.insert(B[b]);
-	for (int a = 0; a < N; a++) {
-		auto p = SB.find(A[a]);
-		if (p != SB.end()) {
-			int b = p->i;
-			if (inner_check(A, a, B, b)) {
-#ifdef DEBUG
-				std::cout << "FUCK:: 1::\n";
-#endif
-				return -1.;
-			}
-		}
-	}
+	//	SetPos SB;
+	//	for (int b = 0; b < M; b++) SB.insert(B[b]);
+	//	for (int a = 0; a < N; a++) {
+	//		auto p = SB.find(A[a]);
+	//		if (p != SB.end()) {
+	//			int b = p->i;
+	//			if (inner_check(A, a, B, b)) {
+	//#ifdef DEBUG
+	//				std::cout << "FUCK:: 1::\n";
+	//#endif
+	//				return -1.;
+	//			}
+	//		}
+	//	}
 
 	std::vector<Bound> VS, V, VA, VB;
 	std::vector<Bound>().swap(VS);
@@ -568,16 +606,19 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	ret = bnd_remove(VS, V, NO_MERGE);
 	if (ret < RET) return RET;
 
-	INNER_CHECK = 1;
+	//INNER_CHECK = 1;
 	int sz = V.size();
-	for (int i = 0; i < sz; i++) if (V[i].i == 1) VB.push_back(V[i]);
-	if (two_polygon_cross_check(A, VB, 0, 1)) {
+	for (int i = 0; i < sz; i++) {
+		if (V[i].i == 0) VA.push_back(V[i]);
+		if (V[i].i == 1) VB.push_back(V[i]);
+	}
+	if (two_polygon_cross_check(A, VB, 0, 1) || two_polygon_cross_check(B, VA, 1, 0)) {
 #ifdef DEBUG
 		std::cout << "FUCK:: 3::\n";
 #endif
 		return -1.;
 	}
-	INNER_CHECK = 0;
+	//INNER_CHECK = 0;
 
 	//if (inner_check(A, B[0]) == 2 || inner_check(B, A[0]) == 2) return -1.;
 
@@ -586,10 +627,11 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 #endif
 	return ret;
 }
-ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
+void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v) {
 	ld ret = 0;
 	bool prl = 0;
 	Vld V;
+	Pos vec = v.unit();
 	Polygon inx;
 	for (int j = 0; j < M; j++) {
 		prl = 0;
@@ -597,8 +639,6 @@ ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 		ld tq = v / (J0 - J1);
 		ld h = std::abs(tq / v.mag());
 		if (zero(tq)) prl = 1;
-		Polygon box = { J0, J1, J0 + v, J1 + v };
-		box = graham_scan(box);
 		for (int i = 0; i < N; i++) {
 			inx.clear();
 			Pos I0 = A[i], I1 = A[(i + 1) % N];
@@ -609,13 +649,19 @@ ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 				Pos J2 = J1 + v;
 				Pos vec = J0 - J1;
 				if (on_seg_strong(J1, J2, I0)) inx.push_back(I0);
-				//if (on_seg_strong(J1, J2, I0 - vec)) inx.push_back(I0 - vec);
-				//if (on_seg_strong(J1, J2, I1)) inx.push_back(I1);
 				if (on_seg_strong(J1, J2, I1 - vec)) inx.push_back(I1 - vec);
 				for (const Pos& p : inx) V.push_back(std::abs((p - J1).mag()));
 			}
 			else if (!prl) {
-				cross_check(box, I0, I1, inx);
+				Pos J2 = J0 + v;
+				Pos J3 = J1 + v;
+				Polygon box = { J0, J1, J2, J3 };
+				box = graham_scan(box);
+				if (inner_check(box, I0)) inx.push_back(I0);
+				if (inner_check(box, I1)) inx.push_back(I1);
+				if (!collinear(J0, J2, I0, I1) && intersect(J0, J2, I0, I1, STRONG)) inx.push_back(intersection(J0, J2, I0, I1));
+				if (!collinear(J1, J3, I0, I1) && intersect(J1, J3, I0, I1, STRONG)) inx.push_back(intersection(J1, J3, I0, I1));
+				//cross_check(box, I0, I1, inx);
 				for (const Pos& p : inx) V.push_back(std::abs(cross(J0, J1, p) / h));
 			}
 		}
@@ -627,14 +673,8 @@ ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 	std::cout << "FUCK::\n";
 	std::cout << "sz:: " << sz << "\n";
 #endif
-	for (const ld& d : V) {
-		Pos vec = v.unit() * d;
-		Polygon B2;
-		for (const Pos& p : B) B2.push_back(p + vec);
-		T = 0; for (Pos& p : B2) p.i = T, T++;
-		ret = std::max(ret, polygon_cross_check(A, B2));
-	}
-	return ret;
+	for (const ld& d : V) events.push_back(Event(t, v + vec * d));
+	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -645,11 +685,12 @@ void solve() {
 	std::cin >> N; Polygon A(N);
 	for (Pos& p : A) std::cin >> p;
 	norm(A);
-	T = 0; for (Pos& p : A) p.i = T, T++;
+	T = 0; for (Pos& p : A) p.i = T, T++, p.d = 0;
 
 	std::cin >> M; Polygon B(M);
 	for (Pos& p : B) std::cin >> p;
 	norm(B);
+	T = 0; for (Pos& p : B) p.i = T, T++, p.d = 0;
 
 	RET = 0;
 	for (int i = 0; i < N; i++) {
@@ -658,7 +699,7 @@ void solve() {
 			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
 			ld t = rad(J0 - J1, I1 - I0);
 			Polygon B2 = rotate_and_norm(B, j, A, i, t);
-			RET = std::max(RET, sweep(A, B2, A[(i + 1) % N] - B2[(j + 1) % M]));
+			sweep(A, B, t, I1 - J1);
 #ifdef DEBUG
 			std::cout << "FUCK::\n";
 			std::cout << "theta:: " << t << "\n";
@@ -668,9 +709,16 @@ void solve() {
 			std::cout << "B2 = [ \n";
 			for (Pos& p : B2) std::cout << p << "\n";
 			std::cout << "]\n";
-			std::cout << "ret:: " << ret << "\n";
 #endif
 		}
+	}
+	std::sort(events.begin(), events.end());
+	events.erase(unique(events.begin(), events.end()), events.end());
+	int sz = events.size();
+	for (const Event& E : events) {
+		Polygon B2;
+		move(B, E, B2);
+		RET = std::max(RET, polygon_cross_check(A, B2));
 	}
 	std::cout << RET << "\n";
 	return;
