@@ -25,6 +25,7 @@ int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
 //#define AUTO_CHECK
 //#define DEBUG
+#define SPEED_TEST
 
 #define STRONG 1
 #define WEAK 0
@@ -236,14 +237,14 @@ bool intersect(const int& a, const int& b) {
 	assert((A.s.i + 1) % len[A.h] == A.e.i);
 	if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
 	if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
-	if (!B.s.d) {
-		if (B.s == A.s && inner_check(H[ai], A.s.i, H[bi], B.s.i)) return 1;
-		if (B.s == A.e && inner_check(H[ai], A.e.i, H[bi], B.s.i)) return 1;
-	}
-	if (!B.e.d) {
-		if (B.e == A.s && inner_check(H[ai], A.s.i, H[bi], B.e.i)) return 1;
-		if (B.e == A.e && inner_check(H[ai], A.e.i, H[bi], B.e.i)) return 1;
-	}
+	//if (!B.s.d) {
+	//	if (B.s == A.s && inner_check(H[ai], A.s.i, H[bi], B.s.i)) return 1;
+	//	if (B.s == A.e && inner_check(H[ai], A.e.i, H[bi], B.s.i)) return 1;
+	//}
+	//if (!B.e.d) {
+	//	if (B.e == A.s && inner_check(H[ai], A.s.i, H[bi], B.e.i)) return 1;
+	//	if (B.e == A.e && inner_check(H[ai], A.e.i, H[bi], B.e.i)) return 1;
+	//}
 	//if (B.e.i != (B.s.i + 1) % len[B.h]) std::swap(B.s, B.e);
 	//assert((B.s.i + 1) % len[B.h] == B.e.i);
 	//if (on_seg_weak(B.s, B.e, A.s)) return ccw(B.s, B.e, A.e) > 0;
@@ -563,8 +564,18 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	ret = bnd_remove(VS, V, NO_MERGE);
 	if (ret < RET) return -1.;
 
-	//INNER_CHECK = 1;
-	int sz = V.size();
+	Polygon tmp;
+	for (Pos p : A) p.d = 0, tmp.push_back(p);
+	for (Pos p : B) p.d = 1, tmp.push_back(p);
+	std::sort(tmp.begin(), tmp.end());
+	int sz = tmp.size();
+	for (int i = 0; i < sz - 1; i++) {
+		if (tmp[i] == tmp[i + 1]) {
+			if (inner_check(A, tmp[i].i, B, tmp[i + 1].i)) return -1;
+		}
+	}
+
+	sz = V.size();
 	for (int i = 0; i < sz; i++) {
 		if (V[i].i == 0) VA.push_back(V[i]);
 		if (V[i].i == 1) VB.push_back(V[i]);
@@ -575,7 +586,6 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 #endif
 		return -1.;
 	}
-	//INNER_CHECK = 0;
 
 	//if (inner_check(A, B[0]) == 2 || inner_check(B, A[0]) == 2) return -1.;
 
@@ -619,7 +629,6 @@ void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v, const 
 				if (inner_check(box, I1)) inx.push_back(I1);
 				if (!collinear(J0, J2, I0, I1) && intersect(J0, J2, I0, I1, STRONG)) inx.push_back(intersection(J0, J2, I0, I1));
 				if (!collinear(J1, J3, I0, I1) && intersect(J1, J3, I0, I1, STRONG)) inx.push_back(intersection(J1, J3, I0, I1));
-				//cross_check(box, I0, I1, inx);
 				for (const Pos& p : inx) V.push_back(std::abs(cross(J0, J1, p) / h));
 			}
 		}
@@ -674,6 +683,9 @@ void solve() {
 	}
 	std::sort(events.begin(), events.end());
 	events.erase(unique(events.begin(), events.end()), events.end());
+#ifdef SPEED_TEST
+	std::cout << "event init done\n";
+#else
 	int sz = events.size();
 	for (const Event& E : events) {
 		Polygon B2;
@@ -682,6 +694,7 @@ void solve() {
 		RET = std::max(RET, polygon_cross_check(A, B2));
 	}
 	std::cout << RET << "\n";
+#endif
 	return;
 }
 int main() { solve(); return 0; }//boj12772 Polygonal Puzzle
