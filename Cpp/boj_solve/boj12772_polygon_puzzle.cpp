@@ -40,6 +40,7 @@ bool EDGE_IGNORE;
 int ai, bi;
 
 int N, M, K, T, Q;
+ld RET = 0;
 bool F[LEN];
 struct Pos {
 	ld x, y;
@@ -539,7 +540,7 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	EDGE_IGNORE = 1;
 	if (two_polygon_cross_check(A, B, 0, 1)) {
 #ifdef DEBUG
-		std::cout << "FUCK:: 1::\n";
+		std::cout << "FUCK:: 2::\n";
 #endif
 		return -1.;
 	}
@@ -553,7 +554,7 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 			int b = p->i;
 			if (inner_check(A, a, B, b)) {
 #ifdef DEBUG
-				std::cout << "FUCK:: 2::\n";
+				std::cout << "FUCK:: 1::\n";
 #endif
 				return -1.;
 			}
@@ -565,6 +566,7 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	std::vector<Bound>().swap(V);
 	bnd_init(A, B, VS, 0, 1);
 	ret = bnd_remove(VS, V, NO_MERGE);
+	if (ret < RET) return RET;
 
 	INNER_CHECK = 1;
 	int sz = V.size();
@@ -649,14 +651,14 @@ void solve() {
 	for (Pos& p : B) std::cin >> p;
 	norm(B);
 
-	ld ret = 0;
+	RET = 0;
 	for (int i = 0; i < N; i++) {
 		Pos& I0 = A[i], & I1 = A[(i + 1) % N];
 		for (int j = 0; j < M; j++) {
 			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
 			ld t = rad(J0 - J1, I1 - I0);
 			Polygon B2 = rotate_and_norm(B, j, A, i, t);
-			ret = std::max(ret, sweep(A, B2, A[(i + 1) % N] - B2[(j + 1) % M]));
+			RET = std::max(RET, sweep(A, B2, A[(i + 1) % N] - B2[(j + 1) % M]));
 #ifdef DEBUG
 			std::cout << "FUCK::\n";
 			std::cout << "theta:: " << t << "\n";
@@ -670,7 +672,7 @@ void solve() {
 #endif
 		}
 	}
-	std::cout << ret << "\n";
+	std::cout << RET << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj12772 Polygonal Puzzle
