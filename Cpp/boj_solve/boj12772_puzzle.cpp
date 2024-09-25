@@ -528,28 +528,6 @@ ld bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 	//std::sort(V2.begin(), V2.end());
 	return rmv;
 }
-bool inner_check(const Polygon& A, const int& a, const Polygon& B, const int& b) {
-	int sza = A.size();
-	int szb = B.size();
-	int CCW;
-
-	const Pos& a0 = A[(a - 1 + sza) % sza], & a1 = A[a], & a2 = A[(a + 1) % sza];
-	const Pos& b0 = B[(b - 1 + szb) % szb], & b1 = B[b], & b2 = B[(b + 1) % szb];
-
-	CCW = ccw(a0, a1, a2);
-	if (CCW > 0 && ccw(a1, a0, b0) < 0 && ccw(a1, a2, b0) > 0) return 1;
-	if (CCW < 0 && !(ccw(a1, a0, b0) >= 0 && ccw(a1, a2, b0) <= 0)) return 1;
-	if (CCW > 0 && ccw(a1, a0, b2) < 0 && ccw(a1, a2, b2) > 0) return 1;
-	if (CCW < 0 && !(ccw(a1, a0, b2) >= 0 && ccw(a1, a2, b2) <= 0)) return 1;
-
-	CCW = ccw(b0, b1, b2);
-	if (CCW > 0 && ccw(b1, b0, a0) < 0 && ccw(b1, b2, a0) > 0) return 1;
-	if (CCW < 0 && !(ccw(b1, b0, a0) >= 0 && ccw(b1, b2, a0) <= 0)) return 1;
-	if (CCW > 0 && ccw(b1, b0, a2) < 0 && ccw(b1, b2, a2) > 0) return 1;
-	if (CCW < 0 && !(ccw(b1, b0, a2) >= 0 && ccw(b1, b2, a2) <= 0)) return 1;
-
-	return 0;
-}
 ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	ld ret = -1.;
 	INNER_CHECK = 1;
@@ -613,7 +591,7 @@ void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v, const 
 			Pos I0 = A[i], I1 = A[(i + 1) % N];
 			if (prl && collinear(I0, I1, J0, J1)) {
 				if (sign(dot(I0, I1, J0, J1)) > 0) continue;
-				Pos J0_ = J0, J1_ = J1_;
+				Pos J0_ = J0, J1_ = J1;
 				if (q * (J0_ - J1_) < 0) std::swap(J0_, J1_);
 				if (q * (I0 - I1) > 0) std::swap(I0, I1);
 				Pos J2 = J1_ + q;
