@@ -479,7 +479,7 @@ bool two_polygon_cross_check(const Polygon& A, const std::vector<Bound>& B, cons
 }
 void make_bnd(std::vector<Bound>& V, Pos d1, Pos d2, const int& n) {
 	assert(d2 != d1);
-	if (d2 < d1) std::swap(d1, d2);
+	if (cmpx(d2, d1)) std::swap(d1, d2);
 	V.push_back(Bound(d1, d2, n));
 	return;
 }
