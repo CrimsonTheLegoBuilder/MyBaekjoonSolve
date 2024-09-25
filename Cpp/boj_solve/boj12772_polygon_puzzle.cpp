@@ -15,9 +15,9 @@ typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
-const ll INF = 1e17;
+const ll INF = 1e17;		  
 const int LEN = 105;
-const ld TOL = 1e-15;
+const ld TOL = 1e-7;
 //const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
