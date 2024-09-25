@@ -17,7 +17,7 @@ typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
 const ll INF = 1e17;		  
 const int LEN = 105;
-const ld TOL = 1e-7;
+const ld TOL = 1e-15;
 //const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -169,9 +169,12 @@ struct Seg {
 	bool operator != (const Seg& S) const { return !(*this == S); }
 	//bool operator < (const Seg& S) const { return (s == S.s) ? e < S.e : s < S.s; }
 	bool operator < (const Seg& rhs) const {
-		if (rhs.s == s) return cross(rhs.s, rhs.e, e) < 0;
-		if (rhs.s < s) return cross(rhs.s, rhs.e, s) < 0;
-		return cross(rhs.s, rhs.e, e) < 0;
+		//if (rhs.s == s) return cross(rhs.s, rhs.e, e) < 0;
+		//if (rhs.s < s) return cross(rhs.s, rhs.e, s) < 0;
+		//return cross(rhs.s, rhs.e, e) < 0;
+		if (rhs.s == s) return ccw(rhs.s, rhs.e, e) < 0;
+		if (rhs.s < s) return ccw(rhs.s, rhs.e, s) < 0;
+		return ccw(rhs.s, rhs.e, e) < 0;
 	}
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) { os << "DEBUG::Seg s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n"; return os; }
 } seg[LEN << 3];
@@ -182,8 +185,8 @@ struct Bound {
 	bool operator == (const Bound& S) const { return s == S.s && e == S.e; }
 	bool operator != (const Bound& S) const { return !(*this == S); }
 	bool operator < (const Bound& S) const {
-		int tq = ccw(s, e, S.s, S.e);
-		if (!tq) {
+		ld tq = cross(s, e, S.s, S.e);
+		if (zero(tq)) {
 			if (collinear(s, e, S.s, S.e)) {
 				if (s == S.s) return e < S.e;
 				return s < S.s;
