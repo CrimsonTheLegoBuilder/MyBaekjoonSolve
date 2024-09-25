@@ -573,17 +573,17 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	return ret;
 }
 void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v, const Pos& q) {
-	ld ret = 0;
 	bool prl = 0;
-	Vld V;
+	ld ret = 0;
 	Pos vec = q.unit();
+	Vld V;
 	Polygon inx;
 	for (int j = 0; j < M; j++) {
 		prl = 0;
 		Pos J0 = B[j], J1 = B[(j + 1) % M];
 		ld tq = q / (J0 - J1);
-		ld h = std::abs(tq / q.mag());
 		if (zero(tq)) prl = 1;
+		ld h = std::abs(tq / q.mag());
 		Polygon box = { J0, J1, J0 + q, J1 + q };
 		box = graham_scan(box);
 		for (int i = 0; i < N; i++) {
