@@ -81,7 +81,7 @@ typedef std::set<Pos> SetPos;
 typedef std::vector<Pos> Polygon;
 int len[10];
 Polygon H[10];
-bool cmpx(const Pos& p, const Pos& q) { return zero(p.x - q.x) ? p.y < q.y : p.x < q.y; }
+bool cmpx(const Pos& p, const Pos& q) { return zero(p.x - q.x) ? p.y < q.y : p.x < q.x; }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -534,7 +534,10 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	len[1] = M;
 
 	EDGE_IGNORE = 1;
-	if (two_polygon_cross_check(A, B, 0, 1)) return -1.;
+	if (two_polygon_cross_check(A, B, 0, 1)) {
+		std::cout << "FUCK:: 1::\n";
+		return -1.;
+	}
 	EDGE_IGNORE = 0;
 
 	SetPos SB;
@@ -543,7 +546,10 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 		auto p = SB.find(A[a]);
 		if (p != SB.end()) {
 			int b = p->i;
-			if (inner_check(A, a, B, b)) return -1.;
+			if (inner_check(A, a, B, b)) {
+				std::cout << "FUCK:: 2::\n";
+				return -1.;
+			}
 		}
 	}
 
@@ -556,7 +562,10 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	INNER_CHECK = 1;
 	int sz = V.size();
 	for (int i = 0; i < sz; i++) if (V[i].i == 1) VB.push_back(V[i]);
-	if (two_polygon_cross_check(A, VB, 0, 1)) return -1.;
+	if (two_polygon_cross_check(A, VB, 0, 1)) {
+		std::cout << "FUCK:: 3::\n";
+		return -1.;
+	}
 	INNER_CHECK = 0;
 
 	//if (inner_check(A, B[0]) == 2 || inner_check(B, A[0]) == 2) return -1.;
@@ -600,6 +609,7 @@ ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 	std::sort(V.begin(), V.end());
 	V.erase(unique(V.begin(), V.end()), V.end());
 	int sz = V.size();
+	std::cout << "sz:: " << sz << "\n";
 	for (const ld& d : V) {
 		Pos vec = v.unit() * d;
 		Polygon B2;
@@ -612,6 +622,8 @@ ld sweep(const Polygon& A, const Polygon& B, const Pos& v) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(9);
 
 	std::cin >> N; Polygon A(N);
 	for (Pos& p : A) std::cin >> p;
@@ -632,7 +644,7 @@ void solve() {
 			ret = std::max(ret, sweep(A, B2, I1 - J1));
 		}
 	}
-	std::cout << ret << "n";
+	std::cout << ret << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj12772 Polygonal Puzzle
