@@ -25,7 +25,7 @@ int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 
 //#define AUTO_CHECK
 //#define DEBUG
-#define SPEED_TEST
+//#define SPEED_TEST
 
 #define STRONG 1
 #define WEAK 0
@@ -259,7 +259,7 @@ struct Event {
 	bool operator == (const Event& e) const { return zero(t - e.t) && v == e.v; }
 };
 std::vector<Event> events;
-inline void move(const Polygon& B, const Event& E, Polygon& B2) {
+inline void conv(const Polygon& B, const Event& E, Polygon& B2) {
 	for (Pos p : B) B2.push_back(p.rot(E.t) + E.v);
 	T = 0; for (Pos& p : B2) p.i = T, T++, p.d = 0;
 	return;
@@ -667,7 +667,7 @@ void solve() {
 	int sz = events.size();
 	for (const Event& E : events) {
 		Polygon B2;
-		move(B, E, B2);
+		conv(B, E, B2);
 		H[1] = B2;
 		RET = std::max(RET, polygon_cross_check(A, B2));
 	}
