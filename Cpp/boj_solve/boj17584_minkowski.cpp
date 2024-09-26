@@ -18,11 +18,10 @@ const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 bool zero(const ld& x) { return !sign(x); }
-ll sq(int x) { return (ll)x * x; }
-ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
+ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
-int T, N, M;
+int N, M;
 struct Pos {
 	int x, y, i;
 	Pos(int X = 0, int Y = 0, int I = 0) : x(X), y(Y), i(I) {}
@@ -30,29 +29,17 @@ struct Pos {
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator < (const Pos& p) const { return x == p.x ? y == p.y ? i > p.i : y < p.y : x < p.x; }
-	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const int& n) const { return { x * n, y * n }; }
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
-	ll xy() const { return (ll)x * y; }
 	ll Euc() const { return (ll)x * x + (ll)y * y; }
-	int Man() const { return std::abs(x) + std::abs(y); }
-	ld mag() const { return hypot(x, y); }
-	ld rad() const { return atan2(y, x); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-	int quad() const { return y > 0 || y == 0 && x >= 0; }
-	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
@@ -119,7 +106,7 @@ Polygon graham_scan(Polygon& C) {
 	}
 	return H;
 }
-bool minkovski_difference(Polygon& R, Polygon& S) {
+bool minkowski_difference(Polygon& R, Polygon& S) {
 	ll ar = area(R);
 	ll as = area(S);
 	if (ar == as) {
@@ -134,7 +121,7 @@ bool minkovski_difference(Polygon& R, Polygon& S) {
 	for (int i = 0; i < sz; i++) {
 		Pos v = R[(i + 1) % sz] - R[i];
 		int gcd_ = gcd(std::abs(v.x), std::abs(v.y));
-		v.x /= gcd_; v.y /= gcd_;
+		v /= gcd_;
 		v.i = i;
 		V.push_back(v);
 	}
@@ -142,7 +129,7 @@ bool minkovski_difference(Polygon& R, Polygon& S) {
 	for (int i = 0; i < sz; i++) {
 		Pos v = S[(i + 1) % sz] - S[i];
 		int gcd_ = gcd(std::abs(v.x), std::abs(v.y));
-		v.x /= gcd_; v.y /= gcd_;
+		v /= gcd_;
 		v.i = ~i;
 		V.push_back(v);
 	}
@@ -199,7 +186,7 @@ bool query() {
 	norm(R), norm(S);
 	assert(convex(R));
 	assert(convex(S));
-	while (minkovski_difference(R, S));
+	while (minkowski_difference(R, S));
 	std::cout << area(R) + area(S) << "\n";
 	return 1;
 }
