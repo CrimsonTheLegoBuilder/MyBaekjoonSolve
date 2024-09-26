@@ -31,7 +31,7 @@ inline ld norm(ld th) {
 
 //#define AUTO_CHECK
 //#define DEBUG
-#define SPEED_TEST
+//#define EVENT_COUNT
 
 #define STRONG 1
 #define WEAK 0
@@ -44,9 +44,7 @@ inline ld norm(ld th) {
 #define WHAT_THE_FUCK
 #endif
 
-bool INNER_CHECK;
 int ai, bi;
-
 int N, M, K, T, Q;
 ld RET = 0;
 struct Pos {
@@ -88,7 +86,6 @@ struct Pos {
 } pos[LEN << 3]; const Pos O = Pos(0, 0);
 typedef std::set<Pos> SetPos;
 typedef std::vector<Pos> Polygon;
-Polygon H[2];
 int len[2];
 bool cmpx(const Pos& p, const Pos& q) { return zero(p.x - q.x) ? p.y < q.y : p.x < q.x; }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
@@ -115,28 +112,6 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool 
 		on_seg_strong(d1, d2, s1) ||
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
-}
-Polygon graham_scan(Polygon& C) {
-	Polygon H;
-	if (C.size() < 3) {
-		std::sort(C.begin(), C.end());
-		return C;
-	}
-	std::swap(C[0], *min_element(C.begin(), C.end()));
-	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
-		int ret = ccw(C[0], p, q);
-		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
-		return ret > 0;
-		}
-	);
-	C.erase(unique(C.begin(), C.end()), C.end());
-	int sz = C.size();
-	for (int i = 0; i < sz; i++) {
-		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
-			H.pop_back();
-		H.push_back(C[i]);
-	}
-	return H;
 }
 ld area(const Polygon& H) {
 	ld ret = 0;
@@ -550,29 +525,6 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 #endif
 	return ret;
 }
-void cross_check(const Polygon& H, const Pos& p, const Pos& q, Polygon& inx) {
-	bool fp = 1, fq = 1;
-	int sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		const Pos& cur = H[i], & nxt = H[(i + 1) % sz];
-		if (intersect(cur, nxt, p, q, STRONG)) {
-			if (!collinear(cur, nxt, p, q)) inx.push_back(intersection(cur, nxt, p, q));
-			else {
-				if (on_seg_strong(p, q, cur)) inx.push_back(cur);
-				if (on_seg_strong(p, q, nxt)) inx.push_back(nxt);
-				if (on_seg_strong(cur, nxt, p))inx.push_back(p);
-				if (on_seg_strong(cur, nxt, q))inx.push_back(q);
-			}
-		}
-		if (ccw(cur, nxt, p) < 0) fp = 0;
-		if (ccw(cur, nxt, q) < 0) fq = 0;
-	}
-	if (fp) inx.push_back(p);
-	if (fq) inx.push_back(q);
-	std::sort(inx.begin(), inx.end(), cmpx);
-	inx.erase(unique(inx.begin(), inx.end()), inx.end());
-	return;
-}
 void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v, const Pos& q) {
 	bool prl = 0;
 	ld ret = 0;
@@ -585,8 +537,6 @@ void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v, const 
 		ld tq = q / (J0 - J1);
 		if (zero(tq)) prl = 1;
 		ld h = std::abs(tq / q.mag());
-		Polygon box = { J0, J1, J0 + q, J1 + q };
-		box = graham_scan(box);
 		for (int i = 0; i < N; i++) {
 			inx.clear();
 			Pos I0 = A[i], I1 = A[(i + 1) % N];
@@ -710,7 +660,7 @@ void solve() {
 	std::sort(events.begin(), events.end());
 	events.erase(unique(events.begin(), events.end()), events.end());
 	int sz = events.size();
-#ifdef SPEED_TEST
+#ifdef EVENT_COUNT
 	std::cout << "event init done\n";
 	std::cout << "sz:: " << sz << "\n";
 #endif
