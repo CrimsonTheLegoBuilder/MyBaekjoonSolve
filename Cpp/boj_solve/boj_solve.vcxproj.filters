@@ -1350,13 +1350,16 @@
     <ClCompile Include="boj10135_solar.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj12772_polygon_puzzle.cpp">
+    <ClCompile Include="boj12772_polygon_puzzle_wrong.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj12772_puzzle.cpp">
+    <ClCompile Include="boj12772_puzzle_slow.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj12772_sweeping.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj32145.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
