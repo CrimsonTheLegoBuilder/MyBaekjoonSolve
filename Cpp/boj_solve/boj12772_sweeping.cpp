@@ -242,7 +242,7 @@ struct Event {
 };
 std::vector<Event> events;
 inline void conv(const Polygon& B, const Event& E, Polygon& B2) {
-	for (Pos p : B) B2.push_back(p.rot(E.t) + E.v);
+	for (const Pos& p : B) B2.push_back(p.rot(E.t) + E.v);
 	T = 0; for (Pos& p : B2) p.i = T, T++, p.d = 0;
 	return;
 }
