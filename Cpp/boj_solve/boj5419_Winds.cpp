@@ -42,7 +42,7 @@ bool cmp_X(const Pos& p, const Pos& q) {
 		assert(fp != fq);
 		return fp < fq;
 	}
-	return tqp < tqq;
+	return tqp > tqq;
 }
 int cx;
 struct Info {
@@ -67,36 +67,6 @@ ll sum(int i) {
 }
 bool col = 0;
 int ans[LEN];
-void f(int s, int e, const Vint& v) {
-	if (s == e) return;
-	int m = s + e >> 1;
-
-	Vint on;
-	Vint off;
-	for (const int& i : v) {
-		if (ans[i] <= m) {
-			on.push_back(i);
-			update(I[i], 1);
-		}
-		else {
-			int recieved = sum(I[i]);
-			if (col) recieved -= sum(I[i] - 1);
-			if (recieved >= K[i]) {
-				ans[i] = m;
-				on.push_back(i);
-				update(I[i], 1);
-			}
-			else {
-				off.push_back(i);
-				K[i] -= recieved;
-			}
-		}
-	}
-	for (const int& i : on) update(I[i], -1);
-	f(s, m, on);
-	f(m + 1, e, off);
-	return;
-}
 void query() {
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> pos[i], pos[i].idx = i;
@@ -125,11 +95,14 @@ void query() {
 #endif
 
 	Vint v;
-	for (int i = 0; i < N; ++i) { ans[i] = i + 1; v.push_back(pos[i].idx); }
-	f(1, N, v);
+	for (int i = 0; i < N; ++i) { ans[i] = 0; v.push_back(pos[i].idx); }
+	for (const int& i : v) {
+		ans[i] = sum(i + 1);
+		update(I[i], 1);
+	}
 	Q = 0;
 	for (int i = 0; i < N; ++i) Q += ans[i];
-	std::cout << Q;
+	std::cout << Q << "\n";
 	return;
 }
 void solve() {
