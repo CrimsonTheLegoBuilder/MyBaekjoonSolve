@@ -15,7 +15,7 @@ const int LEN = 2e5 + 5;
 #define FUCK
 //#define DEBUG
 
-int N, M, T, Q, I[LEN], K[LEN];
+int N, M, T, Q, I[LEN];
 struct Pos {
 	int x, y;
 	int idx;
@@ -65,14 +65,10 @@ ll sum(int i) {
 	}
 	return result;
 }
-bool col = 0;
 int ans[LEN];
 void query() {
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> pos[i], pos[i].idx = i;
-	for (int i = 0; i < N; i++) std::cin >> K[i];
-	if (X / Y == 0) col = 1;
-	if (X / Y < 0) std::swap(X, Y);
 	std::sort(pos, pos + N, cmp_X);
 
 	for (int i = 0; i < N; ++i) infos[i] = { cross(O, Y, pos[i]), pos[i].idx };
@@ -80,11 +76,6 @@ void query() {
 	for (int i = cx = I[infos[0].idx] = 1; i < N; ++i) {
 		if (infos[i].t != infos[i - 1].t) ++cx;
 		I[infos[i].idx] = cx;
-	}
-	Vint v;
-	for (int i = 0; i < N; ++i) {
-		ans[i] = i + 1;
-		v.push_back(pos[i].idx);
 	}
 
 #ifdef DEBUG
@@ -94,8 +85,10 @@ void query() {
 	}
 #endif
 
+	memset(fenwick, 0, sizeof fenwick);
+	memset(ans, 0, sizeof ans);
 	Vint v;
-	for (int i = 0; i < N; ++i) { ans[i] = 0; v.push_back(pos[i].idx); }
+	for (int i = 0; i < N; ++i) v.push_back(pos[i].idx);
 	for (const int& i : v) {
 		ans[i] = sum(i + 1);
 		update(I[i], 1);
