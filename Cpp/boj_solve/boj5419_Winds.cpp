@@ -15,7 +15,8 @@ const int LEN = 2e5 + 5;
 #define FUCK
 //#define DEBUG
 
-int N, M, T, Q, I[LEN];
+int N, M, T, I[LEN];
+ll Q;
 struct Pos {
 	int x, y;
 	int idx;
@@ -65,7 +66,7 @@ ll sum(int i) {
 	}
 	return result;
 }
-int ans[LEN];
+ll ans[LEN];
 void query() {
 	std::cin >> N;
 	for (int i = 0; i < N; i++) std::cin >> pos[i], pos[i].idx = i;
@@ -90,7 +91,7 @@ void query() {
 	Vint v;
 	for (int i = 0; i < N; ++i) v.push_back(pos[i].idx);
 	for (const int& i : v) {
-		ans[i] = sum(i + 1);
+		ans[i] = sum(I[i]);
 		update(I[i], 1);
 	}
 	Q = 0;
@@ -101,6 +102,8 @@ void query() {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	//freopen("../../../input_data/E_winds/tests/01.in", "r", stdin);
+	//freopen("../../../input_data/E_winds/tests/01_ret.txt", "w", stdout);
 	std::cin >> T;
 	while (T--) query();
 	return;
