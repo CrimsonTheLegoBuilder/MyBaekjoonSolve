@@ -7,10 +7,9 @@
 typedef long long ll;
 typedef long double ld;
 inline int sign(const ll& x) { return x < 0 ? -1 : x > 0; }
-inline ll sq(const int& x) { return (ll)x * x; }
-inline ll sq(const ll& x) { return x * x; }
 
 //#define DEBUG
+#define REMOVE
 
 int T, N, M, K, A;
 struct Pos {
@@ -89,9 +88,7 @@ void solve() {
 		else std::cout << b.i << " " << c.i << "\n";
 		return;
 	}
-	//pvt = aa; std::sort(R.begin(), R.end(), cmpr);
-	//pvt = a; std::sort(L.begin(), L.end(), cmpr);
-
+#ifdef REMOVE
 	Polygon tmp;
 	int sz;
 
@@ -109,6 +106,10 @@ void solve() {
 	tmp.push_back(L[0]);
 	for (int i = 1; i < sz; i++) if (ccw(a, L[i - 1], L[i])) tmp.push_back(L[i]);
 	L = tmp;
+#else
+	pvt = aa; std::sort(R.begin(), R.end(), cmpr);
+	pvt = a; std::sort(L.begin(), L.end(), cmpr);
+#endif
 
 	int rsz = R.size(), lsz = L.size();
 	int r = 0, l = 0;
@@ -153,6 +154,7 @@ int main() { solve(); return 0; }//boj12819 New Tree
 new가 오른쪽에 있다면 a와의 외적 값이 안쪽으로 가는 점이 될때까지 포인터를 옮겨준다.
 왼쪽 점군을 볼 때는 오른쪽 점군에서 이미 new가 안에 있다는 건 확인하고 왔으므로 aa가 밖에 있는지를 확인한다.
 밖에 있다면 찾은거고, 안에 있다면 똑같이 aa 기준으로 외적 값이 안쪽으로 갈 때까지 포인터를 이동해준다.
-외적 값을 계산해 안쪽을 향할 때까지 포인터를 이동한다.
+가운데에 직선을 하나 놓고 돌리는 형태로 풀어낸다고 생각하면 될 듯.
+제한 시간 때문에 정렬을 3번씩 하는 것도 좀 무섭긴 하다.
 
 */
