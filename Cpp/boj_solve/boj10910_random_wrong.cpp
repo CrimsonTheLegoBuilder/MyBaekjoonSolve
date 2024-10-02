@@ -2,7 +2,7 @@
 //credit: ekzm0204
 //from oj.uz
 //https://oj.uz/submission/9669
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <algorithm>
 #include <vector>
