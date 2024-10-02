@@ -1365,6 +1365,24 @@
     <ClCompile Include="boj17584_minkowski.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj5419_Winds.cpp">
+      <Filter>소스 파일\segment_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="boj7569_tomato3D.cpp">
+      <Filter>소스 파일\graph_search</Filter>
+    </ClCompile>
+    <ClCompile Include="mes202409_wrong.cpp">
+      <Filter>소스 파일\stack</Filter>
+    </ClCompile>
+    <ClCompile Include="boj12819_newtree.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="__Geo_solve__.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj11650.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
