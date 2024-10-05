@@ -207,7 +207,8 @@ void sweep(const int& k, const ld& x) {
 	ANS += total * a;
 	return;
 }
-void init(Vld& X) {
+Vld X;
+void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
@@ -270,8 +271,7 @@ void init(Vld& X) {
 	return;
 }
 void solve() {
-	Vld X;
-	init(X);
+	init();
 	int xi = X.size();
 	int sz = VE.size();
 	int i = 0;
