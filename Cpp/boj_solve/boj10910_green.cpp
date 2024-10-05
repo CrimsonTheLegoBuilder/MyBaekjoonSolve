@@ -279,7 +279,7 @@ void solve() {
 	int sz = VE.size();
 	int i = 0;
 	Arc a;
-	for (int Q = 0; Q < xi; Q++) {
+	for (int Q = 0; Q < xi - 1; Q++) {
 		bool o = 0;
 		for (; i < sz; i++) {
 			if (X[Q] != E.x) break;
@@ -314,7 +314,7 @@ void solve() {
 		if (o) {
 			int cnt = 0;
 			for (int j = T - 1; j >= 0; j--) {
-				if (A[j].y < 1e16) break;
+				if (A[j].y < 1e9) break;
 				cnt++;
 			}
 			assert(T >= cnt);
@@ -326,9 +326,7 @@ void solve() {
 			I[a.i][a.j][a.d] = j;
 		}
 
-		if (T < xi - 1) {
-			for (int k = 1; k < T; k++) sweep(k, X[Q + 1]);
-		}
+		for (int k = 1; k < T; k++) sweep(k, X[Q + 1]);
 	}
 	std::cout << ANS << "\n";
 	return;
