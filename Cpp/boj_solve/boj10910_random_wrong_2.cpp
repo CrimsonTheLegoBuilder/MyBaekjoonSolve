@@ -11,7 +11,7 @@ typedef long double ld;
 typedef std::vector<int> Vint;
 const ld INF = 1e17;
 const ld TOL = 1e-13;
-const ld PI = acos(-1);
+const ld PI = acosl(-1);
 const int LEN = 25;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
