@@ -5,20 +5,16 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <queue>
 typedef long long ll;
 typedef long double ld;
 //typedef double ld;
-typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
-typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-13;
 const ld PI = acos(-1);
 const int LEN = 25;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
-inline ll sq(int x) { return (ll)x * x; }
 inline ll sq(ll x) { return x * x; }
 inline ld sq(ld x) { return x * x; }
 inline ld norm(ld th) {
@@ -42,39 +38,25 @@ struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
-	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
+	//bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
-	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
-	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	Pos operator * (const ld& n) const { return { x * n, y * n }; }
+	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
-	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
-	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
-	ld xy() const { return x * y; }
 	Pos rot(ld the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
-	Pos unit() const { return *this / mag(); }
+	//Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
-	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
-	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
+	//friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
-//Vld intersection(const Pos& ca, const ld& ra, const Pos& cb, const ld& rb) {
 Polygon intersection(const Pos& ca, const ld& ra, const Pos& cb, const ld& rb) {
 	Pos vec = cb - ca;
 	ld distance = vec.mag();
@@ -113,7 +95,6 @@ struct Event {
 	ld x;
 	int ai, aj, ad;
 	int bi, bj, bd;
-	//Event(int t_) : t(t_) { x = 0; ai = aj = ad = bi = bj = bd = 0; }
 	bool operator < (const Event& e) const {
 		if (zero(x - e.x)) {
 			return t == e.t ? S[ai].r[aj] > S[e.ai].r[e.aj] : t < e.t;
@@ -126,7 +107,7 @@ struct Signal {
 	int i, j, d;
 	ld x;
 	bool operator < (const Signal& s) const { return i < s.i; }
-} SG[LEN * LEN * LEN];
+} SG[LEN * LEN * LEN * LEN];
 struct Prob {
 	ld p;
 	int i, s;
@@ -174,7 +155,7 @@ ld green(const Signal& sg, const ld& sx, const ld& ex) {
 	return fan * f + rec;
 }
 void sweep(const int& k, const ld& x) {
-	if (k < 0 || T < k) return;
+	if (k < 0 || T <= k + 1) return;
 	if (zero(SG[k].x - x)) return;
 	int sz;
 
@@ -399,3 +380,4 @@ void init() {
 	return;
 }
 int main() { init(); solve(); std::cout << ANS << "\n"; return 0; }
+//refer to ekzm0204
