@@ -125,7 +125,8 @@ ld green(const Arc& a, const ld& sx, const ld& ex) {
 struct Event {
 	int t, i, j, d;
 	ld x;
-	bool operator < (const Event& e) const { return x == e.x ? t < e.t : x < e.x; }
+	//bool operator < (const Event& e) const { return x == e.x ? t < e.t : x < e.x; }
+	bool operator < (const Event& e) const { return zero(x - e.x) ? t < e.t : x < e.x; }
 } E, EE;
 std::vector<Event> VE;
 struct Prob {
@@ -141,7 +142,7 @@ struct Pow {
 };
 void sweep(const int& k, const ld& x) {
 	//if (k < 0 || T <= k + 1) return;
-	if (zero(A[k].x - x)) return;
+	//if (zero(A[k].x - x)) return;
 	int sz;
 
 	Arc hi = A[k + 1];
