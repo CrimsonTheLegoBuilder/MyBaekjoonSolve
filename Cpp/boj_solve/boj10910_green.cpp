@@ -129,7 +129,7 @@ struct Event {
 	ld x;
 	//bool operator < (const Event& e) const { return x == e.x ? t < e.t : x < e.x; }
 	bool operator < (const Event& e) const { return zero(x - e.x) ? t < e.t : x < e.x; }
-} E, EE;
+};
 std::vector<Event> VE;
 struct Prob {
 	ld p;
@@ -217,8 +217,9 @@ void init() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	ANS = 0;
 	std::cin >> N;
+	ANS = 0;
+	Event E, EE;
 	for (int i = 0; i < N; i++) {
 		E.i = i;
 		std::cin >> S[i].x >> S[i].y >> S[i].M >> S[i].L >> S[i].U;
@@ -286,7 +287,7 @@ void solve() {
 	for (int Q = 0; Q < xsz - 1; Q++) {//O(20 * 20)
 		bool o = 0;
 		for (; i < esz; i++) {
-			E = VE[i];
+			const Event& E = VE[i];
 			//if (X[Q] != E.x) break;
 			if (!zero(X[Q] - E.x)) break;
 			if (E.t == START) {
