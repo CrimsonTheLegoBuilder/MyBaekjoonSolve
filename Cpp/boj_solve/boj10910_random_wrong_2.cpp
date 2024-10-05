@@ -10,8 +10,8 @@ typedef long double ld;
 //typedef double ld;
 typedef std::vector<int> Vint;
 const ld INF = 1e17;
-const ld TOL = 1e-13;
-const ld PI = acosl(-1);
+const ld TOL = 1e-7;
+const ld PI = acos(-1);
 const int LEN = 25;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -121,9 +121,9 @@ bool intersection(const int& ai, const int& aj, const int& bi, const int& bj, Po
 	ll d = x * x + y * y;
 	ll ro = S[ai].r[aj] + S[bi].r[bj];
 	ll ri = S[ai].r[aj] - S[bi].r[bj];
-	if (d >= sq(ro) || d <= sq(ri)) return 0;
+	if (d >= sq(ro) || d < sq(ri)) return 0;
 	inx = intersection(S[ai].p(), S[ai].r[aj], S[bi].p(), S[ bi].r[bj]);
-	assert(inx.size() == 2);
+	//assert(inx.size() == 2);
 	return 1;
 }
 ld get_y(const Signal& s, const ld& x) {
