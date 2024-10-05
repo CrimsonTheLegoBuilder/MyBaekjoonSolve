@@ -76,6 +76,10 @@ struct Station {
 	int x, y;
 	int M, L, U;
 	Vint r, s, w;
+	Station(int x0 = 0, int y0 = 0, int m0 = 0, int l0 = 0, int u0 = 0)
+		: x(x0), y(y0), M(m0), L(l0), U(u0) {
+		r.clear(); s.clear(); w.clear();
+	}
 	Pos p() const { return Pos(x, y); }
 } S[LEN];
 bool intersection(const int& ai, const int& aj, const int& bi, const int& bj, Polygon& inx) {
@@ -90,10 +94,8 @@ bool intersection(const int& ai, const int& aj, const int& bi, const int& bj, Po
 	return 1;
 }
 struct Arc {
-	int i, j;
-	bool d;
-	ld x;
-	ld y;
+	int i, j, d;
+	ld x, y;
 	bool operator < (const Arc& a) const { return y < a.y; }
 } A[LEN * LEN * LEN * LEN];
 ld get_y(const Arc& s, const ld& x) {
@@ -121,9 +123,8 @@ ld green(const Arc& a, const ld& sx, const ld& ex) {
 	return rec + fan * f;
 }
 struct Event {
-	int t;
+	int t, i, j, d;
 	ld x;
-	int i, j, d;
 	bool operator < (const Event& e) const { return x == e.x ? t < e.t : x < e.x; }
 } E, EE;
 std::vector<Event> VE;
@@ -227,38 +228,40 @@ void init() {
 			std::cin >> S[i].r[j] >> S[i].s[j] >> S[i].w[j];
 
 			E.t = START;
-			E.x = S[i].x - S[i].r[j];
+			int sx = S[i].x - S[i].r[j];
+			E.x = sx;
 			X.push_back(E.x);
 			VE.push_back(E);
 
 			E.t = END;
-			E.x = S[i].x + S[i].r[j];
+			int ex = S[i].x + S[i].r[j];
+			E.x = ex;
 			X.push_back(E.x);
 			VE.push_back(E);
 
 			E.t = EE.t = CROSS;
 			for (int k = 0; k < i; k++) {
-				if (S[i].p() == S[k].p()) continue;
+				if (S[i].p() == S[k].p()) continue;//no || infinity intersections
+				EE.i = k;
 				for (int m = 0; m < S[k].M; m++) {
-					EE.i = k;
+					EE.j = m;
 					Polygon inx;
 					if (intersection(i, j, k, m, inx)) {
-						if (inx.size() == 1) {
-							if (!sign(inx[0].x - (S[i].x - S[i].r[j])) ||
-								!sign(inx[0].x - (S[i].x + S[i].r[j])))
-								continue;
-						}
 						for (const Pos& p : inx) {
 							E.x = EE.x = p.x;
 							X.push_back(E.x);
 
-							E.d = S[i].y <= p.y ? HI : LO;
-							VE.push_back(E);
-
-							EE.j = m;
-							EE.d = S[k].y <= p.y ? HI : LO;
-							VE.push_back(EE);
-
+							if (sign(p.x - sx) && sign(p.x - ex)) {
+								//E.d = S[i].y <= p.y ? HI : LO;
+								E.d = sign(p.y - S[i].y) >= 0 ? HI : LO;
+								VE.push_back(E);
+							}
+							if (sign(p.x - (S[k].x - S[k].r[m])) &&
+								sign(p.x - (S[k].x + S[k].r[m]))) {
+								//E.d = S[k].y <= p.y ? HI : LO;
+								EE.d = sign(p.y - S[k].y) >= 0 ? HI : LO;
+								VE.push_back(EE);
+							}
 						}
 					}
 				}
@@ -294,7 +297,7 @@ void solve() {
 				a.d = LO;
 				a.y = get_y(a, mx);
 				A[T++] = a;
-				a.d = HI; 
+				a.d = HI;
 				a.y = get_y(a, mx);
 				A[T++] = a;
 			}
