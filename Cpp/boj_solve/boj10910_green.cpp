@@ -317,7 +317,7 @@ void solve() {
 			}
 		}
 
-		std::sort(A, A + T);
+		std::sort(A, A + T);//O(20 * 20 * 20 * 20 * log(20 * 20))
 		if (o) {
 			int cnt = 0;
 			for (int j = T - 1; j >= 0; j--) {
