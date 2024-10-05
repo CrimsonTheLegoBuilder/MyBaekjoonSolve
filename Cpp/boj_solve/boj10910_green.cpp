@@ -23,6 +23,8 @@ inline ld norm(ld th) {
 	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
 	return th;
 }
+inline bool cmpld(const ld& p, const ld& q) { return sign(p - q) > 0; }
+inline bool eqld(const ld& p, const ld& q) { return zero(p - q); }
 
 #define START 1
 #define CROSS 2
@@ -214,7 +216,7 @@ void init() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
+	std::cout.precision(15);
 	ANS = 0;
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {
@@ -229,14 +231,12 @@ void init() {
 			std::cin >> S[i].r[j] >> S[i].s[j] >> S[i].w[j];
 
 			E.t = START;
-			int sx = S[i].x - S[i].r[j];
-			E.x = sx;
+			E.x = S[i].x - S[i].r[j];
 			X.push_back(E.x);
 			VE.push_back(E);
 
 			E.t = END;
-			int ex = S[i].x + S[i].r[j];
-			E.x = ex;
+			E.x = S[i].x + S[i].r[j];
 			X.push_back(E.x);
 			VE.push_back(E);
 
@@ -252,13 +252,14 @@ void init() {
 							E.x = EE.x = p.x;
 							X.push_back(E.x);
 
-							if (sign(p.x - sx) && sign(p.x - ex)) {
+							//if (p.y != S[i].y) {
+							if (sign(p.y - S[i].y)) {
 								//E.d = S[i].y <= p.y ? HI : LO;
 								E.d = sign(p.y - S[i].y) >= 0 ? HI : LO;
 								VE.push_back(E);
 							}
-							if (sign(p.x - (S[k].x - S[k].r[m])) &&
-								sign(p.x - (S[k].x + S[k].r[m]))) {
+							//if (p.y != S[k].y) {
+							if (sign(p.y - S[k].y)) {
 								//E.d = S[k].y <= p.y ? HI : LO;
 								EE.d = sign(p.y - S[k].y) >= 0 ? HI : LO;
 								VE.push_back(EE);
@@ -271,19 +272,23 @@ void init() {
 	}
 	std::sort(VE.begin(), VE.end());
 	std::sort(X.begin(), X.end());
-	X.erase(unique(X.begin(), X.end()), X.end());
+	//X.erase(unique(X.begin(), X.end()), X.end());
+	//std::sort(X.begin(), X.end(), cmpld);
+	X.erase(unique(X.begin(), X.end(), eqld), X.end());
 	return;
 }
 void solve() {
 	init();
-	int xi = X.size();
-	int sz = VE.size();
+	int xsz = X.size();
+	int esz = VE.size();
 	int i = 0;
 	Arc a;
-	for (int Q = 0; Q < xi - 1; Q++) {//O(20 * 20)
+	for (int Q = 0; Q < xsz - 1; Q++) {//O(20 * 20)
 		bool o = 0;
-		for (; i < sz; i++) {
-			if (X[Q] != E.x) break;
+		for (; i < esz; i++) {
+			E = VE[i];
+			//if (X[Q] != E.x) break;
+			if (!zero(X[Q] - E.x)) break;
 			if (E.t == START) {
 				a.i = E.i;
 				a.j = E.j;
@@ -322,12 +327,11 @@ void solve() {
 			T -= cnt;
 		}
 
-		for (int j = 0; j < T; j++) {
-			a = A[j];
-			I[a.i][a.j][a.d] = j;
-		}
+		for (int j = 0; j < T; j++) a = A[j], I[a.i][a.j][a.d] = j;
+		
+		for (int k = 0; k < T - 1; k++) sweep(k, X[Q + 1]);//O(20 * 20 * 20 * 20)
 
-		for (int k = 1; k < T; k++) sweep(k, X[Q + 1]);//O(20 * 20 * 20 * 20)
+		for (int j = 0; j < T; j++) A[j].x = X[Q + 1];
 	}
 	std::cout << ANS << "\n";
 	return;
