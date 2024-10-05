@@ -283,12 +283,7 @@ void solve() {
 		bool o = 0;
 		for (; i < sz; i++) {
 			if (X[Q] != E.x) break;
-			if (E.t == END) {
-				A[I[E.i][E.j][HI]].y = INF;
-				A[I[E.i][E.j][LO]].y = INF;
-				o = 1;
-			}
-			else if (E.t == START) {
+			if (E.t == START) {
 				a.i = E.i;
 				a.j = E.j;
 				a.d = E.d;
@@ -307,6 +302,11 @@ void solve() {
 				ld mx = (E.x + X[Q + 1]) * .5;
 				a.y = get_y(a, mx);
 				A[I[E.i][E.j][E.d]] = a;
+			}
+			else if (E.t == END) {
+				A[I[E.i][E.j][HI]].y = INF;
+				A[I[E.i][E.j][LO]].y = INF;
+				o = 1;
 			}
 		}
 
