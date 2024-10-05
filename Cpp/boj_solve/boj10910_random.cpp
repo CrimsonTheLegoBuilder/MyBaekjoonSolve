@@ -7,15 +7,15 @@
 #include <vector>
 #include <queue>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-12;
+const ld TOL = 1e-13;
 const ld PI = acos(-1);
-const int LEN = 20;
+const int LEN = 25;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
@@ -73,6 +73,7 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 //Vld intersection(const Pos& ca, const ld& ra, const Pos& cb, const ld& rb) {
 Polygon intersection(const Pos& ca, const ld& ra, const Pos& cb, const ld& rb) {
 	Pos vec = cb - ca;
@@ -97,13 +98,14 @@ struct Pii {
 struct Pow {
 	int s, w;
 	Pow(int s_, int w_) : s(s_), w(w_) {}
-	bool operator < (const Pow& p) const { return s > p.s; }
+	bool operator < (const Pow& p) const { return s == p.s ? w > p.w : s > p.s; }
 };
 struct Station {
 	int x, y;
 	int M, L, U;
 	Vint r, s, w;
-	Station(int x0, int y0, int m0, int l0, int u0) : x(x0), y(y0), M(m0), L(l0), U(u0) { r.clear(); s.clear(); w.clear(); }
+	Station(int x0 = 0, int y0 = 0, int m0 = 0, int l0 = 0, int u0 = 0) 
+		: x(x0), y(y0), M(m0), L(l0), U(u0) { r.clear(); s.clear(); w.clear(); }
 	Pos p() const { return Pos(x, y); }
 } S[LEN];
 struct Event {
@@ -119,6 +121,7 @@ struct Event {
 		return x < e.x;
 	}
 } E;
+std::vector<Event> VE;
 struct Signal {
 	int i, j, d;
 	ld x;
@@ -151,21 +154,25 @@ ld get_y(const Signal& s, const ld& x) {
 	}
 	return p.y;
 }
-ld green(const Signal& s, const ld& sx, const ld& ex) {
-	ld r = S[s.i].r[s.j];
-	ld sy = get_y(s, sx);
-	ld ey = get_y(s, ex);
-	Pos c = S[s.i].p();
+ld green(const Signal& sg, const ld& sx, const ld& ex) {
+	ld r = S[sg.i].r[sg.j];
+	ld sy = get_y(sg, sx);
+	ld ey = get_y(sg, ex);
+	int f = sg.d == HI ? 1 : -1;
 
-	ld st = norm((c - Pos(sx, sy)).rad());
-	ld et = norm((c - Pos(ex, ey)).rad());
-	ld t = norm((st - et) * (s.d == HI ? 1 : -1));
+	Pos c = S[sg.i].p();
+	Pos s = Pos(sx, sy);
+	Pos e = Pos(ex, ey);
 
-	ld fan = r * r * (t * .5 - cos(t * .5) * sin(t * .5));
+	ld st = norm((s - c).rad());
+	ld et = norm((e - c).rad());
+	ld t = norm((st - et) * f);
+	ld fan = r * r * (t - sin(t)) * .5;
+	//ld fan = r * r * (t * .5 - cos(t * .5) * sin(t * .5));
+
 	ld rec = (ex - sx) * (sy + ey) * .5;
-	return fan * (s.d == HI ? 1 : -1) + rec;
+	return fan * f + rec;
 }
-std::vector<Event> VE;
 void sweep(const int& k, const ld& x) {
 	if (k < 0 || T < k) return;
 	if (zero(SG[k].x - x)) return;
@@ -185,22 +192,21 @@ void sweep(const int& k, const ld& x) {
 	Pos m = Pos(mx, my);
 
 	for (int i = 0; i < N; i++) {
+		Pos v = S[i].p() - m;
 		for (int j = 0; j < S[i].M; j++) {
-			ld r = S[i].r[j];
-			Pos v = S[i].p() - m;
+			ll r = S[i].r[j];
 			IN[i][j] = sign(r * r - v.Euc()) >= 0;
 		}
 	}
 
-	ld per = 1.;
 	std::vector<Prob> P;
 	Prob p;
 	for (int i = 0; i < N; i++) {
 		prob[i] = 1.;
-		std::vector<Pow> V;
 		int all = S[i].U - S[i].L + 1;
 		int L = S[i].L;
 		int U = S[i].U;
+		std::vector<Pow> V;
 		for (int j = 0; j < S[i].M; j++) 
 			if (IN[i][j]) V.push_back(Pow(S[i].s[j], S[i].w[j]));
 		std::sort(V.begin(), V.end());
@@ -211,21 +217,21 @@ void sweep(const int& k, const ld& x) {
 			if (w < L) w = L;
 			int diff = U - w + 1;
 			if (diff > 0) {
+				U = w - 1;
 				p.p = (ld)diff / all;
 				p.i = i;
-				U = w - 1;
 				p.s = s;
 				P.push_back(p);
 			}
 		}
 	}
 	std::sort(P.begin(), P.end());
+	ld per = 1.;
 	ld total = 0;
 	sz = P.size();
 	for (int i = 0; i < sz; i++) {
 		p = P[i];
-		ld rp = per * p.p / prob[p.i];
-		total += rp * p.s;
+		total += p.s * per * p.p / prob[p.i];
 
 		per = per / prob[p.i];
 		prob[p.i] -= p.p;
@@ -245,30 +251,29 @@ void solve() {
 	int sz = VE.size();
 	for (int i = 0; i < sz; i++) {
 		E = VE[i];
-		switch (E.t) {
-
-		case START:
+		if (E.t == START) {
 			int k = 0;
 			Signal s;
 			for (k = 0; k < T; k++) {
 				s = SG[k];
 				ld y = get_y(s, E.x);
-				if (y > S[E.ai].y || (zero(y - S[E.ai].y) && SG[k].d == HI)) break;
+				if (sign(y - S[E.ai].y) > 0 || (zero(y - S[E.ai].y) && SG[k].d == HI))
+					break;
 			}
 
 			sweep_signal(k - 1, E.x);
 			for (int j = T + 1; j > k + 1; j--) SG[j] = SG[j - 2];
 			
-			s.i = E.ai; s.j = E.aj;
+			s.i = E.ai;
+			s.j = E.aj;
 			s.x = E.x;
 
 			s.d = LO; SG[k] = s;
 			s.d = HI; SG[k + 1] = s;
 
 			T += 2;
-			break;
-
-		case END:
+		}
+		else if (E.t == END) {
 			int ui = I[E.ai][E.aj][HI];
 			int di = I[E.ai][E.aj][LO];
 
@@ -284,19 +289,18 @@ void solve() {
 				SG[T] = SG[j];
 				T++;
 			}
-			break;
-
-		case CROSS:
-			int PLUS = 0;
+		}
+		else if (E.t == CROSS) {
+			int PLUS = -1;
 			Vint VI;
 			ld nxt = E.x;
-			for (int j = i + 1; j < sz; j++) {
+			for (int j = i; j < sz; j++) {
 				const Event& NE = VE[j];
 				if (!zero(E.x - NE.x)) { nxt = NE.x; break; }
 				if (NE.t != CROSS) continue;
 				PLUS++;
 			}
-			
+
 			for (int j = 0; j < T - 1; j++) {
 				if (zero(get_y(SG[j], E.x) - get_y(SG[j + 1], E.x))) {
 					VI.push_back(j);
@@ -306,21 +310,21 @@ void solve() {
 			std::sort(VI.begin(), VI.end());
 			VI.erase(unique(VI.begin(), VI.end()), VI.end());
 
-			sz = VI.size();
+			int szi = VI.size();
 			int ss = -1, ee = -1;
 			std::vector<Pii> rev;
-			for (int j = 0; j <= sz; j++) {
+			for (int j = 0; j <= szi; j++) {
 				int k = -1;
-				if (j < sz) {
+				if (j < szi) {
 					k = VI[j];
 					sweep_signal(k - 1, E.x);
 					sweep_signal(k, E.x);
 				}
 				if (ss == -1) ss = ee = k;
 				else {
-					if (k != -1 && zero(get_y(SG[ss], E.x) - get_y(SG[k], E.x))) ee = k;
+					if (k != -1 && zero(get_y(SG[ss], E.x) - get_y(SG[k], E.x))) { ee = k; }
 					else {
-						if (ss != -1) rev.push_back(Pii(ss, ee));
+						if (ss != -1) { rev.push_back(Pii(ss, ee)); }
 						ss = ee = k;
 					}
 				}
@@ -332,18 +336,17 @@ void solve() {
 				int s = rev[j].s;
 				int e = rev[j].e;
 				std::vector<std::pair<ld, Signal>> VS;
-				for (int k = s; k < e; k++) {
+				for (int k = s; k <= e; k++) {
 					SG[k].x = E.x;
 					VS.push_back(std::make_pair(get_y(SG[k], mx), SG[k]));
 				}
 				std::sort(VS.begin(), VS.end());
-				for (int k = s; k <= e; k++) SG[k] = VS[k].second;
+				for (int k = s; k <= e; k++) SG[k] = VS[k - s].second;
 			}
 
 			i += PLUS;
-			break;
 		}
-
+		
 		for (int j = 0; j < T; j++) {
 			const Signal& s = SG[j];
 			I[s.i][s.j][s.d] = j;
