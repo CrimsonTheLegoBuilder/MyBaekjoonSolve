@@ -282,6 +282,7 @@ void solve() {
 	int esz = VE.size();
 	int i = 0;
 	Arc a;
+	assert(xsz <= 400 * 400);
 	for (int Q = 0; Q < xsz - 1; Q++) {//O(400 * 400)
 		bool o = 0;
 		for (; i < esz; i++) {
@@ -320,7 +321,8 @@ void solve() {
 		//	A[k].y = get_y(A[k], mx);
 		//}
 
-		std::sort(A, A + T);//O(400 * 400 * 400 * 400 * log(400))
+		assert(T <= 800);
+		std::sort(A, A + T);//O(400 * 400 * 800 * log(800))
 		
 		if (o) {
 			int cnt = 0;
@@ -334,7 +336,7 @@ void solve() {
 
 		for (int k = 0; k < T; k++) a = A[k], I[a.i][a.j][a.d] = k;
 		
-		for (int k = 0; k < T - 1; k++) sweep(k, X[Q + 1]);//O(400 * 400 * 400)
+		for (int k = 0; k < T - 1; k++) sweep(k, X[Q + 1]);//O(400 * 400 * 800 * 400)
 
 		if (Q == xsz - 2) break;
 		for (int k = 0; k < T; k++) {
