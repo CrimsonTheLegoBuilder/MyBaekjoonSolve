@@ -6,12 +6,12 @@
 #include <cassert>
 #include <vector>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-8;
 const ld PI = acos(-1);
 const int LEN = 25;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -23,8 +23,10 @@ inline ld norm(ld th) {
 	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
 	return th;
 }
-inline bool cmpld(const ld& p, const ld& q) { return sign(p - q) > 0; }
+inline bool cmpld(const ld& p, const ld& q) { return sign(p - q) < 0; }
 inline bool eqld(const ld& p, const ld& q) { return zero(p - q); }
+
+//#define DEBUG
 
 #define START 1
 #define CROSS 2
@@ -127,7 +129,6 @@ ld green(const Arc& a, const ld& sx, const ld& ex) {
 struct Event {
 	int t, i, j, d;
 	ld x;
-	//bool operator < (const Event& e) const { return x == e.x ? t < e.t : x < e.x; }
 	bool operator < (const Event& e) const { return zero(x - e.x) ? t < e.t : x < e.x; }
 };
 std::vector<Event> VE;
@@ -139,12 +140,9 @@ struct Prob {
 ld prob[LEN];
 struct Pow {
 	int s, w;
-	//Pow(int s_, int w_) : s(s_), w(w_) {}
 	bool operator < (const Pow& p) const { return s == p.s ? w > p.w : s > p.s; }
 };
 void sweep(const int& k, const ld& x) {
-	//if (k < 0 || T <= k + 1) return;
-	//if (zero(A[k].x - x)) return;
 	int sz;
 
 	Arc hi = A[k + 1];
@@ -284,7 +282,7 @@ void solve() {
 	int esz = VE.size();
 	int i = 0;
 	Arc a;
-	for (int Q = 0; Q < xsz - 1; Q++) {//O(20 * 20)
+	for (int Q = 0; Q < xsz - 1; Q++) {//O(400 * 400)
 		bool o = 0;
 		for (; i < esz; i++) {
 			const Event& E = VE[i];
@@ -317,24 +315,35 @@ void solve() {
 			}
 		}
 
-		std::sort(A, A + T);//O(20 * 20 * 20 * 20 * log(20 * 20))
+		//for (int k = 0; k < T; k++) {
+		//	ld mx = (A[k].x + X[Q + 1]) * .5;
+		//	A[k].y = get_y(A[k], mx);
+		//}
+
+		std::sort(A, A + T);//O(400 * 400 * 400 * 400 * log(400))
+		
 		if (o) {
 			int cnt = 0;
 			for (int j = T - 1; j >= 0; j--) {
 				if (A[j].y < 1e9) break;
 				cnt++;
 			}
-			assert(T >= cnt);
+			assert(~cnt & 1); assert(~T & 1); assert(T >= cnt);
 			T -= cnt;
 		}
 
-		for (int j = 0; j < T; j++) a = A[j], I[a.i][a.j][a.d] = j;
+		for (int k = 0; k < T; k++) a = A[k], I[a.i][a.j][a.d] = k;
 		
-		for (int k = 0; k < T - 1; k++) sweep(k, X[Q + 1]);//O(20 * 20 * 20 * 20)
+		for (int k = 0; k < T - 1; k++) sweep(k, X[Q + 1]);//O(400 * 400 * 400)
 
-		for (int j = 0; j < T; j++) A[j].x = X[Q + 1];
+		if (Q == xsz - 2) break;
+		for (int k = 0; k < T; k++) {
+			A[k].x = X[Q + 1];
+			ld mx = (A[k].x + X[Q + 2]) * .5;
+			A[k].y = get_y(A[k], mx);
+		}
 	}
 	std::cout << ANS << "\n";
 	return;
 }
-int main() { solve(); return 0; }//refer to ekzm0204
+int main() { solve(); return 0; }//boj10910 Random Signal
