@@ -32,8 +32,10 @@ inline ld norm(ld th) {
 
 #define HI 0
 #define LO 1
+#define CCW 0
+#define CW 1
 
-int N, M, T, Q;
+int N, M, K, I, T, Q;
 bool IN[25][25];
 ld ANS;
 Vld R[400];
@@ -108,10 +110,29 @@ struct Arc {
 	Pos c;
 	int r;
 	bool d;
-} A[200'000]; int AP;
+	Arc(ld hi_ = 0, ld lo_ = 0, Pos c_ = Pos(), int r_ = 0, bool d_ = 0) :
+		hi(hi_), lo(lo_), c(c_), r(r_), d(d_) {}
+} A[200'000]; int AP, AP0;
 struct Tangent {
 	Pos dir, pet;
+	int r;
 	bool d;
+	int i;
+	Tangent(Pos v_ = Pos(), Pos p_ = Pos(), int r_ = 0, bool d_ = 0, int i_ = 0) : dir(v_), pet(p_), r(r_), d(d_), i(i_) {}
+	bool operator < (const Tangent& t) const {
+		ld t0 = dir.rad(), t1 = t.dir.rad();
+		if (!zero(t0 - t1)) {
+			ld f = sign(pet * t.pet);
+			if (f < 0) return pet / dir > 0;
+			else {
+				if (r == t.r) return d < t.d;
+				assert(f > 0 && zero(pet / t.pet));
+				if (pet / dir > 0) return r < t.r;
+				else return r > t.r;
+			}
+		}
+		return sign(t1 - t0);
+	}
 };
 std::map<Pos, std::vector<Tangent>> MAP;
 ld get_y(const Arc& a, const ld& x) {
@@ -238,14 +259,20 @@ void solve() {
 	std::sort(KEY.begin(), KEY.end());
 	KEY.erase(unique(KEY.begin(), KEY.end()), KEY.end());
 
+	AP = 0;
 	for (int i = 0; i < sz; i++) {
 		R[i].push_back(0);
+		R[i].push_back(PI);
 		R[i].push_back(2 * PI);
 		std::sort(R[i].begin(), R[i].end());
-		R[i].erase(unique(R[i].begin(), R[i].end()), R[i].end());
-		for (const ld& t : R[i]) {
-			Pos key = D[i].c() + Pos(0, D[i].r).rot(t);
-
+		R[i].erase(unique(R[i].begin(), R[i].end(), eqld), R[i].end());
+		int szr = R[i].size();
+		for (int j = 0; j < szr - 1; j++) {
+			Pos p = D[i].c() + Pos(0, D[i].r).rot(R[i][j]);
+			Pos q = D[i].c() + Pos(0, D[i].r).rot(R[i][j + 1]);
+			A[AP++] = Arc(R[i][j], R[i][j + 1], D[i].c(), D[i].r,
+				(R[i][j] + R[i][j + 1]) * .5 < PI ? HI : LO);
+			MAP[p].push_back(Tangent());
 		}
 	}
 	std::cout << ANS << "\n";
