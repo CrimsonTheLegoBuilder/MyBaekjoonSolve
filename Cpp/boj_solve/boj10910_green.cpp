@@ -159,6 +159,14 @@ ld get_y(const Arc& a, const ld& x) {
 	}
 	return p.y;
 }
+ld ang(const Arc& a, const Pos& p) {
+	Pos l = a.l();
+	Pos h = a.h();
+	Pos vl = (l - p).unit(), vh = (h - p).unit();
+	ld t = rad(vl, vh);
+	if (sign(a.r * a.r - (a.c - p).Euc()) > 0) return t;
+	return 0;
+}
 ld green(const Arc& a) {
 	ld r = a.r;
 	Pos h = a.h();
@@ -291,7 +299,7 @@ void solve() {
 	for (int i = 0; i < sz; i++) {
 		R[i].push_back(0);
 		R[i].push_back(PI);
-		R[i].push_back(2 * PI);
+		R[i].push_back(PI * 2);
 		std::sort(R[i].begin(), R[i].end());
 		R[i].erase(unique(R[i].begin(), R[i].end(), eqld), R[i].end());
 		int szr = R[i].size();
