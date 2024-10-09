@@ -31,6 +31,12 @@ inline ld norm(ld th) {
 
 //#define DEBUG
 
+/*
+
+이거 안 될 거 같은데?? ㅋㅋㅋㅋㅋㅋ
+
+*/
+
 #define HI 0
 #define LO 1
 #define CCW 0
@@ -58,6 +64,7 @@ struct Pos {
 	Pos rot(ld the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
+	Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 } key; const Pos O = { 0, 0 };
@@ -116,8 +123,11 @@ struct Arc {
 	bool d, rvs;
 	Arc(ld hi_ = 0, ld lo_ = 0, Pos c_ = Pos(), int r_ = 0, bool d_ = 0, bool rvs_ = 0) :
 		hi(hi_), lo(lo_), c(c_), r(r_), d(d_), rvs(rvs_) {}
+	Pos h() const { return c + Pos(r, 0).rot(hi); }
+	Pos l() const { return c + Pos(r, 0).rot(lo); }
 } A[200'000]; int AP, AP0;
 typedef std::vector<Arc> ClosedLoop;
+ld AREA[200'000];
 struct Tangent {
 	Pos dir, pet;
 	int r;
@@ -149,18 +159,14 @@ ld get_y(const Arc& a, const ld& x) {
 	}
 	return p.y;
 }
-ld green(const Arc& a, const ld& sx, const ld& ex) {
+ld green(const Arc& a) {
 	ld r = a.r;
-	ld sy = get_y(a, sx);
-	ld ey = get_y(a, ex);
-	int f = a.d == HI ? 1 : -1;
-	Pos c = a.c;
-	Pos s = Pos(sx, sy);
-	Pos e = Pos(ex, ey);
-	ld t = norm(std::abs(rad(e - c, s - c)));
-	ld fan = r * r * t * .5 - std::abs(cross(c, e, s)) * .5;
-	ld rec = (ex - sx) * (sy + ey) * .5;
-	return rec + fan * f;
+	Pos h = a.h();
+	Pos l = a.l();
+	ld fan = r * r * a.hi - a.lo;
+	ld tri = cross(a.c, l, h) * .5;
+	ld rec = (l.x - h.x) * (l.y + h.y) * .5;
+	return fan - tri + rec;
 }
 struct Prob {
 	ld p;
@@ -182,6 +188,11 @@ bool join(int i, int j) {
 	return 1;
 }
 ClosedLoop CL[200'000]; int ci;
+ld area(const ClosedLoop& cl) {
+	ld ret = 0;
+	for (const Arc& a : cl) ret += green(a);
+	return ret;
+}
 std::set<int> CLI[200'000];
 int V[200'000];
 Vint GS[200'000];
@@ -285,24 +296,66 @@ void solve() {
 		R[i].erase(unique(R[i].begin(), R[i].end(), eqld), R[i].end());
 		int szr = R[i].size();
 		for (int j = 0; j < szr - 1; j++) {
-			A[AP++] = Arc(norm(R[i][j]), norm(R[i][j + 1]), D[i].c(), D[i].r,
-				(R[i][j] + R[i][j + 1]) * .5 < PI ? HI : LO);
+			A[AP++] = Arc(R[i][j], R[i][j + 1], D[i].c(), D[i].r,
+				(R[i][j] + R[i][j + 1]) * .5 < PI ? HI : LO, CCW);
 		}
 	}
 	AP0 = AP;
 	for (int i = 0; i < sz; i++) {
 		int szr = R[i].size();
 		for (int j = 0; j < szr - 1; j++) {
-			A[AP++] = Arc(norm(R[i][j]), norm(R[i][j + 1]), D[i].c(), D[i].r,
-				(R[i][j] + R[i][j + 1]) * .5 < PI ? HI : LO, 1);
+			A[AP++] = Arc(R[i][j], R[i][j + 1], D[i].c(), D[i].r,
+				(R[i][j] + R[i][j + 1]) * .5 < PI ? HI : LO, CW);
 		}
 	}
 	for (int i = 0; i < AP; i++) {
 		Pos p = A[i].c + Pos(0, A[i].r).rot(A[i].lo);
 		Pos q = A[i].c + Pos(0, A[i].r).rot(A[i].hi);
-
-		MAP[p].push_back(Tangent());
-		MAP[q].push_back(Tangent());
+		Pos dir, pet;
+		pet = (A[i].c - p).unit();
+		dir = -~pet;
+		MAP[p].push_back(Tangent(dir, pet, A[i].r, 0, i));
+		pet = (A[i].c - q).unit();
+		dir = ~pet;
+		MAP[q].push_back(Tangent(dir, pet, A[i].r, 1, i));
+	}
+	for (const Pos& key : KEY) {
+		std::vector<Tangent>& v = MAP[key];
+		std::sort(v.begin(), v.end());
+		int sz = v.size();
+		assert(!(sz & 1));
+		for (int j = 0; j < sz; j += 2) {
+			Tangent cur = v[(j - 1 + sz) % sz], nxt = v[j];
+			assert(cur.d != nxt.d);
+			GS[nxt.i].push_back(cur.i);
+		}
+	}
+	memset(V, 0, sizeof V);
+	ci = 0;
+	for (int i = 0; i < AP; i++) {
+		if (!V[i]) {
+			dfs(ci, i);
+			AREA[i] = area(CL[i]);
+			if (zero(AREA[i])) {
+				CL[ci].clear();
+				CLI[ci].clear();
+				ci--;
+			}
+			ci++;
+		}
+	}
+	memset(P, -1, sizeof P);
+	for (int i = 0; i < ci; i++) {
+		std::set<int>& CUR = CLI[i];
+		for (int j = i + 1; j < ci; j++) {
+			std::set<int>& NXT = CLI[j];
+			for (const int& idx : CUR) {
+				if (NXT.count(idx + AP0) || NXT.count(idx - AP0)) {
+					join(i, j);
+					break;
+				}
+			}
+		}
 	}
 	std::cout << ANS << "\n";
 	return;
