@@ -6,6 +6,7 @@
 #include <cassert>
 #include <vector>
 #include <map>
+#include <set>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
@@ -51,12 +52,15 @@ struct Pos {
 	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
+	Pos operator - () const { return { -x, -y }; }
+	Pos operator ~ () const { return { -y, x }; }
+	Pos operator ! () const { return { y, x }; }
 	Pos rot(ld the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
 	ld rad() const { return atan2(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-}; const Pos O = { 0, 0 };
+} key; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
 Polygon KEY;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
@@ -109,10 +113,11 @@ struct Arc {
 	ld hi, lo;
 	Pos c;
 	int r;
-	bool d;
-	Arc(ld hi_ = 0, ld lo_ = 0, Pos c_ = Pos(), int r_ = 0, bool d_ = 0) :
-		hi(hi_), lo(lo_), c(c_), r(r_), d(d_) {}
+	bool d, rvs;
+	Arc(ld hi_ = 0, ld lo_ = 0, Pos c_ = Pos(), int r_ = 0, bool d_ = 0, bool rvs_ = 0) :
+		hi(hi_), lo(lo_), c(c_), r(r_), d(d_), rvs(rvs_) {}
 } A[200'000]; int AP, AP0;
+typedef std::vector<Arc> ClosedLoop;
 struct Tangent {
 	Pos dir, pet;
 	int r;
@@ -176,8 +181,20 @@ bool join(int i, int j) {
 	else P[j] += P[i], P[i] = j;
 	return 1;
 }
-int V[LEN * LEN * 10];
-Vint GS[LEN * LEN * 10];
+ClosedLoop CL[200'000]; int ci;
+std::set<int> CLI[200'000];
+int V[200'000];
+Vint GS[200'000];
+void dfs(const int& i, int v) {
+	V[v] = 1;
+	CL[i].push_back(A[v]);
+	CLI[i].insert(v);
+	for (const int& w : GS[v]) {
+		if (V[w]) continue;
+		dfs(i, w);
+	}
+	return;
+}
 void sweep(const int& k, const ld& x) {
 	int sz;
 	ld a = 0;
@@ -268,12 +285,24 @@ void solve() {
 		R[i].erase(unique(R[i].begin(), R[i].end(), eqld), R[i].end());
 		int szr = R[i].size();
 		for (int j = 0; j < szr - 1; j++) {
-			Pos p = D[i].c() + Pos(0, D[i].r).rot(R[i][j]);
-			Pos q = D[i].c() + Pos(0, D[i].r).rot(R[i][j + 1]);
-			A[AP++] = Arc(R[i][j], R[i][j + 1], D[i].c(), D[i].r,
+			A[AP++] = Arc(norm(R[i][j]), norm(R[i][j + 1]), D[i].c(), D[i].r,
 				(R[i][j] + R[i][j + 1]) * .5 < PI ? HI : LO);
-			MAP[p].push_back(Tangent());
 		}
+	}
+	AP0 = AP;
+	for (int i = 0; i < sz; i++) {
+		int szr = R[i].size();
+		for (int j = 0; j < szr - 1; j++) {
+			A[AP++] = Arc(norm(R[i][j]), norm(R[i][j + 1]), D[i].c(), D[i].r,
+				(R[i][j] + R[i][j + 1]) * .5 < PI ? HI : LO, 1);
+		}
+	}
+	for (int i = 0; i < AP; i++) {
+		Pos p = A[i].c + Pos(0, A[i].r).rot(A[i].lo);
+		Pos q = A[i].c + Pos(0, A[i].r).rot(A[i].hi);
+
+		MAP[p].push_back(Tangent());
+		MAP[q].push_back(Tangent());
 	}
 	std::cout << ANS << "\n";
 	return;
