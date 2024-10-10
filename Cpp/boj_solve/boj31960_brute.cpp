@@ -19,7 +19,7 @@ typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-15;
+const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -86,7 +86,12 @@ ld cos_2nd_(const ld& a, const ld& b, const ld& c) {
 	ld t = (a * a + b * b - c * c) / (2 * a * b);
 	return std::abs(acos(std::min(std::max(t, -1.0), 1.0)));
 }
-ld cos_2nd(const ll& a, const ll& b, const ll& c) { return cos_2nd_(sqrt(a), sqrt(b), sqrt(c)); }
+ld cos_2nd(const ll& a, const ll& b, const ll& c) {
+	ll num = a + b - c;
+	ld den = 2 * sqrt(a) * sqrt(b);
+	ld t = num / den;
+	return std::abs(acos(std::min(std::max(t, -1.0), 1.0)));
+}
 ld heron(const ll& a2, const ll& b2, const ll& c2) {
 	ld a = sqrt(a2);
 	ld b = sqrt(b2);
@@ -95,7 +100,12 @@ ld heron(const ll& a2, const ll& b2, const ll& c2) {
 	ld area = sqrt(s * (s - a) * (s - b) * (s - c));
 	return area;
 }
-ld heron(const Vll& v) { return heron(v[0], v[1], v[2]); }
+ld heron(const Vll& v) { assert(3 == v.size()); return heron(v[0], v[1], v[2]); }
+ld area(const Vll& v) {
+	ll a = v[0], b = v[1], c = v[2];
+	ld t = cos_2nd(a, b, c);
+	return sqrt(a) * sqrt(b) * sin(t);
+}
 bool half_check(const int& i, const int& j) {
 	if (zero(PI - (THE[i][MID] + THE[j][MID]))) {
 		for (int a0 = 0; a0 < 2; a0++) {
@@ -150,14 +160,14 @@ bool half_check(const Vint& v) {
 				if (zero(PI * .5 - THE[i][j]) && sign(T[i][j] - A) > 0) {
 					vd.clear();
 					vd.push_back(sqrt(A * 2));
-					vd.push_back(sqrt(T[i][j == 1 ? 2 : 1]));
+					vd.push_back(sqrt(T[i][j == LEFT ? RIGHT : LEFT]));
 					vd.push_back(D - sqrt(T[i][j]));
 					if (compose_triangle(vi, vd)) return 1;
 				}
 				if (zero(PI * .25 - THE[i][j]) && sign(T[i][j] - A) > 0) {
 					vd.clear();
 					vd.push_back(D);
-					vd.push_back(sqrt(T[i][j == 1 ? 2 : 1]));
+					vd.push_back(sqrt(T[i][j == LEFT ? RIGHT : LEFT]));
 					vd.push_back(sqrt(A * 2) - sqrt(T[i][j]));
 					if (compose_triangle(vi, vd)) return 1;
 				}
@@ -303,11 +313,36 @@ bool trap_check(const int& i, const int& j, Polygon& B) {
 		std::sort(T2.begin(), T2.end());
 		if (two_tri_check(vi, T1, T2)) return 1;
 	}
-	if (on_seg_strong(Pos(0, 0), Pos(0, D), p)) {
+	int i1 = vi[0], i2 = vi[1];
+	Polygon Z;
 
-	}
-	if (on_seg_strong(Pos(D, 0), Pos(D, D), p)) {
-
+	if (on_seg_weak(Pos(0, 0), Pos(0, D), p))
+		Z = { B[3], B[2], Pos(D, D), Pos(0, D) };
+	
+	else if (on_seg_weak(Pos(D, 0), Pos(D, D), p))
+		Z = { B[0], B[3], Pos(D, D), Pos(0, D) };
+	
+	Vld T1;
+	Vld T2 = { sqrt(T[i2][0]), sqrt(T[i2][1]), sqrt(T[i2][2]) };
+	for (int k = 0; k < 4; k++) {
+		const Pos& pre = Z[k], cur = Z[(k + 1) % 4], nxt = Z[(k + 2) % 4];
+		ld t1 = rad(nxt - cur, pre - cur);
+		ld d1 = (cur - pre).mag();
+		ld d2 = (cur - nxt).mag();
+		std::sort(T2.begin(), T2.end());
+		for (int l = 0; l < 3; l++) {
+			for (int m = 1; m <= 2; m++) {
+				if (zero(sqrt(T[i1][l]) - d1) && zero(sqrt(T[i1][(l + m) % 3]) - d2)) {
+					ld t = cos_2nd(T[i1][l], T[i1][(l + m) % 3], T[i1][(l + (m == LEFT ? RIGHT : LEFT)) % 3]);
+					if (zero(t - t1)) {
+						T1 = { (Z[(k + 2) % 4] - Z[(k + 3) % 4]).mag(), (Z[(k + 3) % 4] - Z[(k + 4) % 4]).mag() };
+						T1.push_back(sqrt(T[i1][(l + (m == LEFT ? RIGHT : LEFT)) % 3]));
+						std::sort(T1.begin(), T1.end());
+						if (cmpvld(T1, T2)) return 1;
+					}
+				}
+			}
+		}
 	}
 	return 0;
 }
@@ -381,4 +416,4 @@ void solve() {
 	while (Q--) std::cout << query() << "\n";
 	return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj31960
