@@ -1392,6 +1392,12 @@
     <ClCompile Include="boj32383.cpp">
       <Filter>소스 파일\stack</Filter>
     </ClCompile>
+    <ClCompile Include="boj10910_green_wrong.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj31960_brute.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
