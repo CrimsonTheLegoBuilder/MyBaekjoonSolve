@@ -38,6 +38,7 @@ inline ld norm(ld th) {
 
 int N, M, Q;
 ld A, D;
+Vll T[4];
 bool D_OK[4], A_OK[4];
 ld THE[4][3];
 bool cmpvld(const Vld& v1, const Vld& v2) {
@@ -118,31 +119,38 @@ bool half_check(const int& i, const int& j) {
 	ld a2 = area(T[j]);
 	if (!zero(A - (a1 + a2))) return 0;
 	Vld T1, T2;
+	T2 = { sqrt(T[j][0]), sqrt(T[j][1]), sqrt(T[j][2]) };
+	std::sort(T2.begin(), T2.end());
+	bool f = 0;
 	if (zero(THE[i][LEFT] - PI * .5)) {
 		T1.push_back(sqrt(A * 2));
 		T1.push_back(D - sqrt(T[i][LEFT]));
 		T1.push_back(sqrt(T[i][RIGHT]));
+		std::sort(T1.begin(), T1.end());
+		if (cmpvld(T1, T2))f = 1;
 	}
-	else if (zero(THE[i][RIGHT] - PI * .5)) {
+	if (zero(THE[i][RIGHT] - PI * .5)) {
 		T1.push_back(sqrt(A * 2));
 		T1.push_back(D - sqrt(T[i][RIGHT]));
 		T1.push_back(sqrt(T[i][LEFT]));
+		std::sort(T1.begin(), T1.end());
+		if (cmpvld(T1, T2))f = 1;
 	}
-	else if (zero(THE[i][LEFT] - PI * .25)) {
+	if (zero(THE[i][LEFT] - PI * .25)) {
 		T1.push_back(sqrt(A * 2) - sqrt(T[i][LEFT]));
 		T1.push_back(D);
 		T1.push_back(sqrt(T[i][RIGHT]));
+		std::sort(T1.begin(), T1.end());
+		if (cmpvld(T1, T2))f = 1;
 	}
-	else if (zero(THE[i][RIGHT] - PI * .25)) {
+	if (zero(THE[i][RIGHT] - PI * .25)) {
 		T1.push_back(sqrt(A * 2) - sqrt(T[i][RIGHT]));
 		T1.push_back(D);
 		T1.push_back(sqrt(T[i][LEFT]));
+		std::sort(T1.begin(), T1.end());
+		if (cmpvld(T1, T2))f = 1;
 	}
-	if (T1.empty()) return 0;
-	T2 = { sqrt(T[j][0]), sqrt(T[j][1]), sqrt(T[j][2]) };
-	std::sort(T1.begin(), T1.end());
-	std::sort(T2.begin(), T2.end());
-	return cmpvld(T1, T2);
+	return f;
 }
 bool compose_triangle(const Vint& vi, Vld& vd) {
 	std::sort(vd.begin(), vd.end());
@@ -236,7 +244,6 @@ bool half_check(const Vint& v) {
 	}
 	return 0;
 }
-Vll T[4];
 bool _4at1() {
 	if (M < 4) return 0;
 	ld t0 = 0;
@@ -277,7 +284,7 @@ bool _4at1() {
 	return 0;
 }
 bool _2and2() {
-	if (M < 4) return 0;
+	if (M < 2) return 0;
 	for (int i = 1; i <= 3; i++) {
 		if (half_check(0, i) || half_check(i, 0)) {
 			for (int j = 1; j <= 3; j++) {
@@ -289,7 +296,6 @@ bool _2and2() {
 			}
 		}
 	}
-
 	return 0;
 }
 bool _3and1() {
@@ -317,7 +323,7 @@ bool two_tri_check(const Vint& vi, Vld& T1, Vld& T2) {
 	return 0;
 }
 bool trap_check(const int& i, const int& j, Polygon& B) {
-	Pos p = B[B.size() - 1];
+	Pos p = B[3];
 	Vint vi;
 	for (int k = 0; k < 4; k++) if (k != i && k != j) vi.push_back(k);
 	if (on_seg_weak(Pos(0, D), Pos(D, D), p)) {
@@ -333,8 +339,56 @@ bool trap_check(const int& i, const int& j, Polygon& B) {
 		if (two_tri_check(vi, T1, T2)) return 1;
 	}
 	int i1 = vi[0], i2 = vi[1];
-	Polygon Z;
 
+	if (p == Pos(0, D)) {
+		Vld T1 = { D, (B[3] - B[2]).mag(), B[3].y - B[2].y }, T2;
+		std::sort(T1.begin(), T1.end());
+		if (!D_OK[i1] && !D_OK[i2]) return 0;
+		if (!D_OK[i1] && D_OK[i2]) std::swap(i1, i2);
+		for (int k = 0; k < 3; k++) {
+			ld tl = cos_2nd(T[i2][k], T[i2][(k + 2) % 3], T[i2][(k + 1) % 3]);
+			ld tr = cos_2nd(T[i2][k], T[i2][(k + 1) % 3], T[i2][(k + 2) % 3]);
+			if (T[i2][k] == T[i1][LEFT]) {
+				if (zero(PI - (T[i1][MID] + tl))) {
+					T2 = { D,
+						sqrt(T[i2][(k + 1) % 3]),
+						sqrt(T[i1][RIGHT]) + sqrt(T[i2][(k + 2) % 3])
+					};
+					std::sort(T2.begin(), T2.end());
+					if (cmpvld(T1, T2)) return 1;
+				}
+				if (zero(PI - (T[i1][MID] + tr))) {
+					T2 = { D,
+						sqrt(T[i2][(k + 2) % 3]),
+						sqrt(T[i1][RIGHT]) + sqrt(T[i2][(k + 1) % 3])
+					};
+					std::sort(T2.begin(), T2.end());
+					if (cmpvld(T1, T2)) return 1;
+				}
+			}
+			if (T[i2][k] == T[i1][RIGHT]) {
+				if (zero(PI - (T[i1][MID] + tl))) {
+					T2 = { D,
+						sqrt(T[i2][(k + 1) % 3]),
+						sqrt(T[i1][LEFT]) + sqrt(T[i2][(k + 2) % 3])
+					};
+					std::sort(T2.begin(), T2.end());
+					if (cmpvld(T1, T2)) return 1;
+				}
+				if (zero(PI - (T[i1][MID] + tr))) {
+					T2 = { D,
+						sqrt(T[i2][(k + 2) % 3]),
+						sqrt(T[i1][LEFT]) + sqrt(T[i2][(k + 1) % 3])
+					};
+					std::sort(T2.begin(), T2.end());
+					if (cmpvld(T1, T2)) return 1;
+				}
+			}
+		}
+		return 0;
+	}
+
+	Polygon Z;
 	if (on_seg_weak(Pos(0, 0), Pos(0, D), p))
 		Z = { B[3], B[2], Pos(D, D), Pos(0, D) };
 	
@@ -384,13 +438,13 @@ bool stack_up() {
 					ld dl = sqrt(T[j][(k + 2) % 3]);
 					nxt = Pos(dl, 0).rot(tl).rot(pvt);
 					B.push_back(nxt);
-					if (trap_check(i, j, B)) return;
+					if (trap_check(i, j, B)) return 1;
 					B.pop_back();
 					ld tr = cos_2nd(T[j][k], T[j][(k + 1) % 3], T[j][(k + 2) % 3]);
 					ld dr = sqrt(T[j][(k + 1) % 3]);
 					nxt = Pos(dr, 0).rot(tr).rot(pvt);
 					B.push_back(nxt);
-					if (trap_check(i, j, B)) return;
+					if (trap_check(i, j, B)) return 1;
 					B.pop_back();
 				}
 			}
