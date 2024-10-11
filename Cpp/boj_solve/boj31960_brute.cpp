@@ -33,8 +33,8 @@ inline ld norm(ld th) {
 }
 
 #define MID 0
-#define LEFT 1
-#define RIGHT 2
+#define LEFT 2
+#define RIGHT 1
 
 int N, M, Q;
 ld A, D;
@@ -113,6 +113,45 @@ ld area(const Vll& v) {
 	ld t = cos_2nd(a, b, c);
 	return sqrt(a) * sqrt(b) * sin(t);
 }
+bool _4at1() {
+	if (M < 4) return 0;
+	ld t0 = 0;
+	for (int i = 0; i < 4; i++) t0 += THE[i][MID];
+	if (!zero(2 * PI - t0)) return 0;
+	Polygon B;
+	B.push_back(O);
+	B.push_back(Pos(D, 0));
+	B.push_back(Pos(sqrt(T[0][1]), 0).rot(THE[0][LEFT]));
+	for (int i = 1; i <= 3; i++) {
+		for (int j = 1; j <= 3; j++) {
+			if (j == i) continue;
+			for (int k = 1; k <= 3; k++) {
+				if (k == i || k == j) continue;
+				ll nxtd = T[0][RIGHT];
+				ld nxtt = THE[0][RIGHT];
+				bool f = 1;
+				for (const auto& l : { i, j, k }) {
+					if (T[l][LEFT] == nxtd && zero(PI * .5 - (nxtt + THE[l][LEFT]))) {
+						nxtd = T[l][RIGHT];
+						nxtt = THE[l][RIGHT];
+					}
+					else if (T[l][RIGHT] == nxtd && zero(PI * .5 - (nxtt + THE[l][RIGHT]))) {
+						nxtd = T[l][LEFT];
+						nxtt = THE[l][LEFT];
+					}
+					else { f = 0; break; }
+				}
+				if (f) {
+					bool f1 = nxtd == T[0][LEFT];
+					bool f2 = zero(PI * .5 - (nxtt + THE[0][LEFT]));
+					assert(f1 && f2);
+					return 1;
+				}
+			}
+		}
+	}
+	return 0;
+}
 bool half_check(const int& i, const int& j) {
 	if (!D_OK[i]) return 0;
 	ld a1 = area(T[i]);
@@ -182,6 +221,21 @@ bool compose_triangle(const Vint& vi, Vld& vd) {
 	}
 	return 0;
 }
+bool _2and2() {
+	if (M < 2) return 0;
+	for (int i = 1; i <= 3; i++) {
+		if (half_check(0, i) || half_check(i, 0)) {
+			for (int j = 1; j <= 3; j++) {
+				if (j == i) continue;
+				for (int k = 1; k <= 3; k++) {
+					if (k == i || k == j) continue;
+					if (half_check(j, k)) return 1;
+				}
+			}
+		}
+	}
+	return 0;
+}
 bool half_check(const Vint& v) {
 	for (int i = 0; i < 3; i++) {
 		if (D_OK[i]) {
@@ -238,60 +292,6 @@ bool half_check(const Vint& v) {
 							std::swap(i1, i2);
 						}
 					}
-				}
-			}
-		}
-	}
-	return 0;
-}
-bool _4at1() {
-	if (M < 4) return 0;
-	ld t0 = 0;
-	for (int i = 0; i < 4; i++) t0 += THE[i][MID];
-	if (!zero(2 * PI - t0)) return 0;
-	Polygon B;
-	B.push_back(O);
-	B.push_back(Pos(D, 0));
-	B.push_back(Pos(sqrt(T[0][1]), 0).rot(THE[0][LEFT]));
-	for (int i = 1; i <= 3; i++) {
-		for (int j = 1; j <= 3; j++) {
-			if (j == i) continue;
-			for (int k = 1; k <= 3; k++) {
-				if (k == i || k == j) continue;
-				ll nxtd = T[0][RIGHT];
-				ld nxtt = THE[0][RIGHT];
-				bool f = 1;
-				for (const auto& l : { i, j, k }) {
-					if (T[l][LEFT] == nxtd && zero(PI * .5 - (nxtt + THE[l][LEFT]))) {
-						nxtd = T[l][RIGHT];
-						nxtt = THE[l][RIGHT];
-					}
-					else if (T[l][RIGHT] == nxtd && zero(PI * .5 - (nxtt + THE[l][RIGHT]))) {
-						nxtd = T[l][LEFT];
-						nxtt = THE[l][LEFT];
-					}
-					else { f = 0; break; }
-				}
-				if (f) {
-					bool f1 = nxtd == T[0][LEFT];
-					bool f2 = zero(PI * .5 - (nxtt + THE[0][LEFT]));
-					assert(f1 && f2);
-					return 1;
-				}
-			}
-		}
-	}
-	return 0;
-}
-bool _2and2() {
-	if (M < 2) return 0;
-	for (int i = 1; i <= 3; i++) {
-		if (half_check(0, i) || half_check(i, 0)) {
-			for (int j = 1; j <= 3; j++) {
-				if (j == i) continue;
-				for (int k = 1; k <= 3; k++) {
-					if (k == i || k == j) continue;
-					if (half_check(j, k)) return 1;
 				}
 			}
 		}
