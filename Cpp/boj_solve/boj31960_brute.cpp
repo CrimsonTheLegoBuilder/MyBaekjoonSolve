@@ -40,6 +40,12 @@ int N, M, Q;
 ld A, D;
 bool D_OK[4], A_OK[4];
 ld THE[4][3];
+bool cmpvld(const Vld& v1, const Vld& v2) {
+	int sz = v1.size();
+	if (sz != v2.size()) return 0;
+	for (int i = 0; i < sz; i++) if (!zero(v1[i] - v2[i])) return 0;
+	return 1;
+}
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -107,18 +113,36 @@ ld area(const Vll& v) {
 	return sqrt(a) * sqrt(b) * sin(t);
 }
 bool half_check(const int& i, const int& j) {
-	if (zero(PI - (THE[i][MID] + THE[j][MID]))) {
-		for (int a0 = 0; a0 < 2; a0++) {
-			int a1 = (a0 + 1) % 2;
-			for (int b0 = 0; b0 < 2; b0++) {
-				int b1 = (b0 + 1) % 2;
-				if (T[i][a0] == T[j][b0] && zero(PI * .5 - (THE[i][a0] + THE[j][b0]))) {
-					return 1;
-				}
-			}
-		}
+	if (!D_OK[i]) return 0;
+	ld a1 = area(T[i]);
+	ld a2 = area(T[j]);
+	if (!zero(A - (a1 + a2))) return 0;
+	Vld T1, T2;
+	if (zero(THE[i][LEFT] - PI * .5)) {
+		T1.push_back(sqrt(A * 2));
+		T1.push_back(D - sqrt(T[i][LEFT]));
+		T1.push_back(sqrt(T[i][RIGHT]));
 	}
-	return 0;
+	else if (zero(THE[i][RIGHT] - PI * .5)) {
+		T1.push_back(sqrt(A * 2));
+		T1.push_back(D - sqrt(T[i][RIGHT]));
+		T1.push_back(sqrt(T[i][LEFT]));
+	}
+	else if (zero(THE[i][LEFT] - PI * .25)) {
+		T1.push_back(sqrt(A * 2) - sqrt(T[i][LEFT]));
+		T1.push_back(D);
+		T1.push_back(sqrt(T[i][RIGHT]));
+	}
+	else if (zero(THE[i][RIGHT] - PI * .25)) {
+		T1.push_back(sqrt(A * 2) - sqrt(T[i][RIGHT]));
+		T1.push_back(D);
+		T1.push_back(sqrt(T[i][LEFT]));
+	}
+	if (T1.empty()) return 0;
+	T2 = { sqrt(T[j][0]), sqrt(T[j][1]), sqrt(T[j][2]) };
+	std::sort(T1.begin(), T1.end());
+	std::sort(T2.begin(), T2.end());
+	return cmpvld(T1, T2);
 }
 bool compose_triangle(const Vint& vi, Vld& vd) {
 	std::sort(vd.begin(), vd.end());
@@ -255,7 +279,7 @@ bool _4at1() {
 bool _2and2() {
 	if (M < 4) return 0;
 	for (int i = 1; i <= 3; i++) {
-		if (half_check(0, i)) {
+		if (half_check(0, i) || half_check(i, 0)) {
 			for (int j = 1; j <= 3; j++) {
 				if (j == i) continue;
 				for (int k = 1; k <= 3; k++) {
@@ -278,12 +302,6 @@ bool _3and1() {
 		}
 	}
 	return 0;
-}
-bool cmpvld(const Vld& v1, const Vld& v2) {
-	int sz = v1.size();
-	if (sz != v2.size()) return 0;
-	for (int i = 0; i < sz; i++) if (!zero(v1[i] - v2[i])) return 0;
-	return 1;
 }
 bool two_tri_check(const Vint& vi, Vld& T1, Vld& T2) {
 	assert(2 == vi.size());
