@@ -232,23 +232,23 @@ bool compose_triangle(const Vint& vi, Vld& vd) {
 }
 bool half_check(const Vint& v) {
 	for (int i = 0; i < 3; i++) {
-		if (D_OK[i]) {
+		if (D_OK[v[i]]) {
 			Vint vi;
 			Vld vd;
 			for (int j = 0; j < 3; j++) if (j != i) vi.push_back(j);
 			for (int j = 1; j <= 2; j++) {
-				if (zero(PI * .5 - THE[i][j]) && sign(T[i][j] - A) > 0) {
+				if (zero(PI * .5 - THE[v[i]][j]) && sign(T[v[i]][j] - A) > 0) {
 					vd.clear();
 					vd.push_back(sqrt(A * 2));
-					vd.push_back(sqrt(T[i][j == LEFT ? RIGHT : LEFT]));
-					vd.push_back(D - sqrt(T[i][j]));
+					vd.push_back(sqrt(T[v[i]][j == LEFT ? RIGHT : LEFT]));
+					vd.push_back(D - sqrt(T[v[i]][j]));
 					if (compose_triangle(vi, vd)) return 1;
 				}
-				if (zero(PI * .25 - THE[i][j]) && sign(T[i][j] - A) > 0) {
+				if (zero(PI * .25 - THE[v[i]][j]) && sign(T[v[i]][j] - A) > 0) {
 					vd.clear();
 					vd.push_back(D);
-					vd.push_back(sqrt(T[i][j == LEFT ? RIGHT : LEFT]));
-					vd.push_back(sqrt(A * 2) - sqrt(T[i][j]));
+					vd.push_back(sqrt(T[v[i]][j == LEFT ? RIGHT : LEFT]));
+					vd.push_back(sqrt(A * 2) - sqrt(T[v[i]][j]));
 					if (compose_triangle(vi, vd)) return 1;
 				}
 			}
