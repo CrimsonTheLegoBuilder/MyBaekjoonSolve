@@ -8,7 +8,6 @@
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
-typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
@@ -17,13 +16,6 @@ const ld TOL = 1e-6;
 const ld PI = acos(-1);
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
-inline ll sq(int x) { return (ll)x * x; }
-inline ld sq(ld x) { return x * x; }
-inline ld norm(ld th) {
-	while (th < 0) th += 2 * PI;
-	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
-	return th;
-}
 bool cmpvld(const Vld& v1, const Vld& v2) {
 	int sz = v1.size();
 	if (sz != v2.size()) return 0;
@@ -116,31 +108,27 @@ bool half_check(const int& i, const int& j) {
 	ld a1 = heron(T[i]);
 	ld a2 = heron(T[j]);
 	if (!zero(D / sqrt(2) - sqrt(a1 + a2))) return 0;
-	Vld T1, T2;
-	T2 = { sqrt(T[j][0]), sqrt(T[j][1]), sqrt(T[j][2]) };
-	std::sort(T2.begin(), T2.end());
+	Vld T1 = { sqrt(T[j][0]), sqrt(T[j][1]), sqrt(T[j][2]) };
+	std::sort(T1.begin(), T1.end());
 	for (int k = 1; k <= 2; k++) {
+		Vld T2;
 		if (zero(THE[i][k] - PI * .5)) {
-			T1.push_back(sqrt(A * 2));
-			T1.push_back(D - sqrt(T[i][k]));
-			T1.push_back(sqrt(T[i][k == LEFT ? RIGHT : LEFT]));
-			std::sort(T1.begin(), T1.end());
-			if (cmpvld(T1, T2)) return 1;
+			T2.push_back(sqrt(A * 2));
+			T2.push_back(D - sqrt(T[i][k]));
+			T2.push_back(sqrt(T[i][k == LEFT ? RIGHT : LEFT]));
 		}
-	}
-	for (int k = 1; k <= 2; k++) {
-		if (zero(THE[i][k] - PI * .25)) {
-			T1.push_back(D);
-			T1.push_back(sqrt(A * 2) - sqrt(T[i][k]));
-			T1.push_back(sqrt(T[i][k == LEFT ? RIGHT : LEFT]));
-			std::sort(T1.begin(), T1.end());
-			if (cmpvld(T1, T2)) return 1;
+		else if (zero(THE[i][k] - PI * .25)) {
+			T2.push_back(D);
+			T2.push_back(sqrt(A * 2) - sqrt(T[i][k]));
+			T2.push_back(sqrt(T[i][k == LEFT ? RIGHT : LEFT]));
 		}
+		if (T2.empty()) continue;
+		std::sort(T2.begin(), T2.end());
+		if (cmpvld(T1, T2)) return 1;
 	}
 	return 0;
 }
 bool _2and2() {
-	if (M < 2) return 0;
 	for (int i = 1; i <= 3; i++) {
 		if (half_check(0, i) || half_check(i, 0)) {
 			for (int j = 1; j <= 3; j++) {
@@ -328,11 +316,11 @@ bool trap_check(const int& i, const int& j, Polygon& B) {
 						if (!zero(PI * .5 - (nxtt + THE[m][n]))) continue;
 						if (!zero(nxtd - sqrt(T[m][n]))) continue;
 						ld l3 = sqrt(T[m][n == LEFT ? RIGHT : LEFT]);
-						Vld T1 = { l1, l2, l3 }, T2;
+						Vld T1 = { l1, l2, l3 };
 						std::sort(T1.begin(), T1.end());
 						for (const int& q : vi) {
 							if (q == m || q == k) continue;
-							T2 = { sqrt(T[q][0]), sqrt(T[q][1]), sqrt(T[q][2]) };
+							Vld T2 = { sqrt(T[q][0]), sqrt(T[q][1]), sqrt(T[q][2]) };
 							std::sort(T2.begin(), T2.end());
 							if (cmpvld(T1, T2)) return 1;
 						}
