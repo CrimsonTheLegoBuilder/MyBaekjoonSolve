@@ -193,7 +193,7 @@ bool _2in2() {
 	}
 	return 0;
 }
-bool half_check(const Vint& v) {
+bool half_check_3(const Vint& v) {
 	assert(3 == v.size());
 	for (int i = 0; i < 3; i++) {
 		Vint vi;
@@ -276,7 +276,7 @@ bool _3and1() {
 			(zero(D - sqrt(T[i][RIGHT])) && zero(THE[i][RIGHT] - PI * .5))) {
 			Vint v;
 			for (int j = 0; j < 4; j++) if (j != i) v.push_back(j);
-			if (half_check(v)) return 1;
+			if (half_check_3(v)) return 1;
 		}
 	}
 	return 0;
@@ -383,8 +383,8 @@ bool stack_up() {
 		Polygon B = { Pos(0, 0), Pos(D, 0) };
 		if (zero(PI * .5 - THE[i][LEFT])) B.push_back(Pos(D, sqrt(T[i][LEFT])));
 		if (zero(PI * .5 - THE[i][RIGHT])) B.push_back(Pos(D, sqrt(T[i][RIGHT])));
-		if (sign(B[2].y - D) >= 0) return 0;
 		assert(3 == B.size());
+		if (sign(B[2].y - D) >= 0) return 0;
 		ld nxtd = (B[0] - B[2]).mag();
 		ld pvt = rad(B[1] - B[0], B[2] - B[0]);
 		if (trap_check(i, -1, B)) return 1;
