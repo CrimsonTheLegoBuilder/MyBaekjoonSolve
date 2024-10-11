@@ -152,7 +152,7 @@ bool half_check(const int& i, const int& j) {
 	if (!D_OK[i]) return 0;
 	ld a1 = area(T[i]);
 	ld a2 = area(T[j]);
-	if (!zero(A - (a1 + a2))) return 0;
+	if (!zero(A * .5 - (a1 + a2))) return 0;
 	Vld T1, T2;
 	T2 = { sqrt(T[j][0]), sqrt(T[j][1]), sqrt(T[j][2]) };
 	std::sort(T2.begin(), T2.end());
@@ -187,36 +187,6 @@ bool half_check(const int& i, const int& j) {
 	}
 	return f;
 }
-bool compose_triangle(const Vint& vi, Vld& vd) {
-	std::sort(vd.begin(), vd.end());
-	Vll T1 = T[vi[0]], T2 = T[vi[1]];
-	for (int k = 0; k < 2; k++) {
-		for (int l = 0; l < 2; l++) {
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					ld t1 = cos_2nd(T1[0], T1[1], T1[2]);
-					ld t2 = cos_2nd(T2[0], T2[1], T2[2]);
-					if (!zero(PI - (t1 + t2))) continue;
-					for (int m = 0; m < 2; m++) {
-						if (T1[m & 1] == T2[m ^ 1]) {
-							Vld v;
-							v.push_back(sqrt(T1[2]));
-							v.push_back(sqrt(T2[2]));
-							v.push_back(sqrt(T1[m ^ 1] + sqrt(T2[m & 1])));
-							std::sort(v.begin(), v.end());
-							bool f = 1;
-							for (int n = 0; n < 3; n++) if (!zero(vd[i] - v[i])) f = 0;
-							if (f) return 1;
-						}
-					}
-				}
-			}
-			std::reverse(T2.begin(), T2.end());
-		}
-		std::reverse(T1.begin(), T1.end());
-	}
-	return 0;
-}
 bool _2and2() {
 	if (M < 2) return 0;
 	for (int i = 1; i <= 3; i++) {
@@ -229,6 +199,36 @@ bool _2and2() {
 				}
 			}
 		}
+	}
+	return 0;
+}
+bool compose_triangle(const Vint& vi, Vld& vd) {
+	std::sort(vd.begin(), vd.end());
+	Vll T1 = T[vi[0]], T2 = T[vi[1]];
+	for (int k = 0; k < 2; k++) {
+		for (int l = 0; l < 2; l++) {
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 3; j++) {
+					ld t1 = cos_2nd(T1[i], T1[(i + 1) % 3], T1[(i + 2) % 3]);
+					ld t2 = cos_2nd(T2[j], T2[(j + 1) % 3], T2[(j + 2) % 3]);
+					if (!zero(PI - (t1 + t2))) continue;
+					for (int m = 0; m < 2; m++) {
+						if (T1[(j + m) % 3] == T2[(j + m) % 3]) {
+							Vld v;
+							v.push_back(sqrt(T1[(i + 2) % 3]));
+							v.push_back(sqrt(T2[(i + 2) % 3]));
+							v.push_back(sqrt(T1[(j + (m + 1) % 2) % 3] + sqrt(T2[(j + (m + 1) % 2) % 3])));
+							std::sort(v.begin(), v.end());
+							bool f = 1;
+							for (int n = 0; n < 3; n++) if (!zero(vd[i] - v[i])) f = 0;
+							if (f) return 1;
+						}
+					}
+				}
+			}
+			std::reverse(T2.begin(), T2.end());
+		}
+		std::reverse(T1.begin(), T1.end());
 	}
 	return 0;
 }
