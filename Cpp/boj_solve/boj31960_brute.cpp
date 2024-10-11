@@ -458,6 +458,7 @@ bool query() {
 		T[i].resize(3);
 		std::cin >> T[i][0] >> T[i][1] >> T[i][2];
 		A += heron(T[i]);
+		//A += area(T[i]);
 	}
 	D = sqrt(A);
 	M = 0;
