@@ -219,9 +219,7 @@ bool compose_triangle(const Vint& vi, Vld& vd) {
 							v.push_back(sqrt(T2[(i + 2) % 3]));
 							v.push_back(sqrt(T1[(j + (m + 1) % 2) % 3] + sqrt(T2[(j + (m + 1) % 2) % 3])));
 							std::sort(v.begin(), v.end());
-							bool f = 1;
-							for (int n = 0; n < 3; n++) if (!zero(vd[i] - v[i])) f = 0;
-							if (f) return 1;
+							if (cmpvld(vd, v)) return 1;
 						}
 					}
 				}
