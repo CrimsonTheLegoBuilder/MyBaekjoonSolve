@@ -306,8 +306,8 @@ bool half_check(const Vint& v) {
 }
 bool _3and1() {
 	for (int i = 0; i < 4; i++) {
-		if ((zero(T[i][LEFT] - D) && zero(THE[i][LEFT] - PI * .5)) ||
-			(zero(T[i][RIGHT] - D) && zero(THE[i][RIGHT] - PI * .5))) {
+		if ((zero(T[i][LEFT] - A) && zero(THE[i][LEFT] - PI * .5)) ||
+			(zero(T[i][RIGHT] - A) && zero(THE[i][RIGHT] - PI * .5))) {
 			Vint v;
 			for (int j = 0; j < 4; j++) if (j != i) v.push_back(j);
 			if (half_check(v)) return 1;
@@ -429,9 +429,12 @@ bool stack_up() {
 	for (int i = 0; i < 4; i++) {
 		if (!D_OK[i]) continue;
 		if (!zero(PI * .5 - THE[i][LEFT]) && !zero(PI * .5 - THE[i][RIGHT])) continue;
+		if (sign(area(T[i]) - A * .5) > 0) return 0;
+		if (sign(area(T[i]) - A * .5) == 0) continue;
 		Polygon B = { Pos(0, 0), Pos(D, 0) };
 		if (zero(PI * .5 - THE[i][LEFT])) B.push_back(Pos(D, sqrt(T[i][LEFT])));
 		if (zero(PI * .5 - THE[i][RIGHT])) B.push_back(Pos(D, sqrt(T[i][RIGHT])));
+		assert(3 == B.size());
 		ld nxtd = (B[0] - B[2]).mag();
 		ld nxtt = rad(B[0] - B[2], B[1] - B[2]);
 		ld pvt = rad(B[1] - B[0], B[2] - B[0]);
