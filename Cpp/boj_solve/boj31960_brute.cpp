@@ -39,7 +39,7 @@ inline ld norm(ld th) {
 int N, M, Q;
 ld A, D;
 Vll T[4];
-bool D_OK[4], A_OK[4];
+bool D_OK[4];
 ld THE[4][3];
 bool cmpvld(const Vld& v1, const Vld& v2) {
 	int sz = v1.size();
@@ -463,7 +463,7 @@ bool query() {
 	D = sqrt(A);
 	M = 0;
 	for (int i = 0; i < 4; i++) {
-		D_OK[i] = 0; A_OK[i] = 0;
+		D_OK[i] = 0;
 		for (int j = 0; j < 3; j++) {
 			if (zero(T[i][j] - A)) {
 				M++;
@@ -474,8 +474,6 @@ bool query() {
 				THE[i][LEFT] = tl;
 				THE[i][RIGHT] = tr;
 				THE[i][MID] = cos_2nd(T[i][LEFT], T[i][RIGHT], T[i][MID]);
-				if (zero(tl - PI * .5)) A_OK[i] = 1;
-				if (zero(tr - PI * .5)) A_OK[i] = 1;
 				break;
 			}
 		}
