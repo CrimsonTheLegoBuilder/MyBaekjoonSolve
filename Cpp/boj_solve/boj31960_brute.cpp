@@ -433,10 +433,8 @@ bool query() {
 				M++;
 				rotate(T[i].begin(), T[i].begin() + j, T[i].end());
 				D_OK[i] = 1;
-				ld tl = cos_2nd(T[i][MID], T[i][LEFT], T[i][RIGHT]);
-				ld tr = cos_2nd(T[i][MID], T[i][RIGHT], T[i][LEFT]);
-				THE[i][LEFT] = tl;
-				THE[i][RIGHT] = tr;
+				THE[i][LEFT] = cos_2nd(T[i][MID], T[i][LEFT], T[i][RIGHT]);
+				THE[i][RIGHT] = cos_2nd(T[i][MID], T[i][RIGHT], T[i][LEFT]);
 				THE[i][MID] = cos_2nd(T[i][LEFT], T[i][RIGHT], T[i][MID]);
 				break;
 			}
