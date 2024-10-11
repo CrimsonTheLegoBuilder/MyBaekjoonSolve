@@ -118,10 +118,6 @@ bool _4at1() {
 	ld t0 = 0;
 	for (int i = 0; i < 4; i++) t0 += THE[i][MID];
 	if (!zero(2 * PI - t0)) return 0;
-	Polygon B;
-	B.push_back(O);
-	B.push_back(Pos(D, 0));
-	B.push_back(Pos(sqrt(T[0][1]), 0).rot(THE[0][LEFT]));
 	for (int i = 1; i <= 3; i++) {
 		for (int j = 1; j <= 3; j++) {
 			if (j == i) continue;
