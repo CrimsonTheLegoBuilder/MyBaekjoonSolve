@@ -5,7 +5,6 @@
 #include <vector>
 #include <cstring>
 #include <cassert>
-typedef long long ll;
 typedef std::vector<bool> Vbool;
 const int LEN = 1 << 12;
 
@@ -35,14 +34,13 @@ void star(bool f, int w, int c, int d) {
 	star(0, w >> 1, c + d, d >> 1);
 	return;
 }
-void triangle_star(int X) {
+void star(int X) {
 	//for (int i = 0; i < X; i++) S[i].clear();
-	for (int i = 0; i < X; i++) {
-		for (int j = X - i - 1; j > 0; j--) {
+	for (int i = 0; i < X; i++) 
+		for (int j = X - i - 1; j > 0; j--) 
 			S[i].push_back(0);
-		}
-	}
-	assert(!(N % 3));
+	//assert(!(N % 3));
+	//if (N > 3) assert(!(N % 2));
 	star(0, X, X >> 1, X >> 2);
 	for (int i = 0; i < X; i++) {
 		for (const bool& f : S[i]) { std::cout << (f ? "*" : " "); }
@@ -55,8 +53,8 @@ void solve() {
 	std::cout.tie(0);
 	//freopen("../../../input_data/star11out.txt", "w", stdout);
 	std::cin >> N;
-	triangle_star(N);
-	//for (int i = 3; i < LEN; i *= 2) triangle_star(i);
+	star(N);
+	//for (int i = 3; i < LEN; i *= 2) star(i);
 	return;
 }
 int main() { solve(); return 0; }//boj2448 star 11
