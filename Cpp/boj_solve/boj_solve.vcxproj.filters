@@ -1410,6 +1410,9 @@
     <ClCompile Include="boj13015_star23.cpp">
       <Filter>소스 파일\implementation</Filter>
     </ClCompile>
+    <ClCompile Include="boj10993_star18.cpp">
+      <Filter>소스 파일\implementation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
