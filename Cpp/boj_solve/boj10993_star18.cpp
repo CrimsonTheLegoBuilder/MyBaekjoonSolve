@@ -7,22 +7,33 @@
 #include <cassert>
 typedef long long ll;
 typedef long double ld;
-const int LEN = 500;
+const int LEN = 2 << 10;
 
-int N, X;
+#define FUCK
+
+int N, C, X;
 bool M[LEN][LEN];
-void recur(int x) {
-	if (x < 0) return;
-	for (int i = x; i < X - x; i++) {
-		M[x][i] = 1;
-		M[X + 2 - x - 1][i] = 1;
+void recur(int x, int d, int b, int t) {
+	if (d < 1) return;
+	int s = C - x + 1, e = C + x - 1;
+	if (d & 1) {
+		for (int i = s; i <= e; i++) M[t - 1][i] = 1;
+		for (int h = t - 1; h >= b; h--) {
+			M[h][s] = M[h][e] = 1;
+			s++; e--;
+		}
 	}
-	for (int i = x; i < X + 1 - x; i++) {
-		M[i][x] = 1;
-		if (i > x + 1) M[i][X - x - 1] = 1;
+	else {
+		for (int i = s; i <= e; i++) M[b][i] = 1;
+		for (int h = b; h < t; h++) {
+			M[h][s] = M[h][e] = 1;
+			s++; e--;
+		}
 	}
-	if (x < X - x) M[x][X - x] = 1;
-	recur(x - 2);
+	x >>= 1;
+	if (d & 1) b += x, t--;
+	else t -= x, b++;
+	recur(x, d - 1, b, t);
 	return;
 }
 int main() {
@@ -30,10 +41,11 @@ int main() {
 	std::cout.tie(0);
 	std::cin >> N;
 	memset(M, 0, sizeof M);
-	X = (N - 1) * 4 + 1;
-	recur(N * 2);
-	for (int i = 0; i < X + 2; i++) {
-		for (int j = 0; j < X; j++) {
+	X = (1 << N) - 1;
+	C = X - 1;
+	recur(X, N, 0, X);
+	for (int i = 0; i < X; i++) {
+		for (int j = 0; j <= C + (N & 1 ? i : C - i); j++) {
 			std::cout << (M[i][j] ? "*" : " ");
 		}
 		std::cout << "\n";
