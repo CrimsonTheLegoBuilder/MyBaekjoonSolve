@@ -16,13 +16,17 @@ typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
-const ld TOL = 1e-7;
+const ld TOL = 1e-10;
 const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
 //ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
+inline ld tol(const ld& x) { return TOL * (x / std::abs(x)); }
+
+#define DEBUG
+#define WHAT_THE_FUCK
 
 //Pick`s Theorem : A = i + b/2 - 1
 int N, M, T, Q;
@@ -78,9 +82,150 @@ std::pair<ld, ld> intersection(const Pos& p1, const Pos& p2, const Pos& q1, cons
 	ld y = (p1.y * a2 + p2.y * a1) * (ld)1. / (a1 + a2);
 	return { x, y };
 }
-ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
+ld get_y(Pos p0, Pos p1, ld x) {
+	if (p1.x < p0.x) std::swap(p1, p0);
+	Pos vec = p1 - p0;
+	ld d = (ld)vec.y / vec.x;
+	return p0.y + (x - p0.x) * d;
+}
+ll pick(const Pos& p0, const Pos& p1, const ll& y) {
+	if (p0.x == p1.x) return 0;
 	ll cnt = 0;
+	ll dx = (ll)p0.x - p1.x;
+	ll dy = (ll)p0.y - p1.y;
+	ll _gcd = gcd(std::abs(dx), std::abs(dy));
+	ll A2 = std::abs(dx * ((ll)p0.y + p1.y));
+	ll b = std::abs(dx / _gcd) + std::abs(p0.y - y) + std::abs(p1.y - y) + std::abs(dx);
+	//Pick`s Theorem : A = i + b / 2 - 1
+	ll i = (A2 - b + 2) >> 1;
+	assert(!(i & 1));
+	return i;
+}
+ll remain_count(Pos p0, Pos p1, Pos s, ll x, ll y) {
+	if (p0.y == p1.y) return (s.y - y - 1) * (std::abs(s.x - x) - 1);
+	if (std::abs(p0.x - p1.x) <= 1) return 0;
+	ll dx = (s.x < x) ? 1ll : -1ll;
+	ll dy = ll(p1.y - p0.y) / std::abs(p1.y - p0.y);
+	int sz = std::abs(x - s.x) + 1;
+	ll cnt = 0;
+	while (sz--) {
+		while (dy * ccw(p0, p1, s) < 0) s.y += dy;
+		s.y -= dy;
+		cnt += s.y - y - (dy < 0 ? 1 : 0);
+		s.x += dx;
+	}
+	return cnt;
+}
+ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
+	/*
+	p3 <-
+	   <- p2 <-
+	      ^    <-  Pos(x, y)
+	      |    ->      *
+	   -> p1 ->
+	p0 ->
+	*/
+	ll cnt = 0;
+	ll t0 = 0, t1 = 0, t2 = 0;
+	ll c0 = 0, c1 = 0, c2 = 0;
 	auto [x, y] = intersection(p0, p1, p2, p3);
+#ifdef DEBUG
+	std::cout << "(" << x << ", " << y << ")\n";
+#endif
+	ld dx0 = x - p0.x;
+	ld dy0 = y - p0.y;
+	ld dx3 = x - p3.x;
+	ld dy3 = y - p3.y;
+	ll x0 = (ll)tol(dx0) + p0.x;
+	ll y0 = (ll)tol(dy0) + p0.y;
+	ll x3 = (ll)tol(dx3) + p3.x;
+	ll y3 = (ll)tol(dy3) + p3.y;
+	ll Y = std::min({ y0 - 1, y3 - 1, (ll)p0.y, (ll)p1.y, (ll)p2.y, (ll)p3.y });
+	Pos v0 = p1 - p0, v3 = p2 - p3;
+	ll gcd0 = gcd(std::abs(v0.x), std::abs(v0.y)), gcd3 = gcd(std::abs(v3.x), std::abs(v3.y));
+	v0 /= (int)gcd0;
+	v3 /= (int)gcd3;
+	t0 = pick(p1, p2, Y);
+	Pos v2 = p2 - p1;
+	ll gcd2 = gcd(std::abs(v2.x), std::abs(v2.y));
+	c0 = std::abs(gcd2);
+	if (v0.x) {
+		int n0 = (ll)tol(dx0) / v0.x;
+		c1 = std::abs(n0) - 1;
+		Pos q0 = p0 + v0 * n0;
+		if (ccw(p3, p2, q0) > 0) q0 -= v0;
+		t1 = pick(p0, q0, Y);
+		ll X = tol(x0);
+		t1 += remain_count(p0, p1, p1, X, Y);
+	}
+	if (v3.x) {
+		int n3 = (ll)tol(dx3) / v3.x;
+		c2 = std::abs(n3) - 1;
+		Pos q3 = p3 + v3 * n3;
+		if (ccw(p0, p1, q3) < 0) q3 -= v3;
+		t2 = pick(p3, q3, Y);
+		ll X = tol(x3);
+		t2 += remain_count(p3, p2, p2, X, Y);
+	}
+	//what the fuck
+	Pos a0 = p1, a1 = p2;
+	if (a0.x == a1.x) return std::abs(t1 - t2);
+	if (a1.x < a0.x) std::swap(a0, a1);
+	if (sign(x - a0.x) >= 0 && sign(a1.x - x) >= 0) {
+		if (std::abs(a0.x - a1.x) <= 1) return 0;
+		ld my = get_y(a0, a1, x);
+		if (sign(my - y) > 0) {
+			cnt = t0 - t1 - t2;
+			cnt -= c1 + c2;
+			if (zero((ll)tol(x) - x)) {
+				ll dy = (ll)tol(y - Y);
+				cnt += dy;
+			}
+		}
+		else {
+			cnt = t1 + t2 - t0;
+			cnt -= c0;
+			if (zero((ll)tol(x) - x)) {
+				ll dy = (ll)tol(y - Y);
+				cnt -= dy;
+			}
+		}
+	}
+	else if (v2.x > 0) {
+		cnt += t0;
+		if (sign(tol(x) - a1.x) > 0) {
+			cnt -= t1;
+			cnt -= c1;
+			cnt += t2;
+			ll dy = a1.y - Y;
+			cnt += dy;
+		}
+		else if (sign(tol(x) - a0.x) < 0) {
+			cnt -= t2;
+			cnt -= c2;
+			cnt += t1;
+			ll dy = a0.y - Y;
+			cnt += dy;
+		}
+	}
+	else if (v2.x < 0) {
+		cnt -= t0;
+		cnt -= c0;
+		if (sign(tol(x) - a1.x) > 0) {
+			cnt -= t1;
+			cnt -= c1;
+			cnt += t2;
+			ll dy = a1.y - Y;
+			cnt -= dy;
+		}
+		else if (sign(tol(x) - a0.x) < 0) {
+			cnt -= t2;
+			cnt -= c2;
+			cnt += t1;
+			ll dy = a0.y - Y;
+			cnt -= dy;
+		}
+	}
 	return cnt;
 }
 void solve() {
@@ -104,4 +249,4 @@ void solve() {
 	std::cout << ret << "\n";
 	return;
 }
-int main() { return 0; }
+int main() { solve(); return 0; }//boj30526
