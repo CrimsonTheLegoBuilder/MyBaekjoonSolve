@@ -72,12 +72,18 @@ ll area(const Polygon& H) {
 	return ret;
 }
 void norm(Polygon& H) { ll A = area(H); if (A < 0) std::reverse(H.begin(), H.end()); return; }
+std::pair<ld, ld> intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
+	ll a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
+	ld x = (p1.x * a2 + p2.x * a1) * (ld)1. / (a1 + a2);
+	ld y = (p1.y * a2 + p2.y * a1) * (ld)1. / (a1 + a2);
+	return { x, y };
+}
 ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	ll cnt = 0;
-
+	auto [x, y] = intersection(p0, p1, p2, p3);
 	return cnt;
 }
-ll solve() {
+void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
@@ -98,3 +104,4 @@ ll solve() {
 	std::cout << ret << "\n";
 	return;
 }
+int main() { return 0; }
