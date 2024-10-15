@@ -21,8 +21,8 @@ const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
-//ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
+ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
+//ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 inline ld tol(const ld& x) { return x + TOL * (x / std::abs(x)); }
 
 #define DEBUG
@@ -88,8 +88,8 @@ ld get_y(Pos p0, Pos p1, ld x) {
 	ld d = (ld)vec.y / vec.x;
 	return p0.y + (x - p0.x) * d;
 }
-ll pick(Pos p0, Pos p1, const ll& y) {
-	if (p0.x == p1.x) return 0;
+ll pick(const Pos& p0, const Pos& p1, const ll& y) {
+	if (std::abs(p0.x - p1.x) <= 1) return 0;
 	ll cnt = 0;
 	ll dx = (ll)p0.x - p1.x;
 	ll dy = (ll)p0.y - p1.y;
@@ -107,22 +107,26 @@ ll remain_count(Pos p0, Pos p1, Pos s, ll x, ll y) {
 	std::cout << "p0:: " << p0 << "\n";
 	std::cout << "p1:: " << p1 << "\n";
 #endif
-	if (p0.y == p1.y) return (s.y - y - 1) * (std::abs(s.x - x) - 1);
-	if (std::abs(s.x - x) <= 1) return 0;
+	if (p0.y == p1.y) return (s.y - y - 1) * (std::abs(s.x - x) + 1);
+	if (std::abs(s.x - x) == 0) return (s.y - y - 1);
 	ll dx = (s.x < x) ? 1ll : -1ll;
 	ll dy = ll(p1.y - p0.y) / std::abs(p1.y - p0.y);
-	int sz = std::abs(x - s.x) + 1;
+	int sz = std::abs(x - s.x);
 	ll cnt = 0;
 	while (sz-- >= 0) {
-		while (s.y * ccw(p0, p1, s) < 0) { 
+		while (s.x * ccw(p0, p1, s) < 0) { 
 			s.y += dy;
 		}
-#ifdef DEBUG
-			std::cout << "FUCK::\n";
-			std::cout << "sz:: " << sz << "\n";
-#endif
 		s.y -= dy;
 		cnt += s.y - y - (dy < 0 ? 1 : 0);
+#ifdef DEBUG
+			std::cout << "REMAIN::\n";
+			std::cout << " sz:: " << sz << "\n";
+			std::cout << "s.y:: " << s.y << "\n";
+			std::cout << "  y:: " << y << "\n";
+			std::cout << "cnt:: " << cnt << "\n";
+			std::cout << "s.x:: " << s.x << "\n";
+#endif
 		s.x += dx;
 	}
 	return cnt;
@@ -145,7 +149,9 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	std::cout << "inx:: (" << x << ", " << y << ")\n";
 #endif
 	ld dx0 = x - p0.x;
+	ld dx1 = x - p1.x;
 	ld dy0 = y - p0.y;
+	ld dx2 = x - p2.x;
 	ld dx3 = x - p3.x;
 	ld dy3 = y - p3.y;
 	ll x0 = (ll)tol(dx0) + p0.x;
@@ -166,41 +172,44 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	c0 = std::abs(gcd2);
 	t0 = pick(p1, p2, Y);
 	if (v0.x) {
-#ifdef DEBUG
-		std::cout << "FUCK::\n";
-		std::cout << "v0::\n";
-#endif
 		int n0 = (ll)tol(dx0) / v0.x;
-		c1 = std::abs(n0) - 1;
+		c1 = std::abs((ll)tol(dx1) / v0.x);
 		Pos q0 = p0 + v0 * n0;
 		if (ccw(p3, p2, q0) > 0) q0 -= v0;
-		t1 = pick(p0, q0, Y);
-		ll X = tol(x0) + p0.x;
+		t1 = pick(p1, q0, Y);
+		ll X = x0;
 #ifdef DEBUG
-		std::cout << "FUCK:: t1:: p0: " << p0 << " p1:: " << p1 << " X:: "  << X << "\n";
-		std::cout << "FUCK:: t1:: q0: " << q0 << "\n";
+		std::cout << "FUCK:: v0\n";
 		std::cout << "FUCK:: t1:: " << t1 << "\n";
+		std::cout << "FUCK:: t1:: p0:: " << p0 << " p1:: " << p1 << " X:: "  << X << "\n";
+		std::cout << "FUCK:: t1:: q0:: " << q0 << "\n";
 #endif
-		t1 += remain_count(p0, p1, p1, X, Y);
+		t1 += remain_count(p0, p1, q0, X, Y);
 #ifdef DEBUG
 		std::cout << "FUCK:: t1:: " << t1 << "\n";
 #endif
 	}
 	if (v3.x) {
-#ifdef DEBUG
-		std::cout << "FUCK::\n";
-		std::cout << "v3::\n";
-#endif
 		int n3 = (ll)tol(dx3) / v3.x;
-		c2 = std::abs(n3) - 1;
+		c2 = std::abs((ll)tol(dx2) / v3.x);
 		Pos q3 = p3 + v3 * n3;
 		if (ccw(p0, p1, q3) < 0) q3 -= v3;
-		t2 = pick(p3, q3, Y);
-		ll X = tol(x3);
-		t2 += remain_count(p3, p2, p2, X, Y);
+		t2 = pick(p2, q3, Y);
+		ll X = x3;
+#ifdef DEBUG
+		std::cout << "FUCK:: v3\n";
+		std::cout << "FUCK:: t2:: " << t2 << "\n";
+		std::cout << "FUCK:: t1:: p2:: " << p2 << " p3:: " << p3 << " X:: " << X << "\n";
+		std::cout << "FUCK:: t1:: q3:: " << q3 << "\n";
+#endif
+		t2 += remain_count(p3, p2, q3, X, Y);
+#ifdef DEBUG
+		std::cout << "FUCK:: t2:: " << t2 << "\n";
+#endif
 	}
 #ifdef DEBUG
-	std::cout << "FUCK:: t0:: " << t0 << " t1:: " << t1 << " t2:: " << t2 << "\n";
+	std::cout << "DEBUG:: t0:: " << t0 << " t1:: " << t1 << " t2:: " << t2 << "\n";
+	std::cout << "DEBUG:: c0:: " << c0 << " c1:: " << c1 << " c2:: " << c2 << "\n";
 #endif
 	//what the fuck
 	Pos a0 = p1, a1 = p2;
@@ -211,7 +220,7 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 		ld my = get_y(a0, a1, x);
 		if (sign(my - y) > 0) {
 			cnt = t0 - t1 - t2;
-			cnt -= c1 + c2;
+			cnt -= c1 + c2 - 2;
 			if (zero((ll)tol(x) - x)) {
 				ll dy = (ll)tol(y - Y);
 				cnt += dy;
@@ -219,7 +228,7 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 		}
 		else {
 			cnt = t1 + t2 - t0;
-			cnt -= c0;
+			cnt -= c0 - 1;
 			if (zero((ll)tol(x) - x)) {
 				ll dy = (ll)tol(y - Y);
 				cnt -= dy;
@@ -229,14 +238,14 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	else if (v2.x > 0) {
 		cnt += t0;
 		if (sign(tol(x) - a1.x) > 0) {
-			cnt -= t1;
+			cnt -= t1 - 1;
 			cnt -= c1;
 			cnt += t2;
 			ll dy = a1.y - Y;
 			cnt += dy;
 		}
 		else if (sign(tol(x) - a0.x) < 0) {
-			cnt -= t2;
+			cnt -= t2 - 1;
 			cnt -= c2;
 			cnt += t1;
 			ll dy = a0.y - Y;
@@ -245,19 +254,19 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	}
 	else if (v2.x < 0) {
 		cnt -= t0;
-		cnt -= c0;
+		cnt -= c0 - 1;
 		if (sign(tol(x) - a1.x) > 0) {
-			cnt -= t1;
+			cnt -= t1 - 1;
 			cnt -= c1;
 			cnt += t2;
-			ll dy = a1.y - Y;
+			ll dy = a1.y - Y + 1;
 			cnt -= dy;
 		}
 		else if (sign(tol(x) - a0.x) < 0) {
-			cnt -= t2;
+			cnt -= t2 - 1;
 			cnt -= c2;
 			cnt += t1;
-			ll dy = a0.y - Y;
+			ll dy = a0.y - Y + 1;
 			cnt -= dy;
 		}
 	}
