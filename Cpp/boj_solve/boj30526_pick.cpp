@@ -88,28 +88,39 @@ ld get_y(Pos p0, Pos p1, ld x) {
 	ld d = (ld)vec.y / vec.x;
 	return p0.y + (x - p0.x) * d;
 }
-ll pick(const Pos& p0, const Pos& p1, const ll& y) {
+ll pick(Pos p0, Pos p1, const ll& y) {
 	if (p0.x == p1.x) return 0;
 	ll cnt = 0;
 	ll dx = (ll)p0.x - p1.x;
 	ll dy = (ll)p0.y - p1.y;
 	ll _gcd = gcd(std::abs(dx), std::abs(dy));
-	ll A2 = std::abs(dx * ((ll)p0.y + p1.y));
-	ll b = std::abs(dx / _gcd) + std::abs(p0.y - y) + std::abs(p1.y - y) + std::abs(dx);
+	ll A2 = std::abs(dx * ((ll)p0.y + p1.y - y - y));
+	ll b = _gcd + std::abs(p0.y - y) + std::abs(p1.y - y) + std::abs(dx);
 	//Pick`s Theorem : A = i + b / 2 - 1
-	ll i = (A2 - b + 2) >> 1;
-	assert(!(i & 1));
-	return i;
+	ll i = (A2 - b + 2);
+	assert(!(i & 1ll));
+	return i >> 1;
 }
 ll remain_count(Pos p0, Pos p1, Pos s, ll x, ll y) {
+#ifdef DEBUG
+	std::cout << "FUCK::\n";
+	std::cout << "p0:: " << p0 << "\n";
+	std::cout << "p1:: " << p1 << "\n";
+#endif
 	if (p0.y == p1.y) return (s.y - y - 1) * (std::abs(s.x - x) - 1);
-	if (std::abs(p0.x - p1.x) <= 1) return 0;
+	if (std::abs(s.x - x) <= 1) return 0;
 	ll dx = (s.x < x) ? 1ll : -1ll;
 	ll dy = ll(p1.y - p0.y) / std::abs(p1.y - p0.y);
 	int sz = std::abs(x - s.x) + 1;
 	ll cnt = 0;
-	while (sz--) {
-		while (dy * ccw(p0, p1, s) < 0) s.y += dy;
+	while (sz-- >= 0) {
+		while (s.y * ccw(p0, p1, s) < 0) { 
+			s.y += dy;
+		}
+#ifdef DEBUG
+			std::cout << "FUCK::\n";
+			std::cout << "sz:: " << sz << "\n";
+#endif
 		s.y -= dy;
 		cnt += s.y - y - (dy < 0 ? 1 : 0);
 		s.x += dx;
@@ -130,7 +141,8 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	ll c0 = 0, c1 = 0, c2 = 0;
 	auto [x, y] = intersection(p0, p1, p2, p3);
 #ifdef DEBUG
-	std::cout << "(" << x << ", " << y << ")\n";
+	std::cout << "tri start:: p0:: " << p0 << " p1 :: " << p1 << " p2 :: " << p2 << " p3 :: " << p3 << " FUCK::\n";
+	std::cout << "inx:: (" << x << ", " << y << ")\n";
 #endif
 	ld dx0 = x - p0.x;
 	ld dy0 = y - p0.y;
@@ -150,6 +162,10 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	ll gcd2 = gcd(std::abs(v2.x), std::abs(v2.y));
 	c0 = std::abs(gcd2);
 	if (v0.x) {
+#ifdef DEBUG
+		std::cout << "FUCK::\n";
+		std::cout << "v0::\n";
+#endif
 		int n0 = (ll)tol(dx0) / v0.x;
 		c1 = std::abs(n0) - 1;
 		Pos q0 = p0 + v0 * n0;
@@ -159,6 +175,10 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 		t1 += remain_count(p0, p1, p1, X, Y);
 	}
 	if (v3.x) {
+#ifdef DEBUG
+		std::cout << "FUCK::\n";
+		std::cout << "v3::\n";
+#endif
 		int n3 = (ll)tol(dx3) / v3.x;
 		c2 = std::abs(n3) - 1;
 		Pos q3 = p3 + v3 * n3;
@@ -240,11 +260,15 @@ void solve() {
 	ll ret = 0;
 	for (int i = 0; i < N; i++) {
 		const Pos& p0 = H[(i - 1 + N) % N], p1 = H[i], p2 = H[(i + 1) % N], p3 = H[(i + 2) % N];
-		if (3 < N && ccw(p0, p1, p2, p3) <= 0) {
+		if (4 >= N || ccw(p0, p1, p2, p3) <= 0) {
 			std::cout << "infinitely many\n";
 			return;
 		}
-		ret += tri_count(p0, p1, p2, p3);
+		ll tmp = tri_count(p0, p1, p2, p3);
+#ifdef DEBUG
+		std::cout << "cnt:: " << tmp << "\n";
+#endif
+		ret += tmp;
 	}
 	std::cout << ret << "\n";
 	return;
