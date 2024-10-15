@@ -178,6 +178,7 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 		ll X = tol(x0) + p0.x;
 #ifdef DEBUG
 		std::cout << "FUCK:: t1:: p0: " << p0 << " p1:: " << p1 << " X:: "  << X << "\n";
+		std::cout << "FUCK:: t1:: q0: " << q0 << "\n";
 		std::cout << "FUCK:: t1:: " << t1 << "\n";
 #endif
 		t1 += remain_count(p0, p1, p1, X, Y);
