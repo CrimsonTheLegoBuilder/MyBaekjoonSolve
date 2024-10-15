@@ -23,7 +23,7 @@ inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
 //ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
-inline ld tol(const ld& x) { return TOL * (x / std::abs(x)); }
+inline ld tol(const ld& x) { return x + TOL * (x / std::abs(x)); }
 
 #define DEBUG
 #define WHAT_THE_FUCK
@@ -103,7 +103,7 @@ ll pick(Pos p0, Pos p1, const ll& y) {
 }
 ll remain_count(Pos p0, Pos p1, Pos s, ll x, ll y) {
 #ifdef DEBUG
-	std::cout << "FUCK::\n";
+	std::cout << "FUCK:: remain\n";
 	std::cout << "p0:: " << p0 << "\n";
 	std::cout << "p1:: " << p1 << "\n";
 #endif
@@ -153,14 +153,18 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	ll x3 = (ll)tol(dx3) + p3.x;
 	ll y3 = (ll)tol(dy3) + p3.y;
 	ll Y = std::min({ y0 - 1, y3 - 1, (ll)p0.y, (ll)p1.y, (ll)p2.y, (ll)p3.y });
+#ifdef DEBUG
+	std::cout << "DEBUG:: dx0:: " << dx0 << " FUCK::\n";
+	std::cout << "DEBUG:: Y:: " << Y << " FUCK::\n";
+#endif
 	Pos v0 = p1 - p0, v3 = p2 - p3;
 	ll gcd0 = gcd(std::abs(v0.x), std::abs(v0.y)), gcd3 = gcd(std::abs(v3.x), std::abs(v3.y));
 	v0 /= (int)gcd0;
 	v3 /= (int)gcd3;
-	t0 = pick(p1, p2, Y);
 	Pos v2 = p2 - p1;
 	ll gcd2 = gcd(std::abs(v2.x), std::abs(v2.y));
 	c0 = std::abs(gcd2);
+	t0 = pick(p1, p2, Y);
 	if (v0.x) {
 #ifdef DEBUG
 		std::cout << "FUCK::\n";
@@ -171,8 +175,15 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 		Pos q0 = p0 + v0 * n0;
 		if (ccw(p3, p2, q0) > 0) q0 -= v0;
 		t1 = pick(p0, q0, Y);
-		ll X = tol(x0);
+		ll X = tol(x0) + p0.x;
+#ifdef DEBUG
+		std::cout << "FUCK:: t1:: p0: " << p0 << " p1:: " << p1 << " X:: "  << X << "\n";
+		std::cout << "FUCK:: t1:: " << t1 << "\n";
+#endif
 		t1 += remain_count(p0, p1, p1, X, Y);
+#ifdef DEBUG
+		std::cout << "FUCK:: t1:: " << t1 << "\n";
+#endif
 	}
 	if (v3.x) {
 #ifdef DEBUG
@@ -187,6 +198,9 @@ ll tri_count(Pos p0, Pos p1, Pos p2, Pos p3) {
 		ll X = tol(x3);
 		t2 += remain_count(p3, p2, p2, X, Y);
 	}
+#ifdef DEBUG
+	std::cout << "FUCK:: t0:: " << t0 << " t1:: " << t1 << " t2:: " << t2 << "\n";
+#endif
 	//what the fuck
 	Pos a0 = p1, a1 = p2;
 	if (a0.x == a1.x) return std::abs(t1 - t2);
