@@ -119,10 +119,10 @@ ll remain_count(const Pos& p0, const Pos& p1, Pos s, const ll& x, const ll& y) {
 		return (std::abs(x - s.x) + 1) * (s.y - y - 1);
 	}
 	ll dy = v.y / std::abs(v.y);
-	assert(sz <= 2000);
+	assert(sz <= 2005);
 	ll cnt = 0;
 	while (sz-- >= 0) {
-		while (dx * ccw(p0, p1, s) < 0) s.y += dy;
+		while (dx * dy * ccw(p0, p1, s) < 0) s.y += dy;
 		if (dx * ccw(p0, p1, s) >= 0) s.y--;
 		cnt += s.y - y;
 		s.x += dx;
