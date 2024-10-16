@@ -341,3 +341,102 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj30526
+
+
+//refer to SolitaryDream
+//#include <bits/stdc++.h>
+//using namespace std;
+//#define FOR(i,s,t) for(int i=(s),_t=(t); i<=_t; ++i)
+//#define DOR(i,s,t) for(int i=(s),_t=(t); i>=_t; --i)
+//typedef double db;
+//typedef long long ll;
+//const int N = 55;
+//struct Point {
+//	int x, y;
+//	Point operator +(const Point& s) const {
+//		return { x + s.x,y + s.y };
+//	}
+//	Point operator -(const Point& s) const {
+//		return { x - s.x,y - s.y };
+//	}
+//	int Len2() const {
+//		return x * x + y * y;
+//	}
+//};
+//int det(Point a, Point b) {
+//	return a.x * b.y - a.y * b.x;
+//}
+//db intersetion(Point a, Point b, Point c, Point d) {
+//	return a.x + (b - a).x * (1.0 * det(d - c, a - c) / det(b - a, d - c));
+//}
+//ll f(ll n, ll a, ll b, ll m) {
+//	if (b == 0) return n * (a / m);
+//	if (a >= m) return n * (a / m) + f(n, a % m, b, m);
+//	if (b >= m) return (n - 1) * n / 2 * (b / m) + f(n, a, b % m, m);
+//	return f((a + b * n) / m, (a + b * n) % m, m, b);
+//}
+//ll g(ll n, ll a, ll b, ll m) {
+//	if (m < 0) m = -m, a = -a, b = -b;
+//	if (b < 0) {
+//		a += b * (n - 1);
+//		b = -b;
+//	}
+//	ll s = 0;
+//	if (a < 0) {
+//		ll aa = (a % m + m) % m;
+//		s -= (aa - a) / m * n;
+//		a = aa;
+//	}
+//	return s + f(n, a, b, m);
+//}
+//const db eps = 1e-9;
+//db mnx;
+//ll solve(Point a, Point b, db l, db r) {
+//	if (a.x == b.x) return 0;
+//	if (l > r) swap(l, r);
+//	if (fabs(mnx - l) < eps) l += eps;
+//	ll xl = ceil(l), xr = floor(r - eps);
+//	if (a.x > b.x) {
+//		return g(xr - xl + 1, -(-a.x * b.y + b.x * a.y + xl * (b.y - a.y)) - 1, -(b.y - a.y), -(b.x - a.x));
+//	}
+//	else {
+//		// if(l==-5 && r==-1) cerr << xl << ' ' << xr << endl;
+//		return -g(xr - xl + 1, -a.x * b.y + b.x * a.y + xl * (b.y - a.y), b.y - a.y, b.x - a.x);
+//	}
+//}
+//Point a[N];
+//int main() {
+//	ios::sync_with_stdio(false);
+//	cin.tie(nullptr);
+//	int n;
+//	cin >> n;
+//	FOR(i, 0, n - 1) cin >> a[i].x >> a[i].y;
+//	ll res = 0;
+//	FOR(i, 0, n - 1) {
+//		int j = (i + 1) % n, k = (j + 1) % n, h = (k + 1) % n;
+//		int s = det(a[j] - a[i], a[h] - a[k]);
+//		if (s < 0) {
+//			cout << "infinitely many\n";
+//			return 0;
+//		}
+//		if (s == 0) {
+//			mnx = 0;
+//			if (solve(a[i], a[j], 0, 1e9) + solve(a[k], a[h], 0, 1e9)) {
+//				cout << "infinitely many\n";
+//				return 0;
+//			}
+//			continue;
+//		}
+//		db px = intersetion(a[i], a[j], a[k], a[h]);
+//		mnx = std::min({ px,(db)a[j].x,(db)a[k].x });
+//		res += solve(a[i], a[j], a[j].x, px);
+//		res += solve(a[k], a[h], a[k].x, px);
+//		res += solve(a[k], a[j], a[j].x, a[k].x);
+//		// if(i==0) {
+//		//     cerr << solve(a[i],a[j],a[j].x,px) << ' ' << solve(a[k],a[h],a[k].x,px) << ' ' << solve(a[k],a[j],a[j].x,a[k].x) << endl;
+//		// }
+//		// cerr << a[j].x << ' ' << a[j].y << ' ' << res << endl;
+//	}
+//	cout << res << '\n';
+//	return 0;
+//}
