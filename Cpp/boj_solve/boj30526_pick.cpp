@@ -144,7 +144,7 @@ ll remain_count(Pos p0, Pos p1, Pos s, ll x, ll y, ld xf) {
 	if (zero(x - xf)) sz--;
 	ll cnt = 0;
 	while (sz-- >= 0) {
-		while (s.x * ccw(p0, p1, s) < 0) { 
+		while (dx * ccw(p0, p1, s) < 0) { 
 			s.y += dy;
 		}
 		s.y -= dy;
