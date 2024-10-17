@@ -14,7 +14,7 @@ ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 #define WHAT_THE_FUCK
 
 //Pick`s Theorem : A = i + b/2 - 1
-int N, M, T, Q;
+int N;
 struct Pos {
 	ll x, y;
 	ll den;
@@ -25,8 +25,8 @@ struct Pos {
 	Pos operator / (const ll& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
+	//Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	//Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
@@ -56,9 +56,7 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ll a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	ll x = (p1.x * a2 + p2.x * a1);
 	ll y = (p1.y * a2 + p2.y * a1);
-	Pos ret = Pos(x, y);
-	ret.den = a1 + a2;
-	return ret;
+	return Pos(x, y, a1 + a2);
 }
 ll gcd(const Pos& p) { return gcd(std::abs(p.x), std::abs(p.y)); }
 ll pick(const Pos& p0, const Pos& p1, const ll& y) {
@@ -69,10 +67,10 @@ ll pick(const Pos& p0, const Pos& p1, const ll& y) {
 	ll _gcd = gcd(std::abs(dx), std::abs(dy));
 	ll A2 = std::abs(dx * ((ll)p0.y + p1.y - y - y));
 	ll b = _gcd + std::abs(p0.y - y) + std::abs(p1.y - y) + std::abs(dx);
+	ll i2 = (A2 - b + 2);
+	assert(!(i2 & 1ll));
+	return i2 >> 1;
 	//Pick`s Theorem : A = i + b / 2 - 1
-	ll i = (A2 - b + 2);
-	assert(!(i & 1ll));
-	return i >> 1;
 }
 ll remain_count(const Pos& p0, const Pos& p1, Pos s, const ll& x, const ll& y) {
 	Pos v = p1 - p0;
@@ -125,9 +123,7 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 	if (p.is_int()) q0 = p.p();
 	else q0 = p1 + v * n;
 
-	ll tmp = pick(p1, q0, miny);
-	cnt += tmp;
-
+	cnt += pick(p1, q0, miny);
 	if (q0.x == p1.x) q0.x += qx;
 	cnt += remain_count(p0, p1, q0, X, miny);
 
@@ -142,6 +138,7 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 		cnt += w0.y - miny;
 		if (dx > 0 && w0.x != minx) cnt--;
 	}
+
 	if (dx < 0) { cnt += n; cnt *= -1ll; }
 	return cnt;
 }
