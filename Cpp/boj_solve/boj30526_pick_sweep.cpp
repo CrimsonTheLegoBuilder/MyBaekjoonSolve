@@ -25,7 +25,7 @@ ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 //ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 inline ld tol(const ld& x) { return x + TOL * (x / std::abs(x)); }
 
-//#define DEBUG
+#define DEBUG
 #define WHAT_THE_FUCK
 
 //Pick`s Theorem : A = i + b/2 - 1
@@ -127,6 +127,9 @@ ll remain_count(const Pos& p0, const Pos& p1, Pos s, const ll& x, const ll& y) {
 		cnt += s.y - y;
 		s.x += dx;
 	}
+#ifdef DEBUG
+	std::cout << "REMAIN:: " << cnt << "\n";
+#endif
 	return cnt;
 }
 ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& minx, const ll& dx) {
@@ -160,7 +163,9 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 	else q0 = p1 + v * n;
 	
 	cnt += pick(p1, q0, miny);
-	cnt += remain_count(p0, p1, q0, X, miny);
+	//cnt += remain_count(p0, p1, q0, X, miny);
+	if (!cnt && abs(q0.x - p.x_()) > 1.) cnt += remain_count(p0, p1, q0, X, miny);
+	else if (cnt) cnt += remain_count(p0, p1, q0, X, miny);
 
 	Pos w0 = p1, w1 = p1;
 	if (w1.x < w0.x) std::swap(w0, w1);
@@ -168,7 +173,7 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 		ll y = p.y_int() ? p.y / p.den : floor(p.y_());
 		cnt += y - miny;
 	}
-	else cnt += w0.y - miny;
+	else if (p.x_() > w0.x) cnt += w0.y - miny;
 	if (dx < 0) { cnt += n; cnt *= -1ll; }
 	return cnt;
 }
@@ -176,13 +181,36 @@ ll count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	ll cnt = 0;
 	Pos p = intersection(p0, p1, p2, p3);
 	assert(p.den);
-	ll minx = std::min({ p0.x, p1.x, p2.x, p3.x });
+	ll minx = floor(p.x_());
+	if (p.x_int()) minx = p.p().x;
+	minx = std::min({ minx, p1.x, p2.x });
 	ll miny = floor(p.y_());
 	miny = std::min({ miny, p0.y, p1.y, p2.y, p3.y }) - 2;
 	Pos z = Pos(0, 0, 0);
+#ifndef DEBUG
 	cnt += count(p0, p1, p, miny, minx, p0.x - p1.x);
 	cnt += count(p1, p2, z, miny, minx, p2.x - p1.x);
 	cnt += count(p3, p2, p, miny, minx, p2.x - p3.x);
+#else
+	ll tmp;
+	std::cout << "\nCOUNT::\nDEBUG::  Y:: " << miny << " X:: " << minx << "\n\n";
+	std::cout << "DEBUG:: p0:: " << p0 << " p1:: " << p1 << "\n";
+	tmp = count(p0, p1, p, miny, minx, p0.x - p1.x);
+	cnt += tmp;
+	std::cout << "DEBUG:: p0, p1:: tmp:: " << tmp << "\n\n";
+
+	std::cout << "DEBUG:: p1:: " << p1 << " p2: " << p2 << "\n";
+	tmp = count(p1, p2, z, miny, minx, p2.x - p1.x);
+	cnt += tmp;
+	std::cout << "DEBUG:: p1, p2:: tmp:: " << tmp << "\n\n";
+
+	std::cout << "DEBUG:: p2:: " << p2 << " p3:: " << p3 << "\n";
+	tmp = count(p3, p2, p, miny, minx, p2.x - p3.x);
+	cnt += tmp;
+	std::cout << "DEBUG:: p2, p3:: tmp:: " << tmp << "\n\n";
+	
+	std::cout << "DEBUG::          CNT:: " << cnt << "\n";
+#endif
 	return cnt;
 }
 void solve() {
@@ -218,3 +246,19 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj30526
+
+/*
+
+8
+0 2
+0 1
+1 0
+2 0
+3 1
+3 2
+2 3
+1 3
+
+0
+
+*/
