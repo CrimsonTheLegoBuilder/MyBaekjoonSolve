@@ -23,11 +23,7 @@ struct Pos {
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ll& n) const { return { x * n, y * n }; }
 	Pos operator / (const ll& n) const { return { x / n, y / n }; }
-	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	//Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-	//Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
@@ -59,18 +55,16 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	return Pos(x, y, a1 + a2);
 }
 ll gcd(const Pos& p) { return gcd(std::abs(p.x), std::abs(p.y)); }
-ll pick(const Pos& p0, const Pos& p1, const ll& y) {
+ll pick(const Pos& p0, const Pos& p1, const ll& y) {//Pick`s Theorem : A = i + b / 2 - 1
 	if (std::abs(p0.x - p1.x) <= 1) return 0;
 	ll cnt = 0;
-	ll dx = (ll)p0.x - p1.x;
-	ll dy = (ll)p0.y - p1.y;
-	ll _gcd = gcd(std::abs(dx), std::abs(dy));
-	ll A2 = std::abs(dx * ((ll)p0.y + p1.y - y - y));
-	ll b = _gcd + std::abs(p0.y - y) + std::abs(p1.y - y) + std::abs(dx);
+	Pos v = p1 - p0;
+	ll _gcd = gcd(v);
+	ll A2 = std::abs(v.x * (p0.y + p1.y - y - y));
+	ll b = _gcd + std::abs(p0.y - y) + std::abs(p1.y - y) + std::abs(v.x);
 	ll i2 = (A2 - b + 2);
 	assert(!(i2 & 1ll));
 	return i2 >> 1;
-	//Pick`s Theorem : A = i + b / 2 - 1
 }
 ll remain_count(const Pos& p0, const Pos& p1, Pos s, const ll& x, const ll& y) {
 	Pos v = p1 - p0;
@@ -129,7 +123,7 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 
 	Pos w0 = p1, w1 = p1;
 	if (w1.x < w0.x) std::swap(w0, w1);
-	if (p.x_int() && p.x_() < w0.x) {
+	if (p.x_int() && p.p().x < w0.x) {
 		ll y = p.y_int() ? p.p().y : floor(p.y_());
 		cnt += y - miny;
 		if (dx > 0 && p.p().x != minx && p.y_int()) cnt--;
