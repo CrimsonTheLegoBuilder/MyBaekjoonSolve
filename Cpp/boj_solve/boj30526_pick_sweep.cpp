@@ -17,7 +17,6 @@ typedef std::vector<ld> Vld;
 const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-10;
-const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
@@ -185,7 +184,7 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 	if (p.x_int() && p.x_() < w0.x) {
 		ll y = p.y_int() ? p.y / p.den : floor(p.y_());
 		cnt += y - miny;
-		if (dx > 0 && p.p().x != minx) cnt--;
+		if (dx > 0 && p.p().x != minx && p.y_int()) cnt--;
 #ifdef DEBUG
 		std::cout << "CNT left++ :: " << cnt << "\n";
 #endif
@@ -221,6 +220,7 @@ ll count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	ll tmp;
 	std::cout << "\nCOUNT::\nDEBUG::  Y:: " << miny << " X:: " << minx << "\n\n";
 	std::cout << "DEBUG:: p0:: " << p0 << " p1:: " << p1 << " p2:: " << p2 << " p3:: " << p3 << "\n\n";
+	std::cout << "DEBUG:: intersection:: " << p.x_() << " " << p.y_() << "\n\n";
 	std::cout << "DEBUG:: p0:: " << p0 << " p1:: " << p1 << "\n";
 	tmp = count(p0, p1, p, miny, minx, p0.x - p1.x);
 	cnt += tmp;
@@ -306,5 +306,15 @@ int main() { solve(); return 0; }//boj30526
 -400 1
 
 1596
+
+6
+999 0
+499 865
+-499 865
+-999 0
+-499 -865
+499 -865
+
+2588522
 
 */
