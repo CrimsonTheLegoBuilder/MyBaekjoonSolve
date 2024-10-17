@@ -9,23 +9,25 @@ typedef long long ll;
 typedef long double ld;
 const int LEN = 1e6 + 1;
 
-ll N, A[LEN], B, C;
+ll N, A, B, C;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(2);
-	ll ret = 0;
-	std::cin >> N;
-	for (int i = 0; i < N; i++) std::cin >> A[i];
-	std::cin >> B >> C;
-	for (int i = 0; i < N; i++) {
-		ll D = A[i] - B;
-		ret++;
-		if (D <= 0) continue;
-		else ret += D / C + (D % C != 0);
+	N = 0; C = 0;
+	std::cin >> A >> B;
+	for (int i = 1; i < 46; i++) {
+		for (int j = 0; j < i; j++) {
+			//std::cout << i << " " << C << "\n";
+			C++;
+			if (A <= C && C <= B) {
+				N += i;
+				//std::cout << i << " fuck " << N << "\n";
+			}
+		}
 	}
-	std::cout << ret << "\n";
+	std::cout << N << "\n";
 	return 0;
 }
