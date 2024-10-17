@@ -164,7 +164,7 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 	
 	cnt += pick(p1, q0, miny);
 	//cnt += remain_count(p0, p1, q0, X, miny);
-	if ((!cnt && std::abs(q0.x - p.x_()) > 1.) || cnt)
+	if ((!cnt && std::abs(p1.x - p.x_()) > 1.) || cnt)
 		cnt += remain_count(p0, p1, q0, X, miny);
 
 	Pos w0 = p1, w1 = p1;
