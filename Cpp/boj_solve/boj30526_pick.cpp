@@ -14,6 +14,7 @@ ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 #define WHAT_THE_FUCK
 
 //Pick`s Theorem : A = i + b/2 - 1
+
 int N;
 struct Pos {
 	ll x, y;
@@ -55,7 +56,8 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	return Pos(x, y, a1 + a2);
 }
 ll gcd(const Pos& p) { return gcd(std::abs(p.x), std::abs(p.y)); }
-ll pick(const Pos& p0, const Pos& p1, const ll& y) {//Pick`s Theorem : A = i + b / 2 - 1
+//Pick`s Theorem : A = i + b / 2 - 1
+ll pick(const Pos& p0, const Pos& p1, const ll& y) {
 	if (std::abs(p0.x - p1.x) <= 1) return 0;
 	ll cnt = 0;
 	Pos v = p1 - p0;
