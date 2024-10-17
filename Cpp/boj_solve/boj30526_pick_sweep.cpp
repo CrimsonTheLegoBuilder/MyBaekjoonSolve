@@ -114,6 +114,11 @@ ll remain_count(const Pos& p0, const Pos& p1, Pos s, const ll& x, const ll& y) {
 	assert(v.x);
 	ll dx = v.x / std::abs(v.x);
 	int sz = (x - s.x) * dx;
+#ifdef DEBUG
+	std::cout << "REMAIN::  s:: " << s << "\n";
+	std::cout << "REMAIN::  x:: " << x << "\n";
+	std::cout << "REMAIN:: sz:: " << sz << "\n";
+#endif
 	if (!v.y) {
 		if (sz < 0) return 0;
 		return (std::abs(x - s.x) + 1) * (s.y - y - 1);
@@ -128,7 +133,7 @@ ll remain_count(const Pos& p0, const Pos& p1, Pos s, const ll& x, const ll& y) {
 		s.x += dx;
 	}
 #ifdef DEBUG
-	std::cout << "REMAIN:: " << cnt << "\n";
+	std::cout << "REMAIN:: cnt:: " << cnt << "\n";
 #endif
 	return cnt;
 }
@@ -147,7 +152,7 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 	if (!p.den) {//p1 - p2
 		cnt = pick(p0, p1, miny);
 		if (dx < 0) return -(cnt + (p1.y - miny) + (gcd(v) - 1));
-		return cnt + (p0.y - miny);
+		return cnt + (p0.y - miny) - (p0.x != minx);
 	}
 
 	v /= gcd(v);
@@ -162,19 +167,40 @@ ll count(const Pos& p0, const Pos& p1, const Pos& p, const ll& miny, const ll& m
 	if (p.is_int()) q0 = p.p();
 	else q0 = p1 + v * n;
 	
-	cnt += pick(p1, q0, miny);
-	//cnt += remain_count(p0, p1, q0, X, miny);
-	if ((!cnt && std::abs(p1.x - p.x_()) > 1.) || cnt)
-		cnt += remain_count(p0, p1, q0, X, miny);
-
+	ll tmp = pick(p1, q0, miny);
+	cnt += tmp;
+#ifdef DEBUG
+	std::cout << "CNT before remain:: " << cnt << "\n";
+#endif
+	if (q0.x == p1.x) q0.x += v.x / std::abs(v.x);
+	cnt += remain_count(p0, p1, q0, X, miny);
+	//if ((!cnt && std::abs(p1.x - p.x_()) > 1.) || cnt)
+	//	cnt += remain_count(p0, p1, q0, X, miny);
+#ifdef DEBUG
+	std::cout << "CNT after remain:: " << cnt << "\n";
+	std::cout << "               n:: " << n << "\n";
+#endif
 	Pos w0 = p1, w1 = p1;
 	if (w1.x < w0.x) std::swap(w0, w1);
 	if (p.x_int() && p.x_() < w0.x) {
 		ll y = p.y_int() ? p.y / p.den : floor(p.y_());
 		cnt += y - miny;
+		if (dx > 0 && p.p().x != minx) cnt--;
+#ifdef DEBUG
+		std::cout << "CNT left++ :: " << cnt << "\n";
+#endif
 	}
-	else if (p.x_() > w0.x) cnt += w0.y - miny;
+	else if (p.x_() > w0.x) {
+		cnt += w0.y - miny;
+		if (dx > 0 && w0.x != minx) cnt--;
+#ifdef DEBUG
+		std::cout << "CNT left++ :: " << cnt << "\n";
+#endif
+	}
 	if (dx < 0) { cnt += n; cnt *= -1ll; }
+#ifdef DEBUG
+	std::cout << "CNT total:: " << cnt << "\n";
+#endif
 	return cnt;
 }
 ll count(Pos p0, Pos p1, Pos p2, Pos p3) {
@@ -185,7 +211,7 @@ ll count(Pos p0, Pos p1, Pos p2, Pos p3) {
 	if (p.x_int()) minx = p.p().x;
 	minx = std::min({ minx, p1.x, p2.x });
 	ll miny = floor(p.y_());
-	miny = std::min({ miny, p0.y, p1.y, p2.y, p3.y }) - 2;
+	miny = std::min({ miny, p0.y, p1.y, p2.y, p3.y }) - 1;
 	Pos z = Pos(0, 0, 0);
 #ifndef DEBUG
 	cnt += count(p0, p1, p, miny, minx, p0.x - p1.x);
@@ -194,6 +220,7 @@ ll count(Pos p0, Pos p1, Pos p2, Pos p3) {
 #else
 	ll tmp;
 	std::cout << "\nCOUNT::\nDEBUG::  Y:: " << miny << " X:: " << minx << "\n\n";
+	std::cout << "DEBUG:: p0:: " << p0 << " p1:: " << p1 << " p2:: " << p2 << " p3:: " << p3 << "\n\n";
 	std::cout << "DEBUG:: p0:: " << p0 << " p1:: " << p1 << "\n";
 	tmp = count(p0, p1, p, miny, minx, p0.x - p1.x);
 	cnt += tmp;
@@ -249,6 +276,15 @@ int main() { solve(); return 0; }//boj30526
 
 /*
 
+5
+0 2
+-2 0
+-1 -3
+1 -3
+2 1
+
+23
+
 8
 0 2
 0 1
@@ -260,5 +296,15 @@ int main() { solve(); return 0; }//boj30526
 1 3
 
 0
+
+6
+0 0
+400 1
+400 2
+0 3
+-400 2
+-400 1
+
+1596
 
 */
