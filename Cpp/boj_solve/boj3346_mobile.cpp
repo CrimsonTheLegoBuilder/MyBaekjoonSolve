@@ -60,7 +60,7 @@ struct E {
 	int f;
 	E(ld x_ = 0, int f_ = 0) : x(x_), f(f_) {}
 	bool operator < (const E& e) const {
-		return eq(x, e.x) ? f > e.f : sign(x - e.x) > 0;
+		return eq(x, e.x) ? f < e.f : sign(x - e.x) < 0;
 	}
 };
 bool sweep(const Polygon& B, const ld& d) {
@@ -92,7 +92,7 @@ bool sweep(const Polygon& B, const ld& d) {
 	for (const E& d : tmp) {
 		toggle -= d.f;
 		if (!d.f) f = !f;
-		if (f && toggle < 0) return 1;
+		if (f && toggle <= 0) return 1;
 	}
 	return 0;
 }
@@ -116,14 +116,13 @@ bool F(const Polygon& B, const ld& d) {
 	for (const E& d : tmp) {
 		t -= d.f;
 		if (!d.f) f = !f;
-		if (f && t < 0) return 1;
+		if (f && t <= 0) return 1;
 	}
 	return 0;
 }
 ld bi_search(const Polygon& B) {
 	int cnt = 50;
-	ld s = 0, e = L;
-	for (int i = 0; i < N; i++) s = std::max(s, (ld)std::abs(B[i].x));
+	ld s = 0, e = L * 1.5;
 	while (cnt--) {
 		ld m = (s + e) * .5;
 		//if (sweep(B, m)) s = m;
