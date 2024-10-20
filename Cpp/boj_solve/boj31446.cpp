@@ -38,7 +38,7 @@ void solve() {
 	std::cin >> N >> S2;
 	i2 = S2 - N + 2;
 	Pos p = Pos(0, 1);
-	if (i2 < 0) {
+	if (!(S2 & 1) && i2 < 0 || (S2 & 1) && i2 < -1) {
 		std::cout << "NO\n";
 		return;
 	}
