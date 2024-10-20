@@ -1,152 +1,170 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <cmath>
-#include <cstring>
-#include <cassert>
-#include <random>
-#include <array>
-#include <tuple>
-#include <stack>
-typedef long long ll;
-typedef long double ld;
-typedef std::pair<int, int> pi;
-const ll INF = 1e17;
-const int LEN = 1e5 + 1;
-const ld TOL = 1e-7;
-int N, M, T, Q;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
-int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
-struct Info { ll area, l, r; };
+/*
 
-using namespace std;
-typedef long long int ll;
-typedef pair<ll, ll> pll;
+전체적인 로직은 제가 푼 코드 제출번호 70580386과 거의 비슷합니다. 교차 판정, 데이크스트라 등 로직이 맞는다면 AC가 나와야 합니다.
 
-pll operator-(pll x, pll y) { return { x.first - y.first, x.second - y.second }; }
-ll operator/(pll x, pll y) { return x.first * y.second - x.second * y.first; }
+기하 파트에서 문제가 큽니다. 정수형만으로 해결 가능한 문제에 실수 자료형은 쓰지 않는 걸 추천드립니다. 기하 문제를 포함해서 프로그래밍에서 부동 소수점 오차는 어떻게 날 지 알 수 없어서 틀리기도 쉽고 디버깅도 까다롭습니다.
+
+그리고 이 문제는 선분이 교차하는지만 알면 그래프 연결이 가능하기 떄문에 17386번 문제에서 AC를 받는 정수 자료형만 쓰는 로직으로 판단을 해야 정확한 판단이 가능합니다. 일차방정식을 사용한 선분 교차 알고리즘이 17386에서 AC를 받는 로직인지 확인이 필요합니다.
+
+1
+-5 0 5 0 4
+-1 0 0 -5
+0 -5 1 0
+1 0 0 5
+0 5 -1 0
 
 
-bool ccw(pll x, pll y, pll z)
-{
-    pll v = y - x, u = z - y;
-    return v / u > 0;
-}
+*/
 
-ll n, i, j, k, maxi;
-pll p[100001], a;
-
-
-bool cmp(pll x, pll y)
-{
-    x = x - a, y = y - a;
-    if (x / y == 0)
-    {
-        if (x.first == y.first)
-            return x.second < y.second;
-        return x.first < y.first;
-    }
-    return x / y > 0;
-}
-
-ll dis(pll x, pll y)
-{
-    return ((x.first - y.first) * (x.first - y.first) + (x.second - y.second) * (x.second - y.second));
-}
-
-int main() {
-
-    cin >> n;
-    for (i = 1; i <= n; i++)
-        scanf("%lld %lld", &p[i].first, &p[i].second);
-
-    if (n == 1)
-        printf("0");
-    else
-    {
-
-        sort(p + 1, p + (n + 1));
-        a = p[1];
-
-        ll imsi = 1;
-        while (p[imsi] == p[1])
-        {
-            imsi++;
-            if (imsi > n)
-                break;
-        }
-        if (imsi > n)
-        {
-            printf("0");
-        }
-        else
-        {
-            sort(p + imsi, p + (n + 1), cmp);
-
-            stack<ll> s;
-
-            s.push(1), s.push(imsi);
-
-            ll first, second;
-            for (i = imsi + 1; i <= n; i++)
-            {
-                second = s.top();
-                s.pop();
-                first = s.top();
-
-                while (!ccw(p[first], p[second], p[i]))
-                {
-                    second = s.top();
-                    s.pop();
-                    if (s.empty())
-                        break;
-                    first = s.top();
-
-                }
-                s.push(second), s.push(i);
-
-            }
-
-            vector<ll> convex;
-
-            while (!s.empty())
-                convex.push_back(s.top()), s.pop();
-
-            ll aa = convex.size();
-
-            for (i = 0; i < aa; i++)
-                convex.push_back(convex[i]);
-
-            if (aa == 2)
-                maxi = dis(p[convex[0]], p[convex[1]]);
-            else
-            {
-                auto CCW = [&](int lp, int sp) -> ll {
-                    pll lpp = p[convex[lp + 1]] - p[convex[lp]];
-                    pll spp = p[convex[sp + 1]] - p[convex[sp]];
-                    return lpp / spp;
-                    };
-
-                for (int lp = 0, sp = 1; lp < aa; lp++)
-                {
-                    while (CCW(lp, sp) < 0) {
-                        sp = (sp + 1) % aa;
-                        if (maxi < dis(p[convex[lp]], p[convex[sp]]))
-                            maxi = dis(p[convex[lp]], p[convex[sp]]);
-                    }
-                    if (maxi < dis(p[convex[lp]], p[convex[sp]]))
-                        maxi = dis(p[convex[lp]], p[convex[sp]]);
-                }
-            }
-
-            cout << maxi;
-        }
-    }
-
-    return 0;
-}
+//#define _CRT_SECURE_NO_WARNINGS
+//#include <iostream>
+//#include <algorithm>
+//#include <vector>
+//#include <cmath>
+//#include <cstring>
+//#include <cassert>
+//#include <random>
+//#include <array>
+//#include <tuple>
+//#include <stack>
+//typedef long long ll;
+//typedef long double ld;
+//typedef std::pair<int, int> pi;
+//const ll INF = 1e17;
+//const int LEN = 1e5 + 1;
+//const ld TOL = 1e-7;
+//int N, M, T, Q;
+//bool zero(const ld& x) { return std::abs(x) < TOL; }
+//int dcmp(const ld& x) { return std::abs(x) < TOL ? 0 : x > 0 ? 1 : -1; }
+//int dcmp(const ll& x) { return !x ? 0 : x > 0 ? 1 : -1; }
+//struct Info { ll area, l, r; };
+//
+//using namespace std;
+//typedef long long int ll;
+//typedef pair<ll, ll> pll;
+//
+//pll operator-(pll x, pll y) { return { x.first - y.first, x.second - y.second }; }
+//ll operator/(pll x, pll y) { return x.first * y.second - x.second * y.first; }
+//
+//
+//bool ccw(pll x, pll y, pll z)
+//{
+//    pll v = y - x, u = z - y;
+//    return v / u > 0;
+//}
+//
+//ll n, i, j, k, maxi;
+//pll p[100001], a;
+//
+//
+//bool cmp(pll x, pll y)
+//{
+//    x = x - a, y = y - a;
+//    if (x / y == 0)
+//    {
+//        if (x.first == y.first)
+//            return x.second < y.second;
+//        return x.first < y.first;
+//    }
+//    return x / y > 0;
+//}
+//
+//ll dis(pll x, pll y)
+//{
+//    return ((x.first - y.first) * (x.first - y.first) + (x.second - y.second) * (x.second - y.second));
+//}
+//
+//int main() {
+//
+//    cin >> n;
+//    for (i = 1; i <= n; i++)
+//        scanf("%lld %lld", &p[i].first, &p[i].second);
+//
+//    if (n == 1)
+//        printf("0");
+//    else
+//    {
+//
+//        sort(p + 1, p + (n + 1));
+//        a = p[1];
+//
+//        ll imsi = 1;
+//        while (p[imsi] == p[1])
+//        {
+//            imsi++;
+//            if (imsi > n)
+//                break;
+//        }
+//        if (imsi > n)
+//        {
+//            printf("0");
+//        }
+//        else
+//        {
+//            sort(p + imsi, p + (n + 1), cmp);
+//
+//            stack<ll> s;
+//
+//            s.push(1), s.push(imsi);
+//
+//            ll first, second;
+//            for (i = imsi + 1; i <= n; i++)
+//            {
+//                second = s.top();
+//                s.pop();
+//                first = s.top();
+//
+//                while (!ccw(p[first], p[second], p[i]))
+//                {
+//                    second = s.top();
+//                    s.pop();
+//                    if (s.empty())
+//                        break;
+//                    first = s.top();
+//
+//                }
+//                s.push(second), s.push(i);
+//
+//            }
+//
+//            vector<ll> convex;
+//
+//            while (!s.empty())
+//                convex.push_back(s.top()), s.pop();
+//
+//            ll aa = convex.size();
+//
+//            for (i = 0; i < aa; i++)
+//                convex.push_back(convex[i]);
+//
+//            if (aa == 2)
+//                maxi = dis(p[convex[0]], p[convex[1]]);
+//            else
+//            {
+//                auto CCW = [&](int lp, int sp) -> ll {
+//                    pll lpp = p[convex[lp + 1]] - p[convex[lp]];
+//                    pll spp = p[convex[sp + 1]] - p[convex[sp]];
+//                    return lpp / spp;
+//                    };
+//
+//                for (int lp = 0, sp = 1; lp < aa; lp++)
+//                {
+//                    while (CCW(lp, sp) < 0) {
+//                        sp = (sp + 1) % aa;
+//                        if (maxi < dis(p[convex[lp]], p[convex[sp]]))
+//                            maxi = dis(p[convex[lp]], p[convex[sp]]);
+//                    }
+//                    if (maxi < dis(p[convex[lp]], p[convex[sp]]))
+//                        maxi = dis(p[convex[lp]], p[convex[sp]]);
+//                }
+//            }
+//
+//            cout << maxi;
+//        }
+//    }
+//
+//    return 0;
+//}
 
 
 
