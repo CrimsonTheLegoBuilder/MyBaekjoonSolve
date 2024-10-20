@@ -45,7 +45,7 @@ void star(int X) {
 	for (int i = 0; i < X; i++) {
 		int cnt = 0;
 		for (const bool& f : S[i]) { std::cout << (f ? "*" : " "); cnt++; }
-		for (int j = 0; j < X - cnt; j++) std::cout << " ";
+		//for (int j = 0; j < X - cnt; j++) std::cout << " ";
 		std::cout << "\n";
 	}
 	return;
