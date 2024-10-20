@@ -43,7 +43,9 @@ void star(int X) {
 	//if (N > 3) assert(!(N % 2));
 	star(0, X, X >> 1, X >> 2);
 	for (int i = 0; i < X; i++) {
-		for (const bool& f : S[i]) { std::cout << (f ? "*" : " "); }
+		int cnt = 0;
+		for (const bool& f : S[i]) { std::cout << (f ? "*" : " "); cnt++; }
+		for (int j = 0; j < X - cnt; j++) std::cout << " ";
 		std::cout << "\n";
 	}
 	return;
