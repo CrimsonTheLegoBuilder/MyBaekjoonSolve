@@ -62,6 +62,11 @@ struct Pos {
 typedef std::vector<Pos> Polygon;
 Polygon S, T;
 ld l;
+struct Event {
+	int i;
+	Vint idx;
+	Polygon H;
+} ;
 Polygon P[LEN]; int t;
 void print(const Polygon& H) {
 	std::cout << H.size();
