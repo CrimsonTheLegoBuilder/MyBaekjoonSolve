@@ -363,6 +363,7 @@ void rect_to_tri(const int& rt, const int& tt, Vint& id) {
 	Pos v = p0 - p1;
 	ld l0 = v.mag();
 	Vint idx;
+	assert(P[rt].size() == 4);
 	rect_to_rect(rt, l0, idx);
 	assert(idx.size() == 1);
 	assert(idx[0] == t - 1);
