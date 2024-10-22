@@ -319,13 +319,13 @@ void rect_to_square(const ld& l, Vint& id) {
 	Polygon square = box(0, 0, l, l);
 	tape(id.size(), id);
 	t += id.size();
-	ld h = 0;
+	ld y = 0;
 	for (const int& i : id) {
 		Polygon B = P[i];
 		assert(B.size() == 4);
-		for (Pos& b : B) b.y += h;
+		for (Pos& b : B) b.y += y;
 		print(B);
-		h = B[2].y;
+		y = B[2].y;
 	}
 	print(square);
 	P[t++] = square;
