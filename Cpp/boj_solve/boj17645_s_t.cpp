@@ -46,7 +46,6 @@ struct Pii {
 	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
 	Pii operator - () const { return { -x, -y }; }
 	Pii operator ~ () const { return { -y, x }; }
-	Pii operator ! () const { return { y, x }; }
 	ll Euc() const { return (ll)x * x + (ll)y * y; }
 	friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
@@ -95,31 +94,20 @@ struct Pos {
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
-	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
 	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
-	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
-	ld xy() const { return x * y; }
-	Pos rot(ld the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
-	Pos unit() const { return *this / mag(); }
-	ld rad() const { return atan2(y, x); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
-	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
-	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
