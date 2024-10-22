@@ -85,6 +85,8 @@ bool closer(const Vpii& H, const int& i, const int& j) {
 		int k1 = (k0 + 1) % sz;
 		if (k0 == i || k0 == j || k1 == i || k1 == j) continue;
 		if (intersect(H[i], H[j], H[k0], H[k1])) return 0;
+		if (on_seg_weak(H[i], H[j], H[k0])) return 0;
+		if (on_seg_weak(H[i], H[j], H[k1])) return 0;
 	}
 	return 1;
 }
@@ -151,6 +153,8 @@ bool closer(const Polygon& H, const int& i, const int& j) {
 		int k1 = (k0 + 1) % sz;
 		if (k0 == i || k0 == j || k1 == i || k1 == j) continue;
 		if (intersect(H[i], H[j], H[k0], H[k1])) return 0;
+		if (on_seg_weak(H[i], H[j], H[k0])) return 0;
+		if (on_seg_weak(H[i], H[j], H[k1])) return 0;
 	}
 	return 1;
 }
