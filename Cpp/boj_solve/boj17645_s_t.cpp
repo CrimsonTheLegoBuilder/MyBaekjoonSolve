@@ -22,7 +22,7 @@ inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& u, const ld& v) { return zero(u - v); }
 
 #define CUT(i, j) std::cout << "scissors\n"; std::cout << (i) << " " << (j) << "\n";
-#define TAPE(c) std::cout << "tape\n"; << std::cout << (c) << " ";	  
+#define TAPE std::cout << "tape\n";	  
 
 int N, M;
 struct Pos {
@@ -147,6 +147,38 @@ Polygon rect_to_rect(const Polygon& H, const ld& l, const int& i, bool& f) {
 	l_ = H0[1].x - H0[0].x;
 	if (eq(l, h[i])) f = 1;
 	return H0;
+}
+void tri_to_rect(const Polygon& H) {
+	int sz = H.size();
+	assert(sz == 3);
+	const Pos& p0 = H[0], p1 = H[1], p2 = H[2];
+	ld l0 = (p0 - p1).mag(), l1 = (p1 - p2).mag(), l2 = (p2 - p0).mag();
+	ld lmax = std::max(l0, l1, l2);
+	Polygon rect;
+	for (int i = 0; i < 3; i++) {
+		const Pos& p0 = H[i], p1 = H[(i + 1) % 3], p2 = H[(i + 2) % 3];
+		Pos v = p0 - p1;
+		l0 = v.mag();
+		if (eq(l0, lmax)) {
+			Pos pl = (p0 + p2) * .5;
+			Pos pr = (p1 + p2) * .5;
+			Pos m = intersection(pl, pr, p2, p2 + ~v);
+			Polygon R0 = { p0, p1, pr, pl };
+			Polygon Tl = { pl, m, p2 };
+			Polygon Tr = { pr, p2, m };
+			CUT(t, 3);
+			print(R0);
+			print(Tl);
+			print(Tr);
+			Polygon R0_ = { p0, p1, pr, pl };
+			Polygon Tl_ = { pl, m, p2 };
+			Polygon Tr_ = { pr, p2, m };
+			TAPE;
+			std::cout << 3 << " ";
+
+
+		}
+	}
 }
 void polygon_to_square() {
 	l = sqrt(area(S));
