@@ -396,8 +396,7 @@ void start_to_square() {
 	triangulation(S);
 #endif
 	//P[0] = S
-	t = 1;
-	for (t; t < tr; t++) P[t] = TRI[t];
+	for (t = 1; t < tr; t++) P[t] = TRI[t];
 	cut(0, tr - 1);
 	for (int i = 1; i < t; i++) print(P[i]);
 	int t1 = t;
