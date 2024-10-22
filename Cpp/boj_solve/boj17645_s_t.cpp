@@ -226,7 +226,8 @@ void triangulation(const Polygon& H) {
 	}
 	return;
 }
-void tri_to_rect(const Polygon& H, Vint& id) {
+void tri_to_rect(const int& i, Vint& id) {
+	Polygon& H = P[i];
 	int sz = H.size();
 	assert(sz == 3);
 	const Pos& p0 = H[0], p1 = H[1], p2 = H[2];
@@ -243,7 +244,7 @@ void tri_to_rect(const Polygon& H, Vint& id) {
 	Polygon Tr_ = { Pos(dd, 0), Pos(dd, h), Pos(dd - dr, h) };
 	Polygon R = box(0, 0, dd, h);
 	Vint I = { t, t + 1, t + 2 };
-	cut(t - 1, 3); print(R0); print(Tl); print(Tr);
+	cut(i, 3); print(R0); print(Tl); print(Tr);
 	tape(3, I); print(R0_); print(Tl_); print(Tr_); print(R);
 	t += 3;
 	id.push_back(t);
@@ -400,7 +401,7 @@ void start_to_square() {
 	for (int i = 1; i < t; i++) print(P[i]);
 	int t1 = t;
 	Vint id;
-	for (int i = 1; i < t1; i++) tri_to_rect(P[i], id);
+	for (int i = 1; i < t1; i++) tri_to_rect(i, id);
 	Vint idx = id; id.clear();
 	for (const int& i : idx) rect_to_rect(i, l, id);
 	rect_to_square(l, id);
