@@ -225,12 +225,10 @@ void tri_to_rect(const Polygon& H, Vint& id) {
 	int sz = H.size();
 	assert(sz == 3);
 	const Pos& p0 = H[0], p1 = H[1], p2 = H[2];
-	Polygon R;
 	Pos v = p0 - p1;
 	Pos pl = (p0 + p2) * .5, pr = (p1 + p2) * .5;
 	Pos m = intersection(pl, pr, p2, p2 + ~v);
 	Polygon R0 = { p0, p1, pr, pl }, Tl = { p2, pl, m }, Tr = { p2, m, pr };
-	cut(t - 1, 3); print(R0); print(Tl); print(Tr);
 	ld dd = (p0 - p1).mag();
 	ld dr = (pr - m).mag();
 	ld dl = (pl - m).mag();
@@ -238,8 +236,9 @@ void tri_to_rect(const Polygon& H, Vint& id) {
 	Polygon R0_ = { O, Pos(dd, 0), Pos(dd - dr, h), Pos(dl, h) };
 	Polygon Tl_ = { O, Pos(dl, h), Pos(0, h) };
 	Polygon Tr_ = { Pos(dd, 0), Pos(dd, h), Pos(dd - dr, h) };
-	R = box(0, 0, dd, h);
+	Polygon R = box(0, 0, dd, h);
 	Vint I = { t, t + 1, t + 2 };
+	cut(t - 1, 3); print(R0); print(Tl); print(Tr);
 	tape(3, I); print(R0_); print(Tl_); print(Tr_); print(R);
 	t += 3;
 	id.push_back(t);
@@ -249,7 +248,7 @@ void tri_to_rect(const Polygon& H, Vint& id) {
 void rect_to_rect(const int& i, const ld& x, const ld& y, const ld& l, Vint& id) {
 	if (eq(x, l)) { id.push_back(i); return; }
 	if (sign(x - l * 2) >= 0 || sign(l - x * 2) >= 0) {
-		Polygon R0, R1, R2;
+		Polygon R0, R1, R2, R2_;
 		ld nx, ny;
 		if (sign(x - l * 2) >= 0) {
 			nx = x * .5; ny = y * 2;
@@ -259,11 +258,11 @@ void rect_to_rect(const int& i, const ld& x, const ld& y, const ld& l, Vint& id)
 			nx = x * 2; ny = y * .5;
 			R0 = box(0, 0, nx, ny); R1 = box(0, 0, x, ny), R2 = box(0, ny, x, y);
 		}
-		cut(i, 2); print(R1); print(R2);
-		if (sign(x - l * 2) >= 0) R2 = box(0, y, nx, ny);
-		else if (sign(l - x * 2) >= 0) R2 = box(x, 0, nx, ny);
+		if (sign(x - l * 2) >= 0) R2_ = box(0, y, nx, ny);
+		else if (sign(l - x * 2) >= 0) R2_ = box(x, 0, nx, ny);
 		Vint I = { t, t + 1 };
-		tape(2, I); print(R1); print(R2); print(R0);
+		cut(i, 2); print(R1); print(R2);
+		tape(2, I); print(R1); print(R2_); print(R0);
 		t += 2;
 		P[t++] = R0;
 		rect_to_rect(t - 1, nx, ny, l, id);
