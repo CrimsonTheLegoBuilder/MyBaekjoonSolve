@@ -31,9 +31,9 @@ int N, M;
 struct Pii {
 	int x, y;
 	Pii(int X = 0, int Y = 0) : x(X), y(Y) {}
-	bool operator == (const Pos& p) const { return x == p.x &&y == p.y; }
-	bool operator != (const Pos& p) const { return x == p.x || y == p.y; }
-	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator == (const Pii& p) const { return x == p.x &&y == p.y; }
+	bool operator != (const Pii& p) const { return x == p.x || y == p.y; }
+	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
 	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
 	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
 	Pii operator * (const int& scalar) const { return { x * scalar, y * scalar }; }
@@ -259,13 +259,13 @@ void rect_to_rect(const int& i, const ld& x, const ld& y, const ld& l, Vint& id)
 		if (sign(x - l * 2) >= 0) {
 			nx = x * .5; ny = y * 2;
 			R0 = box(0, 0, nx, ny); R1 = box(0, 0, nx, y); R2 = box(nx, 0, x, y);
+			R2_ = box(0, y, nx, ny);
 		}
 		else if (sign(l - x * 2) >= 0) {
 			nx = x * 2; ny = y * .5;
 			R0 = box(0, 0, nx, ny); R1 = box(0, 0, x, ny), R2 = box(0, ny, x, y);
+			R2_ = box(x, 0, nx, ny);
 		}
-		if (sign(x - l * 2) >= 0) R2_ = box(0, y, nx, ny);
-		else if (sign(l - x * 2) >= 0) R2_ = box(x, 0, nx, ny);
 		Vint I = { t, t + 1 };
 		cut(i, 2); print(R1); print(R2);
 		tape(2, I); print(R1); print(R2_); print(R0);
@@ -362,10 +362,10 @@ void rect_to_tri(const int& rt, const int& tt, Vint& id) {
 	const Pos& p0 = H[0], p1 = H[1], p2 = H[2];
 	Pos v = p0 - p1;
 	ld l0 = v.mag();
-	Vint id;
-	rect_to_rect(rt, l0, id);
-	assert(id.size() == 1);
-	assert(id[0] == t - 1);
+	Vint idx;
+	rect_to_rect(rt, l0, idx);
+	assert(idx.size() == 1);
+	assert(idx[0] == t - 1);
 	Polygon R = P[t - 1];
 	Pos pl = (p0 + p2) * .5, pr = (p1 + p2) * .5;
 	Pos m = intersection(pl, pr, p2, p2 + ~v);
