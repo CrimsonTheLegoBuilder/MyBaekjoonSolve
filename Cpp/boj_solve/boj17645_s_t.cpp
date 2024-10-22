@@ -400,9 +400,9 @@ void start_to_square() {
 	cut(0, tr - 1);
 	for (int i = 1; i < t; i++) print(P[i]);
 	int t1 = t;
+	Vint idx;
+	for (int i = 1; i < t1; i++) tri_to_rect(i, idx);
 	Vint id;
-	for (int i = 1; i < t1; i++) tri_to_rect(i, id);
-	Vint idx = id; id.clear();
 	for (const int& i : idx) rect_to_rect(i, l, id);
 	rect_to_square(l, id);
 	assert(P[t - 1][2] == Pos(l, l));
