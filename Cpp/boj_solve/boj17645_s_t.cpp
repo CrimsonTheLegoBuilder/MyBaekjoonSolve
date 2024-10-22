@@ -371,10 +371,10 @@ void rect_to_tri(const int& rt, const int& tt, Vint& id) {
 	Polygon R0_ = { Pos(0, 0), Pos(dd, 0), Pos(dd - dr, h), Pos(dl, h) };
 	Polygon Tl_ = { Pos(0, 0), Pos(dl, h), Pos(0, h) };
 	Polygon Tr_ = { Pos(dd, 0), Pos(dd, h), Pos(dd - dr, h) };
-	cut(rt, 3); print(R0_); print(Tl_); print(Tr_);
 	Vint I = { t, t + 1, t + 2 };
-	t += 3;
+	cut(rt, 3); print(R0_); print(Tl_); print(Tr_);
 	tape(3, I); print(R0); print(Tl); print(Tr); print(H);
+	t += 3;
 	id.push_back(t);
 	P[t++] = H;
 	return;
