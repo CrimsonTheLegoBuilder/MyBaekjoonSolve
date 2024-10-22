@@ -210,7 +210,8 @@ void triangulation(const Polygon& H) {
 			}
 		}
 		TRI[tr++] = tri;
-		return; }
+		return;
+	}
 	for (int i = 0; i < sz; i++) {
 		for (int j = i + 1; j < sz; j++) {
 			if (closer(H, i, j)) {
