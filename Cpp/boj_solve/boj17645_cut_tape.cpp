@@ -148,13 +148,13 @@ void rect_to_rect(const int& i, const ld& x, const ld& y, const ld& l, Vint& id,
 			R0 = box(0, 0, nx, ny); R1 = box(0, 0, x, ny), R2 = box(0, ny, x, y);
 			R2_ = box(x, 0, nx, ny);
 		}
-		Vint I = { t, t + 1 };
 		if (!zero(yy)) {
 			for (Pos& p : R0) p.y += yy;
 			for (Pos& p : R1) p.y += yy;
 			for (Pos& p : R2) p.y += yy;
 			for (Pos& p : R2_) p.y += yy;
 		}
+		Vint I = { t, t + 1 };
 		cut(i, 2); print(R1); print(R2);
 		tape(2, I); print(R1); print(R2_); print(R0);
 		t += 2;
@@ -188,10 +188,10 @@ void rect_to_rect(const int& i, const ld& x, const ld& y, const ld& l, Vint& id,
 		for (Pos& p : TB) p.y += yy;
 		for (Pos& p : TS) p.y += yy;
 	}
+	Vint I = { t, t + 1, t + 2 };
 	cut(i, 3); print(TZ); print(TB); print(TS);
 	for (Pos& b : TB) b += vb;
 	for (Pos& s : TS) s += vs;
-	Vint I = { t, t + 1, t + 2 };
 	tape(3, I); print(TZ); print(TB); print(TS); print(R0);
 	t += 3;
 	id.push_back(t);
