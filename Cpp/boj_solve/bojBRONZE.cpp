@@ -9,31 +9,24 @@ typedef long long ll;
 typedef long double ld;
 const int LEN = 1e6 + 1;
 
-ll N, S, M, L, XL, XXL, XXXL, T, P;
-ll sum_t;
-ll count_shirt(ll sz, ll t) {
-	return sz / t + (sz % t != 0);
-}
-std::pair<ll, ll> count_pen(ll n, ll p) {
-	ll doz = n / p;
-	ll rem = n % p;
-	return { doz, rem };
-}
+int H1, M1, S1, H2, M2, S2, H3, M3, S3;
+ll T1, T2, T3;
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(2);
-	std::cin >> N >> S >> M >> L >> XL >> XXL >> XXXL >> T >> P;
-	sum_t = count_shirt(S, T);
-	sum_t += count_shirt(M, T);
-	sum_t += count_shirt(L, T);
-	sum_t += count_shirt(XL, T);
-	sum_t += count_shirt(XXL, T);
-	sum_t += count_shirt(XXXL, T);
-	auto [doz_p, rem_p] = count_pen(N, P);
-	std::cout << sum_t << "\n";
-	std::cout << doz_p << " ";
-	std::cout << rem_p << "\n";
+	scanf("%d:%d:%d", &H1, &M1, &S1);
+	scanf("%d:%d:%d", &H2, &M2, &S2);
+	T1 = H1 * 60ll * 60 + M1 * 60ll + S1;
+	T2 = H2 * 60ll * 60 + M2 * 60ll + S2;
+	T3 = T2 - T1;
+	if (T3 < 0) T3 += 24 * 60 * 60;
+	H3 = T3 / (60 * 60);
+	T3 %= (60 * 60);
+	M3 = T3 / 60;
+	T3 %= 60;
+	S3 = T3;
+	printf("%02d:%02d:%02d", H3, M3, S3);
 	return 0;
 }
