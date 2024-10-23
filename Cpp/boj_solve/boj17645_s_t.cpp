@@ -1,4 +1,3 @@
-/* https://codeforces.com/blog/entry/68748 */
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
@@ -23,6 +22,7 @@ inline bool eq(const ld& u, const ld& v) { return zero(u - v); }
 
 #define INT
 
+//https://codeforces.com/blog/entry/68748
 void cut(const int& i, const int& cnt) { std::cout << "scissors\n"; std::cout << i << " " << cnt << "\n"; }
 void tape(const int& cnt, const Vint& I) { std::cout << "tape\n"; std::cout << cnt; for (const int& i : I) std::cout << " " << i; std::cout << "\n"; }
 
@@ -465,4 +465,4 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj17645
-/* https://codeforces.com/blog/entry/68748 */
+//https://codeforces.com/blog/entry/68748
