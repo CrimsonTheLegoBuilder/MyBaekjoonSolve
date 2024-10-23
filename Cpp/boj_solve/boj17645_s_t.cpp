@@ -286,7 +286,7 @@ void rect_to_rect(const int& i, const ld& x, const ld& y, const ld& l, Vint& id)
 		TB = { Pos(dx, y), Pos(x, 0), Pos(x, y) };
 		TS = { Pos(l, 0), Pos(x, 0), m };
 		vb = Pos(-dx, dy);
-		vs = Pos(-x, y);
+		vs = Pos(-l, y);
 	}
 	else {
 		m = Pos(dx, h);
@@ -294,7 +294,7 @@ void rect_to_rect(const int& i, const ld& x, const ld& y, const ld& l, Vint& id)
 		TB = { Pos(0, y), Pos(x, dy), Pos(x, y) };
 		TS = { Pos(0, h), m, Pos(0, y)};
 		vb = Pos(dx, -dy);
-		vs = Pos(x, -y);
+		vs = Pos(x, -h);
 	}
 	cut(i, 3); print(TZ); print(TB); print(TS);
 	for (Pos& b : TB) b += vb;
@@ -355,7 +355,7 @@ void square_split(Vint& id) {
 	}
 	return;
 }
-void rect_to_tri(const int& rt, const int& tt, Vint& id) {
+void rect_to_tri(int rt, const int& tt, Vint& id) {
 	Polygon H = TRI[tt];
 	int sz = H.size();
 	assert(sz == 3);
@@ -366,7 +366,8 @@ void rect_to_tri(const int& rt, const int& tt, Vint& id) {
 	assert(P[rt].size() == 4);
 	rect_to_rect(rt, l0, idx);
 	assert(idx.size() == 1);
-	assert(idx[0] == t - 1);
+	rt = idx[0];
+	assert(rt == t - 1);
 	Polygon R = P[t - 1];
 	Pos pl = (p0 + p2) * .5, pr = (p1 + p2) * .5;
 	Pos m = intersection(pl, pr, p2, p2 + ~v);
