@@ -18,6 +18,7 @@ inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& u, const ld& v) { return zero(u - v); }
 
 //https://codeforces.com/blog/entry/68748
+
 void cut(const int& i, const int& cnt) { std::cout << "scissors\n"; std::cout << i << " " << cnt << "\n"; }
 void tape(const int& cnt, const Vint& I) { std::cout << "tape\n"; std::cout << cnt; for (const int& i : I) std::cout << " " << i; std::cout << "\n"; }
 
