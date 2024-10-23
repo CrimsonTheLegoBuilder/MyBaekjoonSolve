@@ -23,6 +23,7 @@ inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& u, const ld& v) { return zero(u - v); }
 
 #define INT
+#define FIT
 
 void cut(const int& i, const int& cnt) { std::cout << "scissors\n"; std::cout << i << " " << cnt << "\n"; }
 void tape(const int& cnt, const Vint& I) { std::cout << "tape\n"; std::cout << cnt; for (const int& i : I) std::cout << " " << i; std::cout << "\n"; }
@@ -318,7 +319,6 @@ void rect_to_rect(const int& i, const ld& l, Vint& id) {
 void rect_to_square(const ld& l, Vint& id) {
 	Polygon square = box(0, 0, l, l);
 	tape(id.size(), id);
-	t += id.size();
 	ld y = 0;
 	for (const int& i : id) {
 		Polygon B = P[i];
@@ -327,6 +327,9 @@ void rect_to_square(const ld& l, Vint& id) {
 		print(B);
 		y = B[2].y;
 	}
+	//std::cout << "SQUARE::\n";
+	//std::cout << "SQUARE::\n";
+	//std::cout << "SQUARE::\n";
 	print(square);
 	P[t++] = square;
 	return;
@@ -342,11 +345,12 @@ void square_split(Vint& id) {
 	ld l = sqrt(area(T));
 	triangulation(T);
 #endif
+	//std::cout << "TTTTTT:: " << t << "\n";
 	cut(t - 1, tr - 1);
 	ld y = 0;
 	for (int i = 1; i < tr; i++) {
 		ld a = std::abs(area(TRI[i]));
-		ld h = a * 2 / l;
+		ld h = a / l;
 		Polygon B = box(0, y, l, y + h);
 		print(B);
 		id.push_back(t);
@@ -379,6 +383,12 @@ void rect_to_tri(int rt, const int& tt, Vint& id) {
 	Polygon R0_ = { Pos(0, 0), Pos(dd, 0), Pos(dd - dr, h), Pos(dl, h) };
 	Polygon Tl_ = { Pos(0, 0), Pos(dl, h), Pos(0, h) };
 	Polygon Tr_ = { Pos(dd, 0), Pos(dd, h), Pos(dd - dr, h) };
+#ifdef FIT
+	ld y = P[rt][0].y;
+	for (Pos& p : R0_) p.y += y;
+	for (Pos& p : Tl_) p.y += y;
+	for (Pos& p : Tr_) p.y += y;
+#endif
 	Vint I = { t, t + 1, t + 2 };
 	cut(rt, 3); print(R0_); print(Tl_); print(Tr_);
 	tape(3, I); print(R0); print(Tl); print(Tr); print(H);

@@ -8,9 +8,8 @@ def parse_polygon_input(input_str):
 
     for line in lines:
         tokens = line.split()
-        if tokens[0] == '3':  # 다각형 형태인 경우
-            coords = list(map(float, tokens[1:]))
-            polygons.append(coords)
+        coords = list(map(float, tokens[1:]))
+        polygons.append(coords)
 
     return polygons
 
@@ -38,11 +37,11 @@ def plot_polygons(polygons):
 
 
 # 입력
-input_str = """
+a = """
 3 3.000000 3.000000 0.000000 0.000000 3.000000 0.000000
 3 0.000000 0.000000 3.000000 3.000000 0.000000 3.000000
 """
 
 # 파싱 및 그리기
-polygons = parse_polygon_input(input_str)
+polygons = parse_polygon_input(a)
 plot_polygons(polygons)
