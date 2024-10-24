@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -6,11 +6,30 @@
 #include <sstream>
 #include <vector>
 
+#include <cassert>
+#undef NDEBUG
+
 #include <cstdio>
 
 typedef long long ll;
 typedef long double ld;
 const int LEN = 1e5 + 1;
+
+bool is_valid_number(const std::string& input) {
+	size_t start = 0;
+	// 첫 글자가 '-'이면 음수 가능하므로 넘어감
+	if (input[start] == '-') {
+		start++;
+	}
+
+	// 나머지 글자가 모두 숫자인지 확인
+	for (size_t i = start; i < input.size(); ++i) {
+		if (!std::isdigit(input[i])) {
+			return false; // 숫자가 아닌 글자가 있으면 false 반환
+		}
+	}
+	return true;
+}
 
 int N, M, Q;
 struct Pos {
@@ -62,24 +81,20 @@ bool query(int q) {
 	Polygon H(N), P(M);
 	//for (Pos& p : H) std::cin >> p;
 	for (Pos& p : H) {
-		std::string input;
-		std::getline(std::cin, input);
-		char unicode_minus = '\u2212';
-		std::replace(input.begin(), input.end(), '?', '-');
-		//std::cout << "fuck:: " << input << '\n';
-		std::istringstream input_stream(input);
-		input_stream >> p;
+		std::string x, y;
+		std::cin >> x >> y;
+		assert(is_valid_number(x));
+		assert(is_valid_number(y));
+		p = Pos(std::stoi(x), std::stoi(y));
 	}
 	norm(H);
 	//for (Pos& p : P) std::cin >> p;
 	for (Pos& p : P) {
-		std::string input;
-		std::getline(std::cin, input);
-		char unicode_minus = '\u2212';
-		std::replace(input.begin(), input.end(), '?', '-');
-		//std::cout << "fuck:: " << input << '\n';
-		std::istringstream input_stream(input);
-		input_stream >> p;
+		std::string x, y;
+		std::cin >> x >> y;
+		assert(is_valid_number(x));
+		assert(is_valid_number(y));
+		p = Pos(std::stoi(x), std::stoi(y));
 	}
 	//std::cout << "FUCK::\n";
 	//std::cout << "N, M " << N << " " << M << " H, P " << H.size() << " " << P.size() << "\n";
