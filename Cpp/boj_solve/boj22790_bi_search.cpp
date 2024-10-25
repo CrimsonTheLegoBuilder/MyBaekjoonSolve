@@ -5,50 +5,33 @@
 #include <string>
 #include <sstream>
 #include <vector>
-
-#include <cassert>
-#undef NDEBUG
-
 #include <cstdio>
-
 typedef long long ll;
-typedef long double ld;
+typedef double ld;
 const int LEN = 1e5 + 1;
 
-bool is_valid_number(const std::string& input) {
+int make_int(const std::string& input) {
 	size_t start = 0;
-	// 첫 글자가 '-'이면 음수 가능하므로 넘어감
-	if (input[start] == '-') {
-		start++;
-	}
-
-	// 나머지 글자가 모두 숫자인지 확인
+	int s = 1;
+	int ret = 0;
+	if (input[0] == '-' || (input[0] != '-' && !std::isdigit(input[0]))) start++, s = -1;
 	for (size_t i = start; i < input.size(); ++i) {
-		if (!std::isdigit(input[i])) {
-			return false; // 숫자가 아닌 글자가 있으면 false 반환
-		}
+		if (!std::isdigit(input[i])) continue;
+		ret = ret * 10 + (input[i] - '0');
 	}
-	return true;
+	return ret * s;
 }
-
 int N, M, Q;
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
-	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const int& n) const { return { x * n, y * n }; }
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
 	ll operator / (const Pos& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-	ld mag() { return hypot(x, y); }
-	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-}; const Pos O = { 0, 0 };
+};
 typedef std::vector<Pos> Polygon;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -79,26 +62,11 @@ bool query(int q) {
 	std::cin >> N >> M;
 	if (!N && !M) return 0;
 	Polygon H(N), P(M);
-	//for (Pos& p : H) std::cin >> p;
-	for (Pos& p : H) {
-		std::string x, y;
-		std::cin >> x >> y;
-		assert(is_valid_number(x));
-		assert(is_valid_number(y));
-		p = Pos(std::stoi(x), std::stoi(y));
-	}
-	norm(H);
-	//for (Pos& p : P) std::cin >> p;
-	for (Pos& p : P) {
-		std::string x, y;
-		std::cin >> x >> y;
-		assert(is_valid_number(x));
-		assert(is_valid_number(y));
-		p = Pos(std::stoi(x), std::stoi(y));
-	}
-	//std::cout << "FUCK::\n";
-	//std::cout << "N, M " << N << " " << M << " H, P " << H.size() << " " << P.size() << "\n";
 	int ret = 0;
+	std::string x, y;
+	for (Pos& p : H) { std::cin >> x >> y; p = Pos(make_int(x), make_int(y)); }
+	for (Pos& p : P) { std::cin >> x >> y; p = Pos(make_int(x), make_int(y)); }
+	norm(H);
 	for (const Pos& p : P) ret += (inner_check_bi_search(H, p) >= 0);
 	std::cout << "Data set " << q << ": " << ret << "\n";
 	return 1;
@@ -106,33 +74,7 @@ bool query(int q) {
 void solve() {
 	std::cout.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-
-	int q = 1;
-	while (query(q++));
+	Q = 1; while (query(Q++));
 	return;
 }
 int main() { solve(); return 0; }//boj22790 Inside Information
-
-/*
-
-4 6
-0 0
-2 2
-5 5
-5 -1
-5 3
-7 3
-5 -1
-5 -2
-2 2
-4 1
-3 1
-0 0
-5 0
-5 5
-0 5
-0 0
-
-5 -1
-
-*/
