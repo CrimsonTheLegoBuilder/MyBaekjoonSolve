@@ -10,6 +10,20 @@ typedef long long ll;
 typedef double ld;
 const int LEN = 1e5 + 1;
 
+bool is_valid_number(const std::string& input) {
+	size_t start = 0;
+	// 첫 글자가 '-'이면 음수 가능하므로 넘어감
+	if (input[start] == '-') {
+		start++;
+	}
+	// 나머지 글자가 모두 숫자인지 확인
+	for (size_t i = start; i < input.size(); ++i) {
+		if (!std::isdigit(input[i])) {
+			return false; // 숫자가 아닌 글자가 있으면 false 반환
+		}
+	}
+	return true;
+}
 int make_int(const std::string& input) {
 	size_t start = 0;
 	int s = 1;
