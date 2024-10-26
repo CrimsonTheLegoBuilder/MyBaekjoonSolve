@@ -336,15 +336,15 @@ void solve() {
 			Pii J1 = H[j], J2 = H[(j + 1) % N];
 			if (i == j || !cross(I1, I2, J1, J2)) continue;
 			Pii vec = I2 - I1;
-			Polygon box = { J1, J1 - vec, J2, J2 - vec };
-			box = graham_scan(box);
-			assert(box.size() == 4);
+			Polygon tz = { J1, J1 - vec, J2, J2 - vec };
+			tz = graham_scan(tz);
+			assert(tz.size() == 4);
 			int lx = 1e9, rx = -1e9, ly = 1e9, uy = -1e9;
 			for (int k = 0; k < 4; k++) {
-				lx = std::min(lx, box[k].x);
-				rx = std::max(rx, box[k].x);
-				ly = std::min(ly, box[k].y);
-				uy = std::max(uy, box[k].y);
+				lx = std::min(lx, tz[k].x);
+				rx = std::max(rx, tz[k].x);
+				ly = std::min(ly, tz[k].y);
+				uy = std::max(uy, tz[k].y);
 			}
 			int jx = I1.x;
 			norm(jx, lx, xs);
@@ -352,7 +352,7 @@ void solve() {
 			norm(jy, ly, ys);
 			for (int x = jx; x <= rx; x += xs) {//O(50 * 50 * 20)
 				for (int y = jy; y <= uy; y += ys) {//O(50 * 50 * 20 * 20)
-					if (inner_check(box, Pii(x, y))) {//O(50 * 50 * 20 * 20 * 4) == O(4000000)
+					if (inner_check(tz, Pii(x, y))) {//O(50 * 50 * 20 * 20 * 4) == O(4000000)
 						Pos o = intersection(P(J1), P(J2), Pos(x, y), Pos(x, y) + P(vec));
 						Pos v = P(S) - o;
 						V.push_back(norm(v, xs, ys));

@@ -38,10 +38,7 @@ void solve() {
 	std::cin >> N >> S2;
 	i2 = S2 - N + 2;
 	Pos p = Pos(0, 1);
-	if (!(S2 & 1) && i2 < 0 || (S2 & 1) && i2 < -1) {
-		std::cout << "NO\n";
-		return;
-	}
+	if (i2 < 0) { std::cout << "NO\n"; return; }
 	std::cout << "YES\n";
 	if (!i2 && N == 3) {
 		std::cout << p << "\n";
@@ -88,7 +85,7 @@ void solve() {
 			if (!p.y) p.y++;
 			else p.x++, p.y--;
 		}
-		//std::cout << p << "\n";
+		std::cout << p << "\n";
 	}
 	return;
 }

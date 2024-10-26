@@ -101,7 +101,7 @@ ld area(const Polygon& H) {
 }
 Polygon box(const ld& x0, const ld& y0, const ld& x1, const ld& y1) { return { Pos(x0, y0), Pos(x1, y0), Pos(x1, y1), Pos(x0, y1) }; }
 void triangulation(const Vpii& H) {
-	int sz = H.size();
+	int sz = H.size(); assert(sz >= 3);
 	if (sz == 3) {
 		const Pii& p0 = H[0], p1 = H[1], p2 = H[2];
 		ll l0 = (p0 - p1).Euc(), l1 = (p1 - p2).Euc(), l2 = (p2 - p0).Euc();
