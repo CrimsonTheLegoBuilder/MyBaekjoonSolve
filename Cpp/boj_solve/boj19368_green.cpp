@@ -53,10 +53,8 @@ struct Pos {
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos rot(ld the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
-	ld xy() const { return x * y; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
-	//ld mag() const { return hypot(x, y); }
 	Pos unit() const { return *this / mag(); }
 	ld rad() const { return norm(atan2(y, x)); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return norm(atan2(p1 / p2, p1 * p2)); }
@@ -91,7 +89,13 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { l
 struct Seg {
 	Pos s, e;
 	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) {}
-	ld green(const Pos& m, const ld& v) const { return m.y * v * (s.x - e.x); }
+	//ld green(const Pos& m, const ld& d) const { return m.y * d * (s.x - e.x); }
+	ld green(const ld& lo, const ld& hi) const {
+		ld d = hi - lo;
+		ld ratio = (lo + hi) * .5;
+		Pos m = s + (e - s) * ratio;
+		return m.y * d * (s.x - e.x);
+	}
 };
 ld dot(const Seg& p, const Seg& q) { return dot(p.s, p.e, q.s, q.e); }
 bool collinear(const Seg& p, const Seg& q) { return collinear(p.s, p.e, q.s, q.e); }
@@ -107,7 +111,8 @@ struct Circle {
 	bool operator >= (const Pos& p) const { return sign(r * r - (c - p).Euc()) >= 0; }
 	//bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
-	bool meet(const Circle& q) const { return !(*this <= q) && !(q <= *this); }
+	bool operator <= (const Pos& p) const { return r < (c - p).mag() - TOL; }
+	bool meet(const Circle& q) const { return sign(sq((ll)r - q.r) - (c - q.c).Euc()) <= 0 && sign(sq((ll)r + q.r) - (c - q.c).Euc()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
@@ -115,8 +120,8 @@ struct Circle {
 		Pos s = Pos(cos(lo), sin(lo)), e = Pos(cos(hi), sin(hi));
 		ld fan = area(lo, hi);
 		Pos m = c + (s + e) * r * (ld).5;
-		ld I = (cos(lo) - cos(hi)) * m.y * r;
-		return fan + I - (s / e) * r * r * (ld).5;
+		ld tz = (cos(lo) - cos(hi)) * m.y * r;
+		return fan + tz - (s / e) * r * r * (ld).5;
 	}
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	inline friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
@@ -181,30 +186,30 @@ struct Arc {
 	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
 	Arc(ld LO = 0, ld HI = 0) : lo(LO), hi(HI) {}
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-	ld area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
-	ld green(const Circle& cen) const {
-		Pos LO = -Pos(1, 0).rot(lo) * cen.r;
-		Pos HI = Pos(1, 0).rot(hi) * cen.r;
-		Pos vec = Pos(cen.c.x, cen.c.y);
-		return (area(cen) + vec / (HI + LO)) * .5;
-	}
-	ld m() const {
-		ld m_ = (lo + hi) * .5;
-		if (sign(lo - hi) > 0) m_ = norm(m_ + PI);
-		return m_;
-	}
-	Pos mid(const Circle& c) const { return c.c + Pos(c.r).rot(m()); }
+	//ld area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
+	//ld green(const Circle& cen) const {
+	//	Pos LO = -Pos(1, 0).rot(lo) * cen.r;
+	//	Pos HI = Pos(1, 0).rot(hi) * cen.r;
+	//	Pos vec = Pos(cen.c.x, cen.c.y);
+	//	return (area(cen) + vec / (HI + LO)) * .5;
+	//}
+	//ld m() const {
+	//	ld m_ = (lo + hi) * .5;
+	//	if (sign(lo - hi) > 0) m_ = norm(m_ + PI);
+	//	return m_;
+	//}
+	//Pos mid(const Circle& c) const { return c.c + Pos(c.r).rot(m()); }
 	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
 	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
-void insert(Arcs& va, const Arc& a, const bool& rvs = 0) {
-	ld l = a.lo, h = a.hi;
-	if (rvs) std::swap(l, h);
-	if (l > h) { va.push_back(Arc(l, 2 * PI)); va.push_back(Arc(0, h)); }
-	else va.push_back(Arc(l, h));
-	return;
-}
+//void insert(Arcs& va, const Arc& a, const bool& rvs = 0) {
+//	ld l = a.lo, h = a.hi;
+//	if (rvs) std::swap(l, h);
+//	if (l > h) { va.push_back(Arc(l, 2 * PI)); va.push_back(Arc(0, h)); }
+//	else va.push_back(Arc(l, h));
+//	return;
+//}
 struct Sector {
 	Circle c;
 	Arc a;
@@ -212,7 +217,6 @@ struct Sector {
 	Arcs va, r1, r2;
 	int val = -1;
 	inline friend std::istream& operator >> (std::istream& is, Sector& s) { is >> s.c >> s.a; return is; }
-	bool operator < (const Sector& s) const { return c < s.c; }
 	void init() {
 		a.hi = norm(a.si + a.theta);
 		std::swap(a.lo, a.hi);
@@ -229,7 +233,7 @@ bool cmpc(const Sector& p, const Sector& q) { return cmpcr(p.c, q.c); }
 bool inner_check(const Sector& s, const Pos& p, const int& f = STRONG) {
 	assert(!eq(s.c.r, (s.c.c - p).mag()));
 	if (s.c < p) return 0;
-	return !s.outer_check(p, f);
+	return !s.outer_check(p, f == STRONG ? WEAK : STRONG);
 }
 void init() {
 	std::sort(S, S + N, cmpc);
@@ -246,21 +250,22 @@ void init() {
 			if (ci == cj) {
 				if (j < i) continue;
 				while (j < N && ci == S[j].c) {
-					if (S[i].outer_check(js1.s, STRONG))
+					S[j].val = 0;
+					if (!S[i].outer_check(js1.s, WEAK))
 						S[j].r1.push_back(Arc(0, 1));
-					if (S[i].outer_check(js2.e, STRONG))
+					if (!S[i].outer_check(js2.e, WEAK))
 						S[j].r2.push_back(Arc(0, 1));
-					if (S[j].outer_check(is1.s, WEAK) || is1.s == js2.e)
+					if (!S[j].outer_check(is1.s, STRONG) || is1.s == js2.e)
 						S[i].r1.push_back(Arc(0, 1));
-					if (S[j].outer_check(is2.e, WEAK) || is2.e == js1.s)
+					if (!S[j].outer_check(is2.e, STRONG) || is2.e == js1.s)
 						S[i].r2.push_back(Arc(0, 1));
 					j++;
 				}
 				j--;
-				if (!S[i].val) continue;
-				S[i].val = 2;
-				S[j].val = 0;
-				uva.push_back(S[i].a);
+				if (S[i].val) {
+					S[i].val = 2;
+					uva.push_back(S[i].a);
+				}
 				continue;
 			}
 			Vld tmp = { 0, 2 * PI };
@@ -284,20 +289,22 @@ void init() {
 			ld r1, r2, r3, r4;
 			std::vector<Seg> IS = { is1, is2 };
 			std::vector<Seg> JS = { js1, js2 };
-			for (int k = 1; k <= 2; k++) {
-				for (int l = 1; l <= 2; l++) {
-					const Seg& s1 = IS[k - 1];
-					const Seg& s2 = JS[l - 1];
-					if (collinear(s1, s2) && i < j) {
-						r1 = projection(s1.s, s1.e, s2.s); r1 = fit(r1, 0, 1);
-						r2 = projection(s1.s, s1.e, s2.e); r2 = fit(r2, 0, 1);
-						r3 = projection(s2.s, s2.e, s1.s); r3 = fit(r3, 0, 1);
-						r4 = projection(s2.s, s2.e, s1.e); r4 = fit(r4, 0, 1);
-						if (l == 1) S[j].r1.push_back(Arc(r3, r4));
-						if (l == 2) S[j].r2.push_back(Arc(r3, r4));
-						if (dot(s1, s2) < 0) {
-							if (k == 1) S[i].r1.push_back(Arc(r1, r2));
-							if (k == 2) S[i].r2.push_back(Arc(r1, r2));
+			if (i < j) {
+				for (int k = 1; k <= 2; k++) {
+					for (int l = 1; l <= 2; l++) {
+						const Seg& s1 = IS[k - 1];
+						const Seg& s2 = JS[l - 1];
+						if (collinear(s1, s2)) {
+							r1 = projection(s1.s, s1.e, s2.s); r1 = fit(r1, 0, 1);
+							r2 = projection(s1.s, s1.e, s2.e); r2 = fit(r2, 0, 1);
+							r3 = projection(s2.s, s2.e, s1.s); r3 = fit(r3, 0, 1);
+							r4 = projection(s2.s, s2.e, s1.e); r4 = fit(r4, 0, 1);
+							if (l == 1) S[j].r1.push_back(Arc(r3, r4));
+							if (l == 2) S[j].r2.push_back(Arc(r3, r4));
+							if (dot(s1, s2) < 0) {
+								if (k == 1) S[i].r1.push_back(Arc(r1, r2));
+								if (k == 2) S[i].r2.push_back(Arc(r1, r2));
+							}
 						}
 					}
 				}
@@ -307,8 +314,16 @@ void init() {
 				Vld ix1;
 				Seg s1 = t == 1 ? is1 : is2;
 				if (on_seg_strong(s1.s, s1.e, cj.c)) {
-					ld ix0 = projection(s1.s, s1.e, cj.c);
-					tmp.push_back(ix0);
+					ld ix = projection(s1.s, s1.e, cj.c);
+					tmp.push_back(ix);
+				}
+				if (on_seg_strong(s1.s, s1.e, S[j].s1.s)) {
+					ld ix = projection(s1.s, s1.e, S[j].s1.s);
+					tmp.push_back(ix);
+				}
+				if (on_seg_strong(s1.s, s1.e, S[j].s2.e)) {
+					ld ix = projection(s1.s, s1.e, S[j].s2.e);
+					tmp.push_back(ix);
 				}
 				ix1 = circle_line_intersections(s1, cj, LINE);
 				ld ix2 = intersection(is1, js1);
@@ -322,26 +337,29 @@ void init() {
 					ld l = tmp[k], h = tmp[k + 1];
 					ld m = (l + h) * .5;
 					Pos mid = ci.p(m);
-					if (t == 1 && inner_check(S[j], mid)) S[i].r1.push_back(Arc(l, h));
-					if (t == 2 && inner_check(S[j], mid)) S[i].r2.push_back(Arc(l, h));
+					if (t == 1 && inner_check(S[j], mid, WEAK)) S[i].r1.push_back(Arc(l, h));
+					if (t == 2 && inner_check(S[j], mid, WEAK)) S[i].r2.push_back(Arc(l, h));
 				}
 			}
 		}
 		if (S[i].val == 1) {
 			ld lo = ai.lo, hi = ai.hi;
-			if (lo > hi) { S[i].va.push_back(Arc(lo, 2 * PI)); S[i].va.push_back(Arc(0, hi)); }
+			if (lo > hi) {
+				S[i].va.push_back(Arc(lo, 2 * PI));
+				S[i].va.push_back(Arc(0, hi));
+			}
 			else S[i].va.push_back(Arc(lo, hi));
 		}
 		else if (S[i].val == 2) {
 			uva.push_back(S[i].a);
 			Arcs va;
 			for (const Arc& a : uva) {
-				ld l = a.lo, h = a.hi;
-				if (l < h) {
-					va.push_back(Arc(h, 2 * PI));
-					va.push_back(Arc(0, l));
+				ld lo = a.lo, hi = a.hi;
+				if (lo < hi) {
+					va.push_back(Arc(hi, 2 * PI));
+					va.push_back(Arc(0, lo));
 				}
-				else va.push_back(Arc(h, l));
+				else va.push_back(Arc(hi, lo));
 			}
 			std::sort(va.begin(), va.end());
 			va.push_back(Arc(2 * PI, 2 * PI));
@@ -366,31 +384,21 @@ ld green() {
 		if (S[i].val) {
 			hi = 0;
 			for (const Arc& a : S[i].va) {
-				if (a.lo > hi) union_area += Arc(hi, a.lo).green(S[i].c), hi = a.hi;
+				if (a.lo > hi) union_area += S[i].c.green(hi, a.lo), hi = a.hi;
 				else hi = std::max(hi, a.hi);
 			}
 		}
 		if (!eq(S[i].s1.s.x, S[i].s1.e.x)) {
 			hi = 0;
 			for (const Arc& a : S[i].r1) {
-				if (a.lo > hi) {
-					ld d = hi - a.lo;
-					ld ratio = (a.lo + hi) * .5;
-					Pos m = S[i].s1.s + (S[i].s1.e - S[i].s1.s) * ratio;
-					union_area += S[i].s1.green(m, d), hi = a.hi;
-				}
+				if (a.lo > hi) union_area += S[i].s1.green(hi, a.lo), hi = a.hi;
 				else hi = std::max(hi, a.hi);
 			}
 		}
 		if (!eq(S[i].s2.s.x, S[i].s2.e.x)) {
 			hi = 0;
 			for (const Arc& a : S[i].r2) {
-				if (a.lo > hi) {
-					ld d = hi - a.lo;
-					ld ratio = (a.lo + hi) * .5;
-					Pos m = S[i].s2.s + (S[i].s2.e - S[i].s2.s) * ratio;
-					union_area += S[i].s2.green(m, d), hi = a.hi;
-				}
+				if (a.lo > hi) union_area += S[i].s2.green(hi, a.lo), hi = a.hi;
 				else hi = std::max(hi, a.hi);
 			}
 		}
