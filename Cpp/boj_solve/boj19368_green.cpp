@@ -107,13 +107,13 @@ struct Circle {
 	bool operator != (const Circle& q) const { return !(*this == q); }
 	bool operator < (const Circle& q) const { return r < q.r && sign(sq((ll)r - q.r) - (c - q.c).Euc()) >= 0; }
 	bool operator <= (const Circle& q) const { return r <= q.r && sign(sq((ll)r - q.r) - (c - q.c).Euc()) >= 0; }
-	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
-	bool operator >= (const Pos& p) const { return sign(r * r - (c - p).Euc()) >= 0; }
-	//bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
-	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
-	bool operator <= (const Pos& p) const { return r < (c - p).mag() - TOL; }
-	bool meet(const Circle& q) const { return sign(sq((ll)r - q.r) - (c - q.c).Euc()) <= 0 && sign(sq((ll)r + q.r) - (c - q.c).Euc()) >= 0; }
+	bool operator > (const Pos& p) const { return sign(r - (c - p).mag()) > 0; }
+	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
+	bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
+	bool operator <= (const Pos& p) const { return sign(r - (c - p).mag()) <= 0; }
+	//bool meet(const Circle& q) const { return sign(sq((ll)r - q.r) - (c - q.c).Euc()) <= 0 && sign(sq((ll)r + q.r) - (c - q.c).Euc()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
+	//bool outside(const Circle& q) const { return sign((c - q.c).mag() - ((ll)r + q.r)) >= 0; }
 	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
 	ld green(const ld& lo, const ld& hi) const {
@@ -226,8 +226,8 @@ struct Sector {
 		va.clear(); r1.clear(); r2.clear();
 		val = 1;
 	}
-	bool outer_check(const Pos& q, const int& f = STRONG) const { return inside(s1.s, c.c, s2.e, q, f); }
-	bool ccw() const { return sign(cross(s1.s, c.c, s2.e)); }
+	bool outer_check(const Pos& q, const int& f = STRONG) const { return inside(s2.e, c.c, s1.s, q, f); }
+	bool ccw() const { return sign(cross(s2.e, c.c, s1.s)); }
 } S[LEN];
 bool cmpc(const Sector& p, const Sector& q) { return cmpcr(p.c, q.c); }
 bool inner_check(const Sector& s, const Pos& p, const int& f = STRONG) {

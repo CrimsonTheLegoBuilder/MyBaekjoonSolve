@@ -1428,9 +1428,6 @@
     <ClCompile Include="boj1569.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj31446.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj3346_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -1441,6 +1438,12 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj22790_bi_search.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj31446_pick.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj19368_green.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
