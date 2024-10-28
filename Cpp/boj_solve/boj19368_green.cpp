@@ -326,8 +326,8 @@ void init() {
 					tmp.push_back(ix);
 				}
 				ix1 = circle_line_intersections(s1, cj, LINE);
-				ld ix2 = intersection(is1, js1);
-				ld ix3 = intersection(is1, js2);
+				ld ix2 = intersection(s1, js1);
+				ld ix3 = intersection(s1, js2);
 				tmp.insert(tmp.end(), ix1.begin(), ix1.end());
 				if (ix2 > -TOL) tmp.push_back(ix2);
 				if (ix3 > -TOL) tmp.push_back(ix3);
