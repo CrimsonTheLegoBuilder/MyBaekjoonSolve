@@ -74,7 +74,6 @@ ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return dot(d1, d2, 
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	//return f1 && f2;
 	bool f3 = on_seg_strong(s1, s2, d1) ||
 		on_seg_strong(s1, s2, d2) ||
 		on_seg_strong(d1, d2, s1) ||
@@ -89,7 +88,6 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { l
 struct Seg {
 	Pos s, e;
 	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) {}
-	//ld green(const Pos& m, const ld& d) const { return m.y * d * (s.x - e.x); }
 	ld green(const ld& lo, const ld& hi) const {
 		ld d = hi - lo;
 		ld ratio = (lo + hi) * .5;
@@ -112,9 +110,7 @@ struct Circle {
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
 	bool operator <= (const Pos& p) const { return sign(r - (c - p).mag()) <= 0; }
-	//bool meet(const Circle& q) const { return sign(sq((ll)r - q.r) - (c - q.c).Euc()) <= 0 && sign(sq((ll)r + q.r) - (c - q.c).Euc()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
-	//bool outside(const Circle& q) const { return sign((c - q.c).mag() - ((ll)r + q.r)) >= 0; }
 	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
 	ld green(const ld& lo, const ld& hi) const {
@@ -187,30 +183,10 @@ struct Arc {
 	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
 	Arc(ld LO = 0, ld HI = 0) : lo(LO), hi(HI) {}
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-	//ld area(const Circle& cen) const { return (hi - lo) * cen.r * cen.r; }
-	//ld green(const Circle& cen) const {
-	//	Pos LO = -Pos(1, 0).rot(lo) * cen.r;
-	//	Pos HI = Pos(1, 0).rot(hi) * cen.r;
-	//	Pos vec = Pos(cen.c.x, cen.c.y);
-	//	return (area(cen) + vec / (HI + LO)) * .5;
-	//}
-	//ld m() const {
-	//	ld m_ = (lo + hi) * .5;
-	//	if (sign(lo - hi) > 0) m_ = norm(m_ + PI);
-	//	return m_;
-	//}
-	//Pos mid(const Circle& c) const { return c.c + Pos(c.r).rot(m()); }
 	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
 	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
-//void insert(Arcs& va, const Arc& a, const bool& rvs = 0) {
-//	ld l = a.lo, h = a.hi;
-//	if (rvs) std::swap(l, h);
-//	if (l > h) { va.push_back(Arc(l, 2 * PI)); va.push_back(Arc(0, h)); }
-//	else va.push_back(Arc(l, h));
-//	return;
-//}
 struct Sector {
 	Circle c;
 	Arc a;
@@ -232,7 +208,6 @@ struct Sector {
 } S[LEN];
 bool cmpc(const Sector& p, const Sector& q) { return cmpcr(p.c, q.c); }
 bool inner_check(const Sector& s, const Pos& p, const int& f = STRONG) {
-	assert(!eq(s.c.r, (s.c.c - p).mag()));
 	if (s.c < p) return 0;
 	return !s.outer_check(p, f == STRONG ? WEAK : STRONG);
 }
@@ -252,6 +227,7 @@ void init() {
 				if (j < i) continue;
 				while (j < N && ci == S[j].c) {
 					S[j].val = 0;
+					uva.push_back(S[j].a);
 					if (!S[i].outer_check(js1.s, WEAK))
 						S[j].r1.push_back(Arc(0, 1));
 					if (!S[i].outer_check(js2.e, WEAK))
@@ -353,7 +329,6 @@ void init() {
 			else S[i].va.push_back(Arc(lo, hi));
 		}
 		else if (S[i].val == 2) {
-			uva.push_back(S[i].a);
 			Arcs va;
 			for (const Arc& a : uva) {
 				ld lo = a.lo, hi = a.hi;
@@ -421,47 +396,4 @@ void solve() {
 	while (std::cin >> N) query();
 	return;
 }
-int main() { solve(); return 0; }//boj19368
-
-/*
-
-남은 구현 내용: 완전히 같은 원들은 병합해서 하나로 운용 가능. 한 개로 합치는 함수를 구현해야함.
-
-*/
-
-
-//struct Pii {
-//	int x, y;
-//	Pii(int X = 0, int Y = 0) : x(X), y(Y) {}
-//	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
-//	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
-//	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
-//	bool operator <= (const Pii& p) const { return x == p.x ? y <= p.y : x <= p.x; }
-//	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
-//	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
-//	Pii operator * (const int& n) const { return { x * n, y * n }; }
-//	Pii operator / (const int& n) const { return { x / n, y / n }; }
-//	ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
-//	ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
-//	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
-//	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
-//	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-//	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
-//	Pii operator - () const { return { -x, -y }; }
-//	Pii operator ~ () const { return { -y, x }; }
-//	Pii operator ! () const { return { y, x }; }
-//	ll xy() const { return (ll)x * y; }
-//	inline ll Euc() const { return (ll)x * x + (ll)y * y; }
-//	inline ld rad() const { return norm(atan2(y, x)); }
-//	int Man() const { return std::abs(x) + std::abs(y); }
-//	ld mag() const { return hypot(x, y); }
-//	inline friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
-//	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
-//};
-//const Pii Oii = { 0, 0 };
-//const Pii INF_PT = { (int)INF, (int)INF };
-//inline ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
-//inline ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
-//inline ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
-//inline ll dot(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) * (d4 - d3); }
-//inline int ccw(const Pii& d1, const Pii& d2, const Pii& d3) { return sign(cross(d1, d2, d3)); }
+int main() { solve(); return 0; }//boj19368 Circular Sectors
