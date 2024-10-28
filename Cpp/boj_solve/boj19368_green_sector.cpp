@@ -18,15 +18,14 @@ inline bool eq(const ld& u, const ld& v) { return zero(u - v); }
 inline ll sq(ll x) { return x * x; }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
 inline ld fit(ld x, ld lo, ld hi) { return std::min(hi, std::max(lo, x)); }
-
 #define si lo
 #define theta hi
-
 #define LINE 1
 #define CIRCLE 2
-
 #define STRONG 0
 #define WEAK 1
+#define LO x
+#define HI y
 
 int N;
 struct Pos {
@@ -47,6 +46,7 @@ struct Pos {
 	inline friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	inline friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 };
+typedef std::vector<Pos> Polygon;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -160,7 +160,8 @@ struct Sector {
 	Circle c;
 	Arc a;
 	Seg s1, s2;
-	Arcs va, v1, v2;
+	Arcs va;
+	Polygon v1, v2;
 	int val = -1;
 	inline friend std::istream& operator >> (std::istream& is, Sector& s) { is >> s.c >> s.a; return is; }
 	void init() {
@@ -197,13 +198,13 @@ void init() {
 					S[j].val = 0;
 					uva.push_back(S[j].a);
 					if (!S[i].outer_check(js1.s, WEAK))
-						S[j].v1.push_back(Arc(0, 1));
+						S[j].v1.push_back(Pos(0, 1));
 					if (!S[i].outer_check(js2.e, WEAK))
-						S[j].v2.push_back(Arc(0, 1));
+						S[j].v2.push_back(Pos(0, 1));
 					if (!S[j].outer_check(is1.s, STRONG) || is1.s == js2.e)
-						S[i].v1.push_back(Arc(0, 1));
+						S[i].v1.push_back(Pos(0, 1));
 					if (!S[j].outer_check(is2.e, STRONG) || is2.e == js1.s)
-						S[i].v2.push_back(Arc(0, 1));
+						S[i].v2.push_back(Pos(0, 1));
 					j++;
 				}
 				j--;
@@ -244,11 +245,11 @@ void init() {
 							r2 = projection(s1.s, s1.e, s2.e); r2 = fit(r2, 0, 1);
 							r3 = projection(s2.s, s2.e, s1.s); r3 = fit(r3, 0, 1);
 							r4 = projection(s2.s, s2.e, s1.e); r4 = fit(r4, 0, 1);
-							if (l == 1) S[j].v1.push_back(Arc(r3, r4));
-							if (l == 2) S[j].v2.push_back(Arc(r3, r4));
+							if (l == 1) S[j].v1.push_back(Pos(r3, r4));
+							if (l == 2) S[j].v2.push_back(Pos(r3, r4));
 							if (dot(s1, s2) < 0) {
-								if (k == 1) S[i].v1.push_back(Arc(r1, r2));
-								if (k == 2) S[i].v2.push_back(Arc(r1, r2));
+								if (k == 1) S[i].v1.push_back(Pos(r1, r2));
+								if (k == 2) S[i].v2.push_back(Pos(r1, r2));
 							}
 						}
 					}
@@ -274,8 +275,8 @@ void init() {
 					ld l = tmp[k], h = tmp[k + 1];
 					ld m = (l + h) * .5;
 					Pos mid = s.p(m);
-					if (t == 1 && inner_check(S[j], mid, WEAK)) S[i].v1.push_back(Arc(l, h));
-					if (t == 2 && inner_check(S[j], mid, WEAK)) S[i].v2.push_back(Arc(l, h));
+					if (t == 1 && inner_check(S[j], mid, WEAK)) S[i].v1.push_back(Pos(l, h));
+					if (t == 2 && inner_check(S[j], mid, WEAK)) S[i].v2.push_back(Pos(l, h));
 				}
 			}
 		}
@@ -306,8 +307,8 @@ void init() {
 			}
 		}
 		std::sort(S[i].va.begin(), S[i].va.end()); S[i].va.push_back(Arc(2 * PI, 2 * PI));
-		std::sort(S[i].v1.begin(), S[i].v1.end()); S[i].v1.push_back(Arc(1, 1));
-		std::sort(S[i].v2.begin(), S[i].v2.end()); S[i].v2.push_back(Arc(1, 1));
+		std::sort(S[i].v1.begin(), S[i].v1.end()); S[i].v1.push_back(Pos(1, 1));
+		std::sort(S[i].v2.begin(), S[i].v2.end()); S[i].v2.push_back(Pos(1, 1));
 	}
 	return;
 }
@@ -323,16 +324,16 @@ ld union_area() {
 		}
 		if (!eq(S[i].s1.s.x, S[i].s1.e.x)) {
 			hi = 0;
-			for (const Arc& a : S[i].v1) {
-				if (a.lo > hi) A += S[i].s1.green(hi, a.lo), hi = a.hi;
-				else hi = std::max(hi, a.hi);
+			for (const Pos& a : S[i].v1) {
+				if (a.LO > hi) A += S[i].s1.green(hi, a.LO), hi = a.HI;
+				else hi = std::max(hi, a.HI);
 			}
 		}
 		if (!eq(S[i].s2.s.x, S[i].s2.e.x)) {
 			hi = 0;
-			for (const Arc& a : S[i].v2) {
-				if (a.lo > hi) A += S[i].s2.green(hi, a.lo), hi = a.hi;
-				else hi = std::max(hi, a.hi);
+			for (const Pos& a : S[i].v2) {
+				if (a.LO > hi) A += S[i].s2.green(hi, a.LO), hi = a.HI;
+				else hi = std::max(hi, a.HI);
 			}
 		}
 	}
