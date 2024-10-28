@@ -96,6 +96,7 @@ struct Seg {
 		Pos m = s + (e - s) * ratio;
 		return m.y * d * (s.x - e.x);
 	}
+	Pos p(const ld& rt) const { return s + (e - s) * rt; }
 };
 ld dot(const Seg& p, const Seg& q) { return dot(p.s, p.e, q.s, q.e); }
 bool collinear(const Seg& p, const Seg& q) { return collinear(p.s, p.e, q.s, q.e); }
@@ -337,7 +338,7 @@ void init() {
 				for (int k = 0; k < sz - 1; k++) {
 					ld l = tmp[k], h = tmp[k + 1];
 					ld m = (l + h) * .5;
-					Pos mid = ci.p(m);
+					Pos mid = s1.p(m);
 					if (t == 1 && inner_check(S[j], mid, WEAK)) S[i].r1.push_back(Arc(l, h));
 					if (t == 2 && inner_check(S[j], mid, WEAK)) S[i].r2.push_back(Arc(l, h));
 				}
@@ -421,6 +422,12 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj19368
+
+/*
+
+남은 구현 내용: 완전히 같은 원들은 병합해서 하나로 운용 가능. 한 개로 합치는 함수를 구현해야함.
+
+*/
 
 
 //struct Pii {
