@@ -5,7 +5,7 @@
 #include <cassert>
 #include <vector>
 typedef long long ll;
-typedef long double ld;
+typedef double ld;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-13;
