@@ -15,22 +15,22 @@ inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& u, const ld& v) { return zero(u - v); }
-inline ll sq(ll x) { return x * x; }
+inline ll sq(const ll& x) { return x * x; }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
-inline ld fit(ld x, ld lo, ld hi) { return std::min(hi, std::max(lo, x)); }
+inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
 #define si lo
 #define theta hi
+#define LO x
+#define HI y
 #define LINE 1
 #define CIRCLE 2
 #define STRONG 0
 #define WEAK 1
-#define LO x
-#define HI y
 
 int N;
 struct Pos {
 	ld x, y;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
@@ -62,7 +62,7 @@ bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
 struct Seg {
 	Pos s, e;
-	Seg(Pos S = Pos(), Pos E = Pos()) : s(S), e(E) {}
+	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
 	Pos p(const ld& rt) const { return s + (e - s) * rt; }
 	ld green(const ld& lo, const ld& hi) const {
 		ld d = hi - lo;
@@ -76,8 +76,9 @@ bool collinear(const Seg& p, const Seg& q) { return collinear(p.s, p.e, q.s, q.e
 struct Circle {
 	Pos c;
 	int r;
-	Circle(Pos C = Pos(), int R = 0) : c(C), r(R) {}
+	Circle(Pos c_ = Pos(), int r_ = 0) : c(c_), r(r_) {}
 	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
+	bool operator < (const Circle& q) const { return c == q.c ? r < q.r : c < q.c; }
 	bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
@@ -93,7 +94,6 @@ struct Circle {
 	inline friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	inline friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 };
-bool cmpcr(const Circle& p, const Circle& q) { return p.c == q.c ? p.r < q.r : p.c < q.c; }
 ld intersection(const Seg& s1, const Seg& s2) {
 	const Pos& p1 = s1.s, p2 = s1.e, q1 = s2.s, q2 = s2.e;
 	ld det = (q2 - q1) / (p2 - p1);
@@ -119,13 +119,13 @@ Vld circle_line_intersections(const Seg& l, const Circle& q, const int& t = LINE
 	Vld ret;
 	if (t == LINE) {
 		if (0 < lo && lo < 1) ret.push_back(lo);
-		if (zero(det)) return ret;//remove dupl
+		if (zero(det)) return ret;
 		if (0 < hi && hi < 1) ret.push_back(hi);
 	}
 	else {//circle
 		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
 		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
-		if (zero(det)) return ret;//remove dupl
+		if (zero(det)) return ret;
 		if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
 	}
 	return ret;
@@ -144,13 +144,13 @@ Vld intersection(const Circle& a, const Circle& b) {
 	ld h = acos(X);
 	Vld ret = {};
 	ret.push_back(norm(rd - h));
-	if (zero(h)) return ret;//remove dupl
+	if (zero(h)) return ret;
 	ret.push_back(norm(rd + h));
 	return ret;
 }
 struct Arc {
 	ld lo, hi;
-	Arc(ld LO = 0, ld HI = 0) : lo(LO), hi(HI) {}
+	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
 	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
 	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
@@ -167,21 +167,16 @@ struct Sector {
 	void init() {
 		a.hi = norm(a.si + a.theta);
 		std::swap(a.lo, a.hi);
-		Pos lo = c.p(a.lo);
-		Pos hi = c.p(a.hi);
-		s1 = Seg(lo, c.c); s2 = Seg(c.c, hi);
+		Pos lo = c.p(a.lo), hi = c.p(a.hi);
+		s1 = Seg(lo, c.c); s2 = Seg(c.c, hi);//ccw
 		va.clear(); v1.clear(); v2.clear();
 		val = 1;
 	}
 	bool outer_check(const Pos& q, const int& f = STRONG) const { return inside(s2.e, c.c, s1.s, q, f); }
 } S[LEN];
-bool cmpc(const Sector& p, const Sector& q) { return cmpcr(p.c, q.c); }
-bool inner_check(const Sector& s, const Pos& p, const int& f = STRONG) {
-	if (s.c < p) return 0;
-	return !s.outer_check(p, f == STRONG ? WEAK : STRONG);
-}
+bool inner_check(const Sector& s, const Pos& p, const int& f = STRONG) { return (s.c < p) ? 0 : !s.outer_check(p, (f + 1) % 2); }
 void init() {
-	std::sort(S, S + N, cmpc);
+	std::sort(S, S + N, [&](const Sector& p, const Sector& q) -> bool { return p.c < q.c; });
 	for (int i = 0; i < N; i++) {
 		const Arc& ai = S[i].a;
 		Arcs uva;
@@ -214,7 +209,7 @@ void init() {
 				}
 				continue;
 			}
-			Vld tmp = { 0, 2 * PI };
+			Vld tmp = { (ld)0, 2 * PI };
 			if (S[i].val) {
 				Vld cc = intersection(ci, cj);
 				Vld cs1 = circle_line_intersections(js1, ci, CIRCLE);
