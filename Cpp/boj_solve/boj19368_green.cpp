@@ -245,8 +245,8 @@ void init() {
 			const Circle& ci = S[i].c, cj = S[j].c;
 			if (ci.outside(cj)) continue;
 			const Arc& aj = S[j].a;
-			const Seg& is1 = S[i].s1, is2 = S[i].s1;
-			const Seg& js1 = S[j].s1, js2 = S[j].s1;
+			const Seg& is1 = S[i].s1, is2 = S[i].s2;
+			const Seg& js1 = S[j].s1, js2 = S[j].s2;
 			if (ci == cj) {
 				if (j < i) continue;
 				while (j < N && ci == S[j].c) {
@@ -277,7 +277,7 @@ void init() {
 				tmp.insert(tmp.end(), cs1.begin(), cs1.end());
 				tmp.insert(tmp.end(), cs2.begin(), cs2.end());
 				std::sort(tmp.begin(), tmp.end());
-				tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
+				tmp.erase(unique(tmp.begin(), tmp.end(), eq), tmp.end());
 				int sz = tmp.size();
 				for (int k = 0; k < sz - 1; k++) {
 					ld l = tmp[k], h = tmp[k + 1];
@@ -331,7 +331,8 @@ void init() {
 				tmp.insert(tmp.end(), ix1.begin(), ix1.end());
 				if (ix2 > -TOL) tmp.push_back(ix2);
 				if (ix3 > -TOL) tmp.push_back(ix3);
-				tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
+				std::sort(tmp.begin(), tmp.end());
+				tmp.erase(unique(tmp.begin(), tmp.end(), eq), tmp.end());
 				int sz = tmp.size();
 				for (int k = 0; k < sz - 1; k++) {
 					ld l = tmp[k], h = tmp[k + 1];
