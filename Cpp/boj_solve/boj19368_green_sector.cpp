@@ -161,7 +161,6 @@ struct Sector {
 	Arcs va;
 	Polygon v1, v2;
 	int val = -1;
-	inline friend std::istream& operator >> (std::istream& is, Sector& s) { is >> s.c >> s.a; return is; }
 	void init() {
 		a.hi = norm(a.si + a.theta);
 		std::swap(a.lo, a.hi);
@@ -170,9 +169,10 @@ struct Sector {
 		va.clear(); v1.clear(); v2.clear();
 		val = 1;
 	}
-	bool outer_check(const Pos& q, const int& f = STRONG) const { return inside(s2.e, c.c, s1.s, q, f); }
+	bool outer_check(const Pos& p, const int& f = STRONG) const { return inside(s2.e, c.c, s1.s, p, f); }
+	bool inner_check(const Pos& p, const int& f = STRONG) const { return (c < p) ? 0 : !outer_check(p, (f + 1) % 2); }
+	inline friend std::istream& operator >> (std::istream& is, Sector& s) { is >> s.c >> s.a; return is; }
 } S[LEN];
-bool inner_check(const Sector& s, const Pos& p, const int& f = STRONG) { return (s.c < p) ? 0 : !s.outer_check(p, (f + 1) % 2); }
 void init() {
 	std::sort(S, S + N, [&](const Sector& p, const Sector& q) -> bool { return p.c < q.c; });
 	for (int i = 0; i < N; i++) {
@@ -182,7 +182,6 @@ void init() {
 			if (i == j) continue;
 			const Circle& ci = S[i].c, cj = S[j].c;
 			if (ci.outside(cj)) continue;
-			const Arc& aj = S[j].a;
 			const Seg& is1 = S[i].s1, is2 = S[i].s2;
 			const Seg& js1 = S[j].s1, js2 = S[j].s2;
 			if (ci == cj) {
@@ -222,13 +221,13 @@ void init() {
 					ld l = tmp[k], h = tmp[k + 1];
 					ld m = (l + h) * .5;
 					Pos mid = ci.p(m);
-					if (inner_check(S[j], mid)) S[i].va.push_back(Arc(l, h));
+					if (S[j].inner_check(mid)) S[i].va.push_back(Arc(l, h));
 				}
 			}
 			if (i < j) {
 				ld r1, r2, r3, r4;
-				std::vector<Seg> IS = { is1, is2 };
-				std::vector<Seg> JS = { js1, js2 };
+				Seg IS[2] = { is1, is2 };
+				Seg JS[2] = { js1, js2 };
 				for (int k = 1; k <= 2; k++) {
 					for (int l = 1; l <= 2; l++) {
 						const Seg& s1 = IS[k - 1];
@@ -268,8 +267,8 @@ void init() {
 					ld l = tmp[k], h = tmp[k + 1];
 					ld m = (l + h) * .5;
 					Pos mid = s.p(m);
-					if (t == 1 && inner_check(S[j], mid, WEAK)) S[i].v1.push_back(Pos(l, h));
-					if (t == 2 && inner_check(S[j], mid, WEAK)) S[i].v2.push_back(Pos(l, h));
+					if (t == 1 && S[j].inner_check(mid, WEAK)) S[i].v1.push_back(Pos(l, h));
+					if (t == 2 && S[j].inner_check(mid, WEAK)) S[i].v2.push_back(Pos(l, h));
 				}
 			}
 		}

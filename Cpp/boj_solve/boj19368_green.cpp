@@ -188,7 +188,6 @@ void init() {
 			if (i == j) continue;
 			const Circle& ci = S[i].c, cj = S[j].c;
 			if (ci.outside(cj)) continue;
-			const Arc& aj = S[j].a;
 			const Seg& is1 = S[i].s1, is2 = S[i].s2;
 			const Seg& js1 = S[j].s1, js2 = S[j].s2;
 			if (ci == cj) {
