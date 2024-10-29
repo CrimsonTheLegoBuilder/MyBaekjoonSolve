@@ -113,6 +113,7 @@ void solve() {
 	if (e_in & 1) cnt--;
 	//std::cout << cnt << "\n";
 	cnt = std::max(cnt, 0);
+	//std::cout << cnt << "\n";
 	std::cout << (cnt >> 1) + 1 << "\n";
 }
 int main() { solve(); return 0; }//boj1873
