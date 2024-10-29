@@ -180,10 +180,10 @@ void init() {
 		Arcs uva;
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
-			const Circle& ci = S[i].c, cj = S[j].c;
+			const Circle& ci = S[i].c, & cj = S[j].c;
 			if (ci.outside(cj)) continue;
-			const Seg& is1 = S[i].s1, is2 = S[i].s2;
-			const Seg& js1 = S[j].s1, js2 = S[j].s2;
+			const Seg& is1 = S[i].s1, & is2 = S[i].s2;
+			const Seg& js1 = S[j].s1, & js2 = S[j].s2;
 			if (ci == cj) {
 				if (j < i) continue;
 				while (j < N && ci == S[j].c) {
@@ -249,12 +249,11 @@ void init() {
 			}
 			for (int t = 1; t <= 2; t++) {
 				tmp = { (ld)0, (ld)1 };
-				Vld ix1;
 				Seg s = t == 1 ? is1 : is2;
 				if (on_seg_weak(s.s, s.e, cj.c)) tmp.push_back(projection(s.s, s.e, cj.c));
 				if (on_seg_weak(s.s, s.e, S[j].s1.s)) tmp.push_back(projection(s.s, s.e, S[j].s1.s));
 				if (on_seg_weak(s.s, s.e, S[j].s2.e)) tmp.push_back(projection(s.s, s.e, S[j].s2.e));
-				ix1 = circle_line_intersections(s, cj, LINE);
+				Vld ix1 = circle_line_intersections(s, cj, LINE);
 				ld ix2 = intersection(s, js1);
 				ld ix3 = intersection(s, js2);
 				tmp.insert(tmp.end(), ix1.begin(), ix1.end());
