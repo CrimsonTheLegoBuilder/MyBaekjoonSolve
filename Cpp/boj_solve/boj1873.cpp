@@ -64,15 +64,26 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sig
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) > 0; }
 int collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
-bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool f = 0) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	return f1 && f2;
-	//bool f3 = on_seg_strong(s1, s2, d1) ||
-	//	on_seg_strong(s1, s2, d2) ||
-	//	on_seg_strong(d1, d2, s1) ||
-	//	on_seg_strong(d1, d2, s2);
-	//return (f1 && f2) || f3;
+	if (f) return f1 && f2;
+	bool f3 = on_seg_strong(s1, s2, d1) ||
+		on_seg_strong(s1, s2, d2) ||
+		on_seg_strong(d1, d2, s1) ||
+		on_seg_strong(d1, d2, s2);
+	return (f1 && f2) || f3;
+}
+bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int& f = 1) {
+	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
+	return ccw(p0, p1, q) >= f && ccw(p1, p2, q) >= f;
+}
+int count(Pos s, Pos e, const Pos& q) {
+	if (on_seg_strong(s, e, q)) return 2;
+	if (s.y == e.y) return 0;
+	if (s.y > e.y) std::swap(s, e);
+	if (s.y >= q.y || q.y > e.y) return 0;
+	return ccw(s, e, q) > 0;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -81,16 +92,68 @@ void solve() {
 	Pos s, e;
 	Polygon P(N);
 	std::cin >> s >> e;
-	int cnt = 0, ret = 0;
+	if (s == e) { std::cout << "1\n"; return; }
+	int si = 0, ei = 0, cnt = 0;
+	int s_in = 0, e_in = 0;
 	for (Pos& p : P) std::cin >> p;
 	if (e < s) std::swap(s, e);
 	for (int i = 0; i < N; i++) {
 		const Pos& p0 = P[i], p1 = P[(i + 1) % N], p2 = P[(i + 2) % N], p3 = P[(i + 3) % N];
-		if (intersect(s, e, p1, p2)) { cnt++; continue; }
+		int f;
+		if (!s_in) {
+			f = count(p1, p2, s);
+			if (f == 2) s_in == 2;
+			else si += f;
+		}
+		if (!e_in) {
+			f = count(p1, p2, e);
+			if (f == 2) e_in == 2;
+			else ei += f;
+		}
+		if (!intersect(s, e, p1, p2)) continue;
+		if (intersect(s, e, p1, p2, 1)) cnt++;
 		else if (collinear(s, e, p1, p2)) {
-
+			int ccw0 = ccw(p1, p2, p0), ccw3 = ccw(p1, p2, p3);
+			assert(ccw0); assert(ccw3);
+			if (on_seg_strong(p1, p2, s) && on_seg_strong(p1, p2, e)) { std::cout << "1\n"; return; }
+			else if (on_seg_weak(s, e, p1) && on_seg_weak(s, e, p2)) {
+				cnt += ccw0 != ccw3;
+			}
+			else if (on_seg_strong(p1, p2, s)) {
+				if (dot(p1, p2, e) > 0 && ccw3 < 0) cnt++;
+				else if (dot(p2, p1, e) > 0 && ccw0 < 0) cnt++;
+			}
+			else if (on_seg_strong(p1, p2, e)) {
+				if (dot(p1, p2, s) > 0 && ccw3 < 0) cnt++;
+				else if (dot(p2, p1, s) > 0 && ccw0 < 0) cnt++;
+			}
+		}
+		else if (p1 == s) {
+			if (collinear(s, e, p1, p0)) continue;
+			cnt += inside(p0, p1, p2, e);
+		}
+		else if (p1 == e) {
+			if (collinear(s, e, p1, p0)) continue;
+			cnt += inside(p0, p1, p2, s);
+		}
+		else if (on_seg_weak(s, e, p1)) {
+			if (collinear(s, e, p1, p0)) continue;
+			int ccw0 = ccw(s, e,p0), ccw2 = ccw(s, e, p2);
+			assert(ccw0); assert(ccw2);
+			cnt += ccw0 != ccw2;
+		}
+		else if (on_seg_weak(p1, p2, s)) {
+			cnt += ccw(p1, p2, e) > 0;
+		}
+		else if (on_seg_weak(p1, p2, e)) {
+			cnt += ccw(p1, p2, s) > 0;
 		}
 	}
-	std::cout << (ret >> 1) + 1 << "\n";
+	if (s_in != 2) s_in = si & 1;
+	if (e_in != 2) e_in = ei & 1;
+	if (s_in & 1) cnt--;
+	if (e_in & 1) cnt--;
+	cnt = std::max(cnt, 0);
+	std::cout << (cnt >> 1) + 1 << "\n";
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj1873
