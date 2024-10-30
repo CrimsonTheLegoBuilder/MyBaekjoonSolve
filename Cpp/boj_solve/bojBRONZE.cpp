@@ -6,20 +6,34 @@
 #include <cstring>
 #include <cassert>
 typedef long long ll;
-typedef long double ld;
+typedef double ld;
 const int LEN = 1e6 + 1;
 int sq(int x) { return x * x; }
+ld sq(ld x) { return x * x; }
 
-int N, V, E;
+int N, M[4];
+
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(4);
+	std::cout.precision(7);
 	std::cin >> N;
-	for (int i = 1; i <= N; i++) {
-		std::cin >> V >> E;
-		//std::cout << 2 - V + E << "\n";
+	while (N--) {
+		std::cin >> M[0] >> M[1] >> M[2] >> M[3];
+		std::sort(M, M + 4);
+		if (M[0] == 4) std::cout << "YES\n";
+		else if (M[3] == 3) std::cout << "YES\n";
+		else if (M[1] / 4) std::cout << "NO\n";
+		else if (M[2] / 4 && M[3] / 4) {
+			M[2] %= 4;
+			M[3] %= 4;
+			if (M[0] + M[1] == 3) std::cout << "NO\n";
+			else if (M[2] + M[3] == 3) std::cout << "NO\n";
+			else if (M[0] == M[2] && M[1] == M[3]) std::cout << "YES\n";
+			else std::cout << "NO\n";
+		}
+		else std::cout << "NO\n";
 	}
 	return 0;
 }
