@@ -100,7 +100,7 @@ void solve() {
 		else if (collinear(s, e, p1, p0)) continue;
 		else if (p1 == s) cnt += inside(p0, p1, p2, e);
 		else if (p1 == e) cnt += inside(p0, p1, p2, s);
-		else if (on_seg_weak(s, e, p1)) cnt += ccw(s, e, p0) != ccw(s, e, p2);
+		else if (on_seg_weak(s, e, p1)) cnt += inside(p0, p1, p2, s) + inside(p0, p1, p2, e);
 		else if (on_seg_weak(p1, p2, s)) cnt += ccw(p1, p2, e) > 0;
 		else if (on_seg_weak(p1, p2, e)) cnt += ccw(p1, p2, s) > 0;
 	}
