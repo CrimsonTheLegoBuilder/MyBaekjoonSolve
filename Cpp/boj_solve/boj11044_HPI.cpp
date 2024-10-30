@@ -7,10 +7,10 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-6;
 const ld PI = acos(-1);
 const int LEN = 2e3 + 5;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -18,6 +18,8 @@ inline bool zero(const ld& x) { return !sign(x); }
 struct II { int i1, i2; };
 
 int Q, N;
+ld ANS[LEN];
+int ans = 0;
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -117,7 +119,7 @@ int inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	assert(sz >= 3);
 	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
 	if (on_seg_strong(H[0], H[1], p) || on_seg_strong(H[0], H[sz - 1], p)) return 0;
-	int s = 0, e = sz - 1, m;
+	int s = 1, e = sz - 1, m;
 	while (s + 1 < e) {
 		m = s + e >> 1;
 		if (cross(H[0], H[m], p) > 0) s = m;
@@ -136,7 +138,8 @@ int inner_check_bi_search_2(const std::vector<Pos>& H, const Pos& p) {//convex
 	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
 	if (p == H[0] || p == H[1] || p == H[sz - 1] ) return 1;
 	if (on_seg_weak(H[0], H[1], p) || on_seg_weak(H[0], H[sz - 1], p)) return 0;
-	int s = 0, e = sz - 1, m;
+	//if (on_seg_strong(H[0], H[1], p) || on_seg_strong(H[0], H[sz - 1], p)) return 0;
+	int s = 1, e = sz - 1, m;
 	while (s + 1 < e) {
 		m = s + e >> 1;
 		if (cross(H[0], H[m], p) > 0) s = m;
@@ -145,9 +148,21 @@ int inner_check_bi_search_2(const std::vector<Pos>& H, const Pos& p) {//convex
 	if (cross(H[s], H[e], p) > 0) return 2;
 	else if (H[s] == p ||  H[e] == p) return 1;
 	else if (on_seg_weak(H[s], H[e], p)) return 0;
+	//else if (on_seg_strong(H[s], H[e], p)) return 0;
 	else return -1;
 }
-II find(const std::vector<Pos>& H, const Pos& p) {//convex
+int inner_check(const Polygon& H, const Pos& p) {
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		int i1 = (i + 1) % sz;
+		if (H[i] == p) return 1;
+		if (H[i1] == p) return 1;
+		if (on_seg_weak(H[i], H[i1], p)) return 0;
+		if (ccw(H[i], H[i1], p) < 0) return -1;
+	}
+	return 2;
+}
+II find_(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
 	//if (!sz) return -1;
 	//if (sz == 1) return p == H[0] ? 0 : -1;
@@ -157,9 +172,9 @@ II find(const std::vector<Pos>& H, const Pos& p) {//convex
 	if (p == H[0]) return { 0, -1 };
 	if (p == H[1]) return { 1, -1 };
 	if (p == H[sz - 1]) return { sz - 1, -1 };
-	if (on_seg_weak(H[0], H[1], p)) return { 0, 1 };
-	if (on_seg_weak(H[0], H[sz - 1], p)) return { 0, sz - 1 };
-	int s = 0, e = sz - 1, m;
+	if (on_seg_strong(H[0], H[1], p)) return { 0, 1 };
+	if (on_seg_strong(H[0], H[sz - 1], p)) return { 0, sz - 1 };
+	int s = 1, e = sz - 1, m;
 	while (s + 1 < e) {
 		m = s + e >> 1;
 		if (cross(H[0], H[m], p) > 0) s = m;
@@ -168,10 +183,21 @@ II find(const std::vector<Pos>& H, const Pos& p) {//convex
 	if (cross(H[s], H[e], p) > 0) return { -1, -1 };
 	else if (H[s] == p) return { s, -1 };
 	else if (H[e] == p) return { e, -1 };
-	else if (on_seg_weak(H[s], H[e], p)) return { s, e };
+	else if (on_seg_strong(H[s], H[e], p)) return { s, e };
 	else return { -1, -1 };
 }
-bool query() {//O(2000)
+II find(const Polygon& H, const Pos& p) {
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		int i1 = (i + 1) % sz;
+		if (H[i] == p) return { i, -1 };
+		if (H[i1] == p) return { i1, -2 };
+		if (on_seg_weak(H[i], H[i1], p)) return { i, i1 };
+		if (ccw(H[i], H[i1], p) < 0) return { -1, -1 };
+	}
+	return { -1, -1 };
+}
+bool query() {
 	std::cin >> N;
 	if (!N) return 0;
 	ld ret = 0;
@@ -179,7 +205,7 @@ bool query() {//O(2000)
 	Polygon H(N);
 	for (Pos& p : H) std::cin >> p;
 	for (int i = 0; i < N; i++) {
-		for (int j = i + 1; j < N; j++) {//(O(2000 * 20 * 20) == O(800000)
+		for (int j = i + 1; j < N; j++) {
 			Pos m = (H[i] + H[j]) * .5;
 			Pos v = ~(H[i] - H[j]);
 			Linear I = Linear(m, m + v);
@@ -210,15 +236,42 @@ bool query() {//O(2000)
 				if (inner_check_bi_search(hpi, p) >= 0 ||
 					inner_check_bi_search(HI, p) >= 0) nj--;
 			for (const Pos& p : hpi) {
-				int ii = inner_check_bi_search_2(HI, p);
-				int jj = inner_check_bi_search_2(HJ, p);
-				if (ii == 1 && jj == 1) continue;
+				//int ii = inner_check_bi_search_2(HI, p);
+				//int jj = inner_check_bi_search_2(HJ, p);
+				int ii = inner_check(HI, p);
+				int jj = inner_check(HJ, p);
+				//assert(ii != -1 && jj != -1);
+				//if (ii == -1 || jj == -1) {
+				//	std::cout << "DEBUG:: FUCK::\n";
+				//	std::cout << "H = [\n";
+				//	for (Pos& p : H) std::cout << "(" << p.x << ", " << p.y << "),\n";
+				//	std::cout << "]\n";
+				//	std::cout << "hpi = [\n";
+				//	for (Pos& p : hpi) std::cout << "(" << p.x << ", " << p.y << "),\n";
+				//	std::cout << "]\n";
+				//	std::cout << "HI = [\n";
+				//	for (Pos& p : HI) std::cout << "(" << p.x << ", " << p.y << "),\n";
+				//	std::cout << "]\n";
+				//	std::cout << "HJ = [\n";
+				//	for (Pos& p : HJ) std::cout << "(" << p.x << ", " << p.y << "),\n";
+				//	std::cout << "]\n";
+				//	std::cout << "DEBUG:: FUCK::\n";
+				//}
+				if (ii == 1 && jj == 1) {
+					II iii = find(HI, p);
+					II jjj = find(HJ, p);
+					int i1 = iii.i1, i2 = (i1 + 1) % HI.size(), i0 = (i1 - 1 + HI.size()) % HI.size();
+					int j1 = jjj.i1, j2 = (j1 + 1) % HJ.size(), j0 = (j1 - 1 + HJ.size()) % HJ.size();
+					//std::cout << i0 << " " << i1 << " " << i2 << "\n";
+					//std::cout << j0 << " " << j1 << " " << j2 << "\n";
+					if (!ccw(HI[i0], HI[i1], HJ[j2]) || !ccw(HJ[j0], HJ[j1], HI[i2])) ij++;
+				}
 				else if (ii == 0 && jj == 0) continue;
 				else if (ii == 0 && jj == 1) {
 					II iii = find(HI, p);
 					II jjj = find(HJ, p);
 					int i1 = iii.i1, i2 = iii.i2;
-					int j1 = jjj.i1, j0 = (j1 + 1) % HJ.size(), j2 = (j1 - 1 + HJ.size()) % HJ.size();
+					int j1 = jjj.i1, j2 = (j1 + 1) % HJ.size(), j0 = (j1 - 1 + HJ.size()) % HJ.size();
 					int c1 = ccw(HI[i1], HI[i2], HJ[j0]);
 					int c2 = ccw(HI[i1], HI[i2], HJ[j2]);
 					if (!c1 || !c2 || c1 * c2 == 1) ij++;
@@ -227,12 +280,12 @@ bool query() {//O(2000)
 					II iii = find(HI, p);
 					II jjj = find(HJ, p);
 					int j1 = jjj.i1, j2 = jjj.i2;
-					int i1 = iii.i1, i0 = (i1 + 1) % HI.size(), i2 = (i1 - 1 + HI.size()) % HI.size();
+					int i1 = iii.i1, i2 = (i1 + 1) % HI.size(), i0 = (i1 - 1 + HI.size()) % HI.size();
 					int c1 = ccw(HJ[j1], HJ[j2], HI[i0]);
 					int c2 = ccw(HJ[j1], HJ[j2], HI[i2]);
 					if (!c1 || !c2 || c1 * c2 == 1) ij++;
 				}
-				else ij++;
+				else if (ii == 2 || jj == 2) ij++;
 			}
 			int n = hpi.size() + ni + nj - ij;
 			if (V < n) {
@@ -242,10 +295,11 @@ bool query() {//O(2000)
 			else if (V == n) {
 				V = n;
 				ret = std::max(ret, R);
-			}//TOTAL O(2000 * 20 * 20 * 20 * log(20)) ~= O(80000000)
+			}//TOTAL O(T * 20 * 20 * 20 * 20) ~= O(T * 16,0000)
 		}
 	}
-	std::cout << ret << "\n";
+	//std::cout << ret << "\n";
+	ANS[ans++] = ret;
 	return 1;
 }
 void solve() {
@@ -254,6 +308,7 @@ void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(15);
 	while (query());
+	for (int i = 0; i < ans; i++) std::cout << ANS[i] << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj11044
