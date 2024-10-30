@@ -162,7 +162,7 @@ int inner_check(const Polygon& H, const Pos& p) {
 	}
 	return 2;
 }
-II find_(const std::vector<Pos>& H, const Pos& p) {//convex
+II find_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 	int sz = H.size();
 	//if (!sz) return -1;
 	//if (sz == 1) return p == H[0] ? 0 : -1;
