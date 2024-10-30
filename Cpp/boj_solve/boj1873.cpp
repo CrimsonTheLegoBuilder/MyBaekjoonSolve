@@ -85,7 +85,7 @@ void solve() {
 			assert(ccw0); assert(ccw3);
 			if (on_seg_strong(p1, p2, s) && on_seg_strong(p1, p2, e)) { std::cout << "1\n"; return; }
 			else if (on_seg_weak(s, e, p1) && on_seg_weak(s, e, p2)) {
-				cnt += ccw3 > 0;
+				cnt += ccw3 < 0;
 				cnt += ccw0 < 0;
 			}
 			else if (on_seg_strong(p1, p2, s)) {
