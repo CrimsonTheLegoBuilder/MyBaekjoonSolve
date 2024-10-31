@@ -119,7 +119,7 @@ void solve() {
 	if (e_in & 1) cnt--;
 	cnt = std::max(cnt, 0);
 	assert(cnt % 2 == 0);
-	//std::cout << (cnt >> 1) + 1 << "\n";
+	std::cout << (cnt >> 1) + 1 << "\n";
 }
 int main() { solve(); return 0; }//boj1873
 
