@@ -128,7 +128,7 @@ Vld circle_line_intersections(const Seg& l, const Circle& q, const int& t = LINE
 	}
 	return ret;
 }
-Vld intersection(const Circle& a, const Circle& b) {
+Vld intersections(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
 	Pos vec = cb - ca;
 	ll ra = a.r, rb = b.r;
@@ -208,7 +208,7 @@ void init() {
 			}
 			Vld tmp = { (ld)0, 2 * PI };
 			if (S[i].val) {
-				Vld cc = intersection(ci, cj);
+				Vld cc = intersections(ci, cj);
 				Vld cs1 = circle_line_intersections(js1, ci, CIRCLE);
 				Vld cs2 = circle_line_intersections(js2, ci, CIRCLE);
 				tmp.insert(tmp.end(), cc.begin(), cc.end());

@@ -1455,6 +1455,12 @@
     <ClCompile Include="boj11044_HPI.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="heavy_boj18760_not_mine.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj31304_green.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
