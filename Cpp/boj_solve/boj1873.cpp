@@ -114,6 +114,7 @@ void solve() {
 	//std::cout << cnt << "\n";
 	cnt = std::max(cnt, 0);
 	//std::cout << cnt << "\n";
+	assert(cnt % 2 == 0);
 	std::cout << (cnt >> 1) + 1 << "\n";
 }
 int main() { solve(); return 0; }//boj1873
