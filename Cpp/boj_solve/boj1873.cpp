@@ -9,6 +9,9 @@ typedef long long ll;
 const int LEN = 1e5 + 1;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
+//#define SEG
+#define LINE
+
 int N;
 struct Pos {
 	int x, y;
@@ -60,7 +63,13 @@ void solve() {
 	Pos s, e;
 	std::cin >> s >> e >> N;
 	Polygon P(N);
+#ifdef SEG
 	if (s == e) { std::cout << "1\n"; return; }
+#elif defined(LINE)
+	assert(s != e);
+	if (s.x != e.x) s.x = -1, e.x = 1e6 + 1;
+	else if (s.y != e.y) s.y = -1, e.y = 1e6 + 1;
+#endif
 	int si = 0, ei = 0, cnt = 0;
 	int s_in = 0, e_in = 0;
 	for (Pos& p : P) std::cin >> p;
@@ -104,18 +113,13 @@ void solve() {
 		else if (on_seg_weak(p1, p2, s)) cnt += ccw(p1, p2, e) > 0;
 		else if (on_seg_weak(p1, p2, e)) cnt += ccw(p1, p2, s) > 0;
 	}
-	//std::cout << cnt << " cnt\n";
-	//std::cout << s_in << " s\n";
-	//std::cout << e_in << " e\n";
 	if (s_in != 2) s_in = si & 1;
 	if (e_in != 2) e_in = ei & 1;
 	if (s_in & 1) cnt--;
 	if (e_in & 1) cnt--;
-	//std::cout << cnt << "\n";
 	cnt = std::max(cnt, 0);
-	//std::cout << cnt << "\n";
 	assert(cnt % 2 == 0);
-	std::cout << (cnt >> 1) + 1 << "\n";
+	//std::cout << (cnt >> 1) + 1 << "\n";
 }
 int main() { solve(); return 0; }//boj1873
 
