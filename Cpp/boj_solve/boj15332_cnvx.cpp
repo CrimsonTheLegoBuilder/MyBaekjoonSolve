@@ -289,17 +289,3 @@ void solve() {
 	return; 
 }
 int main() { solve(); return 0; }//boj15332 Making Perimeter of the Convex Hull Shortest
-
-/*
-
-8 4
--10 10
--10 -10
-10 -10
-10 10
-5 5
-5 -5
-5 0
-6 0
-
-*/
