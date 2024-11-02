@@ -243,22 +243,24 @@ void solve() {
 	for (const Pos& p : I) inner_check_bi_search(H, p);
 	for (int i = 0; i < sz; i++) {
 		const Pos& p0 = H[(i - 1 + sz) % sz], & p1 = H[i], & p2 = H[(i + 1) % sz];
-		ld vv = (p0 - p1).mag() + (p1 - p2).mag();
+		ld o1 = (p0 - p1).mag() + (p1 - p2).mag();
 		K = OUT[i].size();
 		std::vector<bool> F(K, 0);
 		for (int k = 0; k < K; k++) OUT[i][k].i = k;
 		Polygon P = lower_monotone_chain(H, i), J;
-		ld r = round(P, HALF);
-		del.push_back(E(vv - r, i));
 		M = P.size();
+		ld r = round(P, HALF);
+		del.push_back(E(o1 - r, i));
 		for (const Pos& p : P) F[p.i] = 1;
 		for (int j = 0; j < M; j++) Polygon().swap(IN[j]);
 		for (const Pos& p : OUT[i]) if (!F[p.i]) J.push_back(p);
 		for (const Pos& p : J) inner_check_bi_search(P, p, 1, INNER);
 		for (int j = 1; j < M - 1; j++) {
+			const Pos& q0 = P[(i - 1 + M) % M], & q1 = P[i], & q2 = P[(i + 1) % M];
+			ld o2 = (q0 - q1).mag() + (q1 - q2).mag();
 			Polygon Q = lower_monotone_chain(P, j, 1, INNER);
 			ld rr = round(Q, HALF);
-			ret = std::min(ret, R - vv + rr);
+			ret = std::min(ret, R - o1 + r - o2 + rr);
 		}
 	}
 	std::sort(del.begin(), del.end());
