@@ -105,9 +105,11 @@ ld round(const Polygon& H, const bool& half = FULL) {
 	for (int i = 0; i < sz - half; i++) R += (H[i] - H[(i + 1) % sz]).mag();
 	return R;
 }
-ld brute(const Polygon& P) {//N <= 100
+ld brute(Polygon& P) {//only use when N <= 100
 	int sz = P.size();
-	ld R = INF;
+	Polygon H = graham_scan(P);
+	ld R = round(H);
+	ld ret = INF;
 	for (int i = 0; i < sz; i++) {
 		for (int j = i + 1; j < sz; j++) {
 			Polygon C;
@@ -115,10 +117,10 @@ ld brute(const Polygon& P) {//N <= 100
 				if (k == i || k == j) continue;
 				C.push_back(P[k]);
 			}
-			R = std::min(R, round(graham_scan(C)));
+			ret = std::min(ret, round(graham_scan(C)));
 		}
 	}
-	return R;
+	return R - ret;
 }
 int inner_check_bi_search(const Polygon& H, const Pos& p, const int& n = 1, const bool& in = OUTER) {//convex
 	int sz = H.size();
@@ -228,16 +230,18 @@ typedef std::vector<E> VE;
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	memset(V, 0, sizeof V);
+	std::cout << std::fixed;
+	std::cout.precision(9);
 	std::cin >> N;
 	assert(N >= 5); assert(N <= LEN);
-	Polygon C(N), H, I;
+	Polygon C(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
 	if (N <= LIMIT) { std::cout << brute(C) << "\n"; return; }
-	H = graham_scan(C);
+	Polygon H = graham_scan(C), I;
 	ld R = round(H), ret = R;
 	VE del;
-	int sz = H.size(), ret = 0;
+	memset(V, 0, sizeof V);
+	int sz = H.size();
 	for (const Pos& p : H) V[p.i] = 1;
 	for (const Pos& p : C) if (!V[p.i]) I.push_back(p);
 	for (const Pos& p : I) inner_check_bi_search(H, p);
@@ -287,7 +291,7 @@ void solve() {
 		ld rr = round(P, HALF);
 		ret = std::min(ret, R - vv + rr);
 	}
-	std::cout << ret << "\n";
+	std::cout << R - ret << "\n";
 	return; 
 }
 int main() { solve(); return 0; }//boj15332 Making Perimeter of the Convex Hull Shortest
