@@ -142,7 +142,20 @@ int inner_check_bi_search(const Polygon& H, const Pos& p, const int& n = 1, cons
 		}
 		return 0;
 	}
-	if (n == 1 && inner_check(H[sz - 1], H[0], H[1], p)) { OUT[0].push_back(p); }
+	if (n == 1) {
+		if (inner_check(H[sz - 2], H[sz - 1], H[0], p)) {
+			if (in) IN[sz - 1].push_back(p);
+			else OUT[sz - 1].push_back(p);
+		}
+		if (inner_check(H[sz - 1], H[0], H[1], p)) {
+			if (in) IN[0].push_back(p);
+			else OUT[0].push_back(p);
+		}
+		if (inner_check(H[0], H[1], H[2], p)) {
+			if (in) IN[1].push_back(p);
+			else OUT[1].push_back(p);
+		}
+	}
 	else if (n == 2) {
 		if (inner_check(H[sz - 3], H[sz - 2], H[sz - 1], H[0], p)) OUT[sz - 2].push_back(p);
 		if (inner_check(H[sz - 2], H[sz - 1], H[0], H[1], p)) OUT[sz - 1].push_back(p);
