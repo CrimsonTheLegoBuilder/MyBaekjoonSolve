@@ -124,7 +124,6 @@ ld brute(Polygon& P) {//only use when N <= 100
 }
 int inner_check_bi_search(const Polygon& H, const Pos& p, const int& n = 1, const bool& in = OUTER) {//convex
 	int sz = H.size();
-	if (n == 2) assert(sz >= LIMIT);
 	assert(sz > 2);
 	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return -1;
 	if (on_seg_strong(H[0], H[1], p)) {
@@ -200,8 +199,7 @@ Polygon lower_monotone_chain(const Polygon& H, const int& x, const int& n = 1, c
 	Polygon& C = in ? IN[x] : OUT[x];
 	int sz = H.size();
 	const Pos& s = H[(x - 1 + sz) % sz], & e = H[(x + n) % sz];
-	C.push_back(s);
-	C.push_back(e);
+	//C.push_back(s); C.push_back(e);
 	std::sort(C.begin(), C.end(), [&](const Pos& p, const Pos& q) -> bool {
 		ll fp = dot(s, e, p), fq = dot(s, e, q);
 		if (fp == fq) {
@@ -236,60 +234,76 @@ void solve() {
 	assert(N >= 5); assert(N <= LEN);
 	Polygon C(N);
 	for (int i = 0; i < N; i++) std::cin >> C[i], C[i].i = i;
-	if (N <= LIMIT) { std::cout << brute(C) << "\n"; return; }
-	Polygon H = graham_scan(C), I;
-	ld R = round(H), ret = R;
+	//if (N <= LIMIT) { std::cout << brute(C) << "\n"; return; }
+	Polygon P = graham_scan(C), I;
+	assert(P.size() >= 3);
+	ld R = round(P), ret = R;
 	VE del;
 	memset(V, 0, sizeof V);
-	int sz = H.size();
-	for (const Pos& p : H) V[p.i] = 1;
+	for (const Pos& p : P) V[p.i] = 1;
 	for (const Pos& p : C) if (!V[p.i]) I.push_back(p);
-	for (const Pos& p : I) inner_check_bi_search(H, p);
+	for (const Pos& p : I) inner_check_bi_search(P, p, 1, OUTER);
+	int sz = P.size();
 	for (int i = 0; i < sz; i++) {
-		const Pos& p0 = H[(i - 1 + sz) % sz], & p1 = H[i], & p2 = H[(i + 1) % sz];
+		const Pos& p0 = P[(i - 1 + sz) % sz], & p1 = P[i], & p2 = P[(i + 1) % sz];
 		ld o1 = (p0 - p1).mag() + (p1 - p2).mag();
+		OUT[i].push_back(p0); OUT[i].push_back(p2);
 		K = OUT[i].size();
-		std::vector<bool> F(K, 0);
 		for (int k = 0; k < K; k++) OUT[i][k].i = k;
-		Polygon P = lower_monotone_chain(H, i), J;
-		M = P.size();
-		ld r = round(P, HALF);
-		del.push_back(E(o1 - r, i));
-		for (const Pos& p : P) F[p.i] = 1;
+		Polygon Q = lower_monotone_chain(P, i, 1, OUTER), J;
+		M = Q.size();
+		ld r = round(Q, HALF);
+		del.push_back(E(o1 - r, p1.i));
+		if (!K) continue;
+		std::vector<bool> F(K, 0);
 		for (int j = 0; j < M; j++) Polygon().swap(IN[j]);
-		for (const Pos& p : OUT[i]) if (!F[p.i]) J.push_back(p);
-		for (const Pos& p : J) inner_check_bi_search(P, p, 1, INNER);
+		for (const Pos& q : Q) F[q.i] = 1;
+		for (const Pos& q : OUT[i]) if (!F[q.i]) J.push_back(q);
+		for (const Pos& q : J) inner_check_bi_search(Q, q, 1, INNER);
 		for (int j = 1; j < M - 1; j++) {
-			const Pos& q0 = P[(i - 1 + M) % M], & q1 = P[i], & q2 = P[(i + 1) % M];
+			const Pos& q0 = Q[(j - 1 + M) % M], & q1 = Q[j], & q2 = Q[(j + 1) % M];
 			ld o2 = (q0 - q1).mag() + (q1 - q2).mag();
-			Polygon Q = lower_monotone_chain(P, j, 1, INNER);
-			ld rr = round(Q, HALF);
+			IN[j].push_back(q0); IN[j].push_back(q2);
+			Polygon H = lower_monotone_chain(Q, j, 1, INNER);
+			ld rr = round(H, HALF);
 			ret = std::min(ret, R - o1 + r - o2 + rr);
 		}
 	}
-	std::sort(del.begin(), del.end());
-	assert(del.size() > 4);
-	int t0 = del[0].i, t1 = del[1].i, t2 = del[2].i, t3 = del[3].i;
-	for (int i = 0; i < sz; i++) {
-		if (H[i].i == t0) {
-			int tnxt = H[(t0 + 1) % sz].i, tpre = H[(t0 - 1 + sz) % sz].i;
-			if (t1 != tnxt && t1 != tpre) ret = std::min(ret, R - del[0].r - del[1].r);
-			else if (t2 != tnxt && t2 != tpre) ret = std::min(ret, R - del[0].r - del[2].r);
-			else {
-				assert(t3 != tnxt && t3 != tpre);
-				ret = std::min(ret, R - del[0].r - del[3].r);
-				ret = std::min(ret, R - del[1].r - del[2].r);
+	if (sz >= 4) {
+		std::sort(del.begin(), del.end());
+		int t0 = del[0].i, t1 = del[1].i, t2 = del[2].i, t3 = del[3].i;
+		for (int i = 0; i < sz; i++) {
+			if (P[i].i == t0) {
+				int tnxt = P[(i + 1) % sz].i, tpre = P[(i - 1 + sz) % sz].i;
+				if (t1 != tnxt && t1 != tpre) ret = std::min(ret, R - del[0].r - del[1].r);
+				else if (t2 != tnxt && t2 != tpre) ret = std::min(ret, R - del[0].r - del[2].r);
+				else {
+					assert(t3 != tnxt && t3 != tpre);
+					ret = std::min(ret, R - del[0].r - del[3].r);
+					ret = std::min(ret, R - del[1].r - del[2].r);
+				}
+				break;
 			}
 		}
 	}
-	for (int i = 0; i < sz; i++) Polygon().swap(OUT[i]);
-	for (const Pos& p : I) inner_check_bi_search(H, p, 2);
-	for (int i = 0; i < sz; i++) {
-		const Pos& p0 = H[(i - 1 + sz) % sz], & p1 = H[i], & p2 = H[(i + 1) % sz], & p3 = H[(i + 2) % sz];
-		ld vv = (p0 - p1).mag() + (p1 - p2).mag() + (p2 - p3).mag();
-		Polygon P = lower_monotone_chain(H, i, 2);
-		ld rr = round(P, HALF);
-		ret = std::min(ret, R - vv + rr);
+	if (sz == 3) {
+		for (int i = 0; i < sz; i++) {
+			Polygon tmp = I;
+			tmp.push_back(P[i]);
+			ret = std::min(ret, round(graham_scan(tmp)));
+		}
+	}
+	else {
+		for (int i = 0; i < sz; i++) Polygon().swap(OUT[i]);
+		for (const Pos& p : I) inner_check_bi_search(P, p, 2, OUTER);
+		for (int i = 0; i < sz; i++) {
+			const Pos& p0 = P[(i - 1 + sz) % sz], & p1 = P[i], & p2 = P[(i + 1) % sz], & p3 = P[(i + 2) % sz];
+			ld o3 = (p0 - p1).mag() + (p1 - p2).mag() + (p2 - p3).mag();
+			OUT[i].push_back(p0); OUT[i].push_back(p3);
+			Polygon Q = lower_monotone_chain(P, i, 2, OUTER);
+			ld rr = round(Q, HALF);
+			ret = std::min(ret, R - o3 + rr);
+		}
 	}
 	std::cout << R - ret << "\n";
 	return; 
