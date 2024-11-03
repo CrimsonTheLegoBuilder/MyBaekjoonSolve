@@ -213,14 +213,20 @@ Polygon lower_monotone_chain(const Polygon& H, const int& x, const int& n = 1, c
 	int sz = H.size();
 	const Pos& s = H[(x - 1 + sz) % sz], & e = H[(x + n) % sz];
 	//C.push_back(s); C.push_back(e);
+	//std::sort(C.begin(), C.end(), [&](const Pos& p, const Pos& q) -> bool {
+	//	ll fp = dot(s, e, p), fq = dot(s, e, q);
+	//	if (fp == fq) {
+	//		ll tp = cross(s, e, p), tq = cross(s, e, q);
+	//		return tp < tq;
+	//	}
+	//	return fp < fq;
+	//	});
 	std::sort(C.begin(), C.end(), [&](const Pos& p, const Pos& q) -> bool {
-		ll fp = dot(s, e, p), fq = dot(s, e, q);
-		if (fp == fq) {
-			ll tp = cross(s, e, p), tq = cross(s, e, q);
-			return tp < tq;
+		int ret = ccw(s, p, q);
+		if (!ret) return (s - p).Euc() < (s - q).Euc();
+		return ret > 0;
 		}
-		return fp < fq;
-		});
+	);
 	Polygon S;
 	sz = C.size();
 	if (sz == 2) return C;
@@ -243,6 +249,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
+	//freopen("../../../input_data/MakingPerimeter/002.in", "r", stdin);
+	//freopen("../../../input_data/MakingPerimeter/out.txt", "w", stdout);
 	std::cin >> N;
 	assert(N >= 5); assert(N <= LEN);
 	Polygon C(N);
@@ -267,7 +275,7 @@ void solve() {
 		M = Q.size();
 		ld r = round(Q, HALF);
 		del.push_back(E(o1 - r, p1.i));
-		if (!K) continue;
+		if (M <= 2) continue;
 		std::vector<bool> F(K, 0);
 		for (int j = 0; j < M; j++) Polygon().swap(IN[j]);
 		for (const Pos& q : Q) F[q.i] = 1;
