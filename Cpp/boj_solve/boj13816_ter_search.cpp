@@ -65,7 +65,7 @@ struct Pos {
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
 	Pos unit() const { return *this / mag(); }
-	ld rad() const { return atan2(y, x); }
+	ld rad() const { return norm(atan2(y, x)); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
@@ -105,7 +105,8 @@ ld largest(Polygon H, const ld& x) {
 	if (!eq(H[i].x, x)) {
 		tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
 		i = (i + 1) % sz;
-		rl = ccw(s, e, H[i]) > 0 ? LEFT : RIGHT;
+		//rl = ccw(s, e, H[i]) > 0 ? LEFT : RIGHT;
+		rl = H[i].x < 0 ? LEFT : RIGHT;
 	}
 	else if (eq(H[i].x, x)) {
 		if (eq(H[(i + 1) % sz].x, x)) {
@@ -113,7 +114,8 @@ ld largest(Polygon H, const ld& x) {
 		}
 		tmp.push_back(H[i]);
 		i = (i + 1) % sz;
-		rl = ccw(s, e, H[i]) > 0 ? LEFT : RIGHT;
+		//rl = ccw(s, e, H[i]) > 0 ? LEFT : RIGHT;
+		rl = H[i].x < 0 ? LEFT : RIGHT;
 	}
 	for (int _ = 0; _ < sz; _++, i = (i + 1) % sz) {
 		if (between(H[i].x, H[(i + 1) % sz].x, x)) {
@@ -123,7 +125,8 @@ ld largest(Polygon H, const ld& x) {
 			else if (rl == RIGHT) R[rt++] = tmp;
 			tmp.clear();
 			tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
-			rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
+			//rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
+			rl = H[(i + 1) % sz].x < 0 ? LEFT : RIGHT;
 		}
 		else if (eq(H[i].x, x)) {
 			tmp.push_back(H[i]);
@@ -132,7 +135,8 @@ ld largest(Polygon H, const ld& x) {
 			if (eq(H[(i + 1) % sz].x, x)) _++, i = (i + 1) % sz;
 			tmp.clear();
 			tmp.push_back(H[i]);
-			rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
+			//rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
+			rl = H[(i + 1) % sz].x < 0 ? LEFT : RIGHT;
 		}
 		else tmp.push_back(H[i]);
 	}
@@ -284,8 +288,9 @@ bool query() {
 	if (!N) return 0;
 	Pos v;
 	std::cin >> v;
+	if ((zero(v.y) && v.x < 0) || v.y < 0) v *= -1;
 	ld t = v.rad();
-	t = norm(t + PI * .5);
+	t = norm(PI * .5 - t);
 	Polygon H;
 	for (Pos& p : H) std::cin >> p, p = p.rot(-t);
 	std::cout << ternary_search(H) << "\n";
