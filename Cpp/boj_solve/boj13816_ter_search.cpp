@@ -146,6 +146,20 @@ ld largest(Polygon H, const ld& x) {
 		}
 		else tmp.push_back(H[i]);
 	}
+
+	//std::cout << "DEBUG:: \n";
+	//std::cout << "x:: " << x << "\n";
+	//std::cout << "L:: \n";
+	//for (int j = 0; j < lt; j++) {
+	//	std::cout << "L[" << j << "]\n";
+	//	for (const Pos& p : L[j]) std::cout << " (" << p.x << ", " << p.y << "),\n";
+	//}
+	//for (int j = 0; j < rt; j++) {
+	//	std::cout << "R[" << j << "]\n";
+	//	for (const Pos& p : R[j]) std::cout << " (" << p.x << ", " << p.y << "),\n";
+	//}
+	//std::cout << "DEBUG:: \n";
+
 	Vld F, A, Y;
 	Vint I;
 	I.resize(lt);
@@ -222,6 +236,13 @@ ld largest(Polygon H, const ld& x) {
 			yi = find_y(Y, R[I[k]][0].y);
 		}
 	}
+	std::sort(F.rbegin(), F.rend());
+	//std::cout << "DEBUG:: \n";
+	//for (int j = 0; j < F.size(); j++) {
+	//	std::cout << "F[" << j << "]:: " << F[j] << "\n";
+	//}
+	//std::cout << "DEBUG:: \n";
+
 	return F[0];
 	//Vld F, A, Y;
 	//Vint I;
@@ -287,7 +308,7 @@ ld ternary_search(const Polygon& H) {
 	assert(H.size() >= 3);
 	ld s = INF, e = -INF;
 	for (const Pos& p : H) s = std::min(s, p.x), e = std::max(e, p.x);
-	int cnt = 30; while (cnt--) {
+	int cnt = 50; while (cnt--) {
 		ld m1 = (s + s + e) / 3;
 		ld m2 = (s + e + e) / 3;
 		ld a1 = largest(H, m1);
@@ -307,7 +328,7 @@ bool query() {
 	t = norm(PI * .5 - t);
 	Polygon H(N);
 	for (Pos& p : H) std::cin >> p, p = p.rot(-t);
-	std::cout << ternary_search(H) << "\n";
+	std::cout << ternary_search(H) * .5 << "\n";
 	return 1;
 }
 void solve() {
