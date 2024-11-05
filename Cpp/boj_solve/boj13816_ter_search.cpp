@@ -129,7 +129,7 @@ ld largest(Polygon H, const ld& x) {
 			tmp.clear();
 			tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
 			//rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
-			rl = H[(i + 1) % sz].x < 0 ? LEFT : RIGHT;
+			rl = H[(i + 1) % sz].x < x ? LEFT : RIGHT;
 		}
 		else if (eq(H[i].x, x)) {
 			tmp.push_back(H[i]);
@@ -142,7 +142,7 @@ ld largest(Polygon H, const ld& x) {
 			tmp.clear();
 			tmp.push_back(H[i]);
 			//rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
-			rl = H[(i + 1) % sz].x < 0 ? LEFT : RIGHT;
+			rl = H[(i + 1) % sz].x < x ? LEFT : RIGHT;
 		}
 		else tmp.push_back(H[i]);
 	}
@@ -190,8 +190,8 @@ ld largest(Polygon H, const ld& x) {
 		int yi = find_y(Y, L[i].back().y);
 		int k = j + 1;
 		while (1) {
-			//std::cout << "yi:: " << yi << "\n";
-			if (yi == -1) { F.push_back(a); break; }
+			std::cout << "yi:: " << yi << "\n";
+			if (yi <= 0) { F.push_back(a); break; }
 			ld y = Y[yi];
 			if (eq(y, h)) { F.push_back(a); break; }
 			while (k < lt && !eq(y, L[I[k]][0].y)) k++;
@@ -227,7 +227,7 @@ ld largest(Polygon H, const ld& x) {
 		int yi = find_y(Y, R[i][0].y);
 		int k = j + 1;
 		while (1) {
-			//std::cout << "yi:: " << yi << "\n";
+			std::cout << "yi:: " << yi << "\n";
 			if (yi <= 0) { F.push_back(a); break; }
 			ld y = Y[yi];
 			if (eq(y, h)) { F.push_back(a); break; }
