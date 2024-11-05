@@ -10,7 +10,6 @@ typedef long long ll;
 typedef double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
-typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
 ld TOL = 1e-15;
 const ld PI = acos(-1);
@@ -19,7 +18,6 @@ inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& u, const ld& v) { return zero(u - v); }
 inline bool between(ld s, ld e, const ld& x) { if (e < s) std::swap(s, e); return sign(x - s) > 0 && sign(e - x) > 0; }
-inline ld sq(ld x) { return (ld)x * x; }
 inline ld norm(ld th) {
 	while (th < 0) th += 2 * PI;
 	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
@@ -41,58 +39,26 @@ int find_y(const Vld& Y, const ld& y) {
 	//return Y.size();
 }
 
-#define RIGHT 1
-#define LEFT 2
-
 int N;
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
-	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
-	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
-	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
-	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
 	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
-	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
-	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
-	ld xy() const { return x * y; }
 	Pos rot(ld the) const { return { x * (ld)cosl(the) - y * (ld)sinl(the), x * (ld)sinl(the) + y * (ld)cosl(the) }; }
-	ld Euc() const { return x * x + y * y; }
-	ld mag() const { return sqrtl(Euc()); }
-	Pos unit() const { return *this / mag(); }
 	ld rad() const { return norm(atan2l(y, x)); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
-	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
-	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-}; const Pos O = { 0, 0 };
+};
 typedef std::vector<Pos> Polygon;
 Polygon R[LEN], L[LEN];
 int rt, lt;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
-ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d2, d3)) > 0; }
-bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
-ld green(const Pos& s, const Pos& e) { Pos m = (s + e) * .5; return m.y * (s.x - e.x); }
 ld area(const Polygon& H) {
 	ld a = 0;
 	int sz = H.size();
@@ -106,8 +72,6 @@ ld largest(Polygon H, const ld& x) {
 	for (i = 0; i < sz; i++) if (eq(H[i].x, x) || between(H[i].x, H[(i + 1) % sz].x, x)) break;
 	rt = lt = 0;
 	Polygon tmp;
-	bool f = 1;
-	int rl = LEFT;
 	if (!eq(H[i].x, x)) {
 		tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
 		i = (i + 1) % sz;
@@ -164,21 +128,12 @@ ld largest(Polygon H, const ld& x) {
 		return py < qy;
 		});
 	A.resize(lt, 0);
-	f = 1;
 	for (int j = 0; j < lt; j++) {
 		i = I[j];
 		A[i] = area(L[i]);
-		if (A[i] < 0) f = 0;
 		Y.push_back(L[i][0].y);
 	}
 	std::sort(Y.begin(), Y.end());
-	//std::cout << "DEBUG:: \n";
-	//std::cout << "L:: \n";
-	//for (int j = 0; j < lt; j++) {
-	//	std::cout << "L[" << I[j] << "]\n";
-	//	for (const Pos& p : L[I[j]]) std::cout << " (" << p.x << ", " << p.y << "),\n";
-	//}
-	//std::cout << "DEBUG:: \n";
 	for (int j = 0; j < lt; j++) {
 		i = I[j];
 		if (A[i] < 0) continue;
@@ -187,10 +142,10 @@ ld largest(Polygon H, const ld& x) {
 		int yi = find_y(Y, L[i].back().y);
 		int k = j + 1;
 		while (1) {
-			ld y = Y[yi];
-			//std::cout << "FUCK:: L " << lt << " " << j << " " << k << " " << h << " " << y << " " << Y[yi] << "\n";
+			//std::cout << "FUCK:: L " << lt << " " << j << " " << k << " " << h << " " << y << "\n";
 			//std::cout << "FUCK:: L \n";
-			if (sign(y - h) > 0) { F.push_back(a); break; }
+			ld y = Y[yi];
+			//if (sign(y - h) > 0) { F.push_back(a); break; }
 			if (eq(y, h)) { F.push_back(a); break; }
 			while (k < lt && !eq(y, L[I[k]][0].y)) k++;
 			if (k >= I.size()) break;
@@ -211,20 +166,12 @@ ld largest(Polygon H, const ld& x) {
 		return py < qy;
 		});
 	A.resize(rt, 0);
-	f = 1;
 	for (int j = 0; j < rt; j++) {
 		i = I[j];
 		A[i] = area(R[i]);
-		if (A[i] < 0) f = 0;
 		Y.push_back(R[i].back().y);
 	}
 	std::sort(Y.begin(), Y.end());
-	//std::cout << "DEBUG:: \n";
-	//std::cout << "R:: \n";
-	//for (int j = 0; j < rt; j++) {
-	//	std::cout << "R[" << I[j] << "]\n";
-	//	for (const Pos& p : L[I[j]]) std::cout << " (" << p.x << ", " << p.y << "),\n";
-	//}
 	for (int j = 0; j < rt; j++) {
 		i = I[j];
 		if (A[i] < 0) continue;
@@ -233,9 +180,10 @@ ld largest(Polygon H, const ld& x) {
 		int yi = find_y(Y, R[i][0].y);
 		int k = j + 1;
 		while (1) {
+			//std::cout << "FUCK:: R " << lt << " " << j << " " << k << " " << h << " " << y << "\n";
 			//std::cout << "FUCK:: R \n";
 			ld y = Y[yi];
-			if (sign(y - h) > 0) { F.push_back(a); break; }
+			//if (sign(y - h) > 0) { F.push_back(a); break; }
 			if (eq(y, h)) { F.push_back(a); break; }
 			while (k < rt && !eq(y, R[I[k]].back().y)) k++;
 			if (k >= I.size()) break;
@@ -278,7 +226,6 @@ bool query() {
 	if (!N) return 0;
 	Pos v;
 	std::cin >> v;
-	if ((zero(v.y) && v.x < 0) || v.y < 0) v *= -1;
 	ld t = v.rad();
 	t = norm(PI * .5 - t);
 	Polygon H(N);
@@ -296,4 +243,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj13816 Cave Explorer
-
