@@ -6,13 +6,13 @@
 #include <cassert>
 #include <vector>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-4;
 const ld PI = acos(-1);
 const int LEN = 105;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -148,7 +148,7 @@ ld largest(Polygon H, const ld& x) {
 	}
 
 	//std::cout << "DEBUG:: \n";
-	//std::cout << "x:: " << x << "\n";
+	std::cout << "x:: " << x << "\n";
 	//std::cout << "L:: \n";
 	//for (int j = 0; j < lt; j++) {
 	//	std::cout << "L[" << j << "]\n";
@@ -314,6 +314,7 @@ ld ternary_search(const Polygon& H) {
 		ld m2 = (s + e + e) / 3;
 		ld a1 = largest(H, m1);
 		ld a2 = largest(H, m2);
+		std::cout << "a1a2:: " << a1 << " " << a2 << "\n";
 		if (a1 > a2) s = m1;
 		else e = m2;
 	}
