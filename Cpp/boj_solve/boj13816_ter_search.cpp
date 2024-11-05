@@ -190,6 +190,7 @@ ld largest(Polygon H, const ld& x) {
 		int yi = find_y(Y, L[i].back().y);
 		int k = j + 1;
 		while (1) {
+			//std::cout << "yi:: " << yi << "\n";
 			if (yi == -1) { F.push_back(a); break; }
 			ld y = Y[yi];
 			if (eq(y, h)) { F.push_back(a); break; }
@@ -227,7 +228,7 @@ ld largest(Polygon H, const ld& x) {
 		int k = j + 1;
 		while (1) {
 			//std::cout << "yi:: " << yi << "\n";
-			if (yi == -1) { F.push_back(a); break; }
+			if (yi <= 0) { F.push_back(a); break; }
 			ld y = Y[yi];
 			if (eq(y, h)) { F.push_back(a); break; }
 			while (k < rt && !eq(y, R[I[k]].back().y)) k++;
@@ -339,4 +340,23 @@ void solve() {
 	while (query());
 	return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj13816
+
+/*
+* 
+10
+1 9998
+0 0
+1 9999
+2 0
+3 9999
+4 0
+5 10000
+4 1
+3 10000
+2 1
+1 10000
+ans 1.4999749962
+ret 2.500075061
+
+*/
