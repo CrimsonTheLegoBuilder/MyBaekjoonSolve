@@ -148,7 +148,7 @@ ld largest(Polygon H, const ld& x) {
 			//if (sign(y - h) > 0) { F.push_back(a); break; }
 			if (eq(y, h)) { F.push_back(a); break; }
 			while (k < lt && !eq(y, L[I[k]][0].y)) k++;
-			if (k >= I.size()) break;
+			if (k >= I.size()) { F.push_back(a); break; }
 			if (A[I[k]] > 0) { F.push_back(a); break; }
 			if (A[I[k]] < 0) a += A[I[k]];
 			yi = find_y(Y, L[I[k]].back().y);
@@ -186,7 +186,7 @@ ld largest(Polygon H, const ld& x) {
 			//if (sign(y - h) > 0) { F.push_back(a); break; }
 			if (eq(y, h)) { F.push_back(a); break; }
 			while (k < rt && !eq(y, R[I[k]].back().y)) k++;
-			if (k >= I.size()) break;
+			if (k >= I.size()) { F.push_back(a); break; }
 			if (A[I[k]] > 0) { F.push_back(a); break; }
 			if (A[I[k]] < 0) a += A[I[k]];
 			yi = find_y(Y, R[I[k]][0].y);
