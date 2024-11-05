@@ -327,7 +327,7 @@ bool query() {
 	ld t = v.rad();
 	t = norm(PI * .5 - t);
 	Polygon H(N);
-	for (Pos& p : H) std::cin >> p, p = p.rot(-t);
+	for (Pos& p : H) std::cin >> p, p = p.rot(t);
 	std::cout << ternary_search(H) * .5 << "\n";
 	return 1;
 }
