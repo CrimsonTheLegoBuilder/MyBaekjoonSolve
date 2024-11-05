@@ -308,7 +308,7 @@ ld ternary_search(const Polygon& H) {
 	assert(H.size() >= 3);
 	ld s = INF, e = -INF;
 	for (const Pos& p : H) s = std::min(s, p.x), e = std::max(e, p.x);
-	int cnt = 50; while (cnt--) {
+	int cnt = 100; while (cnt--) {
 		ld m1 = (s + s + e) / 3;
 		ld m2 = (s + e + e) / 3;
 		ld a1 = largest(H, m1);
