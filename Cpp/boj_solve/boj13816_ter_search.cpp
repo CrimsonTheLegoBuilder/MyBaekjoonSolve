@@ -124,7 +124,7 @@ ld largest(Polygon H, const ld& x) {
 			//if (rl == LEFT) L[lt++] = tmp;
 			//else if (rl == RIGHT) R[rt++] = tmp;
 			//std::cout << tmp.size();
-			if (tmp[1].x < x) L[rt++] = tmp;
+			if (tmp[1].x < x) L[lt++] = tmp;
 			else if (tmp[1].x > x) R[rt++] = tmp;
 			tmp.clear();
 			tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
@@ -134,9 +134,9 @@ ld largest(Polygon H, const ld& x) {
 		else if (eq(H[i].x, x)) {
 			tmp.push_back(H[i]);
 			//std::cout << tmp.size();
-			//if (rl == LEFT) L[rt++] = tmp;
+			//if (rl == LEFT) L[lt++] = tmp;
 			//else if (rl == RIGHT) R[rt++] = tmp;
-			if (tmp[1].x < x) L[rt++] = tmp;
+			if (tmp[1].x < x) L[lt++] = tmp;
 			else if (tmp[1].x > x) R[rt++] = tmp;
 			if (eq(H[(i + 1) % sz].x, x)) _++, i = (i + 1) % sz;
 			tmp.clear();
@@ -164,9 +164,10 @@ ld largest(Polygon H, const ld& x) {
 		if (A[i] < 0) Y.push_back(L[i][0].y);
 	}
 	std::sort(Y.begin(), Y.end());
-			std::cout << "DEBUG::\n";
+	//std::cout << "sz:: " << sz << " lt:: " << lt << " rt:: "<< rt << " Y:: " << Y.size() << " I:: " << I.size() << "\n";
+			//std::cout << "DEBUG::\n";
 	for (int j = 0; j < lt; j++) {
-			std::cout << "DEBUG::\n";
+			//std::cout << "DEBUG::\n";
 		i = I[j];
 		if (A[i] < 0) continue;
 		assert(L[i].back().y < L[i][0].y);
@@ -203,15 +204,15 @@ ld largest(Polygon H, const ld& x) {
 	for (int j = 0; j < rt; j++) {
 		i = I[j];
 		if (A[i] < 0) continue;
-		std::cout << "FUCK:: " << R[i].back().y << " " <<  R[i][0].y << "\n";
-		for (Pos& p : R[i]) std::cout << p << "\n";
+		//std::cout << "FUCK:: " << R[i].back().y << " " <<  R[i][0].y << "\n";
+		//for (Pos& p : R[i]) std::cout << p << "\n";
 		assert(R[i].back().y > R[i][0].y);
 		ld a = A[i];
 		ld h = R[i].back().y;
 		int yi = find_y(Y, R[i][0].y);
 		int k = j + 1;
 		while (1) {
-			std::cout << "yi:: " << yi << "\n";
+			//std::cout << "yi:: " << yi << "\n";
 			if (yi == -1) { F.push_back(a); break; }
 			ld y = Y[yi];
 			if (eq(y, h)) { F.push_back(a); break; }
