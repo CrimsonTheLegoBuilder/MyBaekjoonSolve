@@ -12,7 +12,7 @@ typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
-const ld TOL = 1e-4;
+const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 105;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -25,14 +25,20 @@ inline ld norm(ld th) {
 	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
 	return th;
 }
-ld find_y(const Vld& Y, const ld& y) {
-	int s = 0, e = Y.size() - 1, m = -1;
-	while (s < e) {
-		m = (s + e) >> 1;
-		if (sign(y - Y[m]) > 0) s = m + 1;
-		else e = m;
+int find_y(const Vld& Y, const ld& y) {
+	//int s = 0, e = Y.size() - 1, m = 0;
+	//while (s < e) {
+	//	m = (s + e) >> 1;
+	//	if (sign(y - Y[m]) > 0) s = m + 1;
+	//	else e = m;
+	//}
+	//return s;
+	for (int i = 0; i < Y.size(); i++) {
+		if (i == 0 && y < Y[i]) return i;
+		if (eq(Y[i], y)) return i;
+		else if (between(Y[i], Y[i + 1], y)) return i + 1;
 	}
-	return m;
+	return Y.size();
 }
 
 #define RIGHT 1
@@ -105,8 +111,6 @@ ld largest(Polygon H, const ld& x) {
 	if (!eq(H[i].x, x)) {
 		tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
 		i = (i + 1) % sz;
-		//rl = ccw(s, e, H[i]) > 0 ? LEFT : RIGHT;
-		rl = H[i].x < 0 ? LEFT : RIGHT;
 	}
 	else if (eq(H[i].x, x)) {
 		if (eq(H[(i + 1) % sz].x, x)) {
@@ -114,41 +118,29 @@ ld largest(Polygon H, const ld& x) {
 		}
 		tmp.push_back(H[i]);
 		i = (i + 1) % sz;
-		//rl = ccw(s, e, H[i]) > 0 ? LEFT : RIGHT;
-		rl = H[i].x < 0 ? LEFT : RIGHT;
 	}
 	for (int _ = 0; _ < sz; _++, i = (i + 1) % sz) {
 		if (between(H[i].x, H[(i + 1) % sz].x, x)) {
 			tmp.push_back(H[i]);
 			tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
-			//if (rl == LEFT) L[lt++] = tmp;
-			//else if (rl == RIGHT) R[rt++] = tmp;
-			//std::cout << tmp.size();
 			if (tmp[1].x < x) L[lt++] = tmp;
 			else if (tmp[1].x > x) R[rt++] = tmp;
 			tmp.clear();
 			tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
-			//rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
-			rl = H[(i + 1) % sz].x < x ? LEFT : RIGHT;
 		}
 		else if (eq(H[i].x, x)) {
 			tmp.push_back(H[i]);
-			//std::cout << tmp.size();
-			//if (rl == LEFT) L[lt++] = tmp;
-			//else if (rl == RIGHT) R[rt++] = tmp;
 			if (tmp[1].x < x) L[lt++] = tmp;
 			else if (tmp[1].x > x) R[rt++] = tmp;
 			if (eq(H[(i + 1) % sz].x, x)) _++, i = (i + 1) % sz;
 			tmp.clear();
 			tmp.push_back(H[i]);
-			//rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
-			rl = H[(i + 1) % sz].x < x ? LEFT : RIGHT;
 		}
 		else tmp.push_back(H[i]);
 	}
 
 	//std::cout << "DEBUG:: \n";
-	std::cout << "x:: " << x << "\n";
+	//std::cout << "x:: " << x << "\n";
 	//std::cout << "L:: \n";
 	//for (int j = 0; j < lt; j++) {
 	//	std::cout << "L[" << j << "]\n";
@@ -175,31 +167,35 @@ ld largest(Polygon H, const ld& x) {
 	for (int j = 0; j < lt; j++) {
 		i = I[j];
 		A[i] = area(L[i]);
-		if (A[i] < 0) Y.push_back(L[i][0].y);
+		Y.push_back(L[i][0].y);
 	}
 	std::sort(Y.begin(), Y.end());
-	//std::cout << "sz:: " << sz << " lt:: " << lt << " rt:: "<< rt << " Y:: " << Y.size() << " I:: " << I.size() << "\n";
-			//std::cout << "DEBUG::\n";
+	//std::cout << "DEBUG:: \n";
+	//std::cout << "L:: \n";
+	//for (int j = 0; j < lt; j++) {
+	//	std::cout << "L[" << I[j] << "]\n";
+	//	for (const Pos& p : L[I[j]]) std::cout << " (" << p.x << ", " << p.y << "),\n";
+	//}
+	//std::cout << "DEBUG:: \n";
 	for (int j = 0; j < lt; j++) {
-			//std::cout << "DEBUG::\n";
 		i = I[j];
 		if (A[i] < 0) continue;
-		assert(L[i].back().y < L[i][0].y);
 		ld h = L[i][0].y;
 		ld a = A[i];
 		int yi = find_y(Y, L[i].back().y);
 		int k = j + 1;
 		while (1) {
-			std::cout << "yi:: " << yi << "\n";
-			if (yi <= 0) { F.push_back(a); break; }
 			ld y = Y[yi];
+			//std::cout << "FUCK:: L " << lt << " " << j << " " << k << " " << h << " " << y << " " << Y[yi] << "\n";
 			if (eq(y, h)) { F.push_back(a); break; }
 			while (k < lt && !eq(y, L[I[k]][0].y)) k++;
-			assert(A[I[k]] < 0);
+			//if (k >= I.size()) k--;
+			//assert(A[I[k]] < 0);
 			a += A[I[k]];
 			yi = find_y(Y, L[I[k]].back().y);
 		}
 	}
+	Y.clear();
 	I.resize(rt);
 	for (int j = 0; j < rt; j++) I[j] = j;
 	std::sort(I.begin(), I.end(), [&](const int& p, const int& q) -> bool {
@@ -213,108 +209,40 @@ ld largest(Polygon H, const ld& x) {
 	for (int j = 0; j < rt; j++) {
 		i = I[j];
 		A[i] = area(R[i]);
-		if (A[i] < 0) Y.push_back(R[i].back().y);
+		Y.push_back(R[i].back().y);
 	}
 	std::sort(Y.begin(), Y.end());
 	for (int j = 0; j < rt; j++) {
 		i = I[j];
 		if (A[i] < 0) continue;
-		//std::cout << "FUCK:: " << R[i].back().y << " " <<  R[i][0].y << "\n";
-		//for (Pos& p : R[i]) std::cout << p << "\n";
-		assert(R[i].back().y > R[i][0].y);
 		ld a = A[i];
 		ld h = R[i].back().y;
 		int yi = find_y(Y, R[i][0].y);
 		int k = j + 1;
 		while (1) {
-			std::cout << "yi:: " << yi << "\n";
-			if (yi <= 0) { F.push_back(a); break; }
+			//std::cout << "FUCK:: R \n";
+			//if (yi <= 0) { F.push_back(a); break; }
 			ld y = Y[yi];
 			if (eq(y, h)) { F.push_back(a); break; }
 			while (k < rt && !eq(y, R[I[k]].back().y)) k++;
-			assert(A[I[k]] < 0);
+			if (k >= I.size()) k--;
 			a += A[I[k]];
 			yi = find_y(Y, R[I[k]][0].y);
 		}
 	}
 	std::sort(F.rbegin(), F.rend());
-	//std::cout << "DEBUG:: \n";
-	//for (int j = 0; j < F.size(); j++) {
-	//	std::cout << "F[" << j << "]:: " << F[j] << "\n";
-	//}
-	//std::cout << "DEBUG:: \n";
-
 	return F[0];
-	//Vld F, A, Y;
-	//Vint I;
-	//std::sort(L, L + lt, [&](const Polygon& P, const Polygon& Q) -> bool {
-	//	ld py = P[0].y < P.back().y ? P[0].y :P.back().y;
-	//	ld qy = Q[0].y < Q.back().y ? Q[0].y :Q.back().y;
-	//	return py < qy;
-	//	});
-	//A.resize(lt, 0);
-	//for (int j = 0; j < lt; j++) {
-	//	A[j] = area(L[j]);
-	//	if (A[j] < 0) Y.push_back(L[j][0].y);
-	//}
-	//std::sort(Y.begin(), Y.end());
-	//for (int j = 0; j < lt; j++) {
-	//	if (A[j] < 0) continue;
-	//	assert(L[j].back().y < L[j][0].y);
-	//	ld h = L[j][0].y;
-	//	ld a = A[j];
-	//	int yi = find_y(Y, L[j].back().y);
-	//	int k = j + 1;
-	//	while (1) {
-	//		ld y = Y[yi];
-	//		if (eq(y, h)) { F.push_back(a); break; }
-	//		while (k < lt && !eq(y, L[k][0].y)) k++;
-	//		assert(A[k] < 0);
-	//		a += A[k];
-	//		yi = find_y(Y, L[k].back().y);
-	//	}
-	//}
-	//std::sort(R, R + rt, [&](const Polygon& P, const Polygon& Q) -> bool {
-	//	ld py = P[0].y < P.back().y ? P[0].y : P.back().y;
-	//	ld qy = Q[0].y < Q.back().y ? Q[0].y : Q.back().y;
-	//	return py < qy;
-	//	});
-	//A.resize(rt, 0);
-	//Y.clear();
-	//for (int j = 0; j < rt; j++) {
-	//	A[j] = area(R[j]);
-	//	if (A[j] < 0) Y.push_back(R[j].back().y);
-	//}
-	//std::sort(Y.begin(), Y.end());
-	//for (int j = 0; j < rt; j++) {
-	//	if (A[j] < 0) continue;
-	//	assert(R[j].back().y > R[j][0].y);
-	//	ld h = R[j].back().y;
-	//	ld a = A[j];
-	//	int yi = find_y(Y, R[j][0].y);
-	//	int k = j + 1;
-	//	while (1) {
-	//		ld y = Y[yi];
-	//		if (eq(y, h)) { F.push_back(a); break; }
-	//		while (k < rt && !eq(y, R[k].back().y)) k++;
-	//		assert(A[k] < 0);
-	//		a += A[k];
-	//		yi = find_y(Y, R[k][0].y);
-	//	}
-	//}
-	//std::sort(F.rbegin(), F.rend());
-	//return F[0];
 }
 ld ternary_search(const Polygon& H) {
 	assert(H.size() >= 3);
 	ld s = INF, e = -INF;
 	for (const Pos& p : H) s = std::min(s, p.x), e = std::max(e, p.x);
-	int cnt = 100; while (cnt--) {
+	int cnt = 150; while (cnt--) {
 		ld m1 = (s + s + e) / 3;
 		ld m2 = (s + e + e) / 3;
 		ld a1 = largest(H, m1);
 		ld a2 = largest(H, m2);
-		std::cout << "a1a2:: " << a1 << " " << a2 << "\n";
+		//std::cout << "a1a2:: " << a1 << " " << a2 << "\n";
 		if (a1 > a2) s = m1;
 		else e = m2;
 	}
@@ -338,10 +266,12 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
+	//freopen("../../../input_data/cave.txt", "r", stdin);
+	//freopen("../../../input_data/cave.ret", "w", stdout);
 	while (query());
 	return;
 }
-int main() { solve(); return 0; }//boj13816
+int main() { solve(); return 0; }//boj13816 Cave Explorer
 
 /*
 * 
@@ -361,3 +291,192 @@ ans 1.4999749962
 ret 2.500075061
 
 */
+
+//ld largest(Polygon H, const ld& x) {
+//	Pos s = Pos(x, -1), e = Pos(x, 1);
+//	ld ret = 0;
+//	int i, sz = H.size();
+//	for (i = 0; i < sz; i++) if (eq(H[i].x, x) || between(H[i].x, H[(i + 1) % sz].x, x)) break;
+//	rt = lt = 0;
+//	Polygon tmp;
+//	bool f = 1;
+//	int rl = LEFT;
+//	if (!eq(H[i].x, x)) {
+//		tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
+//		i = (i + 1) % sz;
+//		//rl = ccw(s, e, H[i]) > 0 ? LEFT : RIGHT;
+//		rl = H[i].x < 0 ? LEFT : RIGHT;
+//	}
+//	else if (eq(H[i].x, x)) {
+//		if (eq(H[(i + 1) % sz].x, x)) {
+//			i = (i + 1) % sz;
+//		}
+//		tmp.push_back(H[i]);
+//		i = (i + 1) % sz;
+//		//rl = ccw(s, e, H[i]) > 0 ? LEFT : RIGHT;
+//		rl = H[i].x < 0 ? LEFT : RIGHT;
+//	}
+//	for (int _ = 0; _ < sz; _++, i = (i + 1) % sz) {
+//		if (between(H[i].x, H[(i + 1) % sz].x, x)) {
+//			tmp.push_back(H[i]);
+//			tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
+//			//if (rl == LEFT) L[lt++] = tmp;
+//			//else if (rl == RIGHT) R[rt++] = tmp;
+//			//std::cout << tmp.size();
+//			if (tmp[1].x < x) L[lt++] = tmp;
+//			else if (tmp[1].x > x) R[rt++] = tmp;
+//			tmp.clear();
+//			tmp.push_back(intersection(s, e, H[i], H[(i + 1) % sz]));
+//			//rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
+//			rl = H[(i + 1) % sz].x < x ? LEFT : RIGHT;
+//		}
+//		else if (eq(H[i].x, x)) {
+//			tmp.push_back(H[i]);
+//			//std::cout << tmp.size();
+//			//if (rl == LEFT) L[lt++] = tmp;
+//			//else if (rl == RIGHT) R[rt++] = tmp;
+//			if (tmp[1].x < x) L[lt++] = tmp;
+//			else if (tmp[1].x > x) R[rt++] = tmp;
+//			if (eq(H[(i + 1) % sz].x, x)) _++, i = (i + 1) % sz;
+//			tmp.clear();
+//			tmp.push_back(H[i]);
+//			//rl = ccw(s, e, H[(i + 1) % sz]) > 0 ? LEFT : RIGHT;
+//			rl = H[(i + 1) % sz].x < x ? LEFT : RIGHT;
+//		}
+//		else tmp.push_back(H[i]);
+//	}
+//
+//	//std::cout << "DEBUG:: \n";
+//	//std::cout << "x:: " << x << "\n";
+//	//std::cout << "L:: \n";
+//	//for (int j = 0; j < lt; j++) {
+//	//	std::cout << "L[" << j << "]\n";
+//	//	for (const Pos& p : L[j]) std::cout << " (" << p.x << ", " << p.y << "),\n";
+//	//}
+//	//for (int j = 0; j < rt; j++) {
+//	//	std::cout << "R[" << j << "]\n";
+//	//	for (const Pos& p : R[j]) std::cout << " (" << p.x << ", " << p.y << "),\n";
+//	//}
+//	//std::cout << "DEBUG:: \n";
+//
+//	Vld F, A, Y;
+//	Vint I;
+//	I.resize(lt);
+//	for (int j = 0; j < lt; j++) I[j] = j;
+//	std::sort(I.begin(), I.end(), [&](const int& p, const int& q) -> bool {
+//		const Polygon& P = L[p];
+//		const Polygon& Q = L[q];
+//		ld py = P[0].y < P.back().y ? P[0].y : P.back().y;
+//		ld qy = Q[0].y < Q.back().y ? Q[0].y : Q.back().y;
+//		return py < qy;
+//		});
+//	//std::cout << "DEBUG:: \n";
+//	//std::cout << "L:: \n";
+//	//for (int j = 0; j < lt; j++) {
+//	//	std::cout << "L[" << I[j] << "]\n";
+//	//	for (const Pos& p : L[I[j]]) std::cout << " (" << p.x << ", " << p.y << "),\n";
+//	//}
+//	//std::cout << "DEBUG:: \n";
+//	A.resize(lt, 0);
+//	for (int j = 0; j < lt; j++) {
+//		i = I[j];
+//		A[i] = area(L[i]);
+//		Y.push_back(L[i][0].y);
+//	}
+//	std::sort(Y.begin(), Y.end());
+//	//std::cout << "Y::\n";
+//	//for (const ld& y : Y) std::cout << y << "\n";
+//	//std::cout << "Y::\n";
+//	//std::cout << "sz:: " << sz << " lt:: " << lt << " rt:: "<< rt << " Y:: " << Y.size() << " I:: " << I.size() << "\n";
+//			//std::cout << "DEBUG::\n";
+//	for (int j = 0; j < lt; j++) {
+//			//std::cout << "DEBUG::\n";
+//		i = I[j];
+//		//std::cout << "DEBUG:: A[" << I[j] << "] :: " << A[I[j]] << "\n";
+//		if (A[i] < 0) continue;
+//		//assert(L[i].back().y <= L[i][0].y);
+//		ld h = L[i][0].y;
+//		ld a = A[i];
+//		int yi = find_y(Y, L[i].back().y);
+//		int k = j + 1;
+//		while (1) {
+//			//std::cout << "yi:: " << yi << "\n";
+//			//std::cout << "Y:: " << Y.size() << "\n";
+//			if (yi <= 0) { F.push_back(a); break; }
+//			ld y = Y[yi];
+//			//std::cout << y << " " << h << "\n";
+//			if (eq(y, h)) { F.push_back(a); break; }
+//			while (k < lt && !eq(y, L[I[k]][0].y)) k++;
+//			//std::cout << "k:: " << k << "\n";
+//			if (k >= I.size()) k--;
+//			//assert(A[I[k]] < 0);
+//			a += A[I[k]];
+//			yi = find_y(Y, L[I[k]].back().y);
+//		}
+//	}
+//	std::cout << "DEBUG:: \n";
+//	std::cout << "R:: \n";
+//	for (int j = 0; j < lt; j++) {
+//		std::cout << "R[" << I[j] << "]\n";
+//		for (const Pos& p : R[I[j]]) std::cout << " (" << p.x << ", " << p.y << "),\n";
+//	}
+//	std::cout << "DEBUG:: \n";
+//	Y.clear();
+//	I.resize(rt);
+//	for (int j = 0; j < rt; j++) I[j] = j;
+//	std::sort(I.begin(), I.end(), [&](const int& p, const int& q) -> bool {
+//		const Polygon& P = R[p];
+//		const Polygon& Q = R[q];
+//		ld py = P[0].y < P.back().y ? P[0].y : P.back().y;
+//		ld qy = Q[0].y < Q.back().y ? Q[0].y : Q.back().y;
+//		return py < qy;
+//		});
+//	A.resize(rt, 0);
+//	for (int j = 0; j < rt; j++) {
+//		i = I[j];
+//		A[i] = area(R[i]);
+//		Y.push_back(R[i].back().y);
+//	}
+//	std::sort(Y.begin(), Y.end());
+//	//std::cout << "Y::\n";
+//	//for (const ld& y : Y) std::cout << y << "\n";
+//	//std::cout << "Y::\n";
+//	for (int j = 0; j < rt; j++) {
+//		i = I[j];
+//		//std::cout << "DEBUG:: A[" << I[j] << "] :: " << A[I[j]] << "\n";
+//		if (A[i] < 0) continue;
+//		//std::cout << "FUCK:: " << R[i].back().y << " " <<  R[i][0].y << "\n";
+//		//for (Pos& p : R[i]) std::cout << p << "\n";
+//		//assert(R[i].back().y >= R[i][0].y);
+//		ld a = A[i];
+//		ld h = R[i].back().y;
+//		int yi = find_y(Y, R[i][0].y);
+//		//std::cout << "start y:: " << R[i][0].y << "\n";
+//		//std::cout << "start yi:: " << yi << "\n";
+//		//std::cout << "start yy:: " << Y[yi] << "\n";
+//		//std::cout << "start h:: " << h << "\n";
+//		int k = j + 1;
+//		while (1) {
+//			std::cout << "yi:: " << yi << "\n";
+//			if (yi <= 0) { F.push_back(a); break; }
+//			ld y = Y[yi];
+//			std::cout << y << " " << h << "\n";
+//			if (eq(y, h)) { F.push_back(a); break; }
+//			while (k < rt && !eq(y, R[I[k]].back().y)) k++;
+//			std::cout << "A:: " << A.size() << "\n";
+//			std::cout << "I:: " << I.size() << "\n";
+//			std::cout << "k:: " << k << "\n";
+//			if (k >= I.size()) k--;
+//			//assert(A[I[k]] < 0);
+//			a += A[I[k]];
+//			yi = find_y(Y, R[I[k]][0].y);
+//		}
+//	}
+//	std::sort(F.rbegin(), F.rend());
+//	//std::cout << "DEBUG:: \n";
+//	//for (int j = 0; j < F.size(); j++) {
+//	//	std::cout << "F[" << j << "]:: " << F[j] << "\n";
+//	//}
+//	//std::cout << "DEBUG:: \n";
+//	return F[0];
+//}
