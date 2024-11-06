@@ -94,6 +94,7 @@ void solve() {
 	for (int i = 0; i < N; i++)
 		for (int j = 0; j <= M; j++)
 			C[i][j] = INF;
+	for (int i = 0; i <= N; i++) std::sort(G[i].rbegin(), G[i].rend());
 	for (int j = 0; j <= M; j++) C[N - 1][j] = P[N - 1].c;
 	dijkstra(N - 1, P[N - 1]);
 	ld ret = INF;
