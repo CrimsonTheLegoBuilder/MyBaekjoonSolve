@@ -46,17 +46,17 @@ void dijkstra(const int& s, const Pos& v) {
 	Q.push(Info(s, v.c, 0));
 	while (!Q.empty()) {
 		Info p = Q.top(); Q.pop();
-		if (p.i == 0) continue;//fin
-		if (p.d > C[p.i][p.c]) continue;
+		if (p.i == 0) continue;//도착하면 더 이상 갈 필요 없음
+		if (p.d > C[p.i][p.c]) continue;//거리가 더 커도 갈 필요 없음
 		for (const Info& w : G[p.i]) {
 			int c = p.c + w.c;
 			ld d = p.d + w.d;
-			if (c > M) continue;
-			if (C[w.i][c] > d) {
-				C[w.i][c] = d;
-				for (int j = c + 1; j <= M; j++) {
-					if (C[w.i][j] < d) break;
-					C[w.i][j] = d;
+			if (c > M) continue;//carl의 체력이 고갈
+			if (C[w.i][c] > d) {//해당 체력으로 도착했을 때 더 짧은 거리로 이동할 수 있을 경우
+				C[w.i][c] = d;//거리를 갱신
+				for (int j = c + 1; j <= M; j++) {//보다 더 체력을 소모할 때
+					if (C[w.i][j] < d) break;//소비한 스테미너가 더 많은데 거리는 짧을 때 break
+					C[w.i][j] = d;//거리를 갱신
 				}
 				Q.push(Info(w.i, c, d));
 			}
@@ -75,7 +75,7 @@ void solve() {
 	for (int i = 0; i < H; i++) {
 		std::cin >> B[i];
 		for (int j = 0; j < W; j++) {
-			if (B[i][j] != '.') P.push_back(Pos(i, j, B[i][j] - '0'));
+			if (B[i][j] != '.') P.push_back(Pos(i, j, B[i][j] - '0'));//정점 수집
 		}
 	}
 	N = P.size();
@@ -86,16 +86,16 @@ void solve() {
 			int D = (p - q).Euc();
 			if (D <= R) {
 				ld d = (p - q).mag();
-				G[i].push_back(Info(j, q.c, d));
-				G[j].push_back(Info(i, p.c, d));
+				G[i].push_back(Info(j, q.c, d));//그래프 구성
+				G[j].push_back(Info(i, p.c, d));//그래프 구성
 			}
 		}
 	}
 	for (int i = 0; i < N; i++)
 		for (int j = 0; j <= M; j++)
-			C[i][j] = INF;
-	for (int i = 0; i < N; i++) std::sort(G[i].rbegin(), G[i].rend());
-	for (int j = 0; j <= M; j++) C[N - 1][j] = P[N - 1].c;
+			C[i][j] = INF;//비용 초기화
+	for (int j = 0; j <= M; j++) C[N - 1][j] = P[N - 1].c;//이건 뭘까?
+	for (int i = 0; i < N; i++) std::sort(G[i].rbegin(), G[i].rend());//정렬을 왜 하지?
 	dijkstra(N - 1, P[N - 1]);
 	ld ret = INF;
 	for (int j = 0; j <= M; j++) ret = std::min(ret, C[0][j]);
