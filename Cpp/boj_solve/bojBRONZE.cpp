@@ -11,7 +11,7 @@ const int LEN = 1e6 + 1;
 int sq(int x) { return x * x; }
 ld sq(ld x) { return x * x; }
 
-int N, M[4];
+int N, M[100], T, D;
 
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -19,21 +19,11 @@ int main() {
 	std::cout << std::fixed;
 	std::cout.precision(7);
 	std::cin >> N;
-	while (N--) {
-		std::cin >> M[0] >> M[1] >> M[2] >> M[3];
-		std::sort(M, M + 4);
-		if (M[0] == 4) std::cout << "YES\n";
-		else if (M[3] == 3) std::cout << "YES\n";
-		else if (M[1] / 4) std::cout << "NO\n";
-		else if (M[2] / 4 && M[3] / 4) {
-			M[2] %= 4;
-			M[3] %= 4;
-			if (M[0] + M[1] == 3) std::cout << "NO\n";
-			else if (M[2] + M[3] == 3) std::cout << "NO\n";
-			else if (M[0] == M[2] && M[1] == M[3]) std::cout << "YES\n";
-			else std::cout << "NO\n";
-		}
-		else std::cout << "NO\n";
+	int s = 5;
+	for (int i = 2; i <= N; i++) {
+		s = s + i * 3 + 1;
+		s %= 45678;
 	}
+	std::cout << s << "\n";
 	return 0;
 }

@@ -1467,10 +1467,10 @@
     <ClCompile Include="boj10473_dijk.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj13816_ter_search.cpp">
+    <ClCompile Include="boj15332_cnvx.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj15332_cnvx.cpp">
+    <ClCompile Include="boj13816_ter_search_fucking.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
