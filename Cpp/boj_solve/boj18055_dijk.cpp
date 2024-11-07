@@ -9,10 +9,8 @@
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
-typedef std::vector<int> Vint;
-typedef std::vector<ld> Vld;
 const ll INF = 1e17;
-const int LEN = 101;
+const int LEN = 26;
 const ld TOL = 1e-7;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -24,13 +22,11 @@ char B[LEN][LEN];
 struct Pos {
 	int x, y;
 	int c;
-	Pos(int X = 0, int Y = 0, int C = 0) : x(X), y(Y), c(C) {}
+	Pos(int x_ = 0, int y_ = 0, int c_ = 0) : x(x_), y(y_), c(c_) {}
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	int Euc() const { return sq(x) + sq(y); }
 	ld mag() const { return hypot(x, y); }
-	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
-	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 struct Info {
@@ -91,11 +87,9 @@ void solve() {
 			}
 		}
 	}
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N - 1; i++)
 		for (int j = 0; j <= M; j++)
 			C[i][j] = INF;//비용 초기화
-	for (int j = 0; j <= M; j++) C[N - 1][j] = P[N - 1].c;//이건 뭘까?
-	for (int i = 0; i < N; i++) std::sort(G[i].rbegin(), G[i].rend());//정렬을 왜 하지?
 	dijkstra(N - 1, P[N - 1]);
 	ld ret = INF;
 	for (int j = 0; j <= M; j++) ret = std::min(ret, C[0][j]);
@@ -103,4 +97,4 @@ void solve() {
 	else std::cout << ret << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj18055
+int main() { solve(); return 0; }//boj18055 jay202의 코드를 참고했음
