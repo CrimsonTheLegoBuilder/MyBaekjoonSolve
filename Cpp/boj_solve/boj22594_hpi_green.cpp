@@ -140,6 +140,7 @@ Planes make_hp(const Polygon& H) {
 	return V;
 }
 ld expect(const Pos& p, const Pos& a, const Pos& b) {
+	//https://drken1215.hatenablog.com/entry/2020/10/15/061200
 	Pos h = projection(a, b, p);
 	ld h_ = (p - h).mag(), a_ = (a - h).mag(), b_ = (b - h).mag();
 	if (on_seg_strong(a, b, h)) a_ *= -1;
