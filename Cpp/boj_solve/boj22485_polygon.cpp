@@ -15,6 +15,7 @@ typedef long long ll;
 typedef double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
+typedef std::vector<bool> Vbool;
 const ll INF = 1e17;
 const int LEN = 105;
 const ld TOL = 1e-25;
@@ -45,9 +46,12 @@ struct BigPos {//what the fuck??? holy shit fucking floating point accuracy erro
 	friend std::ostream& operator << (std::ostream& os, const BigPos& p) { os << "(" << p.x << ", " << p.y << ")"; return os; }
 } C[LEN]; const BigPos BO = { 0, 0, 1 }; const BigPos BINVAL = { 0, 0, 0 };
 ll cross(const BigPos& d1, const BigPos& d2, const BigPos& d3) { return (d2 - d1) / (d3 - d2); }
+ll cross(const BigPos& d1, const BigPos& d2, const BigPos& d3, const BigPos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const BigPos& d1, const BigPos& d2, const BigPos& d3) { return (d2 - d1) * (d3 - d2); }
 int ccw(const BigPos& d1, const BigPos& d2, const BigPos& d3) { ll ret = cross(d1, d2, d3); return sign(ret); }
+int ccw(const BigPos& d1, const BigPos& d2, const BigPos& d3, const BigPos& d4) { ll ret = cross(d1, d2, d3, d4); return sign(ret); }
 bool on_seg_strong(const BigPos& d1, const BigPos& d2, const BigPos& d3) { return !ccw(d1, d2, d3) && dot(d1, d3, d2) >= 0; }
+bool collinear(const BigPos& d1, const BigPos& d2, const BigPos& d3, const BigPos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 bool intersect(const BigPos& s1, const BigPos& s2, const BigPos& d1, const BigPos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
@@ -72,6 +76,15 @@ BigPos intersection(const BigPos& p1, const BigPos& p2, const BigPos& q1, const 
 }
 struct BigSeg {
 	BigPos a, b;
+	bool operator < (const BigSeg& s) const {
+		ll tq;
+		if (tq = ccw(a, b, s.a, s.b)) return tq > 0;
+		if (collinear(a, b, s.a, s.b)) {
+			if (a == s.a) return b < s.b;
+			return a < s.a;
+		}
+		return ccw(a, b, s.a) > 0;
+	}
 	friend std::istream& operator >> (std::istream& is, BigSeg& s) { is >> s.a >> s.b; return is; }
 } B[LEN];
 BigPos intersection(const BigSeg& s1, const BigSeg& s2) {
@@ -212,6 +225,7 @@ void solve() {
 	for (int i = 0; i < N; i++) std::cin >> C[i];
 	for (int i = 0; i < N - 1; i++) {
 		BigPos a = C[i], b = C[i + 1];
+		if (b < a) std::swap(a, b);
 		B[i] = { a, b };
 		B[i].a.den = B[i].b.den = 1;
 		seg[i].a = conv(B[i].a);
@@ -221,6 +235,13 @@ void solve() {
 		seg[i].b.i = i;
 	}
 	N--;
+	Vbool V(N, 1);
+	std::sort(B, B + N);
+	for (int i = 0; i < N; i++) {
+		for (int j = i + 1; j < N; j++) {
+			
+		}
+	}
 	Polygon INXS;
 	for (int i = 0; i < N; i++) {
 		for (int j = i + 1; j < N; j++) {
