@@ -11,8 +11,6 @@ typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
-#define right x
-#define left y
 const ld INF = 1e30;
 const int LEN = 1e5 + 1;
 const ld PI = acos(-1);
@@ -111,6 +109,7 @@ Pos inner_check_bi_search(const std::vector<Pos>& H, const Pos& p) {//convex
 		int i1 = -1, i2 = -1;
 		if (H[0] == p) i1 = 0;
 		if (H[1] == p) i2 = 1;
+		if (on_seg_strong(H[0], H[1], p)) i1 = 0, i2 = 1;
 		return Pos(i1, i2);
 	}
 	if (cross(H[0], H[1], p) < 0 || cross(H[0], H[sz - 1], p) > 0) return Pos(-1, -1);
@@ -217,10 +216,18 @@ void solve() {
 	Polygon C(M); for (Pos& p : C) std::cin >> p;
 	Polygon H = graham_scan(C);
 	int sz = H.size();
-	ld ans = INF;
 	if (sz == 1) { std::cout << "0.0000000000\n"; return; }
-	else if (sz == 2) {
+	Pos T = Pos(0, -1e9), B = Pos(0, 1e9);
+	Pos IN = Pos(sz + 1, sz + 1);
+	for (const Pos& p : H) {
+		if (p.y > T.y) T = p;
+		if (p.y < B.y) B = p;
+	}
+	ld ans = INF;
+	if (sz == 2) {
 		for (const Pos& p : P) {
+			if (p.y >= T.y) { ans = 0; break; }
+			if (p.y <= B.y) { ans = 0; break; }
 			for (const Pos& h : H) {
 				ld t1 = std::abs((h - p).rad());
 				ld t2 = PI - t1;
@@ -230,15 +237,9 @@ void solve() {
 		std::cout << ans << "\n";
 		return;
 	}
-	Pos T = Pos(0, -1e9), B = Pos(0, 1e9);
-	Pos IN = Pos(sz + 1, sz + 1);
-	for (const Pos& p : H) {
-		if (p.y > T.y) T = p;
-		if (p.y < B.y) B = p;
-	}
 	for (const Pos& p : P) {
-		if (p.y > T.y) { ans = 0; continue; }
-		if (p.y < B.y) { ans = 0; continue; }
+		if (p.y >= T.y) { ans = 0; break; }
+		if (p.y <= B.y) { ans = 0; break; }
 		Pos t = find_tangent_bi_search(H, p);
 		if (t == IN) continue;
 		const Pos& u = H[t.x], & v = H[t.y];
@@ -248,7 +249,8 @@ void solve() {
 			ans = std::min(ans, std::min(t1, t2));
 		}
 	}
-	std::cout << ans << "\n";
+	if (ans > 1e9) std::cout << "Impossible\n";
+	else std::cout << ans << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj22170
