@@ -35,6 +35,7 @@ struct BigPos {//what the fuck??? holy shit fucking floating point accuracy erro
 	bool operator == (const BigPos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const BigPos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const BigPos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator <= (const BigPos& p) const { return *this < p || *this == p; }
 	BigPos operator + (const BigPos& p) const { return { x + p.x, y + p.y }; }
 	BigPos operator - (const BigPos& p) const { return { x - p.x, y - p.y }; }
 	BigPos operator * (const ll& n) const { return { x * n, y * n }; }
@@ -91,6 +92,7 @@ BigPos intersection(const BigSeg& s1, const BigSeg& s2) {
 	if (!intersect(s1.a, s1.b, s2.a, s2.b)) return BINVAL;
 	return intersection(s1.a, s1.b, s2.a, s2.b);
 }
+bool collinear(const BigSeg& s1, const BigSeg& s2) { return collinear(s1.a, s1.b, s2.a, s2.b); }
 struct Pos {
 	ld x, y;
 	int i;
@@ -226,18 +228,41 @@ void solve() {
 		BigPos a = C[i], b = C[i + 1];
 		if (b < a) std::swap(a, b);
 		B[i] = { a, b };
+		//B[i].a.den = B[i].b.den = 1;
+		//seg[i].a = conv(B[i].a);
+		//seg[i].b = conv(B[i].b);
+		//seg[i].i = i;
+		//seg[i].a.i = i;
+		//seg[i].b.i = i;
+	}
+	N--;
+	Vbool F(N, 1);
+	std::sort(B, B + N);
+	for (int i = 0; i < N - 1; i++) {
+		if (collinear(B[i], B[i + 1])) {
+			if (B[i].b < B[i + 1].a) continue;
+			if (B[i].a == B[i + 1].a) F[i] = 0;
+			else if (B[i + 1].a <= B[i].b) {
+				F[i] = 0;
+				B[i + 1].a = std::min(B[i].a, B[i + 1].a);
+				B[i + 1].b = std::max(B[i].b, B[i + 1].b);
+			}
+		}
+	}
+	std::vector<BigSeg> tmp;
+	for (int i = 0; i < N; i++) if (F[i]) tmp.push_back(B[i]);
+	N = tmp.size();
+	for (int i = 0; i < N; i++) B[i] = tmp[i];
+	for (int i = 0; i < N; i++) {
+		//BigPos a = C[i], b = C[i + 1];
+		//if (b < a) std::swap(a, b);
+		//B[i] = { a, b };
 		B[i].a.den = B[i].b.den = 1;
 		seg[i].a = conv(B[i].a);
 		seg[i].b = conv(B[i].b);
 		seg[i].i = i;
 		seg[i].a.i = i;
 		seg[i].b.i = i;
-	}
-	N--;
-	Vbool F(N, 1);
-	std::sort(B, B + N);
-	for (int i = 0; i < N - 1; i++) {
-		if ()
 	}
 	Polygon INXS;
 	for (int i = 0; i < N; i++) {
