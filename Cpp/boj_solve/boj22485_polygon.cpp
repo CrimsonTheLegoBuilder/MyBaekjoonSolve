@@ -221,8 +221,8 @@ void solve() {
 		seg[i].b.i = i;
 	}
 	Polygon INXS;
-	for (int i = 0; i < M; i++) {
-		for (int j = i + 1; j < M; j++) {
+	for (int i = 0; i < N; i++) {
+		for (int j = i + 1; j < N; j++) {
 			BigPos inx = intersection(B[i], B[j]);
 			if (inx.den) {
 #ifdef DEBUG
@@ -242,7 +242,7 @@ void solve() {
 	std::sort(INXS.begin(), INXS.end());
 	INXS.erase(unique(INXS.begin(), INXS.end()), INXS.end());
 	I = 0;
-	for (int i = 0; i < M; i++) {
+	for (int i = 0; i < N; i++) {
 		inx_sort(INX[i], seg[i].a);
 		Polygon& v = INX[i];
 		int sz = v.size();
@@ -253,7 +253,7 @@ void solve() {
 		}
 	}
 	I0 = I;
-	for (int i = 0; i < M; i++) {
+	for (int i = 0; i < N; i++) {
 		Polygon& v = INX[i];
 		int sz = v.size();
 		for (int j = 0; j < sz - 1; j++) {
