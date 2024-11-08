@@ -138,11 +138,6 @@ ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 -
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { ld ret = cross(d1, d2, d3); return sign(ret); }
 bool cmpr(const Pos& p, const Pos& q) {
-	//bool f1 = O < p;
-	//bool f2 = O < q;
-	//if (f1 != f2) return f1;
-	//int tq = ccw(O, p, q);
-	//return !tq ? p.rv > q.rv : tq > 0;
 	ld tp = p.rad();
 	ld tq = q.rad();
 	return tp == tq ? p.rv > q.rv : tp < tq;
@@ -195,22 +190,11 @@ int I, I0;
 std::map<Pos, Polygon> map_pos;
 ld A[LEN * LEN + 10];
 Polygon cell[LEN * LEN + 10]; int ci;
-std::set<int> cell_i[LEN * LEN + 10];
-int P[LEN * LEN + 10];//disjoint set
-int find(int i) { return P[i] < 0 ? i : P[i] = find(P[i]); }
-bool join(int i, int j) {
-	i = find(i), j = find(j);
-	if (i == j) return 0;
-	if (P[i] < P[j]) P[i] += P[j], P[j] = i;
-	else P[j] += P[i], P[i] = j;
-	return 1;
-}
 int V[LEN * LEN * 10];
 Vint GS[LEN * LEN * 10];
 void dfs(const int& i, int v) {
 	V[v] = 1;
 	cell[i].push_back(frag[v].a);
-	cell_i[i].insert(v);
 	for (const int& w : GS[v]) {
 		if (V[w]) continue;
 		dfs(i, w);
@@ -228,12 +212,6 @@ void solve() {
 		BigPos a = C[i], b = C[i + 1];
 		if (b < a) std::swap(a, b);
 		B[i] = { a, b };
-		//B[i].a.den = B[i].b.den = 1;
-		//seg[i].a = conv(B[i].a);
-		//seg[i].b = conv(B[i].b);
-		//seg[i].i = i;
-		//seg[i].a.i = i;
-		//seg[i].b.i = i;
 	}
 	N--;
 	Vbool F(N, 1);
@@ -254,9 +232,6 @@ void solve() {
 	N = tmp.size();
 	for (int i = 0; i < N; i++) B[i] = tmp[i];
 	for (int i = 0; i < N; i++) {
-		//BigPos a = C[i], b = C[i + 1];
-		//if (b < a) std::swap(a, b);
-		//B[i] = { a, b };
 		B[i].a.den = B[i].b.den = 1;
 		seg[i].a = conv(B[i].a);
 		seg[i].b = conv(B[i].b);
@@ -350,7 +325,6 @@ void solve() {
 #endif
 			if (0 == A[ci]) {
 				cell[ci].clear();
-				cell_i[ci].clear();
 				A[ci] = 0;
 				ci--;
 			}
