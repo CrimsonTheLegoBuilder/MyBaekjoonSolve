@@ -15,12 +15,13 @@ typedef std::vector<ld> Vld;
 #define left y
 const ld INF = 1e30;
 const int LEN = 1e5 + 1;
+const ld PI = acos(-1);
 const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
 int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 bool zero(const ld& x) { return !sign(x); }
 
-int N, T;
+int N, M;
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -211,8 +212,23 @@ void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(8);
 	std::cin >> N;
-	Polygon H(N);
-	for (Pos& p : H) std::cin >> p;
+	Polygon P(N); for (Pos& p : P) std::cin >> p;
+	std::cin >> M;
+	Polygon C(M); for (Pos& p : C) std::cin >> p;
+	Polygon H = graham_scan(C);
+	int sz = H.size();
+	if (sz == 1) { std::cout << "0.00000000000000\n"; return; }
+	else if (sz == 2) {
+		for (const Pos& p : P) {
+			for (const Pos& h : H) {
+
+			}
+		}
+		return;
+	}
+	for (const Pos& p : P) {
+		Pos t = find_tangent_bi_search(H, p);
+	}
 
 	return;
 }
