@@ -315,7 +315,7 @@ void solve() {
 	}
 	ld ret = 0;
 	for (int i = 0; i < ci; i++) if (A[i] > 0) ret += A[i];
-	std::cout << ret << "\n";
+	std::cout << ret * .5 << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj22485 Area Folding
