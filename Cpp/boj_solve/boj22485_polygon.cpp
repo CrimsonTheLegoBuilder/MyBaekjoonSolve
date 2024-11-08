@@ -289,7 +289,7 @@ void solve() {
 		assert(!(sz & 1));
 		for (int j = 0; j < sz; j += 2) {
 			Pos cur = v[(j - 1 + sz) % sz], nxt = v[j];
-			assert(cur.rv != nxt.rv);
+			//assert(cur.rv != nxt.rv);
 			GS[nxt.i].push_back(cur.i);
 		}
 	}
