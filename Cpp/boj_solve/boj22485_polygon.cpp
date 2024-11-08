@@ -215,7 +215,6 @@ void dfs(const int& i, int v) {
 	}
 	return;
 }
-
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -235,12 +234,10 @@ void solve() {
 		seg[i].b.i = i;
 	}
 	N--;
-	Vbool V(N, 1);
+	Vbool F(N, 1);
 	std::sort(B, B + N);
-	for (int i = 0; i < N; i++) {
-		for (int j = i + 1; j < N; j++) {
-			
-		}
+	for (int i = 0; i < N - 1; i++) {
+		if ()
 	}
 	Polygon INXS;
 	for (int i = 0; i < N; i++) {
