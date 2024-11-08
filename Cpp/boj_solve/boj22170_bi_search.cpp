@@ -138,7 +138,7 @@ Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 	Pos IN = Pos(sz + 1, sz + 1);
 	Pos F = inner_check_bi_search(H, p);
 	//std::cout << "inner_bi:: " << F << "\n";
-	if (F == IN) return INVAL;
+	if (F == IN) return IN;
 	if (F != INVAL) return F;
 	int i1{ 0 }, i2{ 0 };
 	int ccw1 = ccw(p, H[0], H[1]), ccwN = ccw(p, H[0], H[sz - 1]);
@@ -210,26 +210,45 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(8);
+	std::cout.precision(10);
 	std::cin >> N;
 	Polygon P(N); for (Pos& p : P) std::cin >> p;
 	std::cin >> M;
 	Polygon C(M); for (Pos& p : C) std::cin >> p;
 	Polygon H = graham_scan(C);
 	int sz = H.size();
-	if (sz == 1) { std::cout << "0.00000000000000\n"; return; }
+	ld ans = INF;
+	if (sz == 1) { std::cout << "0.0000000000\n"; return; }
 	else if (sz == 2) {
 		for (const Pos& p : P) {
 			for (const Pos& h : H) {
-
+				ld t1 = std::abs((h - p).rad());
+				ld t2 = PI - t1;
+				ans = std::min(ans, std::min(t1, t2));
 			}
 		}
+		std::cout << ans << "\n";
 		return;
 	}
-	for (const Pos& p : P) {
-		Pos t = find_tangent_bi_search(H, p);
+	Pos T = Pos(0, -1e9), B = Pos(0, 1e9);
+	Pos IN = Pos(sz + 1, sz + 1);
+	for (const Pos& p : H) {
+		if (p.y > T.y) T = p;
+		if (p.y < B.y) B = p;
 	}
-
+	for (const Pos& p : P) {
+		if (p.y > T.y) { ans = 0; continue; }
+		if (p.y < B.y) { ans = 0; continue; }
+		Pos t = find_tangent_bi_search(H, p);
+		if (t == IN) continue;
+		const Pos& u = H[t.x], & v = H[t.y];
+		for (const Pos& q : { u, v }) {
+			ld t1 = std::abs((q - p).rad());
+			ld t2 = PI - t1;
+			ans = std::min(ans, std::min(t1, t2));
+		}
+	}
+	std::cout << ans << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj22170
