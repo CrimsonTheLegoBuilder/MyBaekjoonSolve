@@ -201,10 +201,6 @@ Pos find_tangent_bi_search(const Polygon& H, const Pos& p) {
 	if (ccw(p, H[i1], H[i2]) < 0) std::swap(i1, i2);
 	return Pos(i2, i1);
 }
-void query(const Polygon& H) {
-
-	return;
-}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
