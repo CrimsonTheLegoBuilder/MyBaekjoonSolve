@@ -131,20 +131,6 @@ Planes make_hp(const Polygon& H) {
 	for (int i = 0; i < sz; i++) V.push_back(Linear(H[i], H[(i + 1) % sz]));
 	return V;
 }
-Pos centroid(const Polygon& H) {
-	Pos cen = Pos(0, 0);
-	ld A = 0;
-	int sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		ld a = H[i] / H[(i + 1) % sz];
-		cen += (H[i] + H[(i + 1) % sz]) * a;
-		A += a;
-	}
-	A *= .5;
-	cen /= 6;
-	if (!zero(A)) cen /= A;
-	return cen;
-}
 struct Pos3D {
 	ld x, y, z;
 	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
@@ -172,7 +158,6 @@ struct Pos3D {
 	Pos3D norm(const Pos3D& p) const { return (*this / p).unit(); }
 	friend std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z; return os; }
-
 };
 const Pos3D O3D = { 0, 0, 0 };
 const Pos3D X_axis = { 1, 0, 0 };
@@ -198,7 +183,6 @@ struct Plane {
 	friend std::ostream& operator << (std::ostream& os, const Plane& f) { os << f.a << " " << f.b << " " << f.c << " " << f.d; return os; }
 } knife;
 typedef std::vector<Plane> Surfaces;
-int above(const Plane& S, const Pos3D& p) { return sign(p * S.norm() + S.d); }
 void update_sc(const Plane& p) {
 	ld angle1 = -atan2(p.b, p.a);
 	ld dx = sqrtl(p.a * p.a + p.b * p.b);
@@ -266,7 +250,6 @@ int intersection(const Plane& p1, const Plane& p2, Line3D& l) {
 	return 1;
 }
 int A_[LEN], B_[LEN], C_[LEN], D_[LEN];
-bool V[LEN];
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -305,7 +288,6 @@ void solve() {
 		Line3D l;
 		int f = 1;
 		Planes hp = B;
-		memset(V, 0, sizeof V);
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
 			f = intersection(S[i], S[j], l);
@@ -315,13 +297,11 @@ void solve() {
 			Pos s = convert(l.p0, v);
 			Pos e = convert(l.p0 + l.dir, v);
 			hp.push_back(Linear(s, e));
-			V[j] = 1;
 		}
 		if (f == -1) continue;
 		Polygon hpi = half_plane_intersection(hp);
 		if (!hpi.size()) continue;
 		int k = 0;
-		Pos cen = centroid(hpi);
 		q = recover(hpi[0], v);
 		f0 = 1;
 		for (int i = 0; i < ii; i++) {
