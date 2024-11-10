@@ -9,14 +9,14 @@
 #include <deque>
 #include <tuple>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-9;
-const ld EPS = 1e-7;
+const ld TOL = 1e-10;
+const ld EPS = 1e-2;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -131,6 +131,20 @@ Planes make_hp(const Polygon& H) {
 	for (int i = 0; i < sz; i++) V.push_back(Linear(H[i], H[(i + 1) % sz]));
 	return V;
 }
+Pos centroid(const Polygon& H) {
+	Pos cen = Pos(0, 0);
+	ld A = 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		ld a = H[i] / H[(i + 1) % sz];
+		cen += (H[i] + H[(i + 1) % sz]) * a;
+		A += a;
+	}
+	A *= .5;
+	cen /= 6;
+	if (!zero(A)) cen /= A;
+	return cen;
+}
 struct Pos3D {
 	ld x, y, z;
 	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
@@ -147,8 +161,8 @@ struct Pos3D {
 	}
 	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
 	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	Pos3D& operator += (const Pos3D& p) { x + p.x; y + p.y; z + p.z; return *this; }
-	Pos3D& operator -= (const Pos3D& p) { x - p.x; y - p.y; z - p.z; return *this; }
+	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
+	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
 	Pos3D operator * (const ld& n) const { return { x * n, y * n, z * n }; }
 	Pos3D operator / (const ld& n) const { return { x / n, y / n, z / n }; }
 	Pos3D& operator *= (const ld& n) { x * n; y * n; z * n; return *this; }
@@ -177,6 +191,8 @@ struct Plane {
 	Plane& operator *= (const ld& s) { a *= s; b *= s; c *= s; d *= s; return *this; }
 	Pos3D norm() const { return Pos3D(a, b, c); };
 	Plane& operator += (const ld& n) { d += n; return *this; }
+	Plane operator + (const ld& n) const { return { a, b, c, d + n }; }
+	Plane operator - (const ld& n) const { return { a, b, c, d - n }; }
 	friend std::istream& operator >> (std::istream& is, Plane& f) { is >> f.a >> f.b >> f.c >> f.d; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Plane& f) { os << f.a << " " << f.b << " " << f.c << " " << f.d; return os; }
 } knife;
@@ -207,16 +223,25 @@ Pos3D rotate(const Pos3D& p) {
 	return Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
 }
 Pos convert(Pos3D p, const Pos3D& v) {
-	std::cout << "pppp:: " << p << "\n";
-	p = rotate(p - v);
-	std::cout << "conv:: " << p << "\n";
+	//std::cout << "pppp1:: " << p << "\n";
+	//std::cout << "vvvv1:: " << v << "\n";
+	p -= v;
+	//std::cout << "pppp2:: " << p << "\n";
+	p = rotate(p);
+	//std::cout << "pppp3:: " << p << "\n";
 	return Pos(p.x, p.y);
 }
 Pos3D recover(const Pos& p2D, const Pos3D& v) {
-	ld x = p2D.x / sc[3];
+	ld x = p2D.x * -sc[3];
 	ld y = p2D.y;
-	ld z = p2D.x / -sc[2];
-	Pos3D p = Pos3D(x * -sc[1] + y * sc[0], x * -sc[0] + y * -sc[1], z);
+	ld z = p2D.x * sc[2];
+	//std::cout << "recover:: sc[2]:: " << sc[2] << "\n";
+	//std::cout << "recover:: sc[3]:: " << sc[3] << "\n";
+	//std::cout << "recover:: x:: " << x << "\n";
+	//std::cout << "recover:: y:: " << y << "\n";
+	//std::cout << "recover:: z:: " << z << "\n";
+	Pos3D p = Pos3D(x * -sc[1] + y * sc[0], x * sc[0] + y * sc[1], z);
+	//std::cout << "recover:: p:: " << p << "\n";
 	return p + v;
 }
 typedef std::vector<Pos3D> Polygon3D;
@@ -284,7 +309,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
+	std::cout.precision(15);
 	std::cin >> N;
 	Surfaces S(N);
 	for (Plane& p : S) {
@@ -316,11 +341,11 @@ void solve() {
 		update_sc(S[i]);
 		Pos3D v = offset(S[i], O3D);
 		//std::cout << "dist:: " << dist(S[i], O3D) << "\n";
-		std::cout << "v:: " << v << "\n";
-		Pos3D w = { 1, 1, 1 };
-		Pos w1 = convert(w, v);
-		std::cout << w1 << "\n";
-		std::cout << recover(w1, v) << " recover:: { 1, 1, 1 } \n";
+		//std::cout << "v:: " << v << "\n";
+		//Pos3D w = { 2, 2, -2 };
+		//Pos w1 = convert(w, v);
+		//std::cout << w1 << "\n";
+		//std::cout << recover(w1, v) << " recover:: { 2, 2, -2 } \n";
 		Line3D l;
 		int f = 1;
 		Planes hp = B;
@@ -334,11 +359,11 @@ void solve() {
 			if (f == 0) continue;
 			//std::cout << "S[" << j << "]:: " << S[j] << "\n";
 			//std::cout << "l.p0:: " << l.p0 << "\nl.dir:: " << l.dir << "\n";
-			std::cout << "dist:: i:: " << dist(S[i], l.p0) << "\n";
-			std::cout << "dist:: j:: " << dist(S[j], l.p0) << "\n";
-			std::cout << "dot:: i:: " << S[i].norm() * l.dir << "\n";
-			std::cout << "dot:: j:: " << S[j].norm() * l.dir << "\n";
-			std::cout << "mag:: l:: " << sign(l.dir.mag()) << "\n";
+			//std::cout << "dist:: i:: " << dist(S[i], l.p0) << "\n";
+			//std::cout << "dist:: j:: " << dist(S[j], l.p0) << "\n";
+			//std::cout << "dot:: i:: " << S[i].norm() * l.dir << "\n";
+			//std::cout << "dot:: j:: " << S[j].norm() * l.dir << "\n";
+			//std::cout << "mag:: l:: " << sign(l.dir.mag()) << "\n";
 			//std::cout << "v:: " << v << "\n";
 			Pos s = convert(l.p0, v);
 			Pos e = convert(l.p0 + l.dir, v);
@@ -356,6 +381,10 @@ void solve() {
 		//std::cout << "hpi:: \n";
 		//for (const Pos& p : hpi) std::cout << p << "\n";
 		//std::cout << "hpi:: \n";
+		Pos cen = centroid(hpi);
+		q = recover(cen, v);
+		l = { S[i].norm(), q };
+		q = intersection(S[i] + 1e-5, l);
 		q = recover(hpi[0], v);
 		f0 = 1;
 		break;
@@ -367,12 +396,14 @@ void solve() {
 		//q = Pos3D(1.5, 2.0, -5.0);
 		for (const Plane& p : S) {
 			std::cout << "dist:: " << dist(p, q) << "\n";
+			std::cout << (- p.a * q.x - p.b * q.y - p.c * q.y - 0.001 <= p.d) << "\n";
+			std::cout << (- p.a * q.x - p.b * q.y - p.c * q.y - 0.001) << " " << (p.d) << "\n";
 		}
 	}
 	else std::cout << "banana\n";
 	//q = Pos3D(2, 0, 2);
 	//for (const Plane& p : S) {
-	//	std::cout << "dist:: " << dist(p, q) << "\n";
+		//std::cout << "dist:: " << dist(p, q) << "\n";
 	//}
 	return;
 }
