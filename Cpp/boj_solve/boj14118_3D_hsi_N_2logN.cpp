@@ -9,14 +9,14 @@
 #include <deque>
 #include <tuple>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
-const ld EPS = 1e-6;
+const ld TOL = 1e-5;
+const ld EPS = 1e-2;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -184,13 +184,13 @@ struct Plane {
 } knife;
 typedef std::vector<Plane> Surfaces;
 void update_sc(const Plane& p) {
-	ld angle1 = -atan2(p.b, p.a);
+	ld angle1 = -atan2l(p.b, p.a);
 	ld dx = sqrtl(p.a * p.a + p.b * p.b);
-	ld angle2 = -atan2(dx, p.c);
-	sc[0] = sin(angle1);
-	sc[1] = cos(angle1);
-	sc[2] = sin(angle2);
-	sc[3] = cos(angle2);
+	ld angle2 = -atan2l(dx, p.c);
+	sc[0] = sinl(angle1);
+	sc[1] = cosl(angle1);
+	sc[2] = sinl(angle2);
+	sc[3] = cosl(angle2);
 	return;
 }
 Pos3D rotate(const Pos3D& p) {
@@ -301,7 +301,6 @@ void solve() {
 		if (f == -1) continue;
 		Polygon hpi = half_plane_intersection(hp);
 		if (!hpi.size()) continue;
-		int k = 0;
 		q = recover(hpi[0], v);
 		f0 = 1;
 		for (int i = 0; i < ii; i++) {
