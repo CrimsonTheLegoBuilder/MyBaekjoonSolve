@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -8,6 +9,10 @@
 typedef std::vector<int> Vint;
 
 int N;
+
+
+
+
 Vint get_pi(const std::string& s) {
 	int m = s.size(), j = 0;
 	Vint pi(m, 0);

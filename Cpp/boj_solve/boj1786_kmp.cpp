@@ -64,10 +64,30 @@ Vint kmp(const Polygon& T, const Polygon& P) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	std::cin >> N;
+	Polygon A(N), B(N);
+	for (Pos& p : A) std::cin >> p;
+	for (Pos& p : B) std::cin >> p;
 	Polygon T, P;
-	Vint matched = kmp(T, P);
-	std::cout << matched.size() << "\n";
-	for (const int& i : matched) std::cout << i + 1 << " ";
+	Vint matched;
+	for (int i = 0; i < N; i++) {
+		T.push_back(A[(i + 1) % N] - A[i]);
+		P.push_back(B[(i + 1) % N] - B[i]);
+	}
+	for (int i = 0; i < N; i++) T.push_back(T[i]);
+	matched = kmp(T, P);
+	if (matched.size()) { std::cout << "YES\n"; return; }
+	T.clear();
+	std::reverse(A.begin(), A.end());
+	for (int i = 0; i < N; i++) {
+		T.push_back(A[(i + 1) % N] - A[i]);
+	}
+	for (int i = 0; i < N; i++) T.push_back(T[i]);
+	matched = kmp(T, P);
+	if (matched.size()) { std::cout << "YES\n"; return; }
+	std::cout << "NO\n";
+	//std::cout << matched.size() << "\n";
+	//for (const int& i : matched) std::cout << i + 1 << " ";
 	return;
 }
 int main() { solve(); return 0; }//boj29309
