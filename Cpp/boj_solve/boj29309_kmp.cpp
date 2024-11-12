@@ -74,7 +74,14 @@ void solve() {
 		T.push_back(A[(i + 1) % N] - A[i]);
 		P.push_back(B[(i + 1) % N] - B[i]);
 	}
+	//std::cout << "T:: \n";
+	//for (Pos& p : T) std::cout << p << "\n";
+	//std::cout << "P:: \n";
+	//for (Pos& p : P) std::cout << p << "\n";
 	for (int i = 0; i < N; i++) T.push_back(T[i]);
+	matched = kmp(T, P);
+	if (matched.size()) { std::cout << "YES\n"; return; }
+	for (Pos& p : T) p.y *= -1;
 	matched = kmp(T, P);
 	if (matched.size()) { std::cout << "YES\n"; return; }
 	T.clear();
@@ -82,7 +89,14 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		T.push_back(A[(i + 1) % N] - A[i]);
 	}
+	//std::cout << "T:: \n";
+	//for (Pos& p : T) std::cout << p << "\n";
+	//std::cout << "P:: \n";
+	//for (Pos& p : P) std::cout << p << "\n";
 	for (int i = 0; i < N; i++) T.push_back(T[i]);
+	matched = kmp(T, P);
+	if (matched.size()) { std::cout << "YES\n"; return; }
+	for (Pos& p : T) p.y *= -1;
 	matched = kmp(T, P);
 	if (matched.size()) { std::cout << "YES\n"; return; }
 	std::cout << "NO\n";
