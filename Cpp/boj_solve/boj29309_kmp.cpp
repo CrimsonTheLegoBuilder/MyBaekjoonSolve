@@ -23,7 +23,8 @@ inline ll sq(int x) { return (ll)x * x; }
 int N;
 struct Pos {
 	int x, y;
-	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
+	ll c;
+	Pos(int X = 0, int Y = 0, ll C = 0) : x(X), y(Y), c(C) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -34,32 +35,42 @@ struct Pos {
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
+	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
+	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pos operator - () const { return { -x, -y }; }
+	Pos operator ~ () const { return { -y, x }; }
+	Pos operator ! () const { return { y, x }; }
+	ll xy() const { return (ll)x * y; }
+	ll Euc() const { return (ll)x * x + (ll)y * y; }
+	int Man() const { return std::abs(x) + std::abs(y); }
+	ld mag() const { return hypot(x, y); }
+	ld rad() const { return atan2(y, x); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+	int quad() const { return y > 0 || y == 0 && x >= 0; }
+	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-Vint get_pi(const Polygon& s) {
-	int m = s.size(), j = 0;
-	Vint pi(m, 0);
-	for (int i = 1; i < m; i++) {
-		while (j > 0 && s[i] != s[j]) j = pi[j - 1];
-		if (s[i] == s[j]) pi[i] = ++j;
-	}
-	return pi;
+ll area(const Polygon& H) {
+	ll a = 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) a += H[i] / H[(i + 1) % sz];
+	return a;
 }
-Vint kmp(const Polygon& T, const Polygon& P) {
-	Vint ans;
-	Vint pi = get_pi(P);
-	int t = T.size(), p = P.size(), j = 0;
-	for (int i = 0; i < t; i++) {
-		while (j > 0 && T[i] != P[j]) j = pi[j - 1];
-		if (T[i] == P[j]) {
-			if (j == p - 1) ans.push_back(i - p + 1), j = pi[j];
-			else j++;
-		}
-	}
-	return ans;
+void norm(Polygon& H) {
+	ll A = area(H); assert(A);
+	if (A < 0) std::reverse(H.begin(), H.end());
+	auto s = std::min_element(H.begin(), H.end());
+	std::rotate(H.begin(), s, H.end());
+}
+void move(Polygon& H, const Pos& vec) {
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) H[i] += vec;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -68,40 +79,9 @@ void solve() {
 	Polygon A(N), B(N);
 	for (Pos& p : A) std::cin >> p;
 	for (Pos& p : B) std::cin >> p;
-	Polygon T, P;
-	Vint matched;
-	for (int i = 0; i < N; i++) {
-		T.push_back(A[(i + 1) % N] - A[i]);
-		P.push_back(B[(i + 1) % N] - B[i]);
-	}
-	//std::cout << "T:: \n";
-	//for (Pos& p : T) std::cout << p << "\n";
-	//std::cout << "P:: \n";
-	//for (Pos& p : P) std::cout << p << "\n";
-	for (int i = 0; i < N; i++) T.push_back(T[i]);
-	matched = kmp(T, P);
-	if (matched.size()) { std::cout << "YES\n"; return; }
-	for (Pos& p : T) p.y *= -1;
-	matched = kmp(T, P);
-	if (matched.size()) { std::cout << "YES\n"; return; }
-	T.clear();
-	std::reverse(A.begin(), A.end());
-	for (int i = 0; i < N; i++) {
-		T.push_back(A[(i + 1) % N] - A[i]);
-	}
-	//std::cout << "T:: \n";
-	//for (Pos& p : T) std::cout << p << "\n";
-	//std::cout << "P:: \n";
-	//for (Pos& p : P) std::cout << p << "\n";
-	for (int i = 0; i < N; i++) T.push_back(T[i]);
-	matched = kmp(T, P);
-	if (matched.size()) { std::cout << "YES\n"; return; }
-	for (Pos& p : T) p.y *= -1;
-	matched = kmp(T, P);
-	if (matched.size()) { std::cout << "YES\n"; return; }
-	std::cout << "NO\n";
-	//std::cout << matched.size() << "\n";
-	//for (const int& i : matched) std::cout << i + 1 << " ";
+	Polygon T, P1, P2;
+
+	
 	return;
 }
 int main() { solve(); return 0; }//boj29309
