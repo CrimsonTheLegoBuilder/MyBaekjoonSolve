@@ -17,7 +17,8 @@ const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 int N;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return !sign(x); }
 
 struct Pos {
 	ld x, y;
