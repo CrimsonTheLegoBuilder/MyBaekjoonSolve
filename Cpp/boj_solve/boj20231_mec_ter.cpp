@@ -14,11 +14,12 @@ typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-9;
+const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
+inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
 
 Vld ans;
 int N, M;
@@ -226,7 +227,7 @@ ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j
 	const Pos& pa = A[(i + 1) % a], & pb = B[(j + 1) % b];
 	ld s = 0, e = (pa - pb).mag(), m1, m2, r1 = 0, r2 = 0;
 	//std::cout << e << "\n";
-	int cnt = 70; while (cnt--) {
+	int cnt = 30; while (cnt--) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
 		//std::cout << r1 << " " << r2 << "\n";
@@ -235,7 +236,78 @@ ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j
 		if (r1 > r2) s = m1;
 		else e = m2;
 	}
-	return r2 * 2;
+	return r2;
+}
+ld ternary_search(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& c, const ld& r) {
+	Pos vec, v1, v2;
+	auto dist = [&](const ld& t) -> ld {
+		Pos s2 = p1 + vec.rot(t);
+		ld d = cross(p1, s2, c) / (p1 - s2).mag();
+		return r - d;
+		};
+	vec = (p0 - p1);
+	v1 = ~(p0 - p1), v2 = ~(p2 - p1);
+	ld s = 0, e = rad(v1, v2), m1, m2, d1, d2;
+	int cnt = 30; while (cnt--) {
+		m1 = (s + s + e) / 3;
+		m2 = (s + e + e) / 3;
+		d1 = dist(m1);
+		d2 = dist(m2);
+		if (sign(d1 < d2)) s = m1;
+		else e = m2;
+	}
+	return (s + e) * .5;
+}
+ld fit(const Polygon& P, const ld& r) {
+	auto dist = [&](const Pos& s1, const Pos& s2, const Pos& c) -> ld {
+		ld d = cross(s1, s2, c) / (s1 - s2).mag();
+		return r - d;
+		};
+	int sz = P.size();
+	ld ret = 0;
+	for (int i = 0; i < sz; i++) {
+		for (int j = i + 1; j < sz; j++) {
+			ld tmp = 0;
+			const Pos& p = P[i], & q = P[j];
+			Pos mid = (p + q) * .5;
+			Pos vec = p - mid;
+			ld h = vec.mag();
+			if (sign(h - r) > 0) continue;
+			ld w = sqrt(r * r - h * h);
+			Pos c1 = mid + ~vec.unit() * w;
+			Pos c2 = mid - ~vec.unit() * w;
+			for (const Pos& c : { c1, c2 }) {
+				for (int k = 0; k < sz; k++) {
+					if (k == i || k == j) continue;
+					if (sign((P[k] - c).mag() - r) > 0) { tmp = -1; break; }
+					const Pos& p0 = P[(k - 1 + sz) % sz], & p1 = P[k], & p2 = P[(k + 1) % sz];
+					//if (eq(r, (p1 - c).mag())) tmp = std::max({ tmp, dist(p0, p1, c1), dist(p1, p2, c) });
+					//else if (ccw(p0, p1, c) < 0 && ccw(p1, p2, c) < 0)
+					//	tmp = std::max(tmp, ternary_search(p0, p1, p2, c, r));
+					//else tmp = std::max({ tmp, dist(p0, p1, c), dist(p1, p2, c) });
+					if (ccw(p0, p1, c) < 0 && ccw(p1, p2, c) < 0)
+						tmp = std::max(tmp, ternary_search(p0, p1, p2, c, r));
+					else tmp = std::max({ tmp, dist(p0, p1, c), dist(p1, p2, c) });
+				}
+				ret = std::max(ret, tmp);
+			}
+		}
+	}
+	return ret;
+}
+bool fit(const Polygon& A, const Polygon& B, const ld& r) {
+	ld da = fit(A, r);
+	ld db = fit(B, r);
+	ld D = r * 2;
+	return sign((da + db) - D) >= 0 ? 1 : 0;
+}
+ld bi_search(const Polygon& A, const Polygon& B, ld s, ld e) {
+	int cnt = 30; while (cnt--) {
+		ld m = (s + e) * .5;
+		if (fit(A, B, m)) e = m;
+		else s = m;
+	}
+	return s + e;
 }
 bool query() {
 	std::cin >> N;
@@ -248,6 +320,8 @@ bool query() {
 	for (Pos& p : B) std::cin >> p;
 	norm(B);
 	ld ret = INF;
+	ld r1 = INF;
+	ld ra = minimum_enclose_circle(A).r, rb = minimum_enclose_circle(B).r;
 	for (int i = 0; i < N; i++) {
 		Pos& I0 = A[i], & I1 = A[(i + 1) % N];
 		for (int j = 0; j < M; j++) {
@@ -256,10 +330,14 @@ bool query() {
 			Pos v;
 			//std::cout << "FUCK::\n";
 			Polygon B2 = rotate_and_norm(B, j, A, i, t, v);
-			ret = std::min(ret, ternary_search(A, i, B2, j));
+			r1 = std::min(r1, ternary_search(A, i, B2, j));
 		}
 	}
-	//std::cout << ret << "\n";
+	//std::cout << "r1 :: " << r1 << "\n";
+	ld r2 = bi_search(A, B, std::max(ra, rb), r1);
+	//std::cout << "r2 :: " << r2 << "\n";
+	ret = std::min({ ret, r1, r2 }) * 2;
+	//std::cout << "ret:: " << ret << "\n";
 	ans.push_back(ret);
 	return 1;
 }
