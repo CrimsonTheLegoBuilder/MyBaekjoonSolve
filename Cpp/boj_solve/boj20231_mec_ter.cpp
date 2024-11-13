@@ -227,7 +227,7 @@ ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j
 	const Pos& pa = A[(i + 1) % a], & pb = B[(j + 1) % b];
 	ld s = 0, e = (pa - pb).mag(), m1, m2, r1 = 0, r2 = 0;
 	//std::cout << e << "\n";
-	int cnt = 30; while (cnt--) {
+	int cnt = 50; while (cnt--) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
 		//std::cout << r1 << " " << r2 << "\n";
@@ -285,8 +285,10 @@ ld fit(const Polygon& P, const ld& r) {
 					//else if (ccw(p0, p1, c) < 0 && ccw(p1, p2, c) < 0)
 					//	tmp = std::max(tmp, ternary_search(p0, p1, p2, c, r));
 					//else tmp = std::max({ tmp, dist(p0, p1, c), dist(p1, p2, c) });
-					if (ccw(p0, p1, c) < 0 && ccw(p1, p2, c) < 0)
-						tmp = std::max(tmp, ternary_search(p0, p1, p2, c, r));
+					if (ccw(p0, p1, c) < 0 && ccw(p1, p2, c) < 0) {
+						ld d = r + (c - p1).mag();
+						tmp = std::max(tmp, d);
+					}
 					else tmp = std::max({ tmp, dist(p0, p1, c), dist(p1, p2, c) });
 				}
 				ret = std::max(ret, tmp);
