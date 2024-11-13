@@ -210,8 +210,9 @@ Circle minimum_enclose_circle(std::vector<Pos> P) {
 	}
 	return mec;
 }
-ld minimum_enclose_circle(Polygon A, Polygon B, Pos v) {
+ld minimum_enclose_circle(Polygon A, int i, Polygon B, int j, ld d) {
 	Polygon V;
+	Pos v = (A[i] - B[j]).unit() * d;
 	for (Pos& p : B) p += v;
 	for (const Pos& p : A) V.push_back(p);
 	for (const Pos& p : B) V.push_back(p);
@@ -225,8 +226,8 @@ ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j
 	int cnt = 50; while (cnt--) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
-		r1 = minimum_enclose_circle(A, B, v * m1);
-		r2 = minimum_enclose_circle(A, B, v * m2);
+		r1 = minimum_enclose_circle(A, i, B, j, m1);
+		r2 = minimum_enclose_circle(A, i, B, j, m2);
 		if (r1 > r2) s = m1;
 		else e = m2;
 	}
