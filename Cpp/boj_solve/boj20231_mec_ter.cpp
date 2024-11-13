@@ -13,13 +13,13 @@ typedef long long ll;
 typedef double ld;
 typedef std::pair<int, int> pi;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-9;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 
-int N;
+int N, M;
 struct Pos {
 	ld x, y;
 	int i, d;
@@ -132,6 +132,18 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
+ld area(const Polygon& H) {
+	ld ret = 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) ret += H[i] / H[(i + 1) % sz];
+	return ret;
+}
+bool norm(Polygon& H) {
+	ld a = area(H);
+	if (zero(a)) return 1;
+	if (a < 0) std::reverse(H.begin(), H.end());
+	return 0;
+}
 Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t, Pos& v) {
 	int sz = B.size();
 	for (int j = 0; j < sz; j++) B[j] = B[j].rot(t);
@@ -198,3 +210,108 @@ Circle minimum_enclose_circle(std::vector<Pos> P) {
 	}
 	return mec;
 }
+ld minimum_enclose_circle(Polygon A, Polygon B, Pos v) {
+	Polygon V;
+	for (Pos& p : B) p += v;
+	for (const Pos& p : A) V.push_back(p);
+	for (const Pos& p : B) V.push_back(p);
+	return minimum_enclose_circle(V).r;
+}
+ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j, Pos v) {
+	int a = A.size(), b = B.size();
+	const Pos& pa = A[i], & pb = B[j];
+	ld s = 0, e = (pa - pb).mag(), m1, m2, r1, r2;
+	v = v.unit();
+	int cnt = 50; while (cnt--) {
+		m1 = (s + s + e) / 3;
+		m2 = (s + e + e) / 3;
+		r1 = minimum_enclose_circle(A, B, v * m1);
+		r2 = minimum_enclose_circle(A, B, v * m2);
+		if (r1 > r2) s = m1;
+		else e = m2;
+	}
+	return (s + e) * .5;
+}
+bool query() {
+	std::cin >> N;
+	if (!N) return 0;
+	Polygon A(N);
+	for (Pos& p : A) std::cin >> p;
+	norm(A);
+	std::cin >> M;
+	Polygon B(M);
+	for (Pos& p : B) std::cin >> p;
+	norm(B);
+	ld ret = INF;
+	for (int i = 0; i < N; i++) {
+		Pos& I0 = A[i], & I1 = A[(i + 1) % N];
+		for (int j = 0; j < M; j++) {
+			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
+			ld t = rad(J0 - J1, I1 - I0);
+			Pos v;
+			Polygon B2 = rotate_and_norm(B, j, A, i, t, v);
+			ret = std::min(ret, ternary_search(A, i, B2, j, v));
+		}
+	}
+	std::cout << ret << "\n";
+	return 1;
+}
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(15);
+	while (query());
+	return;
+}
+int main() { solve(); return 0; }//boj20231
+
+/*
+
+3
+8 0
+7 7
+0 6
+4
+0 0
+5
+0 5 5 0
+5
+3
+0 0
+2 2
+0 2
+3
+3 1
+5 1
+5 3
+5
+0 0
+3 0
+3 1 1
+3
+0 3
+5
+0 0
+3 0
+3 1
+1 3
+0 3
+9
+0 0
+9 4
+13 13
+9 22
+6 24
+-6 24
+-9 22
+-13 13
+-9 4
+4
+1 0
+0 5
+-1 0
+0 -5
+0
+
+*/
