@@ -12,6 +12,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 typedef std::pair<int, int> pi;
+typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-9;
 const ld PI = acos(-1);
@@ -19,6 +20,7 @@ const int LEN = 1e3;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 
+Vld ans;
 int N, M;
 struct Pos {
 	ld x, y;
@@ -212,26 +214,28 @@ Circle minimum_enclose_circle(std::vector<Pos> P) {
 }
 ld minimum_enclose_circle(Polygon A, int i, Polygon B, int j, ld d) {
 	Polygon V;
-	Pos v = (A[i] - B[j]).unit() * d;
+	Pos v = (A[(i + 1) % A.size()] - B[(j + 1) % B.size()]).unit() * d;
+	//std::cout << v.mag() << "\n";
 	for (Pos& p : B) p += v;
 	for (const Pos& p : A) V.push_back(p);
 	for (const Pos& p : B) V.push_back(p);
 	return minimum_enclose_circle(V).r;
 }
-ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j, Pos v) {
+ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j) {
 	int a = A.size(), b = B.size();
-	const Pos& pa = A[i], & pb = B[j];
-	ld s = 0, e = (pa - pb).mag(), m1, m2, r1, r2;
-	v = v.unit();
-	int cnt = 50; while (cnt--) {
+	const Pos& pa = A[(i + 1) % a], & pb = B[(j + 1) % b];
+	ld s = 0, e = (pa - pb).mag(), m1, m2, r1 = 0, r2 = 0;
+	//std::cout << e << "\n";
+	int cnt = 70; while (cnt--) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
+		//std::cout << r1 << " " << r2 << "\n";
 		r1 = minimum_enclose_circle(A, i, B, j, m1);
 		r2 = minimum_enclose_circle(A, i, B, j, m2);
 		if (r1 > r2) s = m1;
 		else e = m2;
 	}
-	return (s + e) * .5;
+	return r2 * 2;
 }
 bool query() {
 	std::cin >> N;
@@ -250,11 +254,13 @@ bool query() {
 			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
 			ld t = rad(J0 - J1, I1 - I0);
 			Pos v;
+			//std::cout << "FUCK::\n";
 			Polygon B2 = rotate_and_norm(B, j, A, i, t, v);
-			ret = std::min(ret, ternary_search(A, i, B2, j, v));
+			ret = std::min(ret, ternary_search(A, i, B2, j));
 		}
 	}
-	std::cout << ret << "\n";
+	//std::cout << ret << "\n";
+	ans.push_back(ret);
 	return 1;
 }
 void solve() {
@@ -263,56 +269,156 @@ void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(15);
 	while (query());
+	for (const ld& ret : ans) std::cout << ret << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj20231
 
 /*
 
-3
-8 0
-7 7
-0 6
-4
-0 0
-5
-0 5 5 0
-5
-3
-0 0
-2 2
-0 2
-3
-3 1
-5 1
-5 3
-5
-0 0
-3 0
-3 1 1
-3
-0 3
-5
-0 0
-3 0
-3 1
-1 3
-0 3
-9
-0 0
-9 4
-13 13
-9 22
-6 24
--6 24
--9 22
--13 13
--9 4
-4
-1 0
-0 5
--1 0
-0 -5
+40
+904 -405
+906 -400
+395 -616
+-16 -989
+-10 -992
+0 -992
+27 -991
+50 -990
+103 -987
+122 -985
+130 -984
+151 -981
+163 -979
+228 -966
+253 -960
+260 -958
+312 -942
+324 -938
+369 -921
+392 -912
+408 -905
+442 -888
+467 -875
+500 -857
+524 -843
+527 -841
+570 -812
+604 -786
+618 -775
+658 -742
+687 -716
+715 -688
+731 -671
+772 -623
+797 -591
+812 -570
+843 -523
+876 -463
+878 -459
+899 -416
+40
+-923 -266
+-817 -489
+-724 -604
+-635 -711
+-626 -718
+-536 -780
+-352 -889
+-334 -897
+-205 -934
+102 -954
+270 -920
+357 -891
+399 -874
+494 -820
+513 -809
+629 -718
+672 -680
+756 -591
+934 -213
+944 -122
+954 -4
+955 30
+939 178
+918 261
+894 345
+865 405
+776 565
+709 644
+478 832
+382 877
+305 890
+202 900
+-729 407
+-755 393
+-841 335
+-932 234
+-954 50
+-956 18
+-956 16
+-946 -113
+0
+
+36
+510 -524
+616 -398
+631 -375
+675 -289
+694 -250
+726 -115
+728 -73
+732 15
+732 95
+704 213
+690 261
+653 334
+592 434
+497 533
+452 547
+289 518
+66 478
+-394 388
+-638 339
+-677 250
+-713 163
+-724 130
+-735 48
+-735 -41
+-715 -164
+-678 -266
+-630 -386
+-511 -533
+-427 -599
+-400 -619
+-299 -672
+-131 -723
+-27 -738
+110 -722
+287 -678
+426 -598
+21
+722 157
+721 162
+693 258
+687 270
+665 260
+443 -142
+381 -622
+410 -618
+442 -595
+478 -567
+485 -561
+533 -513
+599 -429
+627 -392
+663 -326
+689 -271
+699 -246
+710 -214
+722 -162
+736 74
+734 90
 0
 
 */
