@@ -170,7 +170,7 @@ ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j
 	int a = A.size(), b = B.size();
 	const Pos& pa = A[(i + 1) % a], & pb = B[(j + 1) % b];
 	ld s = 0, e = (pa - pb).mag(), m1, m2, r1 = 0, r2 = 0;
-	int cnt = 50; while (cnt--) {
+	int cnt = 30; while (cnt--) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
 		r1 = minimum_enclose_circle(A, i, B, j, m1).r;
