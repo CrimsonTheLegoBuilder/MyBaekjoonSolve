@@ -13,7 +13,7 @@ typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
-const int LEN = 1e3;
+const int LEN = 40;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
@@ -23,21 +23,13 @@ int N, M;
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
-	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
-	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
-	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
-	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
-	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	Pos operator * (const ld& n) const { return { x * n, y * n }; }
+	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
-	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos rot(ld the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
@@ -109,8 +101,6 @@ struct Circle {
 	Pos c;
 	ld r;
 	Circle(Pos C = Pos(0, 0), ld R = 0) : c(C), r(R) {}
-	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
-	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
@@ -158,19 +148,16 @@ Circle minimum_enclose_circle(std::vector<Pos> P) {
 	}
 	return mec;
 }
-Circle minimum_enclose_circle(Polygon A, int i, Polygon B, int j, ld d) {
-	Polygon V;
+Circle minimum_enclose_circle(Polygon A, const int& i, Polygon B, const int& j, const ld& d) {
 	Pos v = (A[(i + 1) % A.size()] - B[(j + 1) % B.size()]).unit() * d;
-	for (Pos& p : B) p += v;
-	for (const Pos& p : A) V.push_back(p);
-	for (const Pos& p : B) V.push_back(p);
-	return minimum_enclose_circle(V);
+	for (Pos& p : B) A.push_back(p + v);
+	return minimum_enclose_circle(A);
 }
 ld ternary_search(const Polygon& A, const int& i, const Polygon& B, const int& j) {
 	int a = A.size(), b = B.size();
 	const Pos& pa = A[(i + 1) % a], & pb = B[(j + 1) % b];
 	ld s = 0, e = (pa - pb).mag(), m1, m2, r1 = 0, r2 = 0;
-	int cnt = 30; while (cnt--) {
+	int cnt = 25; while (cnt--) {
 		m1 = (s + s + e) / 3;
 		m2 = (s + e + e) / 3;
 		r1 = minimum_enclose_circle(A, i, B, j, m1).r;
@@ -237,13 +224,12 @@ bool query() {
 	Polygon B(M);
 	for (Pos& p : B) std::cin >> p;
 	norm(B);
-	ld ret = INF;
-	ld r1 = INF;
+	ld ret = INF, r1 = INF;
 	ld ra = minimum_enclose_circle(A).r, rb = minimum_enclose_circle(B).r;
 	for (int i = 0; i < N; i++) {
-		Pos& I0 = A[i], & I1 = A[(i + 1) % N];
+		const Pos& I0 = A[i], & I1 = A[(i + 1) % N];
 		for (int j = 0; j < M; j++) {
-			Pos& J0 = B[j], & J1 = B[(j + 1) % M];
+			const Pos& J0 = B[j], & J1 = B[(j + 1) % M];
 			ld t = rad(J0 - J1, I1 - I0);
 			Polygon B2 = rotate_and_norm(B, j, A, i, t);
 			r1 = std::min(r1, ternary_search(A, i, B2, j));
