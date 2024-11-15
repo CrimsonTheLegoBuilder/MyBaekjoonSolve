@@ -65,20 +65,20 @@ struct Pos {
 	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
-	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	Pos operator * (const ld& n) const { return { x * n, y * n }; }
+	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
+	Pos& operator *= (const ld& n) { x *= n; y *= n; return *this; }
+	Pos& operator /= (const ld& n) { x /= n; y /= n; return *this; }
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
 	ld xy() const { return x * y; }
-	Pos rot(ld the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
+	Pos rot(ld the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
 	Pos unit() const { return *this / mag(); }
@@ -102,8 +102,8 @@ struct Vec {
 	ld operator * (const Vec& v) const { return vy * v.vy + vx * v.vx; }
 	ld operator / (const Vec& v) const { return vy * v.vx - vx * v.vy; }
 	Vec operator ~ () const { return { -vx, vy }; }
-	Vec& operator *= (const ld& scalar) { vy *= scalar; vx *= scalar; return *this; }
-	Vec& operator /= (const ld& scalar) { vy /= scalar; vx /= scalar; return *this; }
+	Vec& operator *= (const ld& n) { vy *= n; vx *= n; return *this; }
+	Vec& operator /= (const ld& n) { vy /= n; vx /= n; return *this; }
 	ld mag() const { return hypot(vy, vx); }
 }; const Vec Zero = { 0, 0 };
 struct Line {//ax + by = c
@@ -119,12 +119,12 @@ struct Line {//ax + by = c
 	}
 	ld operator * (const Line& l) const { return s * l.s; }
 	ld operator / (const Line& l) const { return s / l.s; }
-	Line operator + (const ld& scalar) const { return Line(s, c + hypot(s.vy, s.vx) * scalar); }
-	Line operator - (const ld& scalar) const { return Line(s, c - hypot(s.vy, s.vx) * scalar); }
-	Line operator * (const ld& scalar) const { return Line({ s.vy * scalar, s.vx * scalar }, c * scalar); }
-	Line& operator += (const ld& scalar) { c += hypot(s.vy, s.vx) * scalar; return *this; }
-	Line& operator -= (const ld& scalar) { c -= hypot(s.vy, s.vx) * scalar; return *this; }
-	Line& operator *= (const ld& scalar) { s *= scalar, c *= scalar; return *this; }
+	Line operator + (const ld& n) const { return Line(s, c + hypot(s.vy, s.vx) * n); }
+	Line operator - (const ld& n) const { return Line(s, c - hypot(s.vy, s.vx) * n); }
+	Line operator * (const ld& n) const { return Line({ s.vy * n, s.vx * n }, c * n); }
+	Line& operator += (const ld& n) { c += hypot(s.vy, s.vx) * n; return *this; }
+	Line& operator -= (const ld& n) { c -= hypot(s.vy, s.vx) * n; return *this; }
+	Line& operator *= (const ld& n) { s *= n, c *= n; return *this; }
 	ld dist(const Pos& p) const { return s.vy * p.x + s.vx * p.y; }
 	ld above(const Pos& p) const { return s.vy * p.x + s.vx * p.y - c; }
 	ld mag() const { return s.mag(); }
@@ -1007,12 +1007,12 @@ struct Pos3D {
 	}
 	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
 	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	Pos3D operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	Pos3D operator / (const ld& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+	Pos3D operator * (const ld& n) const { return { x * n, y * n, z * n }; }
+	Pos3D operator / (const ld& n) const { return { x / n, y / n, z / n }; }
 	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
-	Pos3D& operator *= (const ld& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
-	Pos3D& operator /= (const ld& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
+	Pos3D& operator *= (const ld& n) { x *= n; y *= n; z *= n; return *this; }
+	Pos3D& operator /= (const ld& n) { x /= n; y /= n; z /= n; return *this; }
 	ld Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
 	ld lon() const { return atan2(y, x); }
@@ -1048,14 +1048,12 @@ struct Plane {
 	ld a, b, c, d;
 	Plane(ld A = 0, ld B = 0, ld C = 0, ld D = 0) : a(A), b(B), c(C), d(D) {}
 	Pos3D norm() const { return Pos3D(a, b, c); };
-	friend std::istream& operator >> (std::istream& is, Plane& f) { 
-		is >> f.a >> f.b >> f.c >> f.d;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Plane& f) {
-		os << f.a << " " << f.b << " " << f.c << " " << f.d;
-		return os;
-	}
+	Plane operator + (const ld& n) const { return { a, b, c, d + n }; }
+	Plane operator - (const ld& n) const { return { a, b, c, d - n }; }
+	Plane& operator += (const ld& n) { d += n; return *this; }
+	Plane& operator -= (const ld& n) { d -= n; return *this; }
+	friend std::istream& operator >> (std::istream& is, Plane& f) { is >> f.a >> f.b >> f.c >> f.d; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Plane& f) { os << f.a << " " << f.b << " " << f.c << " " << f.d; return os; }
 } knife;
 bool circle_intersection(const Pos3D& a, const Pos3D& b, const ld& th, std::vector<Pos3D>& inxs) {
 	inxs.clear();

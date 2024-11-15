@@ -21,7 +21,9 @@ const ll MOD = 1'000'000'007;
 int N, M, T, Q;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
-inline ll sq(int x) { return (ll)x * x; }
+inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
+inline ld sq(const ld& x) { return x * x; }
+inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
 //ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 ll pow_fuck(ll a, ll b) {
@@ -68,8 +70,8 @@ struct Pos {
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ll& scale) { x /= scale; y /= scale; return *this; }
+	Pos& operator *= (const ll& n) { x *= n; y *= n; return *this; }
+	Pos& operator /= (const ll& n) { x /= n; y /= n; return *this; }
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
@@ -101,8 +103,8 @@ struct Pos {
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pos& operator *= (const int& n) { x *= n; y *= n; return *this; }
+	Pos& operator /= (const int& n) { x /= n; y /= n; return *this; }
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
@@ -634,28 +636,24 @@ struct Pos3D {
 	}
 	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
 	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	Pos3D operator * (const ll& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	Pos3D operator / (const ll& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+	Pos3D operator * (const ll& n) const { return { x * n, y * n, z * n }; }
+	Pos3D operator / (const ll& n) const { return { x / n, y / n, z / n }; }
 	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
-	Pos3D& operator *= (const ll& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
-	Pos3D& operator /= (const ll& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
+	Pos3D& operator *= (const ll& n) { x *= n; y *= n; z *= n; return *this; }
+	Pos3D& operator /= (const ll& n) { x /= n; y /= n; z /= n; return *this; }
 	ll Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
-	friend std::istream& operator >> (std::istream& is, Pos3D& p) {
-		is >> p.x >> p.y >> p.z;
-		return is;
-	}
-	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) {
-		os << p.x << " " << p.y << " " << p.z << "\n";
-		return os;
-	}
+	friend std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z << "\n"; return os; }
 } candi[LEN];
 const Pos3D O3D = { 0, 0, 0 };
 const Pos3D X_axis = { 1, 0, 0 };
 const Pos3D Y_axis = { 0, 1, 0 };
 const Pos3D Z_axis = { 0, 0, 1 };
 const Pos3D MAXP3D = { INF, INF, INF };
+typedef std::vector<Pos3D> Polygon3D;
+typedef std::vector<Polygon3D> Polyhedron;
 using Face = std::array<int, 3>;
 std::vector<Face> Hull3D;
 struct Edge {
