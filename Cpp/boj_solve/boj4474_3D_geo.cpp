@@ -18,7 +18,6 @@ const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
-const ll MOD = 1'000'000'007;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -30,7 +29,16 @@ ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 ll gcd(ll a, ll b, ll c) { a = std::abs(a); b = std::abs(b); c = std::abs(c); a = gcd(a, b); return gcd(a, c); }
 
 Vint ans;
-int N, M, K, T, Q;
+ld sc[4];
+int N, M, K, Q;
+struct Pos {
+	ld x, y;
+	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
+	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
+	ld rad() const { return atan2(y, x); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+}; const Pos O = { 0, 0 };
 struct Pos3D {
 	ll x, y, z;
 	Pos3D(ll X = 0, ll Y = 0, ll Z = 0) : x(X), y(Y), z(Z) {}
@@ -77,6 +85,23 @@ Pos3D norm(const Polygon3D& P) {
 	return norm(v);
 }
 int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& n) { return sign(n * norm(cross(d1, d2, d3))); }
+void update_sc(const Pos3D& p) {
+	ld angle1 = -atan2l(p.y, p.x);
+	ld dx = sqrtl(p.x * p.x + p.y * p.y);
+	ld angle2 = -atan2l(dx, p.z);
+	sc[0] = sinl(angle1);
+	sc[1] = cosl(angle1);
+	sc[2] = sinl(angle2);
+	sc[3] = cosl(angle2);
+	return;
+}
+Pos rotate(const Pos3D& p) {
+	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
+	x = z * sc[2] + x * sc[3];
+	y = y;
+	//z = z * sc[3] - x * sc[2];
+	return Pos(x, y);
+}
 bool query() {
 	std::cin >> N;
 	int cnt = 0;
@@ -88,6 +113,7 @@ bool query() {
 		for (Pos3D& p : C) std::cin >> p;
 	}
 	for (int i = 0; i < N; i++) {
+#ifdef INT
 		Pos3D ni = norm(H[i]);
 		Pos3D ref = norm(H[i][1] - H[i][0]);
 		Polygon3D V;
@@ -110,8 +136,26 @@ bool query() {
 			while (ccw(O3D, V[j], V[k], ni) > 0) k = (k + 1) % sz;
 			cnt = std::max(cnt, (k - j + sz) % sz + 1);
 		}
+#else
+		Pos3D ni = norm(H[i]);
+		update_sc(ni);
+		Pos ref = rotate(norm(H[i][1] - H[i][0]));
+		Vld V;
+		for (int j = 0; j < N; j++) {
+			if (i == j) continue;
+			Pos3D nj = norm(H[j]);
+			if ((ni / nj).Euc() == 0) continue;
+			V.push_back(norm(rad(ref, rotate(nj))));
+		}
+		std::sort(V.begin(), V.end());
+		int sz = V.size();
+		for (int j = 0, k = 1; j < sz; j++) {
+			while (norm(V[j] - V[k]) > PI) k = (k + 1) % sz;
+			cnt = std::max(cnt, (k - j + sz) % sz + 1);
+		}
+#endif
 	}
-	std::cout << cnt << "\n";
+	//std::cout << cnt << "\n";
 	ans.push_back(cnt);
 	return 1;
 }
@@ -122,4 +166,4 @@ void solve() {
 	for (const int& i : ans) std::cout << i << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj4474
+int main() { solve(); return 0; }//boj4474 Rescue Beacon
