@@ -1503,6 +1503,18 @@
     <ClCompile Include="boj20231_mec_bi_ter_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj4474_3D_geo.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj8057_stack.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj18672_cnvx_dist_ter_search.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj24004_3D_bi_search.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
