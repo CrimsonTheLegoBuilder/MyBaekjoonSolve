@@ -14,6 +14,7 @@ typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
 const int LEN = 1e5 + 5;
+int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 ll gcd(ll a, ll b, ll c) { a = std::abs(a); b = std::abs(b); c = std::abs(c); a = gcd(a, b); return gcd(a, c); }
 void norm(ll& x, ll& y) {
@@ -46,13 +47,28 @@ typedef std::vector<FracPos> Polygon;
 bool x_eq(const FracPos& p, const FracPos& q) { return (__int128)p.x * q.dx == (__int128)q.x * p.dx; }
 bool y_eq(const FracPos& p, const FracPos& q) { return (__int128)p.y * q.dy == (__int128)q.y * p.dy; }
 bool eq(const FracPos& p, const FracPos& q) { return x_eq(p, q) && y_eq(p, q); }
+bool comp_(const ll& x1, const ll& d1, const ll& x2, const ll& d2, int f = 0) {
+	int s1 = sign(x1) * sign(d1);
+	int s2 = sign(x2) * sign(d2);
+	if (s1 != s2) return s1 < s2;
+	if (s1 == 0) return 0;
+	bool f1 = (__int128)std::abs(x1) * std::abs(d2) < (__int128)std::abs(x2) * std::abs(d1);
+	bool f2 = (__int128)std::abs(x1) * std::abs(d2) > (__int128)std::abs(x2) * std::abs(d1);
+	bool f3 = (__int128)std::abs(x1) * std::abs(d2) == (__int128)std::abs(x2) * std::abs(d1);
+	if (s1 == 1) return f1 || (f && f3);
+	if (s1 == -1) return f2 || (f && f3);
+}
 bool comp(const FracPos& p, const FracPos& q) {
 	if (p.qd != q.qd) return p.qd < q.qd;
 	if (eq(p, q)) return p.f < q.f;
-	if (p.qd == 0) return (__int128)p.x * q.dx > (__int128)q.x * p.dx;
-	if (p.qd == 1) return (__int128)p.y * q.dy > (__int128)q.y * p.dy;
-	if (p.qd == 2) return (__int128)p.x * q.dx < (__int128)q.x * p.dx;
-	if (p.qd == 3) return (__int128)p.y * q.dy < (__int128)q.y * p.dy;
+	//if (p.qd == 0) return (__int128)p.x * q.dx > (__int128)q.x * p.dx;
+	//if (p.qd == 1) return (__int128)p.y * q.dy > (__int128)q.y * p.dy;
+	//if (p.qd == 2) return (__int128)p.x * q.dx < (__int128)q.x * p.dx;
+	//if (p.qd == 3) return (__int128)p.y * q.dy < (__int128)q.y * p.dy;
+	if (p.qd == 0) return comp_(q.x, q.dx, p.x, p.dx);
+	if (p.qd == 1) return comp_(q.y, q.dy, p.y, p.dy);
+	if (p.qd == 2) return comp_(p.x, p.dx, q.x, q.dx);
+	if (p.qd == 3) return comp_(p.y, p.dy, q.y, q.dy);
 	assert(0);
 	return 0;
 }
@@ -68,10 +84,12 @@ Polygon intersections(const Line& l, const FracPos& p1, const FracPos& p2) {
 	FracPos a, b, c, d;
 	ll x1 = p2.y - l.b, d1 = l.a; norm(x1, d1);
 	a = FracPos(x1, d1, p2.y, 1);
-	if (x1 <= (__int128)p1.x * d1 || (__int128)p2.x * d1 < x1) a.dx = a.dy = 0;
+	//if (x1 <= (__int128)p1.x * d1 || (__int128)p2.x * d1 < x1) a.dx = a.dy = 0;
+	if (comp_(x1, 1, p1.x, d1, 1) || comp_(p2.x, d1, x1, 1)) a.dx = a.dy = 0;
 	ll x3 = p1.y - l.b, d3 = l.a; norm(x3, d3);
 	c = FracPos(x3, d3, p1.y, 1);
-	if (x3 < (__int128)p1.x * d3 || (__int128)p2.x * d3 <= x3) c.dx = c.dy = 0;
+	//if (x3 < (__int128)p1.x * d3 || (__int128)p2.x * d3 <= x3) c.dx = c.dy = 0;
+	if (comp_(x3, 1, p1.x, d3) || comp_(p2.x, d3, x3, 1, 1)) c.dx = c.dy = 0;
 	ll y2 = p1.x * l.a + l.b;
 	b = FracPos(p1.x, 1, y2, 1);
 	if (b.y_() <= p1.y || p2.y < b.y_()) b.dx = b.dy = 0;
