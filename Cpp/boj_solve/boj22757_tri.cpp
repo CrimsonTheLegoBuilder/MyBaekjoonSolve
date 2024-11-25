@@ -202,40 +202,17 @@ void dfs(const int& i, int v) {
 	return;
 }
 void query() {
-	std::cin >> N;
+	std::cin >> M;
 	memset(A, 0, sizeof A);
 	memset(V, 0, sizeof V);
 	map_pos.clear();
 	ci = 0;
-	for (int i = 0; i < N * N + 10; i++) {
+	for (int i = 0; i < M * M + 10; i++) {
 		GS[i].clear();
 		cell[i].clear();
 	}
-	for (int i = 0; i < N; i++) std::cin >> C[i];
-	for (int i = 0; i < N - 1; i++) {
-		BigPos a = C[i], b = C[i + 1];
-		if (b < a) std::swap(a, b);
-		B[i] = { a, b };
-	}
-	N--;
-	Vbool F(N, 1);
-	std::sort(B, B + N);
-	for (int i = 0; i < N - 1; i++) {
-		if (collinear(B[i], B[i + 1])) {
-			if (B[i].b < B[i + 1].a) continue;
-			if (B[i].a == B[i + 1].a) F[i] = 0;
-			else if (B[i + 1].a <= B[i].b) {
-				F[i] = 0;
-				B[i + 1].a = std::min(B[i].a, B[i + 1].a);
-				B[i + 1].b = std::max(B[i].b, B[i + 1].b);
-			}
-		}
-	}
-	std::vector<BigSeg> tmp;
-	for (int i = 0; i < N; i++) if (F[i]) tmp.push_back(B[i]);
-	N = tmp.size();
-	for (int i = 0; i < N; i++) B[i] = tmp[i];
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < M; i++) {
+		std::cin >> B[i];
 		B[i].a.den = B[i].b.den = 1;
 		seg[i].a = conv(B[i].a);
 		seg[i].b = conv(B[i].b);
@@ -243,9 +220,11 @@ void query() {
 		seg[i].a.i = i;
 		seg[i].b.i = i;
 	}
+	if (M <= 2) { std::cout << "0\n"; return; }
+	bool f0 = 1;
 	Polygon INXS;
-	for (int i = 0; i < N; i++) {
-		for (int j = i + 1; j < N; j++) {
+	for (int i = 0; i < M; i++) {
+		for (int j = i + 1; j < M; j++) {
 			BigPos inx = intersection(B[i], B[j]);
 			if (inx.den) {
 #ifdef DEBUG
@@ -262,10 +241,11 @@ void query() {
 			}
 		}
 	}
+	if (f0) { std::cout << "0\n"; return; }
 	std::sort(INXS.begin(), INXS.end());
 	INXS.erase(unique(INXS.begin(), INXS.end()), INXS.end());
 	I = 0;
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < M; i++) {
 		inx_sort(INX[i], seg[i].a);
 		Polygon& v = INX[i];
 		int sz = v.size();
@@ -273,10 +253,10 @@ void query() {
 			frag[I] = Seg(v[j], v[j + 1]);
 			frag[I].i = I;
 			I++;
-		}
 	}
+}
 	I0 = I;
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < M; i++) {
 		Polygon& v = INX[i];
 		int sz = v.size();
 		for (int j = 0; j < sz - 1; j++) {
@@ -312,7 +292,7 @@ void query() {
 		assert(!(sz & 1));
 		for (int j = 0; j < sz; j += 2) {
 			Pos cur = v[(j - 1 + sz) % sz], nxt = v[j];
-			//assert(cur.rv != nxt.rv);
+			assert(cur.rv != nxt.rv);
 			GS[nxt.i].push_back(cur.i);
 		}
 	}
@@ -348,4 +328,4 @@ void solve() {
 	std::cin >> T;
 	while (T--) query();
 }
-int main() { return 0; }//boj22757
+int main() { solve(); return 0; }//boj22757
