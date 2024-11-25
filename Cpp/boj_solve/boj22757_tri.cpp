@@ -178,7 +178,7 @@ struct Seg {
 	int i;
 	Seg(Pos A = Pos(), Pos B = Pos()) : a(A), b(B) { i = -1; }
 	Pos inx(const Seg& o) const { return intersection(a, b, o.a, o.b); }
-} seg[LEN], frag[LEN * LEN * 10];
+} seg[LEN], frag[LEN * LEN + 10];
 Polygon INX[LEN * LEN + 10];
 void inx_sort(Polygon& INX, const Pos& a) {
 	std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
@@ -190,8 +190,8 @@ int I, I0;
 std::map<Pos, Polygon> map_pos;
 ld A[LEN * LEN + 10];
 Polygon cell[LEN * LEN + 10]; int ci;
-int V[LEN * LEN * 10];
-Vint GS[LEN * LEN * 10];
+int V[LEN * LEN + 10];
+Vint GS[LEN * LEN + 10];
 void dfs(const int& i, int v) {
 	V[v] = 1;
 	cell[i].push_back(frag[v].a);
