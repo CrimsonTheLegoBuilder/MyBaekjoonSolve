@@ -179,7 +179,7 @@ struct Seg {
 	Seg(Pos A = Pos(), Pos B = Pos()) : a(A), b(B) { i = -1; }
 	Pos inx(const Seg& o) const { return intersection(a, b, o.a, o.b); }
 } seg[LEN], frag[LEN * LEN * 10];
-Polygon INX[LEN];
+Polygon INX[LEN * LEN + 10];
 void inx_sort(Polygon& INX, const Pos& a) {
 	std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
 		return (a - p).Euc() < (a - q).Euc();
@@ -210,6 +210,7 @@ void query() {
 	for (int i = 0; i < M * M + 10; i++) {
 		GS[i].clear();
 		cell[i].clear();
+		INX[i].clear();
 	}
 	for (int i = 0; i < M; i++) {
 		std::cin >> B[i];
@@ -221,7 +222,6 @@ void query() {
 		seg[i].b.i = i;
 	}
 	if (M <= 2) { std::cout << "0\n"; return; }
-	bool f0 = 1;
 	Polygon INXS;
 	for (int i = 0; i < M; i++) {
 		for (int j = i + 1; j < M; j++) {
@@ -241,7 +241,6 @@ void query() {
 			}
 		}
 	}
-	if (f0) { std::cout << "0\n"; return; }
 	std::sort(INXS.begin(), INXS.end());
 	INXS.erase(unique(INXS.begin(), INXS.end()), INXS.end());
 	I = 0;
