@@ -62,7 +62,8 @@ inline int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
 	int dim = 1;
 	for (int i = 1; i < p.size(); i++) {
 		if (dim == 1) {
-			if (p[0] != p[i]) std::swap(p[1], p[i]), ++dim;
+			if (p[0] != p[i])
+				std::swap(p[1], p[i]), ++dim;
 		}
 		else if (dim == 2) {
 			if (!collinear(p[0], p[1], p[i]))
