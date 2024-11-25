@@ -201,7 +201,8 @@ void dfs(const int& i, int v) {
 	}
 	return;
 }
-void query() {
+void query(int t) {
+	std::cout << "Case " << t << ":\n";
 	std::cin >> M;
 	memset(A, 0, sizeof A);
 	memset(V, 0, sizeof V);
@@ -316,7 +317,7 @@ void query() {
 	}
 	int ret = 0;
 	for (int i = 0; i < ci; i++) if (cell[i].size() == 3 && A[i] > 0) ret++;
-	std::cout << ret << "\n";
+	std::cout << ret << "\n\n";
 	return;
 }
 void solve() {
@@ -325,6 +326,6 @@ void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(15);
 	std::cin >> T;
-	while (T--) query();
+	for (int t = 1; t <= T; t++) query(t);
 }
 int main() { solve(); return 0; }//boj22757
