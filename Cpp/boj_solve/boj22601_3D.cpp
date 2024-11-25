@@ -265,7 +265,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(17);
+	std::cout.precision(3);
 	std::cin >> N;
 	C3D.resize(N);
 	C3Df.resize(N + 1);
@@ -296,15 +296,16 @@ void solve() {
 		//std::cout << "a : " << C3Df[F.v[0]] << "\nb : " << C3Df[F.v[1]] << "\nc :  " << C3Df[F.v[2]] << "\n";
 		//std::cout << F.P(C3Df) << "\n";
 		//std::cout << F.P(C3Df).coplanar(O3Df) << "\n";
-		if (!F.P(C3Df).coplanar(O3Df)) {
-			ld a = F.sph_tri_area(C3Df);
-			//std::cout << a << "\n";
-			suf += a;
-		}
+		//if (!F.P(C3Df).coplanar(O3Df)) {
+		//	ld a = F.sph_tri_area(C3Df);
+		//	//std::cout << a << "\n";
+		//	//suf += a;
+		//}
+		suf += F.norm(C3D).mag() * .5;
 	}
 	//std::cout << suf << "\n" << 2 * PI << "\n";
-	if (strictly_inner_check(C3D, Hull3D, O3D)) std::cout << "0.0000000\n";
-	else std::cout << (1 - suf / (4 * PI)) << "\n";
+	//if (strictly_inner_check(C3D, Hull3D, O3D)) std::cout << "0.0000000\n";
+	std::cout << suf << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj23459 - convex_hull_3D refer to koosaga
