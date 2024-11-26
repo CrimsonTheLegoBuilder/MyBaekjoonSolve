@@ -152,18 +152,24 @@ ld ratio(const Pos& p1, const Pos& p2, const ld& t, ld& h, ld& w) {
 void query(int tc) {
 	std::cout << "Case " << tc << ": ";
 	ld h = -1, w = -2;
+	bool f0 = 0;
 	Polygon P(4);
 	for (Pos& p : P) std::cin >> p;
 	P = graham_scan(P);
 	if (P.size() < 4) { std::cout << "sz < 3\n"; }
 	if (P.size() < 4) { ans.push_back(-1); return; }
 	Pos p1 = P[0], p2 = P[2], q1 = P[1], q2 = P[3];
-	//if (dot(p1, p2, q1) >= 0 || dot(p2, p1, q1) >= 0 ||
-	//	dot(p1, p2, q2) >= 0 || dot(p2, p1, q2) >= 0 ||
-	//	dot(q1, q2, p1) >= 0 || dot(q2, q1, p1) >= 0 ||
-	//	dot(q1, q2, p2) >= 0 || dot(q2, q1, p2) >= 0) {
-	//	std::cout << "dot out\n";
-	//	ans.push_back(-1); return;
+	if (dot(p1, p2, q1) >= 0 || dot(p2, p1, q1) >= 0 ||
+		dot(p1, p2, q2) >= 0 || dot(p2, p1, q2) >= 0 ||
+		dot(q1, q2, p1) >= 0 || dot(q2, q1, p1) >= 0 ||
+		dot(q1, q2, p2) >= 0 || dot(q2, q1, p2) >= 0) {
+		f0 = 1;
+	}
+	//if ((dot(p1, p2, q1) >= 0 && dot(p2, p1, q2) >= 0) ||
+	//	(dot(p1, p2, q2) >= 0 && dot(p2, p1, q1) >= 0) ||
+	//	(dot(q1, q2, p1) >= 0 && dot(q2, q1, p2) >= 0) ||
+	//	(dot(q1, q2, p2) >= 0 && dot(q2, q1, p1) >= 0)) {
+	//	f0 = 1;
 	//}
 	Pos v1 = p2 - p1, v2 = q2 - q1;
 	if (zero(v1 * v2) && eq(v1.mag(), v2.mag())) { std::cout << "perp && eq\n"; }
@@ -195,9 +201,11 @@ void query(int tc) {
 	//else std::cout << "no solution\n";
 	std::cout << h << " " << w << "\n";
 	if (eq(h, w)) { ans.push_back(h + 10); return; }
-	//bi_search(P, h, w);
-	//std::cout << h << " " << w << "\n";
-	//if (eq(h, w)) { ans.push_back(h + 10); return; }
+	if (!f0) {
+		bi_search(P, h, w);
+		std::cout << h << " " << w << "\n";
+		if (eq(h, w)) { ans.push_back(h + 10); return; }
+	}
 	ans.push_back(-1);
 	return;
 }
