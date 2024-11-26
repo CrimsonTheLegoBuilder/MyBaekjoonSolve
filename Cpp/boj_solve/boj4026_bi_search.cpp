@@ -107,6 +107,12 @@ ld bi_search(const Polygon& A, const Polygon& B, ld s, ld e) {
 ld ratio(const Pos& p1, const Pos& p2, const ld& t, ld& h, ld& w) {
 	Pos ho = Pos(1, 0).rot(t);
 	Pos ve = ~ho;
+	Pos b1 = intersection(O, ho, p1, p1 + ve);
+	Pos b2 = intersection(p2, p2 + ho, b1, b1 + ve);
+	if (ccw(p2, b2, p1) >= 0) return -1;
+	h = b1.mag();
+	w = (b1 - b2).mag();
+	return w / h;
 }
 void query(int tc) {
 	std::cout << "Case " << tc << ": ";
@@ -133,13 +139,15 @@ void query(int tc) {
 	p1 = Pos(l1, 0);
 	p2 = Pos(l2, 0).rot(t);
 	ld s = 0, e = -(PI * .5 - t), m;
-	ld h, w;
+	ld h = -1, w = -2;
 	int cnt = 30;
 	while (cnt--) {
 		m = (s + e) * .5;
 		if (ratio(p1, p2, m, h, w) > 1) s = m;
 		else e = m;
 	}
+	if (eq(h, w)) std::cout << w << "\n";
+	else std::cout << "no solution\n";
 	return;
 }
 void solve() {
