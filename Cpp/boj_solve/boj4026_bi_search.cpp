@@ -63,6 +63,7 @@ typedef std::vector<Pos> Polygon;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
@@ -96,13 +97,47 @@ std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 	}
 	return H;
 }
-ld bi_search(const Polygon& A, const Polygon& B, ld s, ld e) {
-	int cnt = 30; while (cnt--) {
-		ld m = (s + e) * .5;
-		//std::cout << "m:: " << m << "\n";
-
+ld bi_search(Polygon H, ld& h, ld& w) {
+	//Pos v = H[0];
+	//for (Pos& p : H) p -= v;
+	//ld s = (H[2] - H[0]).rad(), e = s - rad(H[1] - H[0], H[2] - H[0]);
+	//int cnt = 30; while (cnt--) {
+	//	ld m = (s + e) * .5;
+	//	//std::cout << "m:: " << m << "\n";
+	//	Pos b1 = Pos(1, 0).rot(m), b2 = ~b1;
+	//	if (cross(O, b2, H[1], H[3]) < 0) { s = m; continue; }
+	//	w = dot(O, b1, H[0], H[2]);
+	//	h = dot(O, b2, H[1], H[3]);
+	//std::cout << h << " " << w << "\n";
+	//	if (h > w) e = m;
+	//	else s = m;
+	//}
+	for (int i = 0; i < 4; i++) {
+		Pos v = H[i];
+		Polygon C = H;
+		rotate(C.begin(), C.begin() + i, C.end());
+		//std::cout << C[0] << "\n";
+		//for (Pos& p : C) p -= v;
+		ld t = -TOL + std::min(rad(C[1] - C[0], C[2] - C[0]), PI * .5 - rad(C[2] - C[0], C[3] - C[0]));
+		//assert(t >= 0);
+		ld s = (C[2] - C[0]).rad(), e = s - t;
+		int cnt = 30; while (cnt--) {
+			ld m = (s + e) * .5;
+			//std::cout << "m:: " << m << "\n";
+			Pos b1 = Pos(1, 0).rot(m), b2 = ~b1;
+			if (dot(O, b2, H[3], H[2]) > 0 || dot(O, b1, H[2], H[1]) > 0) { e = m; continue; }
+			w = dot(O, b1, C[0], C[2]);
+			h = dot(O, b2, C[1], C[3]);
+			assert(w >= 0);
+			//std::cout << h << " " << w << "\n";
+			if (h < 0) { e = m; continue; }
+			if (h < w) e = m;
+			else s = m;
+		}
+		if (eq(h, w)) std::cout << H[i] << " " << s << " :: theta::\n";
+		if (eq(h, w)) return (h + w) * .5;
 	}
-	return (s + e) * .5;
+	return -1;
 }
 ld ratio(const Pos& p1, const Pos& p2, const ld& t, ld& h, ld& w) {
 	Pos ho = Pos(1, 0).rot(t);
@@ -112,42 +147,58 @@ ld ratio(const Pos& p1, const Pos& p2, const ld& t, ld& h, ld& w) {
 	if (ccw(p2, b2, p1) >= 0) return -1;
 	h = b1.mag();
 	w = (b1 - b2).mag();
-	return w / h;
+	return h / w;
 }
 void query(int tc) {
 	std::cout << "Case " << tc << ": ";
+	ld h = -1, w = -2;
 	Polygon P(4);
 	for (Pos& p : P) std::cin >> p;
 	P = graham_scan(P);
-	if (P.size() < 4) { std::cout << "no solution\n"; return; }
+	if (P.size() < 4) { std::cout << "sz < 3\n"; }
+	if (P.size() < 4) { ans.push_back(-1); return; }
 	Pos p1 = P[0], p2 = P[2], q1 = P[1], q2 = P[3];
-	if (dot(p1, p2, q1) >= 0 || dot(p2, p1, q1) >= 0 ||
-		dot(p1, p2, q2) >= 0 || dot(p2, p1, q2) >= 0 || 
-		dot(q1, q2, p1) >= 0 || dot(q2, q1, p1) >= 0 ||
-		dot(q1, q2, p2) >= 0 || dot(q2, q1, p2) >= 0) {
-		std::cout << "no solution\n"; return;
-	}
+	//if (dot(p1, p2, q1) >= 0 || dot(p2, p1, q1) >= 0 ||
+	//	dot(p1, p2, q2) >= 0 || dot(p2, p1, q2) >= 0 ||
+	//	dot(q1, q2, p1) >= 0 || dot(q2, q1, p1) >= 0 ||
+	//	dot(q1, q2, p2) >= 0 || dot(q2, q1, p2) >= 0) {
+	//	std::cout << "dot out\n";
+	//	ans.push_back(-1); return;
+	//}
 	Pos v1 = p2 - p1, v2 = q2 - q1;
-	if (zero(v1 * v2) && eq(v1.mag(), v2.mag())) { std::cout << v1.mag() << "\n"; return; }
+	if (zero(v1 * v2) && eq(v1.mag(), v2.mag())) { std::cout << "perp && eq\n"; }
+	if (zero(v1 * v2) && eq(v1.mag(), v2.mag())) {
+		//std::cout << v1.mag() + 10 << "\n";
+		ans.push_back(v1.mag() + 10);
+		return;
+	}
 	ld d1 = v1.Euc(), d2 = v2.Euc();
-	if (d2 < d1) std::swap(d1, d2);
-	if (sign(d1 - (d1 + d1)) >= 0) { std::cout << "no solution\n"; return; }
+	if (d2 < d1) std::swap(d1, d2); 
+	if (sign(d1 - (d1 + d1)) >= 0) { std::cout << "too long\n"; }
+	if (sign(d1 - (d1 + d1)) >= 0) { ans.push_back(-1); return; }
 	ld t = std::abs(rad(v1, v2));
 	t = std::min(t, PI - t);
 	ld l1 = v1.mag(), l2 = v2.mag();
 	if (l1 < l2) std::swap(l1, l2);
 	p1 = Pos(l1, 0);
 	p2 = Pos(l2, 0).rot(t);
+	std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
+	std::cout << "l1:: " << l1 << " l2:: " << l2 << "\n";
 	ld s = 0, e = -(PI * .5 - t), m;
-	ld h = -1, w = -2;
 	int cnt = 30;
 	while (cnt--) {
 		m = (s + e) * .5;
 		if (ratio(p1, p2, m, h, w) > 1) s = m;
 		else e = m;
 	}
-	if (eq(h, w)) std::cout << w << "\n";
-	else std::cout << "no solution\n";
+	//if (eq(h, w)) std::cout << w + 10 << "\n";
+	//else std::cout << "no solution\n";
+	std::cout << h << " " << w << "\n";
+	if (eq(h, w)) { ans.push_back(h + 10); return; }
+	//bi_search(P, h, w);
+	//std::cout << h << " " << w << "\n";
+	//if (eq(h, w)) { ans.push_back(h + 10); return; }
+	ans.push_back(-1);
 	return;
 }
 void solve() {
@@ -157,6 +208,10 @@ void solve() {
 	std::cout.precision(15);
 	std::cin >> T;
 	for (int tc = 1; tc <= T; tc++) query(tc);
+	for (int tc = 1; tc <= T; tc++) {
+		if (ans[tc - 1] < 0) std::cout << "Case " << tc << ": " << "no solution\n";
+		else std::cout << "Case " << tc << ": " << ans[tc - 1] << "\n";
+	}
 	return;
 }
-int main() { solve(); return 0; }//boj20231
+int main() { solve(); return 0; }//boj4026
