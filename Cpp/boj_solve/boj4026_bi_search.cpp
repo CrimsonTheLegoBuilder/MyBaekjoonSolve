@@ -196,21 +196,21 @@ void query(int tc) {
 	//bool f1 = 0;
 	//if (dot(inx, p2, p1) > 0 && )
 	ld s = 0, e = -(PI * .5 - t), m;
-	int cnt = 30;
-	while (cnt--) {
-		m = (s + e) * .5;
-		if (ratio(p1, p2, m, h, w) > 1) s = m;
-		else e = m;
-		//std::cout << s << " " << h << " " << w << "\n";
-	}
+	//int cnt = 30;
+	//while (cnt--) {
+	//	m = (s + e) * .5;
+	//	if (ratio(p1, p2, m, h, w) > 1) s = m;
+	//	else e = m;
+	//	//std::cout << s << " " << h << " " << w << "\n";
+	//}
 	//if (eq(h, w)) std::cout << w + 10 << "\n";
 	//else std::cout << "no solution\n";
 	std::cout << h << " " << w << "\n";
-	if (eq(h, w)) { ans.push_back(h + 10); return; }
+	//if (eq(h, w)) { ans.push_back(h + 10); return; }
 	//if (!f0) {
-	//	bi_search(P, h, w);
-	//	std::cout << h << " " << w << "\n";
-	//	if (eq(h, w)) { ans.push_back(h + 10); return; }
+		bi_search(P, h, w);
+		std::cout << h << " " << w << "\n";
+		if (eq(h, w)) { ans.push_back(h + 10); return; }
 	//}
 	ans.push_back(-1);
 	return;
