@@ -112,30 +112,33 @@ ld bi_search(Polygon H, ld& h, ld& w) {
 	//	if (h > w) e = m;
 	//	else s = m;
 	//}
-	for (int i = 0; i < 4; i++) {
-		Pos v = H[i];
-		Polygon C = H;
-		rotate(C.begin(), C.begin() + i, C.end());
-		//std::cout << C[0] << "\n";
-		//for (Pos& p : C) p -= v;
-		ld t = -TOL + std::min(rad(C[1] - C[0], C[2] - C[0]), PI * .5 - rad(C[2] - C[0], C[3] - C[0]));
-		//assert(t >= 0);
-		ld s = (C[2] - C[0]).rad(), e = s - t;
-		int cnt = 30; while (cnt--) {
-			ld m = (s + e) * .5;
-			//std::cout << "m:: " << m << "\n";
-			Pos b1 = Pos(1, 0).rot(m), b2 = ~b1;
-			if (dot(O, b2, H[3], H[2]) > 0 || dot(O, b1, H[2], H[1]) > 0) { e = m; continue; }
-			w = dot(O, b1, C[0], C[2]);
-			h = dot(O, b2, C[1], C[3]);
-			assert(w >= 0);
-			//std::cout << h << " " << w << "\n";
-			if (h < 0) { e = m; continue; }
-			if (h < w) e = m;
-			else s = m;
+	for (int _ = 0; _ < 2; _++) {
+		for (int i = 0; i < 4; i++) {
+			Pos v = H[i];
+			Polygon C = H;
+			rotate(C.begin(), C.begin() + i, C.end());
+			//std::cout << C[0] << "\n";
+			//for (Pos& p : C) p -= v;
+			ld t = -TOL + std::min(rad(C[1] - C[0], C[2] - C[0]), PI * .5 - rad(C[2] - C[0], C[3] - C[0]));
+			//assert(t >= 0);
+			ld s = (C[2] - C[0]).rad(), e = s - t;
+			int cnt = 30; while (cnt--) {
+				ld m = (s + e) * .5;
+				//std::cout << "m:: " << m << "\n";
+				Pos b1 = Pos(1, 0).rot(m), b2 = ~b1;
+				if (dot(O, b2, H[3], H[2]) > 0 || dot(O, b1, H[2], H[1]) > 0) { e = m; continue; }
+				w = dot(O, b1, C[0], C[2]);
+				h = dot(O, b2, C[1], C[3]);
+				assert(w >= 0);
+				//std::cout << h << " " << w << "\n";
+				if (h < 0) { e = m; continue; }
+				if (h < w) e = m;
+				else s = m;
+			}
+			if (eq(h, w)) std::cout << H[i] << " " << s << " :: theta::\n";
+			if (eq(h, w)) return (h + w) * .5;
 		}
-		if (eq(h, w)) std::cout << H[i] << " " << s << " :: theta::\n";
-		if (eq(h, w)) return (h + w) * .5;
+		for (Pos& p : H) p.x *= -1;
 	}
 	return -1;
 }
