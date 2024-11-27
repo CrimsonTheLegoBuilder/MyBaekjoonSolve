@@ -220,7 +220,7 @@ void query(int tc) {
 		Pos u = P[(i + 1) % 4] - P[i];
 		Pos v = ~u;
 		int R = 0, U = 0, L = 0;
-		for (int j = i; j < 4; j++) if (sign(dot(P[i], P[(i + 1) % 4], P[j % 4], P[(j + 1) % 4])) <= 0) { R = j; break; }
+		for (int j = i; j < i + 4; j++) if (sign(dot(P[i], P[(i + 1) % 4], P[j % 4], P[(j + 1) % 4])) <= 0) { R = j; break; }
 		for (int k = R; k < R + 4; k++) if (ccw(P[i], P[(i + 1) % 4], P[k % 4], P[(k + 1) % 4]) <= 0) { U = k; break; }
 		for (int l = U; l <= U + 4; l++) if (sign(dot(P[i], P[(i + 1) % 4], P[l % 4], P[(l + 1) % 4])) >= 0) { L = l; break; }
 		R %= 4;	U %= 4; L %= 4;
