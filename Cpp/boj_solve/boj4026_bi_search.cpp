@@ -165,12 +165,12 @@ void query(int tc) {
 		dot(q1, q2, p2) >= 0 || dot(q2, q1, p2) >= 0) {
 		f0 = 1;
 	}
-	//if ((dot(p1, p2, q1) >= 0 && dot(p2, p1, q2) >= 0) ||
-	//	(dot(p1, p2, q2) >= 0 && dot(p2, p1, q1) >= 0) ||
-	//	(dot(q1, q2, p1) >= 0 && dot(q2, q1, p2) >= 0) ||
-	//	(dot(q1, q2, p2) >= 0 && dot(q2, q1, p1) >= 0)) {
-	//	f0 = 1;
-	//}
+	if ((dot(p1, p2, q1) >= 0 && dot(p2, p1, q2) >= 0) ||
+		(dot(p1, p2, q2) >= 0 && dot(p2, p1, q1) >= 0) ||
+		(dot(q1, q2, p1) >= 0 && dot(q2, q1, p2) >= 0) ||
+		(dot(q1, q2, p2) >= 0 && dot(q2, q1, p1) >= 0)) {
+		ans.push_back(-1); return;
+	}
 	Pos v1 = p2 - p1, v2 = q2 - q1;
 	if (zero(v1 * v2) && eq(v1.mag(), v2.mag())) { std::cout << "perp && eq\n"; }
 	if (zero(v1 * v2) && eq(v1.mag(), v2.mag())) {
@@ -190,22 +190,28 @@ void query(int tc) {
 	p2 = Pos(l2, 0).rot(t);
 	std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
 	std::cout << "l1:: " << l1 << " l2:: " << l2 << "\n";
+	//Pos v = ~(p2 - p1);
+	//Pos inx = intersection(p1, p2, O, v);
+	//ld tt = rad()
+	//bool f1 = 0;
+	//if (dot(inx, p2, p1) > 0 && )
 	ld s = 0, e = -(PI * .5 - t), m;
 	int cnt = 30;
 	while (cnt--) {
 		m = (s + e) * .5;
 		if (ratio(p1, p2, m, h, w) > 1) s = m;
 		else e = m;
+		//std::cout << s << " " << h << " " << w << "\n";
 	}
 	//if (eq(h, w)) std::cout << w + 10 << "\n";
 	//else std::cout << "no solution\n";
 	std::cout << h << " " << w << "\n";
 	if (eq(h, w)) { ans.push_back(h + 10); return; }
-	if (!f0) {
-		bi_search(P, h, w);
-		std::cout << h << " " << w << "\n";
-		if (eq(h, w)) { ans.push_back(h + 10); return; }
-	}
+	//if (!f0) {
+	//	bi_search(P, h, w);
+	//	std::cout << h << " " << w << "\n";
+	//	if (eq(h, w)) { ans.push_back(h + 10); return; }
+	//}
 	ans.push_back(-1);
 	return;
 }
@@ -223,3 +229,9 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj4026
+
+/*
+1
+0 20 11 50 50 -2 63 0
+
+*/
