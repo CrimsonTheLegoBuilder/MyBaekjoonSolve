@@ -14,7 +14,7 @@ typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-8;
 const ld PI = acos(-1);
 const int LEN = 1e3;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -119,10 +119,10 @@ ld bi_search(Polygon H, ld& h, ld& w) {
 			rotate(C.begin(), C.begin() + i, C.end());
 			//std::cout << C[0] << "\n";
 			//for (Pos& p : C) p -= v;
-			ld t = -TOL + std::min(rad(C[1] - C[0], C[2] - C[0]), PI * .5 - rad(C[2] - C[0], C[3] - C[0]));
+			ld t = -1e-4 + std::min(rad(C[1] - C[0], C[2] - C[0]), PI * .5 - rad(C[2] - C[0], C[3] - C[0]));
 			//assert(t >= 0);
 			ld s = (C[2] - C[0]).rad(), e = s - t;
-			int cnt = 30; while (cnt--) {
+			int cnt = 35; while (cnt--) {
 				ld m = (s + e) * .5;
 				//std::cout << "m:: " << m << "\n";
 				Pos b1 = Pos(1, 0).rot(m), b2 = ~b1;
@@ -135,10 +135,12 @@ ld bi_search(Polygon H, ld& h, ld& w) {
 				if (h < w) e = m;
 				else s = m;
 			}
+			if (eq(h, w) && (eq((C[0] - C[2]).mag(), h) || eq((C[1] - C[3]).mag(), h))) continue;
 			if (eq(h, w)) std::cout << H[i] << " " << s << " :: theta::\n";
 			if (eq(h, w)) return (h + w) * .5;
 		}
 		for (Pos& p : H) p.x *= -1;
+		H = graham_scan(H);
 	}
 	return -1;
 }
@@ -168,12 +170,12 @@ void query(int tc) {
 		dot(q1, q2, p2) >= 0 || dot(q2, q1, p2) >= 0) {
 		f0 = 1;
 	}
-	if ((dot(p1, p2, q1) >= 0 && dot(p2, p1, q2) >= 0) ||
-		(dot(p1, p2, q2) >= 0 && dot(p2, p1, q1) >= 0) ||
-		(dot(q1, q2, p1) >= 0 && dot(q2, q1, p2) >= 0) ||
-		(dot(q1, q2, p2) >= 0 && dot(q2, q1, p1) >= 0)) {
-		ans.push_back(-1); return;
-	}
+	//if ((dot(p1, p2, q1) >= 0 && dot(p2, p1, q2) >= 0) ||
+	//	(dot(p1, p2, q2) >= 0 && dot(p2, p1, q1) >= 0) ||
+	//	(dot(q1, q2, p1) >= 0 && dot(q2, q1, p2) >= 0) ||
+	//	(dot(q1, q2, p2) >= 0 && dot(q2, q1, p1) >= 0)) {
+	//	ans.push_back(-1); return;
+	//}
 	Pos v1 = p2 - p1, v2 = q2 - q1;
 	if (zero(v1 * v2) && eq(v1.mag(), v2.mag())) { std::cout << "perp && eq\n"; }
 	if (zero(v1 * v2) && eq(v1.mag(), v2.mag())) {
@@ -199,7 +201,8 @@ void query(int tc) {
 	//bool f1 = 0;
 	//if (dot(inx, p2, p1) > 0 && )
 	ld s = 0, e = -(PI * .5 - t), m;
-	int cnt = 30;
+	//s -= TOL; e += TOL;
+	int cnt = 35;
 	while (cnt--) {
 		m = (s + e) * .5;
 		if (ratio(p1, p2, m, h, w) > 1) s = m;
@@ -236,5 +239,8 @@ int main() { solve(); return 0; }//boj4026
 /*
 1
 0 20 11 50 50 -2 63 0
+
+1
+-90 -63 80 39 80 22 -73 -97
 
 */
