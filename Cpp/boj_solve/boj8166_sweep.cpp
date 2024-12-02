@@ -81,10 +81,15 @@ void solve() {
 		M = N - 1;
 		for (int j = 1; j <= M; j++) A[j] = A[j - 1] + P[j - 1];
 		for (int j = 0, k = 1; j < M; j++) {
-			while (P[j] / P[k] > 0 || (P[j] / P[k] == 0 && P[j] * P[k] > 0 && P[j].Euc() < P[k].Euc())) k = (k + 1) % M;
-			Pos v = A[(k - 1 + M) % M] - A[j];
+			Pos u = P[j];
+			while (j < M && (P[j] / P[(j + 1) % M]) == 0) u += P[(j + 1) % M], j++;
+			//while (j < M - 1 && (P[j] / P[j + 1]) == 0 && (P[j] * P[j + 1]) > 0 && P[j].Euc() < P[k].Euc()) u += P[j + 1];
+			//while (P[j] / P[k] > 0 || (P[j] / P[k] == 0 && P[j] * P[k] > 0 && P[j].Euc() < P[k].Euc())) k = (k + 1) % M;
+			while (u / P[k] > 0) k = (k + 1) % M;
+			//while (P[j] / P[k] > 0 || (P[j] / P[k] == 0 && P[j] * P[k] > 0)) k = (k + 1) % M;
+			Pos v = A[(k + M) % M] - A[j % M];
 			if (k < j) v = A[M] - v;
-			T += -P[j] / v;
+			T += -u / v;
 		}
 	}
 	std::cout << T << "\n";
