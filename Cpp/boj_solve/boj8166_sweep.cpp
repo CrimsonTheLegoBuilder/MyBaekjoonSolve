@@ -3,7 +3,7 @@
 typedef long long ll;
 const int LEN = 3005;
 
-int N; ll T;
+int N, i, j; ll T;
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -17,13 +17,14 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cin >> N;
-	for (int i = 0; i < N; i++) std::cin >> P[i].x >> P[i].y;
+	for (i = 0; i < N; i++) std::cin >> P[i].x >> P[i].y;
 	std::sort(P, P + N, cmp);
-	for (int i = 2; i < N; i++) {
-		for (int j = 0; j < i; j++) V[j] = P[i] - P[j];
+	for (i = 2; i < N; i++) {
+		for (j = 0; j < i; j++) V[j] = P[i] - P[j];
 		Pos v(0, 0); std::sort(V, V + i);
-		for (int j = 0; j < i; j++) T += V[j] / v, v += V[j];
+		for (j = 0; j < i; j++) T += V[j] / v, v += V[j];
 	}
 	std::cout << T / 2 << "." << (T & 1) * 5 << "\n";
+	return;
 }
-int main() { solve(); }//boj8166
+int main() { solve(); return 0; }//boj8166
