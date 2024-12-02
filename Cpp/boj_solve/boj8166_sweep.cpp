@@ -82,11 +82,12 @@ void solve() {
 		for (int j = 1; j <= M; j++) A[j] = A[j - 1] + P[j - 1];
 		for (int j = 0, k = 1; j < M; j++) {
 			while (P[j] / P[k] > 0) k = (k + 1) % M;
-			Pos v = A[(k - 1) % M] - A[j];
-			if (k < j) v += A[M];
+			Pos v = A[(k + M) % M] - A[j + 1];
+			if (k < j) v = A[M] - v;
 			T += -P[j] / v;
 		}
 	}
+	std::cout << T << "\n";
 	std::cout << (T >> 1) << "." << (T & 1 ? 5 : 0) << "\n";
 	return;
 }
