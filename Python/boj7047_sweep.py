@@ -172,14 +172,14 @@ if __name__ == "__main__":
                 elif det0 < 0 or det2 > 0:
                     inx[2] = 1
                 if inx[2] == 0:
-                    if not det0 and det2 > 0:
+                    if not det0 and ccw(d0, d1, d2) < 0:
                         continue
-                    if not det2 and det0 < 0:
+                    if not det2 and ccw(d0, d1, d2) < 0:
                         continue
                 if inx[2] == 1:
-                    if not det0 and det2 < 0:
+                    if not det0 and ccw(d0, d1, d2) < 0:
                         continue
-                    if not det2 and det0 > 0:
+                    if not det2 and ccw(d0, d1, d2) < 0:
                         continue
                 # print("suck::")
                 V.append(inx[:])
