@@ -38,6 +38,8 @@ def intersection(p1: list, p2: list,
     x: int = p1[0] * c2 + p2[0] * c1
     det: int = c1 + c2
     d = gcd(x, det)
+    if d == 0:
+        return [0, 1, 0]
     x //= d
     det //= d
     if not x:
@@ -87,7 +89,7 @@ def cmp_tuple(p1: tuple, p2: tuple) -> int:
     f1: int = p2[0] - p1[0]
     f2: int = p2[1] - p1[1]
     if not f1:
-        return sign(f2)
+        return sign(f2) * -1
     return -1 if f1 > 0 else 1
 
 
@@ -212,6 +214,8 @@ if __name__ == "__main__":
         r: tuple[tuple, tuple] = R[i]
         d1: tuple = r[0]
         d2: tuple = r[1]
+        if d1 not in D or d2 not in D:
+            continue
         i1: int = D[d1]
         i2: int = D[d2]
         U.append((i1, i2))
