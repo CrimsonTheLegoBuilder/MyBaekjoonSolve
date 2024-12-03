@@ -33,10 +33,10 @@ def ccw4(p1, p2,
 def intersection(p1, p2,
                  q1, q2
                  ):
-    c1: int = cross(q1, q2, p1)
-    c2: int = -cross(q1, q2, p2)
-    x: int = p1[0] * c2 + p2[0] * c1
-    det: int = c1 + c2
+    c1 = cross(q1, q2, p1)
+    c2 = -cross(q1, q2, p2)
+    x = p1[0] * c2 + p2[0] * c1
+    det = c1 + c2
     d = gcd(x, det)
     if d == 0:
         return [0, 1, 0]
@@ -54,20 +54,20 @@ def intersection(p1, p2,
 
 
 def area(h):
-    a: int = 0
-    n: int = len(h)
+    a = 0
+    n = len(h)
     for i_ in range(n):
         a += cross([0, 0], h[i_ - 1], h[i_])
     return a
 
 
 def cmp_list(p1, p2):
-    s1: int = sign(p1[0] * p1[1])
-    s2: int = sign(p2[0] * p2[1])
+    s1 = sign(p1[0] * p1[1])
+    s2 = sign(p2[0] * p2[1])
     if s1 != s2:
         return -1 if s1 < s2 else 1
-    j1: int = abs(p1[0] * p2[1])
-    j2: int = abs(p2[0] * p1[1])
+    j1 = abs(p1[0] * p2[1])
+    j2 = abs(p2[0] * p1[1])
     if len(p1) == 3 and j1 == j2:
         return -1 if p1[2] < p2[2] else 1
     if not s1 and not s2:
@@ -86,8 +86,8 @@ def cmp_list(p1, p2):
 
 
 def cmp_tuple(p1, p2):
-    f1: int = p2[0] - p1[0]
-    f2: int = p2[1] - p1[1]
+    f1 = p2[0] - p1[0]
+    f2 = p2[1] - p1[1]
     if not f1:
         return sign(f2) * -1
     return -1 if f1 > 0 else 1
