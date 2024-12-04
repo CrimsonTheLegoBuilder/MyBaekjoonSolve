@@ -32,7 +32,7 @@ inline ld norm(ld th) {
 #define HI 0
 #define LO 1
 
-int N, M, T, Q;
+int N, T, Q;
 int I[LEN][LEN][2];
 bool IN[LEN][LEN];
 ld ANS;
@@ -130,27 +130,24 @@ struct Prob {
 	bool operator < (const Prob& o) const { return s > o.s; }
 };
 ld prob[LEN];
-void sweep(const int& k, const ld& x) {
+ld expect(const int& i, const int& j, const Pos& mid) {
 	int sz;
-
-	ld A = 0;
-	if (zero(A)) return;
-
-	std::vector<Prob> P;
-	Prob p;
-	for (int i = 0; i < N; i++) {
-		prob[i] = 1.;
-		int all = S[i].U - S[i].L + 1;
-		int L = S[i].L;
-		int U = S[i].U;
-		std::vector<Pow> V;
-		for (int j = 0; j < S[i].M; j++)
-			if (IN[i][j]) V.push_back(Pow(S[i].s[j], S[i].w[j]));
-		std::sort(V.begin(), V.end());
-		sz = V.size();
+	std::vector<Prob> P, M;
+	Prob p, m;
+	for (int k = 0; k < N; k++) {
+		prob[k] = 1;
+		int all = S[k].U - S[k].L + 1;
+		int L = S[k].L;
+		int U = S[k].U;
+		std::vector<Pow> PW;
+		for (int l = 0; l < S[k].M; l++) {
+			if (IN[i][j]) PW.push_back(Pow(S[k].s[l], S[k].w[l]));
+		}
+		std::sort(PW.begin(), PW.end());
+		sz = PW.size();
 		for (int j = 0; j < sz; j++) {
-			int s = V[j].s;
-			int w = V[j].w;
+			int s = PW[j].s;
+			int w = PW[j].w;
 			if (w < L) w = L;
 			int diff = U - w + 1;
 			if (diff > 0) {
@@ -173,15 +170,14 @@ void sweep(const int& k, const ld& x) {
 		prob[p.i] -= p.p;
 		per = per * prob[p.i];
 	}
-	ANS += total * A;
-	return;
+	return total;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	ANS = 0;
+	ld A = 0;
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {
 		std::cin >> S[i].x >> S[i].y >> S[i].M >> S[i].L >> S[i].U;
@@ -216,9 +212,11 @@ void solve() {
 				ld a = cij.green(s, e);
 				ld m = (s + e) * .5;
 				Pos mid = cij.p(m);
+				A += expect(i, j, mid) * a;
 			}
 		}
 	}
+	std::cout << A << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj10910
