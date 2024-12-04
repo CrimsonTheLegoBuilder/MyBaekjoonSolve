@@ -104,9 +104,10 @@ struct Station {
 	int M, L, U;
 	int r[20], s[20], w[20];
 	Vld A[20];
+	bool F[20];
 	Station(int x0 = 0, int y0 = 0, int m0 = 0, int l0 = 0, int u0 = 0)
 		: x(x0), y(y0), M(m0), L(l0), U(u0) {
-		for (int i = 0; i < 20; i++) r[i] = 0, s[i] = 0, w[i] = 0, A[i].clear();
+		for (int i = 0; i < 20; i++) r[i] = 0, s[i] = 0, w[i] = 0, F[i] = 0, A[i].clear();
 	}
 	Pos p() const { return Pos(x, y); }
 	Circle c(const int& i) const { return Circle(p(), r[i]); }
@@ -250,6 +251,11 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		std::cin >> S[i].x >> S[i].y >> S[i].M >> S[i].L >> S[i].U;
 		for (int j = 0; j < S[i].M; j++) std::cin >> S[i].r[j] >> S[i].s[j] >> S[i].w[j];
+		for (int j = 0; j < S[i].M; j++) {
+			for (int k = j + 1; k < S[i].M; k++) {
+				if (S[i].c(j) == S[i].c(k)) S[i].F[k] = 1;
+			}
+		}
 	}
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < S[i].M; j++) {
@@ -259,12 +265,13 @@ void solve() {
 			for (int k = 0; k < N; k++) {
 				if (k == i) continue;
 				for (int l = 0; l < S[k].M; l++) {
+					Circle ckl = S[k].c(l);
+					if (i < k && cij == ckl) S[k].F[l] = 1;
 					ll d1 = sq((ll)S[i].x - S[k].x) + sq((ll)S[i].y - S[k].y);
 					if (!d1) continue;
 					ll d2 = sq((ll)S[i].r[j] + S[k].r[l]);
 					ll d3 = sq((ll)S[i].r[j] - S[k].r[l]);
 					if (d1 > d2 || d1 < d3) continue;
-					Circle ckl = S[k].c(l);
 					Vld inxs = intersections(cij, ckl);
 					for (const ld& x : inxs) V.push_back(x);
 				}
@@ -276,6 +283,7 @@ void solve() {
 	}
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < S[i].M; j++) {
+			if (S[i].F[j]) continue;
 			Circle cij = S[i].c(j);
 			const Vld& V = S[i].A[j];
 			int sz = V.size();
