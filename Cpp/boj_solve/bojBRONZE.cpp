@@ -6,30 +6,33 @@
 #include <cstring>
 #include <cassert>
 typedef long long ll;
-typedef double ld;
-typedef std::vector<int> Vint;
+typedef long double ld;
 const int LEN = 1e6 + 1;
 int sq(int x) { return x * x; }
-ld sq(ld x) { return x * x; }
 
-int N, a, b, c;
-Vint v;
+int a, b, c;
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(7);
-	std::cin >> N;
-	v.resize(3);
-	for (int i = 1; i <= N; i++) {
-		std::cin >> v[0] >> v[1] >> v[2];
-		std::sort(v.begin(), v.end());
-		a = v[0], b = v[1], c = v[2];
-		std::cout << "Case #" << i << ": ";
-		if (a + b <= c) std::cout << "invalid!\n";
-		else if (a == b == c)std::cout << "equilateral\n";
-		else if (a == b || b == c) std::cout << "isosceles\n";
-		else std::cout << "scalene\n";
+	std::cout.precision(3);
+	int t = 1;
+	while (1) {
+		std::cin >> a >> b >> c;
+		if (!a && !b && !c) break;
+		std::cout << "Triangle #" << t++ << "\n";
+		if (c > 0 && (a >= c || b >= c)) { std::cout << "Impossible.\n\n"; continue; }
+		if (a < 0) std::cout << "a = ";
+		else if (b < 0) std::cout << "b = ";
+		else if (c < 0) std::cout << "c = ";
+		if (a == -1 || b == -1) {
+			if (b == -1) std::swap(a, b);
+			else std::cout << sqrt(sq(c) - sq(b)) << "\n";
+		}
+		else {
+			//std::cout << sqrt(sq(a) + sq(b)) << "\n";
+		}
+		std::cout << "\n";
 	}
 	return 0;
 }
