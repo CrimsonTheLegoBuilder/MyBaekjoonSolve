@@ -25,17 +25,7 @@ inline ld norm(ld th) {
 	return th;
 }
 
-#define START 1
-#define CROSS 2
-#define END 3
-
-#define HI 0
-#define LO 1
-
 int N, T, Q;
-int I[LEN][LEN][2];
-bool IN[LEN][LEN];
-ld ANS;
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -48,7 +38,7 @@ struct Pos {
 	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
-	Pos rot(ld the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
+	Pos rot(const ld& the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
 	//Pos unit() const { return *this / mag(); }
@@ -65,8 +55,10 @@ struct Circle {
 	int r;
 	Circle(Pos c_ = Pos(), int r_ = 0) : c(c_), r(r_) {}
 	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
+	bool operator != (const Circle& q) const { return !(q == *this); }
 	bool operator < (const Circle& q) const { return c == q.c ? r < q.r : c < q.c; }
 	bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
+	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
@@ -121,7 +113,7 @@ struct Station {
 } S[LEN];
 struct Pow {
 	int s, w;
-	Pow(int s_, int w_) : s(s_), w(w_) {}
+	Pow(int s_ = 0, int w_ = 0) : s(s_), w(w_) {}
 	bool operator < (const Pow& p) const { return s == p.s ? w > p.w : s > p.s; }
 };
 struct Prob {
@@ -129,46 +121,122 @@ struct Prob {
 	int i, s;
 	bool operator < (const Prob& o) const { return s > o.s; }
 };
-ld prob[LEN];
+//ld prob[LEN];
+//ld expect(const int& i, const int& j, const Pos& mid) {
+//	int sz;
+//	std::vector<Prob> P, M;
+//	Prob p, m;
+//	for (int k = 0; k < N; k++) {
+//		prob[k] = 1;
+//		int all = S[k].U - S[k].L + 1;
+//		int L = S[k].L;
+//		int U = S[k].U;
+//		std::vector<Pow> PW;
+//		for (int l = 0; l < S[k].M; l++) {
+//			if (IN[i][j]) PW.push_back(Pow(S[k].s[l], S[k].w[l]));
+//		}
+//		std::sort(PW.begin(), PW.end());
+//		sz = PW.size();
+//		for (int j = 0; j < sz; j++) {
+//			int s = PW[j].s;
+//			int w = PW[j].w;
+//			if (w < L) w = L;
+//			int diff = U - w + 1;
+//			if (diff > 0) {
+//				U = w - 1;
+//				p.p = (ld)diff / all;
+//				p.i = i;
+//				p.s = s;
+//				P.push_back(p);
+//			}
+//		}
+//	}
+//	std::sort(P.begin(), P.end());
+//	ld per = 1.;
+//	ld total = 0;
+//	sz = P.size();
+//	for (int i = 0; i < sz; i++) {
+//		p = P[i];
+//		total += p.s * per * p.p / prob[p.i];
+//		per = per / prob[p.i];
+//		prob[p.i] -= p.p;
+//		per = per * prob[p.i];
+//	}
+//	return total;
+//}
+ld POS[LEN], NEG[LEN];
 ld expect(const int& i, const int& j, const Pos& mid) {
 	int sz;
 	std::vector<Prob> P, M;
 	Prob p, m;
+	Circle cij = S[i].c(j);
 	for (int k = 0; k < N; k++) {
-		prob[k] = 1;
+		POS[k] = 1; NEG[k] = 1;
 		int all = S[k].U - S[k].L + 1;
-		int L = S[k].L;
-		int U = S[k].U;
-		std::vector<Pow> PW;
+		int pl = S[k].L;
+		int pu = S[k].U;
+		int nl = S[k].L;
+		int nu = S[k].U;
+		std::vector<Pow> PP, MM;
 		for (int l = 0; l < S[k].M; l++) {
-			if (IN[i][j]) PW.push_back(Pow(S[k].s[l], S[k].w[l]));
+			Circle ckl = S[k].c(l);
+			if (ckl >= mid) PP.push_back(Pow(S[k].s[l], S[k].w[l]));
+			if (ckl == cij) continue;
+			if (ckl >= mid) MM.push_back(Pow(S[k].s[l], S[k].w[l]));
 		}
-		std::sort(PW.begin(), PW.end());
-		sz = PW.size();
-		for (int j = 0; j < sz; j++) {
-			int s = PW[j].s;
-			int w = PW[j].w;
-			if (w < L) w = L;
-			int diff = U - w + 1;
+		std::sort(PP.begin(), PP.end());
+		sz = PP.size();
+		for (int l = 0; l < sz; l++) {
+			int s = PP[l].s;
+			int w = PP[l].w;
+			if (w < pl) w = pl;
+			int diff = pu - w + 1;
 			if (diff > 0) {
-				U = w - 1;
+				pu = w - 1;
 				p.p = (ld)diff / all;
-				p.i = i;
+				p.i = k;
 				p.s = s;
 				P.push_back(p);
 			}
 		}
+		std::sort(MM.begin(), MM.end());
+		sz = MM.size();
+		for (int l = 0; l < sz; l++) {
+			int s = MM[l].s;
+			int w = MM[l].w;
+			if (w < nl) w = nl;
+			int diff = nu - w + 1;
+			if (diff > 0) {
+				nu = w - 1;
+				m.p = (ld)diff / all;
+				m.i = k;
+				m.s = s;
+				M.push_back(m);
+			}
+		}
 	}
+	ld total = 0, per;
+	per = 1.;
 	std::sort(P.begin(), P.end());
-	ld per = 1.;
-	ld total = 0;
-	sz = P.size();
-	for (int i = 0; i < sz; i++) {
-		p = P[i];
-		total += p.s * per * p.p / prob[p.i];
-		per = per / prob[p.i];
-		prob[p.i] -= p.p;
-		per = per * prob[p.i];
+	sz = P.size(); assert(sz);
+	for (int k = 0; k < sz; k++) {
+		p = P[k];
+		total += p.s * per * p.p / POS[p.i];
+		per = per / POS[p.i];
+		POS[p.i] -= p.p;
+		per = per * POS[p.i];
+	}
+	if (M.size()) {
+		per = 1.;
+		std::sort(M.begin(), M.end());
+		sz = M.size();
+		for (int k = 0; k < sz; k++) {
+			m = M[k];
+			total -= m.s * per * m.p / NEG[m.i];
+			per = per / NEG[m.i];
+			NEG[m.i] -= m.p;
+			per = per * NEG[m.i];
+		}
 	}
 	return total;
 }
@@ -176,7 +244,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
+	std::cout.precision(15);
 	ld A = 0;
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {
@@ -191,6 +259,11 @@ void solve() {
 			for (int k = 0; k < N; k++) {
 				if (k == i) continue;
 				for (int l = 0; l < S[k].M; l++) {
+					ll d1 = sq((ll)S[i].x - S[k].x) + sq((ll)S[i].y - S[k].y);
+					if (!d1) continue;
+					ll d2 = sq((ll)S[i].r[j] + S[k].r[l]);
+					ll d3 = sq((ll)S[i].r[j] - S[k].r[l]);
+					if (d1 > d2 || d1 < d3) continue;
 					Circle ckl = S[k].c(l);
 					Vld inxs = intersections(cij, ckl);
 					for (const ld& x : inxs) V.push_back(x);
