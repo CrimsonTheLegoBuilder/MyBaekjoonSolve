@@ -242,4 +242,4 @@ void solve() {
 	std::cout << A << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj10910 hint from kcm1700
+int main() { solve(); return 0; }//boj10910 Random signals hint from kcm1700

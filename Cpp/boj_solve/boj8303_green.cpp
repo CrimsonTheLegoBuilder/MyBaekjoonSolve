@@ -34,7 +34,7 @@ inline ld power(ld a, ll b) {
 	return ret;
 }
 
-int N, M, K, R, X[LEN], Y[LEN];
+int N, K, R, X[LEN], Y[LEN];
 struct Pos {
 	ld x, y;
 	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
@@ -98,7 +98,6 @@ struct Event {
 typedef std::vector<Event> Ve;
 Ve V[LEN];
 Vld P[LEN];
-ld H[LEN], L[LEN];
 ld A[LEN];
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -121,13 +120,13 @@ void solve() {
 			ld lo = inxs[0], hi = inxs[1];
 			if (lo < hi) {
 				V[i].push_back({ lo, 1 });
-				V[i].push_back({ hi, 0 });
+				V[i].push_back({ hi, -1 });
 			}
 			else {
 				V[i].push_back({ 0, 1 });
-				V[i].push_back({ hi, 0 });
+				V[i].push_back({ hi, -1 });
 				V[i].push_back({ lo, 1 });
-				V[i].push_back({ PI * 2, 0 });
+				V[i].push_back({ PI * 2, -1 });
 			}
 			P[i].push_back(hi);
 			P[i].push_back(lo);
@@ -137,47 +136,28 @@ void solve() {
 		std::sort(P[i].begin(), P[i].end());
 		P[i].erase(unique(P[i].begin(), P[i].end()), P[i].end());
 		V[i].push_back({ 0, 1 });
-		V[i].push_back({ PI * 2, 0 });
+		V[i].push_back({ PI * 2, -1 });
 		std::sort(V[i].begin(), V[i].end());
 	}
-	//memset(H, 0, sizeof H);
-	//memset(L, 0, sizeof L);
 	memset(A, 0, sizeof A);
 	for (int i = 0; i < N; i++) {
 		int szp = P[i].size();
 		int szv = V[i].size();
 		int cnt = 0;
-		//std::cout << "szp:: " << szp << "\n";
-		//for (int j = 0; j < szp; j++) std::cout << P[i][j] << " ";
-		//std::cout << "\n";
-		//std::cout << "szv:: " << szv << "\n";
-		//for (int j = 0; j < szv; j++) std::cout << V[i][j].x << " " << V[i][j].f << " | ";
-		//std::cout << "\n";
 		for (int j = 0, k = 0; j < szp - 1; j++) {
 			const ld& s = P[i][j], e = P[i][j + 1];
-			while (k < szv && eq(V[i][k].x, s)) {
-				if (V[i][k].f) cnt++;
-				else if (!V[i][k].f) cnt--;
-				k++;
-			}
+			while (k < szv && eq(V[i][k].x, s)) { cnt += V[i][k].f; k++; }
 			ld a = C[i].green(s, e);
-			//if (cnt > 0) H[cnt] += a;
-			//if (cnt > 1) L[cnt - 1] -= a;
 			if (cnt > 0) A[cnt] += a;
 			if (cnt > 1) A[cnt - 1] -= a;
 		}
 	}
-	//ld a = 0;
 	ld t = 0;
 	for (int i = 1; i <= N; i++) {
-		//std::cout << "A[" << i << "]:: " << A[i] << "\n";
 		ld r = (ld)(N - i) / N;
-		//a += A[i] * i;
 		t += A[i] * (1 - power(r, K));
-		//t += A[i] * (1 - power(r, std::min(K, N)));
 	}
-	//std::cout << a << "\n";
 	std::cout << t << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj8303
+int main() { solve(); return 0; }//boj8303 The Goat
