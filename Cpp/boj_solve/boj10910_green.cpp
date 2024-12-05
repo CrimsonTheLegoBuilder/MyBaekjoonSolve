@@ -30,7 +30,6 @@ struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
-	//bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const ld& n) const { return { x * n, y * n }; }
@@ -46,18 +45,13 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
-//ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-//ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 struct Circle {
 	Pos c;
 	int r;
 	Circle(Pos c_ = Pos(), int r_ = 0) : c(c_), r(r_) {}
 	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
 	bool operator != (const Circle& q) const { return !(q == *this); }
-	//bool operator < (const Circle& q) const { return c == q.c ? r < q.r : c < q.c; }
-	//bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
-	//bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
 	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
@@ -166,15 +160,17 @@ ld expect(const int& i, const int& j, const Pos& mid) {//from ekzm0204 (oj.uz)
 		}
 	}
 	ld total = 0, per;
-	per = 1.;
-	std::sort(P.begin(), P.end());
-	sz = P.size(); //assert(sz);
-	for (int k = 0; k < sz; k++) {
-		p = P[k];
-		total += p.s * per * p.p / POS[p.i];
-		per = per / POS[p.i];
-		POS[p.i] -= p.p;
-		per = per * POS[p.i];
+	if (P.size()) {
+		per = 1.;
+		std::sort(P.begin(), P.end());
+		sz = P.size();
+		for (int k = 0; k < sz; k++) {
+			p = P[k];
+			total += p.s * per * p.p / POS[p.i];
+			per = per / POS[p.i];
+			POS[p.i] -= p.p;
+			per = per * POS[p.i];
+		}
 	}
 	if (M.size()) {
 		per = 1.;
