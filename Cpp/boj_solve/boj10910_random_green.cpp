@@ -120,6 +120,7 @@ ld expect(const int& i, const int& j, const Pos& mid) {//from ekzm0204 (oj.uz)
 		int nu = S[k].U;
 		std::vector<Pow> PP, MM;
 		for (int l = 0; l < S[k].M; l++) {
+			if (S[k].F[l]) continue;
 			Circle ckl = S[k].c(l);
 			if (ckl >= mid) PP.push_back(Pow(S[k].s[l], S[k].w[l]));
 			if (ckl == cij) continue;
