@@ -219,7 +219,7 @@ ld expect(const int& i, const int& j, const Pos& mid) {
 	ld total = 0, per;
 	per = 1.;
 	std::sort(P.begin(), P.end());
-	sz = P.size(); assert(sz);
+	sz = P.size(); //assert(sz);
 	for (int k = 0; k < sz; k++) {
 		p = P[k];
 		total += p.s * per * p.p / POS[p.i];
