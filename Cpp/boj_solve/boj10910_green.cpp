@@ -50,7 +50,6 @@ struct Circle {
 	int r;
 	Circle(Pos c_ = Pos(), int r_ = 0) : c(c_), r(r_) {}
 	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
-	//bool operator != (const Circle& q) const { return !(q == *this); }
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
