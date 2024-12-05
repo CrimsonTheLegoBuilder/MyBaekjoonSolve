@@ -30,7 +30,6 @@ struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
-	//bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -41,7 +40,6 @@ struct Pos {
 	Pos rot(const ld& the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
-	//Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
@@ -91,14 +89,6 @@ Vld intersections(const Circle& a, const Circle& b) {
 	ret.push_back(norm(rd + h));
 	return ret;
 }
-//struct Arc {
-//	ld lo, hi;
-//	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
-//	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-//	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
-//	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
-//};
-//typedef std::vector<Arc> Arcs;
 struct Station {
 	int x, y;
 	int M, L, U;
@@ -122,51 +112,8 @@ struct Prob {
 	int i, s;
 	bool operator < (const Prob& o) const { return s > o.s; }
 };
-//ld prob[LEN];
-//ld expect(const int& i, const int& j, const Pos& mid) {
-//	int sz;
-//	std::vector<Prob> P, M;
-//	Prob p, m;
-//	for (int k = 0; k < N; k++) {
-//		prob[k] = 1;
-//		int all = S[k].U - S[k].L + 1;
-//		int L = S[k].L;
-//		int U = S[k].U;
-//		std::vector<Pow> PW;
-//		for (int l = 0; l < S[k].M; l++) {
-//			if (IN[i][j]) PW.push_back(Pow(S[k].s[l], S[k].w[l]));
-//		}
-//		std::sort(PW.begin(), PW.end());
-//		sz = PW.size();
-//		for (int j = 0; j < sz; j++) {
-//			int s = PW[j].s;
-//			int w = PW[j].w;
-//			if (w < L) w = L;
-//			int diff = U - w + 1;
-//			if (diff > 0) {
-//				U = w - 1;
-//				p.p = (ld)diff / all;
-//				p.i = i;
-//				p.s = s;
-//				P.push_back(p);
-//			}
-//		}
-//	}
-//	std::sort(P.begin(), P.end());
-//	ld per = 1.;
-//	ld total = 0;
-//	sz = P.size();
-//	for (int i = 0; i < sz; i++) {
-//		p = P[i];
-//		total += p.s * per * p.p / prob[p.i];
-//		per = per / prob[p.i];
-//		prob[p.i] -= p.p;
-//		per = per * prob[p.i];
-//	}
-//	return total;
-//}
-ld POS[LEN], NEG[LEN];
-ld expect(const int& i, const int& j, const Pos& mid) {
+ld expect(const int& i, const int& j, const Pos& mid) {//from ekzm0204 (oj.uz)
+	ld POS[LEN], NEG[LEN];
 	int sz;
 	std::vector<Prob> P, M;
 	Prob p, m;
