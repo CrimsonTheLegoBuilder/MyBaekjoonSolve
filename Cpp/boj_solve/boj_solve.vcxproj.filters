@@ -1302,9 +1302,6 @@
     <ClCompile Include="boj31601_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10910_random_wrong.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj4000_reuni.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -1383,17 +1380,8 @@
     <ClCompile Include="boj11650.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj10910_random_wrong_2.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj10910_green_wrong_2.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj32383.cpp">
       <Filter>소스 파일\stack</Filter>
-    </ClCompile>
-    <ClCompile Include="boj10910_green_wrong.cpp">
-      <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj31960_brute.cpp">
       <Filter>소스 파일\geometry</Filter>
