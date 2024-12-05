@@ -54,8 +54,8 @@ struct Circle {
 	Circle(Pos c_ = Pos(), int r_ = 0) : c(c_), r(r_) {}
 	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
 	bool operator != (const Circle& q) const { return !(q == *this); }
-	bool operator < (const Circle& q) const { return c == q.c ? r < q.r : c < q.c; }
-	bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
+	//bool operator < (const Circle& q) const { return c == q.c ? r < q.r : c < q.c; }
+	//bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
@@ -114,6 +114,8 @@ struct Prob {
 };
 ld expect(const int& i, const int& j, const Pos& mid) {//from ekzm0204 (oj.uz)
 	ld POS[LEN], NEG[LEN];
+	memset(POS, 0, sizeof POS);
+	memset(NEG, 0, sizeof NEG);
 	int sz;
 	std::vector<Prob> P, M;
 	Prob p, m;
