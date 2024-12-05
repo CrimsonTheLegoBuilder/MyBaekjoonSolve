@@ -25,10 +25,10 @@ inline ld norm(ld th) {
 	return th;
 }
 
-int N, T, Q;
+int N;
 struct Pos {
 	ld x, y;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -43,14 +43,14 @@ struct Pos {
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-}; const Pos O = { 0, 0 };
+}; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 struct Circle {
 	Pos c;
 	int r;
 	Circle(Pos c_ = Pos(), int r_ = 0) : c(c_), r(r_) {}
 	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
-	bool operator != (const Circle& q) const { return !(q == *this); }
+	//bool operator != (const Circle& q) const { return !(q == *this); }
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
@@ -62,8 +62,6 @@ struct Circle {
 		ld tz = (cos(lo) - cos(hi)) * m.y * r;
 		return fan + tz - (s / e) * r * r * (ld).5;
 	}
-	inline friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
-	inline friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 };
 Vld intersections(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
