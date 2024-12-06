@@ -84,11 +84,10 @@ struct Station {
 	int x, y;
 	int M, L, U;
 	int r[20], s[20], w[20];
-	Vld A[20];
 	bool F[20];
 	Station(int x0 = 0, int y0 = 0, int m0 = 0, int l0 = 0, int u0 = 0)
 		: x(x0), y(y0), M(m0), L(l0), U(u0) {
-		for (int i = 0; i < 20; i++) r[i] = 0, s[i] = 0, w[i] = 0, F[i] = 0, A[i].clear();
+		for (int i = 0; i < 20; i++) r[i] = 0, s[i] = 0, w[i] = 0, F[i] = 0;
 	}
 	Pos p() const { return Pos(x, y); }
 	Circle c(const int& i) const { return Circle(p(), r[i]); }
@@ -201,8 +200,8 @@ void solve() {
 	}
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < S[i].M; j++) {
-			Vld& V = S[i].A[j];
-			V = { 0 };
+			if (S[i].F[j]) continue;
+			Vld V = { 0 };
 			Circle cij = S[i].c(j);
 			for (int k = 0; k < N; k++) {
 				if (k == i) continue;
@@ -221,13 +220,6 @@ void solve() {
 			std::sort(V.begin(), V.end());
 			V.erase(unique(V.begin(), V.end(), eq), V.end());
 			V.push_back(PI * 2);
-		}
-	}
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < S[i].M; j++) {
-			if (S[i].F[j]) continue;
-			Circle cij = S[i].c(j);
-			const Vld& V = S[i].A[j];
 			int sz = V.size();
 			for (int k = 0; k < sz - 1; k++) {
 				const ld& s = V[k], e = V[k + 1];
