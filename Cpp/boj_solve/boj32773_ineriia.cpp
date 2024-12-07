@@ -8,7 +8,7 @@
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
-inline ll sq(int x) { return (ll)x * x; }
+inline ll sq(const int& x) { return (ll)x * x; }
 
 int N;
 struct Pos {
