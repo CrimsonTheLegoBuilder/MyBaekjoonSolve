@@ -4,11 +4,11 @@
 typedef long long ll;
 typedef double ld;
 
-int N; ll I;
+int N; ld I;
 struct Pos {
-	int x, y;
-	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
-	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	ld x, y;
+	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
+	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
 } P[1001];
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
