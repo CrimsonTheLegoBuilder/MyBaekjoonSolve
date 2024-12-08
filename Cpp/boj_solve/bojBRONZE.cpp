@@ -10,29 +10,25 @@ typedef long double ld;
 const int LEN = 1e6 + 1;
 int sq(int x) { return x * x; }
 
-int a, b, c;
+int N, X, Y, U, R, L, D;
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	int t = 1;
-	while (1) {
-		std::cin >> a >> b >> c;
-		if (!a && !b && !c) break;
-		std::cout << "Triangle #" << t++ << "\n";
-		if (c > 0 && (a >= c || b >= c)) { std::cout << "Impossible.\n\n"; continue; }
-		if (a < 0) std::cout << "a = ";
-		else if (b < 0) std::cout << "b = ";
-		else if (c < 0) std::cout << "c = ";
-		if (a == -1 || b == -1) {
-			if (b == -1) std::swap(a, b);
-			else std::cout << sqrt(sq(c) - sq(b)) << "\n";
-		}
-		else {
-			//std::cout << sqrt(sq(a) + sq(b)) << "\n";
-		}
-		std::cout << "\n";
+	std::cin >> N;
+	U = -1e9;
+	R = -1e9;
+	L = 1e9;
+	D = 1e9;
+	while (N--) {
+		std::cin >> X >> Y;
+		L = std::min(X, L);
+		D = std::min(Y, D);
+		std::cin >> X >> Y;
+		R = std::max(X, R);
+		U = std::max(Y, U);
+		std::cout << ((R - L + U - D) << 1) << "\n";
 	}
 	return 0;
 }
