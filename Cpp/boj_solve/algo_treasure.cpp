@@ -182,4 +182,4 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//TREASURE
+int main() { solve(); return 0; }//ALGOSPOT TREASURE
