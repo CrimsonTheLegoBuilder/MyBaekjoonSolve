@@ -229,7 +229,7 @@ inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(10);
+	std::cout.precision(15);
 	std::cin >> T;
 	while (T--) {
 		std::cin >> N;
