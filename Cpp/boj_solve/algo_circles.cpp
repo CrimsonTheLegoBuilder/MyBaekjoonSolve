@@ -11,7 +11,7 @@ typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
-const int LEN = 305;
+const int LEN = 3005;
 int N, M, T, Q;
 inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
