@@ -6,8 +6,8 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-typedef double ld;
-//typedef long double ld;
+//typedef double ld;
+typedef long double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
@@ -110,22 +110,32 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
 struct Circle {
-	Pii c;
+	Pos c;
 	int r;
-	Circle(Pii C = Pii(0, 0), int R = 0) : c(C), r(R) {}
+	Circle(Pos C = Pos(0, 0), int R = 0) : c(C), r(R) {}
 	bool operator == (const Circle& C) const { return c == C.c && r == C.r; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
 		ll dist = sq((ll)r - q.r);
 		return r < q.r && dist >= (c - q.c).Euc();
 	}
-	bool operator > (const Pii& p) const { return r > (c - p).mag(); }
-	bool operator >= (const Pii& p) const { return r + TOL > (c - p).mag(); }
-	bool operator < (const Pii& p) const { return r < (c - p).mag(); }
+	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
+	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
+	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
 	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
 	inline ld A() const { return 1. * r * r * PI; }
+	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
+	ld rad(const Pos& p) const { return (p - c).rad(); }
+	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
+	ld green(const ld& lo, const ld& hi) const {
+		Pos s = Pos(cos(lo), sin(lo)), e = Pos(cos(hi), sin(hi));
+		ld fan = area(lo, hi);
+		Pos m = c + (s + e) * r * (ld).5;
+		ld tz = (cos(lo) - cos(hi)) * m.y * r;
+		return fan + tz - (s / e) * r * r * (ld).5;
+	}
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 };
@@ -146,11 +156,10 @@ struct Arc {
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
-Arcs VA[LEN];
 bool V[LEN];
 inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
-	Pii ca = a.c, cb = b.c;
-	Pii vec = cb - ca;
+	Pos ca = a.c, cb = b.c;
+	Pos vec = cb - ca;
 	ll ra = a.r, rb = b.r;
 	ld distance = vec.mag();
 	ld rd = vec.rad();
@@ -166,14 +175,23 @@ inline std::vector<Pos> intersection(const Circle& a, const Circle& b) {
 	if (zero(h)) return {};
 	return { Pos(norm(rd - h), norm(rd + h)) };
 }
-inline void arc_init(std::vector<Circle>& VC) {
-	std::sort(VC.begin(), VC.end(), cmpr);
+inline ld union_area(const std::vector<Circle>& VC, const int& x = -1) {
+	memset(V, 0, sizeof V);
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
-		VA[i].clear();
+		if (i == x || V[i]) continue;
+		for (int j = i + 1; j < sz; j++) {
+			if (j == x || V[j]) continue;
+			if (VC[j] < VC[i] || VC[j] == VC[i]) { V[j] = 1; continue; }
+		}
+	}
+	ld A = 0;
+	for (int i = 0; i < sz; i++) {
+		if (i == x || V[i]) continue;
+		Arcs VA;
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
-			Pii vec = VC[i].c - VC[j].c;
+			Pos vec = VC[i].c - VC[j].c;
 			int ra = VC[i].r, rb = VC[j].r;
 			if (vec.Euc() >= sq(ra + rb)) continue;
 			if (vec.Euc() <= sq(ra - rb)) continue;
@@ -187,41 +205,25 @@ inline void arc_init(std::vector<Circle>& VC) {
 			if (lo > hi) {
 				a1 = Arc(lo, 2 * PI, j);
 				a2 = Arc(0, hi, j);
-				VA[i].push_back(a1);
-				VA[i].push_back(a2);
+				VA.push_back(a1);
+				VA.push_back(a2);
 			}
 			else {
 				a1 = Arc(lo, hi, j);
-				VA[i].push_back(a1);
+				VA.push_back(a1);
 			}
 		}
 
-		std::sort(VA[i].begin(), VA[i].end());
-		VA[i].push_back(Arc(2 * PI, 2 * PI, -2));
-	}
-	return;
-}
-inline ld union_except_x(const std::vector<Circle>& VC, const int& x = -1) {
-	memset(V, 0, sizeof V);
-	int sz = VC.size();
-	for (int i = 0; i < sz; i++) {
-		if (i == x || V[i]) continue;
-		for (int j = i + 1; j < sz; j++) {
-			if (j == x || V[j]) continue;
-			if (VC[j] < VC[i] || VC[j] == VC[i]) { V[j] = 1; continue; }
-		}
-	}
-	ld union_area = 0;
-	for (int i = 0; i < sz; i++) {
-		if (i == x || V[i]) continue;
+		std::sort(VA.begin(), VA.end());
+		VA.push_back(Arc(2 * PI, 2 * PI, -2));
 		ld hi = 0;
-		for (const Arc& a : VA[i]) {
+		for (const Arc& a : VA) {
 			if (a.i == x || V[a.i]) continue;
-			if (a.lo > hi) union_area += Arc(hi, a.lo).green(VC[i]), hi = a.hi;
+			if (a.lo > hi) A += VC[i].green(hi, a.lo), hi = a.hi;
 			else hi = std::max(hi, a.hi);
 		}
 	}
-	return union_area;
+	return A;
 }
 inline void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -230,85 +232,11 @@ inline void solve() {
 	std::cout.precision(10);
 	std::cin >> T;
 	while (T--) {
-		ld ret = 0;
 		std::cin >> N;
 		Disks VC(N);
 		for (Circle& c : VC) std::cin >> c;
-		arc_init(VC);
-		std::cout << union_except_x(VC) << "\n";
+		std::cout << union_area(VC) << "\n";
 	}
 	return;
 }
 int main() { solve(); return 0; }//boj10900 lonely mdic
-
-/*
-
-3
-3 0 4
--3 0 4
-0 0 2
-
-5
-0 0 1
-1 1 1
--1 1 1
--1 -1 1
-1 -1 1
-
-9
-3 0 4
--3 0 4
-0 0 2
-9 0 4
-6 0 2
-15 0 4
-12 0 2
-21 0 4
-18 0 2
-
-5
-1000 1000 1415
-1000 -1000 1415
--1000 -1000 1415
--1000 1000 1415
-0 0 1
-
-5
-1000 1000 1414
-1000 -1000 1414
--1000 -1000 1414
--1000 1000 1414
-0 0 1
-
-5
-0 0 1
-2 0 1
-4 0 1
-6 0 1
-8 0 1
-
-5
-0 0 1
-1 0 1
-2 0 1
-3 0 1
-4 0 1
-
-8
--1 2 1000
--2 1 1000
--2 -1 1000
--1 -2 1000
-1 -2 1000
-2 -1 1000
-2 1 1000
-1 2 1000
-
-5
-0 0 1
-0 0 1
-0 0 1
-0 0 1
-0 0 1
-
-*/
