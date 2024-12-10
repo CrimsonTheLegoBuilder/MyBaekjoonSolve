@@ -6,16 +6,16 @@
 #include <vector>
 #include <deque>
 typedef long long ll;
-//typedef double ld;
-typedef long double ld;
+typedef double ld;
+//typedef long double ld;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 3005;
 int N, M, T, Q;
-inline bool zero(const ld& x) { return std::abs(x) < TOL; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return !sign(x); }
 inline ld sq(ld x) { return x * x; }
 inline ld norm(ld th) {
 	while (th < 0) th += PI * 2;
@@ -140,7 +140,7 @@ Vld intersections(const Circle& a, const Circle& b) {
 }
 inline ld union_area(std::vector<Circle>& VC, const int& x = -1) {
 	memset(V, 0, sizeof V);
-	std::sort(VC.begin(), VC.end());
+	std::sort(VC.begin(), VC.end(), cmpr);
 	int sz = VC.size();
 	for (int i = 0; i < sz; i++) {
 		if (i == x || V[i]) continue;
