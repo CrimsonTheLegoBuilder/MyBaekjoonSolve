@@ -10,22 +10,26 @@ typedef long double ld;
 const int LEN = 1e6 + 1;
 ll sq(ll x) { return x * x; }
 
-int N;
+int N, Q, ret[LEN];
+ll X[LEN], Y[LEN], Z[LEN];
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
 	std::cin >> N;
-	int u = 1e6, r = 1e6, l = -1e6, d = -1e6;
-	while (N--) {
-		int x1, x2, y1, y2;
-		std::cin >> x1 >> x2 >> y1 >> y2;
-		u = std::min(u, y2);
-		r = std::min(r, x2);
-		l = std::max(l, x1);
-		d = std::max(d, y1);
+	for (int i = 0; i < N; i++) std::cin >> X[i] >> Y[i] >> Z[i];
+	std::cin >> Q;
+	for (int q = 0; q < Q; q++) {
+		ll x, y, z, r;
+		std::cin >> x >> y >> z >> r;
+		int cnt = 0;
+		for (int i = 0; i < N; i++) {
+			ll d = sq(x - X[i]) + sq(y - Y[i]) + sq(z - Z[i]);
+			cnt += d <= sq(r);
+		}
+		ret[q] = cnt;
 	}
-	std::cout << std::max(u - d, 0) * std::max(r - l, 0) << "\n";
+	//for (int q = 0; q < Q; q++) std::cout << ret[q] << "\n";
 	return 0;
 }
