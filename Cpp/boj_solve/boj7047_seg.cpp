@@ -25,8 +25,8 @@ inline ll sq(int x) { return (ll)x * x; }
 
 int N, M;
 struct Pos {
-	ll x, y;
-	Pos(ll X = 0, ll Y = 0) : x(X), y(Y) {}
+	int x, y;
+	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -138,6 +138,13 @@ Frac intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	//std::cout << "den:: " << det << "\n";
 	return { x, det, 0 };
 }
+struct Seg {
+	Pos s, e;
+	Seg(Pos s = Pos(), Pos e = Pos()) : s(s), e(e) {}
+	bool operator < (const Seg& o) const { return ccw(o.s, o.e, s) > 0 || ccw(o.s, o.e, e) > 0; }
+	void norm() { if (s / e < 0) std::swap(s, e); }
+};
+std::vector<Seg> VS;
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -152,6 +159,7 @@ void solve() {
 		else v = ~v;
 	}
 	Frac inx;
+	Seg se;
 	for (int _ = 0; _ < N; _++) {
 		std::cin >> M;
 		Polygon P(M);
@@ -165,6 +173,7 @@ void solve() {
 		}
 		//norm(P);
 		tmp.clear();
+		VS.clear();
 		for (int i = 0; i < M; i++) {
 			const Pos& p0 = P[(i + 1 + M) % M], & p1 = P[i], & p2 = P[(i - 1 + M) % M];
 			assert(!on_seg_strong(p0, p1, O));
@@ -180,7 +189,9 @@ void solve() {
 				else inx.f = 1;
 				//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
 				//std::cout << "inx:: " << inx.x << " " << inx.f << "\n";
-				tmp.push_back(inx);
+				//tmp.push_back(inx);
+				se = Seg(p1, p2); se.norm();
+				VS.push_back(se);
 			}
 			else if (!det1) {
 				inx = { p1.x, 1, 0 };
@@ -188,8 +199,12 @@ void solve() {
 				if (det0 == 0 && det2 == 0) continue;
 				if (det0 * det2 > 0) {
 					if (dir > 0) {
-						inx.f = 0; tmp.push_back(inx);
-						inx.f = 1; tmp.push_back(inx);
+						//inx.f = 0; tmp.push_back(inx);
+						//inx.f = 1; tmp.push_back(inx);
+						se = Seg(p0, p1); se.norm();
+						VS.push_back(se);
+						se = Seg(p1, p2); se.norm();
+						VS.push_back(se);
 					}
 					continue;
 				}
@@ -197,11 +212,22 @@ void solve() {
 				if (det0 < 0 || det2 > 0) inx.f = 1;
 				if (!det0 && dir < 0) continue;
 				if (!det2 && dir < 0) continue;
-				tmp.push_back(inx);
+				//tmp.push_back(inx);
+				if (det0 > 0 || det2 < 0) inx.f = 0;
+				if (det0 < 0 || det2 > 0) inx.f = 1;
+				if (!det0 && dir < 0) continue;
+				if (!det2 && dir < 0) continue;
+				se = Seg(p0, p1);
+				if (!det0) se = Seg(p1, p2);
+				//if (!det2) se = Seg(p0, p1);
+				se.norm();
+				VS.push_back(se);
 			}
 		}
-		std::sort(tmp.begin(), tmp.end());
-		int sz = tmp.size();
+		//std::sort(tmp.begin(), tmp.end());
+		//int sz = tmp.size();
+		std::sort(VS.begin(), VS.end());
+		int sz = VS.size();
 		assert(sz % 2 == 0);
 		//for (int i = 0; i < sz; i += 2) {
 		//	Frac f1 = tmp[i];
@@ -212,9 +238,19 @@ void solve() {
 		//	//std::cout << "f2:: " << " " << f2.x * 1. / f2.den << " " << f2.f << "\n";
 		//}
 		for (int i = 0; i < sz; i += 2) {
-			Frac f1 = tmp[i];
-			Frac f2 = tmp[i + 1];
-			assert(f1.f == 0 && f2.f == 1);
+			//Frac f1 = tmp[i];
+			//Frac f2 = tmp[i + 1];
+			//assert(f1.f == 0 && f2.f == 1);
+			//if (f2.x < 0) continue;
+			//f1.f = 0;
+			//f2.f = 0;
+			//V.push_back({ f1, f2 });
+			//S.push_back(f1);
+			//S.push_back(f2);
+
+			Frac f1 = intersection(O, v, VS[i].s, VS[i].e);
+			Frac f2 = intersection(O, v, VS[i + 1].s, VS[i + 1].e);
+			//assert(f1.f == 0 && f2.f == 1);
 			if (f2.x < 0) continue;
 			f1.f = 0;
 			f2.f = 0;
@@ -235,7 +271,7 @@ void solve() {
 		R.push_back(Pos(s, e));
 	}
 	std::sort(R.begin(), R.end());
-	ll hi = -1, cnt = 0;
+	int hi = -1, cnt = 0;
 	sz = R.size();
 	for (int i = 0; i < sz; i++) {
 		if (hi < R[i].x) cnt++, hi = R[i].y;
