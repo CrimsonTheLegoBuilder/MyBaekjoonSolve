@@ -25,8 +25,8 @@ inline ll sq(int x) { return (ll)x * x; }
 
 int N, M;
 struct Pos {
-	ll x, y;
-	Pos(ll X = 0, ll Y = 0) : x(X), y(Y) {}
+	int x, y;
+	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -235,7 +235,7 @@ void solve() {
 		R.push_back(Pos(s, e));
 	}
 	std::sort(R.begin(), R.end());
-	ll hi = -1, cnt = 0;
+	int hi = -1, cnt = 0;
 	sz = R.size();
 	for (int i = 0; i < sz; i++) {
 		if (hi < R[i].x) cnt++, hi = R[i].y;
