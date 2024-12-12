@@ -10,13 +10,14 @@
 #include <map>
 typedef long long ll;
 typedef long long int128;
+//typedef __int128 int128;
 //typedef long double ld;
 typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ll INF = 1e17;
-const int LEN = 1e5 + 1;
+const int LEN = 1e3 + 5;
 const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -57,6 +58,7 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 } u, v; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
+Polygon H[LEN];
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
@@ -81,14 +83,14 @@ int128 gcd(int128 a, int128 b) { while (b) { int128 tmp = a % b; a = b; b = tmp;
 int sign(const int128& x) { return x < 0 ? -1 : x > 0 ? 1 : 0; }
 struct Frac {
 	int128 x, den;
-	int f;
+	//int f;
 	bool operator < (const Frac& o) const {
 		int s1 = sign(x) * sign(den);
 		int s2 = sign(o.x) * sign(o.den);
 		if (s1 != s2) return s1 < s2;
 		if (!x) {
 			assert(!o.x);
-			if (f != o.f) return f < o.f;
+			//if (f != o.f) return f < o.f;
 			return 0;
 		}
 		int128 div1 = abs_(x) / abs_(den);
@@ -99,7 +101,7 @@ struct Frac {
 			int128 n1 = mod1 * o.den;
 			int128 n2 = mod2 * den;
 			if (n1 == n2) {
-				if (f != o.f) return f < o.f;
+				//if (f != o.f) return f < o.f;
 				return 0;
 			}
 			return s1 > 0 ? n1 < n2 : n1 > n2;
@@ -108,19 +110,19 @@ struct Frac {
 	}
 	bool operator == (const Frac& o) const {
 		return x == o.x && den == o.den;
-		int s1 = sign(x) * sign(den);
-		int s2 = sign(o.x) * sign(o.den);
-		if (s1 != s2) return 0;
-		if (!x) { assert(!o.x); return 1; }
-		int128 div1 = abs_(x) / abs_(den);
-		int128 div2 = abs_(o.x) / abs_(o.den);
-		int128 mod1 = abs_(x) % abs_(den);
-		int128 mod2 = abs_(o.x) % abs_(o.den);
-		if (div1 != div2) return 0;
-		int128 n1 = mod1 * o.den;
-		int128 n2 = mod2 * den;
-		if (n1 != n2) return 0;
-		return 1;
+		//int s1 = sign(x) * sign(den);
+		//int s2 = sign(o.x) * sign(o.den);
+		//if (s1 != s2) return 0;
+		//if (!x) { assert(!o.x); return 1; }
+		//int128 div1 = abs_(x) / abs_(den);
+		//int128 div2 = abs_(o.x) / abs_(o.den);
+		//int128 mod1 = abs_(x) % abs_(den);
+		//int128 mod2 = abs_(o.x) % abs_(o.den);
+		//if (div1 != div2) return 0;
+		//int128 n1 = mod1 * o.den;
+		//int128 n2 = mod2 * den;
+		//if (n1 != n2) return 0;
+		//return 1;
 	}
 };
 std::vector<Frac> tmp, S;
@@ -136,15 +138,14 @@ Frac intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	else if (sign(x) * sign(det) < 0 && 0 < x) x *= -1, det *= -1;
 	else if (sign(x) * sign(det) > 0) x = abs_(x), det = abs_(det);
 	//std::cout << "den:: " << det << "\n";
-	return { x, det, 0 };
+	//return { x, det, 0 };
+	return { x, det };
 }
-struct Seg {
-	Pos s, e;
-	Seg(Pos s = Pos(), Pos e = Pos()) : s(s), e(e) {}
-	bool operator < (const Seg& o) const { return ccw(o.s, o.e, s) > 0 || ccw(o.s, o.e, e) > 0; }
-	void norm() { if (s / e < 0) std::swap(s, e); }
-};
-std::vector<Seg> VS;
+//struct E {
+//	int x, f;
+//	bool operator < (const E& e) const { return x == e.x ? f < e.f : x < e.x; }
+//};
+//typedef std::vector<E> VE;
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -159,8 +160,7 @@ void solve() {
 		else v = ~v;
 	}
 	Frac inx;
-	Seg se;
-	for (int _ = 0; _ < N; _++) {
+	for (int n = 0; n < N; n++) {
 		std::cin >> M;
 		Polygon P(M);
 		for (Pos& p : P) std::cin >> p;
@@ -171,9 +171,8 @@ void solve() {
 			if (u.y > 0) for (Pos& p : P) p = -~p;
 			else for (Pos& p : P) p = ~p;
 		}
-		//norm(P);
+		H[n] = P;
 		tmp.clear();
-		VS.clear();
 		for (int i = 0; i < M; i++) {
 			const Pos& p0 = P[(i + 1 + M) % M], & p1 = P[i], & p2 = P[(i - 1 + M) % M];
 			assert(!on_seg_strong(p0, p1, O));
@@ -185,50 +184,108 @@ void solve() {
 			if (det1 * det2 < 0) {
 				inx = intersection(O, v, p1, p2);
 				if (sign(inx.x) * sign(inx.den) <= 0) continue;
-				if (ccw(O, v, p1, p2) < 0) inx.f = 0;
-				else inx.f = 1;
+				//if (ccw(O, v, p1, p2) < 0) inx.f = 0;
+				//else inx.f = 1;
 				//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
 				//std::cout << "inx:: " << inx.x << " " << inx.f << "\n";
-				//tmp.push_back(inx);
-				se = Seg(p1, p2); se.norm();
-				VS.push_back(se);
+				S.push_back(inx);
+
 			}
 			else if (!det1) {
-				inx = { p1.x, 1, 0 };
+				//inx = { p1.x, 1, 0 };
+				inx = { p1.x, 1 };
 				if (inx.x <= 0) continue;
 				if (det0 == 0 && det2 == 0) continue;
 				if (det0 * det2 > 0) {
 					if (dir > 0) {
 						//inx.f = 0; tmp.push_back(inx);
 						//inx.f = 1; tmp.push_back(inx);
-						se = Seg(p0, p1); se.norm();
-						VS.push_back(se);
-						se = Seg(p1, p2); se.norm();
-						VS.push_back(se);
+						S.push_back(inx);
 					}
 					continue;
 				}
-				if (det0 > 0 || det2 < 0) inx.f = 0;
-				if (det0 < 0 || det2 > 0) inx.f = 1;
+				//if (det0 > 0 || det2 < 0) inx.f = 0;
+				//if (det0 < 0 || det2 > 0) inx.f = 1;
 				if (!det0 && dir < 0) continue;
 				if (!det2 && dir < 0) continue;
-				//tmp.push_back(inx);
-				if (det0 > 0 || det2 < 0) inx.f = 0;
-				if (det0 < 0 || det2 > 0) inx.f = 1;
-				if (!det0 && dir < 0) continue;
-				if (!det2 && dir < 0) continue;
-				se = Seg(p0, p1);
-				if (!det0) se = Seg(p1, p2);
-				//if (!det2) se = Seg(p0, p1);
-				se.norm();
-				VS.push_back(se);
+				tmp.push_back(inx);
+				S.push_back(inx);
 			}
 		}
 		//std::sort(tmp.begin(), tmp.end());
 		//int sz = tmp.size();
-		std::sort(VS.begin(), VS.end());
-		int sz = VS.size();
-		assert(sz % 2 == 0);
+		//assert(sz % 2 == 0);
+		//for (int i = 0; i < sz; i += 2) {
+		//	Frac f1 = tmp[i];
+		//	Frac f2 = tmp[i + 1];
+		//	std::cout << "f1:: " << f1.x << " " << f1.den << " " << f1.x * 1. / f1.den << " " << f1.f << "\n";
+		//	std::cout << "f2:: " << f2.x << " " << f2.den << " " << f2.x * 1. / f2.den << " " << f2.f << "\n";
+		//	//std::cout << "f1:: " << " " << f1.x * 1. / f1.den << " " << f1.f << "\n";
+		//	//std::cout << "f2:: " << " " << f2.x * 1. / f2.den << " " << f2.f << "\n";
+		//}
+		//for (int i = 0; i < sz; i += 2) {
+		//	Frac f1 = tmp[i];
+		//	Frac f2 = tmp[i + 1];
+		//	assert(f1.f == 0 && f2.f == 1);
+		//	if (f2.x < 0) continue;
+		//	f1.f = 0;
+		//	f2.f = 0;
+		//	V.push_back({ f1, f2 });
+		//	S.push_back(f1);
+		//	S.push_back(f2);
+		//}
+	}
+	std::sort(S.begin(), S.end());
+	S.erase(unique(S.begin(), S.end()), S.end());
+	int sz = S.size();
+	for (int i = 0; i < sz; i++) Mfrac[S[i]] = i;
+	Polygon R;
+	for (int n = 0; n < N; n++) {
+		const Polygon& P = H[n];
+		for (int i = 0; i < M; i++) {
+			const Pos& p0 = P[(i + 1 + M) % M], & p1 = P[i], & p2 = P[(i - 1 + M) % M];
+			assert(!on_seg_strong(p0, p1, O));
+			int det0 = ccw(O, v, p0);
+			int det1 = ccw(O, v, p1);
+			int det2 = ccw(O, v, p2);
+			int dir = ccw(p0, p1, p2);
+			//assert(dir);
+			if (det1 * det2 < 0) {
+				inx = intersection(O, v, p1, p2);
+				if (sign(inx.x) * sign(inx.den) <= 0) continue;
+				Pos p = Pos(Mfrac[inx], 0);
+				if (ccw(O, v, p1, p2) < 0) p.y = 0;
+				else p.y = 1;
+				//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
+				//std::cout << "inx:: " << inx.x << " " << inx.f << "\n";
+				R.push_back(p);
+			}
+			else if (!det1) {
+				//inx = { p1.x, 1, 0 };
+				inx = { p1.x, 1 };
+				if (inx.x <= 0) continue;
+				if (det0 == 0 && det2 == 0) continue;
+				if (det0 * det2 > 0) {
+					if (dir > 0) {
+						Pos p = Pos(Mfrac[inx], 0);
+						p.y = 0; 
+						R.push_back(p);
+						p.y = 1;
+						R.push_back(p);
+					}
+					continue;
+				}
+				Pos p = Pos(Mfrac[inx], 0);
+				if (det0 > 0 || det2 < 0) p.y = 0;
+				if (det0 < 0 || det2 > 0) p.y = 1;
+				if (!det0 && dir < 0) continue;
+				if (!det2 && dir < 0) continue;
+				R.push_back(p);
+			}
+		}
+		//std::sort(tmp.begin(), tmp.end());
+		//int sz = tmp.size();
+		//assert(sz % 2 == 0);
 		//for (int i = 0; i < sz; i += 2) {
 		//	Frac f1 = tmp[i];
 		//	Frac f2 = tmp[i + 1];
@@ -238,19 +295,9 @@ void solve() {
 		//	//std::cout << "f2:: " << " " << f2.x * 1. / f2.den << " " << f2.f << "\n";
 		//}
 		for (int i = 0; i < sz; i += 2) {
-			//Frac f1 = tmp[i];
-			//Frac f2 = tmp[i + 1];
-			//assert(f1.f == 0 && f2.f == 1);
-			//if (f2.x < 0) continue;
-			//f1.f = 0;
-			//f2.f = 0;
-			//V.push_back({ f1, f2 });
-			//S.push_back(f1);
-			//S.push_back(f2);
-
-			Frac f1 = intersection(O, v, VS[i].s, VS[i].e);
-			Frac f2 = intersection(O, v, VS[i + 1].s, VS[i + 1].e);
-			//assert(f1.f == 0 && f2.f == 1);
+			Frac f1 = tmp[i];
+			Frac f2 = tmp[i + 1];
+			assert(f1.f == 0 && f2.f == 1);
 			if (f2.x < 0) continue;
 			f1.f = 0;
 			f2.f = 0;
@@ -259,11 +306,6 @@ void solve() {
 			S.push_back(f2);
 		}
 	}
-	std::sort(S.begin(), S.end());
-	S.erase(unique(S.begin(), S.end()), S.end());
-	int sz = S.size();
-	for (int i = 0; i < sz; i++) Mfrac[S[i]] = i;
-	Polygon R;
 	sz = V.size();
 	for (int i = 0; i < sz; i++) {
 		int s = Mfrac[V[i].first];
