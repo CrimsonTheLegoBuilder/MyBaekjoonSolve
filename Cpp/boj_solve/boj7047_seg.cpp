@@ -83,16 +83,11 @@ int128 gcd(int128 a, int128 b) { while (b) { int128 tmp = a % b; a = b; b = tmp;
 int sign(const int128& x) { return x < 0 ? -1 : x > 0 ? 1 : 0; }
 struct Frac {
 	int128 x, den;
-	//int f;
 	bool operator < (const Frac& o) const {
 		int s1 = sign(x) * sign(den);
 		int s2 = sign(o.x) * sign(o.den);
 		if (s1 != s2) return s1 < s2;
-		if (!x) {
-			assert(!o.x);
-			//if (f != o.f) return f < o.f;
-			return 0;
-		}
+		if (!x) { assert(!o.x); return 0; }
 		int128 div1 = abs_(x) / abs_(den);
 		int128 div2 = abs_(o.x) / abs_(o.den);
 		int128 mod1 = abs_(x) % abs_(den);
@@ -100,10 +95,7 @@ struct Frac {
 		if (div1 == div2) {
 			int128 n1 = mod1 * o.den;
 			int128 n2 = mod2 * den;
-			if (n1 == n2) {
-				//if (f != o.f) return f < o.f;
-				return 0;
-			}
+			if (n1 == n2) return 0;
 			return s1 > 0 ? n1 < n2 : n1 > n2;
 		}
 		return s1 > 0 ? div1 < div2 : div1 > div2;
@@ -112,10 +104,7 @@ struct Frac {
 		return x == o.x && den == o.den;
 	}
 };
-std::vector<Frac> tmp, S;
-std::map<Frac, int> Mfrac;
-//std::vector<std::pair<Frac, Frac>> V;
-//std::vector<std::pair<Pos, Pos>> V;
+std::vector<Frac> S;
 Frac intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ll a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	int128 x = (int128)p1.x * a2 + (int128)p2.x * a1;
@@ -125,15 +114,19 @@ Frac intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	if (x == 0) det = 1;
 	else if (sign(x) * sign(det) < 0 && 0 < x) x *= -1, det *= -1;
 	else if (sign(x) * sign(det) > 0) x = abs_(x), det = abs_(det);
-	//std::cout << "den:: " << det << "\n";
-	//return { x, det, 0 };
 	return { x, det };
 }
-//struct E {
-//	int x, f;
-//	bool operator < (const E& e) const { return x == e.x ? f < e.f : x < e.x; }
-//};
-//typedef std::vector<E> VE;
+int bi_search(const std::vector<Frac>& S, const Frac& f) {
+	int sz = S.size();
+	int s = 0, e = sz - 1, m;
+	while (s <= e) {
+		m = s + e >> 1;
+		if (S[m] == f) return m;
+		else if (S[m] < f) s = m + 1;
+		else e = m - 1;
+	}
+	return s;
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -160,7 +153,6 @@ void solve() {
 			else for (Pos& p : P) p = ~p;
 		}
 		H[n] = P;
-		tmp.clear();
 		for (int i = 0; i < M; i++) {
 			const Pos& p0 = P[(i + 1 + M) % M], & p1 = P[i], & p2 = P[(i - 1 + M) % M];
 			assert(!on_seg_strong(p0, p1, O));
@@ -186,7 +178,6 @@ void solve() {
 				}
 				if (!det0 && dir < 0) continue;
 				if (!det2 && dir < 0) continue;
-				tmp.push_back(inx);
 				S.push_back(inx);
 			}
 		}
@@ -194,11 +185,11 @@ void solve() {
 	std::sort(S.begin(), S.end());
 	S.erase(unique(S.begin(), S.end()), S.end());
 	int sz = S.size();
-	for (int i = 0; i < sz; i++) Mfrac[S[i]] = i;
 	Polygon R, V;
 	for (int n = 0; n < N; n++) {
 		R.clear();
 		const Polygon& P = H[n];
+		M = P.size();
 		for (int i = 0; i < M; i++) {
 			const Pos& p0 = P[(i + 1 + M) % M], & p1 = P[i], & p2 = P[(i - 1 + M) % M];
 			assert(!on_seg_strong(p0, p1, O));
@@ -210,11 +201,9 @@ void solve() {
 			if (det1 * det2 < 0) {
 				inx = intersection(O, v, p1, p2);
 				if (sign(inx.x) * sign(inx.den) <= 0) continue;
-				Pos p = Pos(Mfrac[inx], 0);
+				Pos p = Pos(bi_search(S, inx), 0);
 				if (ccw(O, v, p1, p2) < 0) p.y = 0;
 				else p.y = 1;
-				//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
-				//std::cout << "inx:: " << inx.x << " " << inx.f << "\n";
 				R.push_back(p);
 			}
 			else if (!det1) {
@@ -223,15 +212,15 @@ void solve() {
 				if (det0 == 0 && det2 == 0) continue;
 				if (det0 * det2 > 0) {
 					if (dir > 0) {
-						Pos p = Pos(Mfrac[inx], 0);
-						p.y = 0; 
+						Pos p = Pos(bi_search(S, inx), 0);
+						p.y = 0;
 						R.push_back(p);
 						p.y = 1;
 						R.push_back(p);
 					}
 					continue;
 				}
-				Pos p = Pos(Mfrac[inx], 0);
+				Pos p = Pos(bi_search(S, inx), 0);
 				if (det0 > 0 || det2 < 0) p.y = 0;
 				if (det0 < 0 || det2 > 0) p.y = 1;
 				if (!det0 && dir < 0) continue;
@@ -240,6 +229,7 @@ void solve() {
 			}
 		}
 		sz = R.size();
+		std::sort(R.begin(), R.end());
 		for (int i = 0; i < sz; i += 2) {
 			Pos f1 = R[i];
 			Pos f2 = R[i + 1];
