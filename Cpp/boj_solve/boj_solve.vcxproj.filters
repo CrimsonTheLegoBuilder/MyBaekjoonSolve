@@ -1524,9 +1524,6 @@
     <ClCompile Include="boj8166_sweep.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj7047_sweep.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj10910_green.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -1548,7 +1545,7 @@
     <ClCompile Include="algo_circles.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj7047_seg.cpp">
+    <ClCompile Include="boj7047_sweeping.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
