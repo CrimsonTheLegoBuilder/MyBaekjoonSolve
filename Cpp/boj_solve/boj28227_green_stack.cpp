@@ -197,7 +197,6 @@ void solve() {
 					}
 				}
 				assert(f);
-				S.pop_back();
 				break;
 			}
 			Pos p = D[S.back().i].p(S.back().hi);
