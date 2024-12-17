@@ -152,6 +152,7 @@ Vld intersections(const Circle& a, const Circle& b) {
 Vld intersections(const ll& x1, const ll& ra, const ll& x2, const ll& rb) {
 	ll d = sq(x1 - x2);
 	ld distance = sqrt(d);
+	ld t = x1 < x2 ? 0 : PI;
 	if (d > sq(ra + rb)) return {};
 	if (d < sq(ra - rb)) return {};
 	ld X = (ra * ra - rb * rb + d) / (2 * distance * ra);
@@ -159,9 +160,9 @@ Vld intersections(const ll& x1, const ll& ra, const ll& x2, const ll& rb) {
 	if (X > 1) X = 1;
 	ld h = acos(X);
 	Vld ret = {};
-	ret.push_back(norm(-h));
+	ret.push_back(norm(t - h));
 	if (zero(h)) return ret;
-	ret.push_back(norm(+h));
+	ret.push_back(norm(t + h));
 	return ret;
 }
 struct Domino {
@@ -170,7 +171,7 @@ struct Domino {
 	inline friend std::istream& operator >> (std::istream& is, Domino& a) { is >> a.x >> a.l; return is; }
 	Circle c() const { return Circle(Pos(x), l); }
 	Pos p(const ld& t) const { return c().p(t); }
-	ld y(ld x_ = 0) const { return sqrtl((ld)l * l + sq(x - x_)); }
+	ld y(ld x_ = 0) const { return sqrtl((ld)l * l - sq(x - x_)); }
 } D[LEN];
 struct Arc {
 	ld lo, hi;
@@ -216,8 +217,10 @@ void solve() {
 				assert(f);
 				break;
 			}
-			Pos p = D[S.back().i].p(S.back().hi);
+			Pos p = D[S.back().i].p(S.back().lo);
 			ld y = D[i].y(p.x);
+			//std::cout << "p:: " << p << "\n";
+			//std::cout << "y:: " << y << "\n";
 			if (y <= p.y) {
 				t = atan2(y, p.x - D[i].x);
 				hi = t;
@@ -230,6 +233,11 @@ void solve() {
 		}
 		S.push_back(Arc(lo, hi, i));
 		A[i] += S.back().green();
+		//for (int j = 0; j < N; j++) std::cout << A[j] << " ";
+		//std::cout << "\n";
+		//int sz = S.size();
+		//for (int j = 0; j < sz; j++) std::cout << S[j].i << " ";
+		//std::cout << "\n";
 	}
 	for (int i = 0; i < N; i++) std::cout << A[i] << "\n";
 	return;
