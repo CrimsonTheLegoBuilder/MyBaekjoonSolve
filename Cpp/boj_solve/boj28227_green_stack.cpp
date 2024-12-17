@@ -149,6 +149,21 @@ Vld intersections(const Circle& a, const Circle& b) {
 	ret.push_back(norm(rd + h));
 	return ret;
 }
+Vld intersections(const ll& x1, const ll& ra, const ll& x2, const ll& rb) {
+	ll d = sq(x1 - x2);
+	ld distance = sqrt(d);
+	if (d > sq(ra + rb)) return {};
+	if (d < sq(ra - rb)) return {};
+	ld X = (ra * ra - rb * rb + d) / (2 * distance * ra);
+	if (X < -1) X = -1;
+	if (X > 1) X = 1;
+	ld h = acos(X);
+	Vld ret = {};
+	ret.push_back(norm(-h));
+	if (zero(h)) return ret;
+	ret.push_back(norm(+h));
+	return ret;
+}
 struct Domino {
 	int x, l;
 	Domino(int x_ = 0, int l_ = 0) : x(x_), l(l_) {}
@@ -162,7 +177,7 @@ struct Arc {
 	int i;
 	Arc(ld l_ = 0, ld h_ = 0, int i_ = -1) : lo(l_), hi(h_), i(i_) {}
 	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-	ld green() const { Circle(Pos(D[i].x), D[i].l).green(lo, hi); }
+	ld green() const { return Circle(Pos(D[i].x), D[i].l).green(lo, hi); }
 	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
 	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
 };
@@ -179,15 +194,17 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		ld lo = PI * .5, hi = PI;
 		while (S.size()) {
-			if (D[S.back().i].x <= D[i].x - D[i].l) break;
-			Vld inxs = intersections(D[S.back().i].c(), D[i].c());
+			if (D[S.back().i].x <= (ll)D[i].x - D[i].l) break;
+			//Vld inxs = intersections(D[S.back().i].c(), D[i].c());
+			Vld inxs = intersections(D[S.back().i].x, D[S.back().i].l, D[i].x, D[i].l);
 			ld t = -1;
 			for (const ld& x : inxs) if (S.back().lo <= x && x <= S.back().hi) t = x;
 			if (t > 0) {
 				A[i] += A[S.back().i];
 				S.back().hi = t;
 				A[i] -= S.back().green();
-				inxs = intersections(D[i].c(), D[S.back().i].c());
+				//inxs = intersections(D[i].c(), D[S.back().i].c());
+				inxs = intersections(D[i].x, D[i].l, D[S.back().i].x, D[S.back().i].l);
 				bool f = 0;
 				for (const ld& x : inxs) {
 					if (lo <= x && x <= hi) {
