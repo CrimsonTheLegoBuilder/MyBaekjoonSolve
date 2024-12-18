@@ -202,11 +202,11 @@ void solve() {
 			for (const ld& x : inxs) if (S.back().lo <= x && x <= S.back().hi) t = x;
 			if (t > 0) {
 				A[i] += A[S.back().i];
-				ld l_ = S.back().lo;
-				S.back().lo = t;
-				A[i] -= S.back().green();
-				S.back().lo = l_;
+				ld h_ = S.back().hi;
 				S.back().hi = t;
+				A[i] -= S.back().green();
+				S.back().hi = h_;
+				S.back().lo = t;
 				//inxs = intersections(D[i].c(), D[S.back().i].c());
 				inxs = intersections(D[i].x, D[i].l, D[S.back().i].x, D[S.back().i].l);
 				bool f = 0;
