@@ -40,10 +40,10 @@ struct Pos {
 	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
-	Pos rot(const ld& the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
+	Pos rot(const ld& the) const { return Pos(x * cosl(the) - y * sin(the), x * sin(the) + y * cos(the)); }
 	ld Euc() const { return x * x + y * y; }
-	ld mag() const { return sqrt(Euc()); }
-	ld rad() const { return norm(atan2(y, x)); }
+	ld mag() const { return sqrtl(Euc()); }
+	ld rad() const { return norm(atan2l(y, x)); }
 	inline friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	inline friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 };
@@ -151,14 +151,14 @@ Vld intersections(const Circle& a, const Circle& b) {
 }
 Vld intersections(const ll& x1, const ll& ra, const ll& x2, const ll& rb) {
 	ll d = sq(x1 - x2);
-	ld distance = sqrt(d);
+	ld distance = sqrtl(d);
 	ld t = x1 < x2 ? 0 : PI;
 	if (d > sq(ra + rb)) return {};
 	if (d < sq(ra - rb)) return {};
 	ld X = (ra * ra - rb * rb + d) / (2 * distance * ra);
 	if (X < -1) X = -1;
 	if (X > 1) X = 1;
-	ld h = acos(X);
+	ld h = acosl(X);
 	Vld ret = {};
 	ret.push_back(norm(t - h));
 	if (zero(h)) return ret;
@@ -171,7 +171,7 @@ struct Domino {
 	inline friend std::istream& operator >> (std::istream& is, Domino& a) { is >> a.x >> a.l; return is; }
 	Circle c() const { return Circle(Pos(x), l); }
 	Pos p(const ld& t) const { return c().p(t); }
-	ld y(ld x_ = 0) const { return sqrtl((ld)l * l - sq(x - x_)); }
+	ld y(ld x_ = 0) const { return sqrtl((ll)l * l - sq(x - x_)); }
 } D[LEN];
 struct Arc {
 	ld lo, hi;
