@@ -193,7 +193,7 @@ void solve() {
 	for (int i = 0; i < N; i++) std::cin >> D[i];
 	Arcs S;
 	for (int i = 0; i < N; i++) {
-		ld lo = PI * .5, hi = PI;
+		ld lo = PI * (ld).5, hi = PI;
 		while (S.size()) {
 			if (D[S.back().i].x <= (ll)D[i].x - D[i].l) break;
 			//Vld inxs = intersections(D[S.back().i].c(), D[i].c());
@@ -230,7 +230,9 @@ void solve() {
 				A[i] += A[S.back().i];
 				break;
 			}
-			A[i] += A[S.back().i];
+			//if (S.back().hi >= PI) {
+			//	A[i] += A[S.back().i];
+			//}
 			A[i] -= S.back().green();
 			S.pop_back();
 		}
@@ -246,3 +248,29 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj28227
+
+/*
+
+20
+8 1
+15 5
+19 8
+25 12
+31 17
+34 18
+40 23
+48 28
+54 30
+59 34
+64 38
+70 43
+78 48
+81 49
+88 50
+95 4
+97 5
+102 9
+110 13
+117 18
+
+*/
