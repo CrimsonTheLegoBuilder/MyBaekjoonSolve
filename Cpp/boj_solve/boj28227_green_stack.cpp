@@ -222,7 +222,7 @@ void solve() {
 			//std::cout << "p:: " << p << "\n";
 			//std::cout << "y:: " << y << "\n";
 			if (y <= p.y) {
-				t = atan2(y, p.x - D[i].x);
+				t = atan2l(y, p.x - D[i].x);
 				hi = t;
 				A[i] += A[S.back().i];
 				break;
