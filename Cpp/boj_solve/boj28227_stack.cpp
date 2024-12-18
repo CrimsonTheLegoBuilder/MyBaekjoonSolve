@@ -25,8 +25,8 @@ ld f(ld c, ld x, ld r) {
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	(std::cout << std::fixed).precision(9);
-	freopen("../../../input_data/D/1-09.in", "r", stdin);
-	freopen("../../../input_data/D/ret.txt", "w", stdout);
+	//freopen("../../../input_data/D/1-09.in", "r", stdin);
+	//freopen("../../../input_data/D/ret.txt", "w", stdout);
 	std::cin >> N;
 	for (int i = 0, sp = 0, j; i < N; ++i) {
 		std::cin >> X[i] >> L[i];
@@ -34,7 +34,7 @@ int main() {
 		while (sp) {
 			j = st[sp - 1];
 			if (X[j] <= X[i] - L[i]) break;
-			if ((ll)L[i] * L[i] - (X[i] - X[j]) * (X[i] - X[j]) <= (ll)L[j] * L[j]) {
+			if ((ll)L[i] * L[i] - ((ll)X[i] - X[j]) * ((ll)X[i] - X[j]) <= (ll)L[j] * L[j]) {
 				S[i] += S[j];
 				l[i] = X[j];
 				break;
@@ -50,4 +50,4 @@ int main() {
 		S[i] += f(X[i], l[i], L[i]);
 		std::cout << S[i] << '\n';
 	}
-}
+}//jay0202
