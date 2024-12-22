@@ -32,11 +32,16 @@ int main() {
 	memset(M, 0, sizeof M);
 	X = (N - 1) * 4 + 1;
 	recur(N * 2);
+	if (N == 1) { std::cout << "*"; return 0; }
 	for (int i = 0; i < X + 2; i++) {
+		if (i == 1) {
+			std::cout << "*\n";
+			continue;
+		}
 		for (int j = 0; j < X; j++) {
 			std::cout << (M[i][j] ? "*" : " ");
 		}
-		std::cout << "\n";
+		//if (i < X + 1) std::cout << "\n";
 	}
 	return 0;
 }
