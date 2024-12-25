@@ -12,8 +12,8 @@
 typedef long long ll;
 //typedef __int128 int128;
 typedef long long int128;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<size_t> Vidx;
 typedef std::vector<int> Vint;
@@ -136,13 +136,14 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	ld lo = (-b - det) / a;
 	ld hi = (-b + det) / a;
 	Vld ret;
-	if (t == LINE) {
-		//if (0 < lo && lo < 1) ret.push_back(lo);
-		ret.push_back(lo);
-		//if (zero(det)) return ret;
-		//if (0 < hi && hi < 1) ret.push_back(hi);
-		ret.push_back(hi);
-	}
+	if (t == LINE) { ret.push_back(lo); ret.push_back(hi); }
+	//if (t == LINE) {
+	//	if (0 < lo && lo < 1) ret.push_back(lo);
+	//	ret.push_back(lo);
+	//	if (zero(det)) return ret;
+	//	if (0 < hi && hi < 1) ret.push_back(hi);
+	//	ret.push_back(hi);
+	//}
 	else {//circle
 		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
 		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
@@ -237,7 +238,7 @@ struct Pos3D {
 	Pii pii() const {
 		assert(x < 1e7);
 		assert(y < 1e7);
-		return { x, y };
+		return { (ll)x, (ll)y };
 	}
 	Pos p() const {
 		assert(x < 1e7);
@@ -288,9 +289,6 @@ struct Face {
 	int v[3];
 	Face(int a = 0, int b = 0, int c = 0) { v[0] = a; v[1] = b; v[2] = c; }
 	inline Pos3D norm(std::vector<Pos3D>& C) const { return cross(C[v[0]], C[v[1]], C[v[2]]); }
-	//int128 above(const Polyhedron& C, const Pos3D& p) const {
-	//	return cross(C[v[0]], C[v[1]], C[v[2]]) * (p - C[v[0]]);
-	//}
 };
 std::vector<Face> Hull3D;
 struct Edge {
@@ -359,7 +357,6 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {//incremental const
 					st = idx1;
 					int cur = rvis.size() - 1;
 					label[idx1] = cur;
-
 					std::vector<int> tmp;
 					set_union(rvis[v].begin(), rvis[v].end(), rvis[o].begin(), rvis[o].end(), back_inserter(tmp));
 					//merge sorted vectors ignoring duplicates
@@ -403,7 +400,6 @@ struct Disk {
 ld circle_cut(const Circle& c, const Seg& s) {
 	Pos v1 = s.s - c.c, v2 = s.e - c.c;
 	ll r = c.r;
-	//Vld inx = circle_line_intersections(c, s, CIRCLE);
 	Vld inx = circle_line_intersections(c, s, LINE);
 	if (inx.empty()) return r * r * rad(v1, v2) * .5;
 	Pos m1, m2;
@@ -424,20 +420,18 @@ ld green(const Circle& c, const Polygon& h) {
 	for (int i = 0; i < sz; i++) {
 		int j = (i + 1) % sz;
 		const Pos& p1 = h[i], & p2 = h[j];
-		ld t = circle_cut(c, Seg(p1, p2));
-		//std::cout << "t:: " << t << "\n";
-		a += t;
+		a += circle_cut(c, Seg(p1, p2));
 	}
 	return a;
 }
 typedef std::vector<Disk> Disks;
 Circle seed[LEN];
-Vint ID[LEN], I;
-//Polygon PD[LEN];//power diagram (Laguerre-Voronoi diagram)
+Vint I, ID[LEN];//power diagram (Laguerre-Voronoi diagram)
 ld A;
 void solve() {
 	A = 0;
 	int bnd = 2e4 + 10;
+	//int bnd = 2e6 + 1;
 	//std::cin.tie(0)->sync_with_stdio(0);
 	//std::cout.tie(0);
 	//std::cout << std::fixed;
@@ -458,7 +452,6 @@ void solve() {
 	}
 	for (int i = 0; i < N; i++) if (F[i]) V.push_back(D[i]);
 	std::swap(D, V);
-	//int bnd = 2e6 + 1;
 	D.push_back(Disk(bnd, bnd));
 	D.push_back(Disk(-bnd, bnd));
 	D.push_back(Disk(-bnd, -bnd));
@@ -466,25 +459,10 @@ void solve() {
 	N = D.size();
 	shuffle(D.begin(), D.end(), std::mt19937(0x14004));
 	C3D.resize(N);
-	for (int i = 0; i < N; i++) {
-		C3D[i] = D[i].p3d();
-		//seed[i] = C3D[i].c();
-	}
-	//for (Pos3D& p : C3D) std::cout << "p.z:: " << p.z << "\n";
-	//std::cout << "1\n"; return;
+	for (int i = 0; i < N; i++) C3D[i] = D[i].p3d();
 	Hull3D = convex_hull_3D(C3D);
-	//std::cout << "h.sz:: " << Hull3D.size() << "\n";
 	for (const Face& f : Hull3D) {
-		//std::cout << "f:: " << f.v[0] << " | " << f.v[1] << " | " << f.v[2] << "\n";
-		//std::cout << D[f.v[0]].x << " " << D[f.v[0]].y << " " << C3D[f.v[0]].z << "\n";
-		//std::cout << D[f.v[1]].x << " " << D[f.v[1]].y << " " << C3D[f.v[1]].z << "\n";
-		//std::cout << D[f.v[2]].x << " " << D[f.v[2]].y << " " << C3D[f.v[2]].z << "\nppp\n";
-		//std::cout << "FUCK::\n";
-		//std::cout << C3D[f.v[0]].x << " " << C3D[f.v[0]].y << " " << C3D[f.v[0]].z << "\n";
-		//std::cout << C3D[f.v[1]].x << " " << C3D[f.v[1]].y << " " << C3D[f.v[1]].z << "\n";
-		//std::cout << C3D[f.v[2]].x << " " << C3D[f.v[2]].y << " " << C3D[f.v[2]].z << "\nppp\n";
 		if (ccw(f) < 0) {
-			//std::cout << "OK::\n";
 			ID[f.v[0]].push_back(f.v[1]);
 			ID[f.v[0]].push_back(f.v[2]);
 			ID[f.v[1]].push_back(f.v[0]);
@@ -495,16 +473,10 @@ void solve() {
 			I.push_back(f.v[1]);
 			I.push_back(f.v[2]);
 		}
-		//else { std::cout << "NO::\n"; }
 	}
 	std::sort(I.begin(), I.end());
 	I.erase(unique(I.begin(), I.end()), I.end());
-	//for (int s = 0; s < N; s++) {
 	for (const int s : I) {
-		//std::cout << "DEBUG\n";
-		//std::cout << s << "\n";
-		//std::cout << "DEBUG\n";
-		//const Circle& a = seed[s];
 		const Pii ca = C3D[s].pii();
 		const ll ra = C3D[s].r;
 		const Circle a = Circle(Pos(ca.x, ca.y), ra);
@@ -517,21 +489,9 @@ void solve() {
 		HP.push_back(Linear(Pos(-bnd, -bnd), Pos(bnd, -bnd)));
 		HP.push_back(Linear(Pos(bnd, -bnd), Pos(bnd, bnd)));
 		bool f = 1;
-		//std::cout << "DEBUG::\nS[" << s << "]:: " << C3D[s].x << " " << C3D[s].y << " " << C3D[s].r << "\nD::\n";
 		for (const int& i : ID[s]) {
-			//std::cout << "D[" << i << "]:: " << C3D[i].x << " " << C3D[i].y << " " << C3D[i].r << "\n";
-			//std::cout << i << "\n";
-			//std::cout << " smaller then " << (D[i] >= D[s]) << "\n";
-			//std::cout << " bigger then " << (D[s] >= D[i]) << "\n";
-			//if (D[i] >= D[s]) { f = 0; break; }
-			//if (D[s] >= D[i]) continue;
-			if (C3D[i] >= C3D[s]) {
-				//std::cout << "DEL:::::::::::::::\n";
-				f = 0;
-				break;
-			}
+			if (C3D[i] >= C3D[s]) { f = 0; break; }
 			if (C3D[s] >= C3D[i]) continue;
-			//const Circle& b = seed[i];
 			const Pii cb = C3D[i].pii();
 			const ll rb = C3D[i].r;
 			if (!rb) continue;
@@ -544,18 +504,10 @@ void solve() {
 		if (!f) continue;
 		Polygon HPI = half_plane_intersection(HP);
 		if (!HPI.size()) continue;
-		//std::cout << "HPI::\n";
-		//for (Pos& p : HPI) std::cout << p << "\n";
-		//std::cout << "HPI::\n";
-		//std::cout << "a:: " << a << "\n";
 		ld cut = green(a, HPI);
-		//std::cout << "FUCK:: CUT:: " << cut << "\n";
 		A += cut;
 	}
 	std::cout << A << "\n";
-	//std::cout << PI * 2 * 2 * 2 << "\n";
-	//std::cout << PI * 200000000 + 400000000 << "\n";
-	//std::cout << PI * 200000000 + 400000000 + PI<< "\n";
 	return;
 }
 //int main() { solve(); return 0; }//boj29432
@@ -572,69 +524,3 @@ int main() {
 	}
 	return 0;
 }
-
-/*
-
-3
-0 0 1
-0 -1 2
-10 0 2
-
-25.132741228718345
-
-1
-4
-1 0 1
--1 0 1
-0 1 1
-0 -1 1
-
-3
-4
-10000 0 10000
--10000 0 10000
-0 10000 10000
-0 -10000 10000
-5
-10000 0 10000
--10000 0 10000
-0 10000 10000
-0 -10000 10000
-0 0 1
-9
-10000 0 10000
--10000 0 10000
-0 10000 10000
-0 -10000 10000
-0 0 1
-0 1 1
-1 0 1
--1 0 1
-0 -1 1
-
-1
-5
-10000 0 10000
--10000 0 10000
-0 10000 10000
-0 -10000 10000
-0 0 1
-
-1
-9
-10000 0 10000
--10000 0 10000
-0 10000 10000
-0 -10000 10000
-0 0 1
-0 1 1
-1 0 1
--1 0 1
-0 -1 1
-
-1
-2
-0 0 1
-0 2 1
-
-*/

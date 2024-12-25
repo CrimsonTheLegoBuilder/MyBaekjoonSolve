@@ -1557,6 +1557,9 @@
     <ClCompile Include="boj29432_fast_power_diagram.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj29432_power_diagram_nlogn.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
