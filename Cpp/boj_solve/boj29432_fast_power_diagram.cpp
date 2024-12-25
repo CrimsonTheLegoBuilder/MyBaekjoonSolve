@@ -66,7 +66,6 @@ struct Pos {
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
 	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
 	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
-	ld xy() const { return x * y; }
 	Pos rot(const ld& t) { return { x * cos(t) - y * sin(t), x * sin(t) + y * cos(t) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
@@ -373,9 +372,10 @@ struct Disk {
 	bool operator == (const Disk& d) const { return x == d.x && y == d.y && r == d.r; }
 	bool operator >= (const Disk& d) const {
 		bool f1 = r >= d.r;
-		bool f2 = sq((ll)x - d.x) + sq((ll)y - d.y) < sq((ll)r - d.r);
+		bool f2 = sq((ll)x - d.x) + sq((ll)y - d.y) <= sq((ll)r - d.r);
 		return f1 && f2;
 	}
+	Pii pii() const { return Pii(x, y); }
 	Circle c() const { return Circle(Pos(x, y), r); }
 	Pos3D p3d() const { return Pos3D(x, y, sq(x) + sq(y) - sq(r), r); }
 	friend std::istream& operator >> (std::istream& is, Disk& p) { is >> p.x >> p.y >> p.r; return is; }
@@ -458,18 +458,23 @@ void solve() {
 	}
 	for (int s = 0; s < N; s++) {
 		const Circle& a = seed[s];
-		const Pii ca = Pii(D[s].x, D[s].y);
+		const Pii ca = D[s].pii();
 		const ll ra = D[s].r;
 		if (!ra) continue;
 		std::sort(ID[s].begin(), ID[s].end());
 		ID[s].erase(unique(ID[s].begin(), ID[s].end()), ID[s].end());
 		Vlinear HP;
+		int bnd = 2e6 + 1;
+		HP.push_back(Linear(Pos(bnd, bnd), Pos(-bnd, bnd)));
+		HP.push_back(Linear(Pos(-bnd, bnd), Pos(-bnd, -bnd)));
+		HP.push_back(Linear(Pos(-bnd, -bnd), Pos(bnd, -bnd)));
+		HP.push_back(Linear(Pos(bnd, -bnd), Pos(bnd, bnd)));
 		bool f = 1;
 		for (const int& i : ID[s]) {
 			if (D[i] >= D[s]) { f = 0; break; }
 			if (D[s] >= D[i]) continue;
-			const Circle& b = seed[s];
-			const Pii cb = Pii(D[i].x, D[i].y);
+			const Circle& b = seed[i];
+			const Pii cb = D[i].pii();
 			const ll rb = D[i].r;
 			if (!rb) continue;
 			Pii v = cb - ca;//vec a -> b
