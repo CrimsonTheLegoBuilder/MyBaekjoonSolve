@@ -124,7 +124,7 @@ struct Circle {
 	inline friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 };
 typedef std::vector<Circle> Circles;
-Vld circle_line_intersections(const Seg& l, const Circle& q, const int& t = LINE) {
+Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
 	Pos s = l.s, e = l.e;
 	Pos vec = e - s;
@@ -374,10 +374,37 @@ struct Disk {
 	Circle c() const { return Circle(Pos(x, y), r); }
 	Pos3D p3d() const { return Pos3D(x, y, sq(x) + sq(y) - sq(r), r); }
 };
+ld circle_cut(const Circle& c, const Seg& s) {
+	Pos v1 = s.s - c.c, v2 = s.e - c.c;
+	ll r = c.r;
+	Vld inx = circle_line_intersections(c, s, CIRCLE);
+	if (inx.empty()) return r * r * rad(v1, v2) * .5;
+	Pos m1, m2;
+	if (inx.size() == 2) m1 = c.p(inx[0]), m2 = c.p(inx[1]);
+	else m1 = m2 = c.p(inx[0]);
+	m1 -= c.c; m2 -= c.c;
+	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
+	if (d1 && d2) return (v1 / v2) * .5;
+	else if (d1) return (v1 / m2 + r * r * rad(m2, v2)) * .5;
+	else if (d2) return (r * r * rad(v1, m1) + m1 / v2) * .5;
+	else if (dot(v1, m1, v2) > 0 && dot(v1, m2, v2) > 0)
+		return (r * r * (rad(v1, m1) + rad(m2, v2)) + m1 / m2) * .5;
+	else return (r * r * rad(v1, v2)) * .5;
+}
+ld green(const Circle& c, const Polygon& h) {
+	int sz = h.size();
+	ld a = 0;
+	for (int i = 0; i < sz; i++) {
+		int j = (i + 1) & sz;
+		const Pos& p1 = h[i], & p2 = h[j];
+		a += circle_cut(c, Seg(p1, p2));
+	}
+	return a;
+}
 typedef std::vector<Disk> Disks;
 Circle seed[LEN];
 Vint ID[LEN];
-Polygon PD[LEN];//power diagram (Laguerre-Voronoi diagram)
+//Polygon PD[LEN];//power diagram (Laguerre-Voronoi diagram)
 ld A;
 void solve() {
 	A = 0;
@@ -414,6 +441,7 @@ void solve() {
 		const Circle& a = seed[s];
 		const Pii ca = Pii(D[s].x, D[s].y);
 		const ll ra = D[s].r;
+		if (!ra) continue;
 		std::sort(ID[s].begin(), ID[s].end());
 		ID[s].erase(unique(ID[s].begin(), ID[s].end()), ID[s].end());
 		Vlinear HP;
@@ -428,8 +456,9 @@ void solve() {
 			HP.push_back(Linear(m, m + ~Pos(v.x, v.y)));
 		}
 		Polygon HPI = half_plane_intersection(HP);
-
+		A += green(a, HPI);
 	}
+	std::cout << A << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj29432
