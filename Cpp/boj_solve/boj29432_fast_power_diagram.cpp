@@ -55,8 +55,8 @@ struct Pos {
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
-	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	Pos operator * (const ld& n) const { return { x * n, y * n }; }
+	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
 	Pos operator ~ () const { return { -y, x }; }
@@ -220,12 +220,12 @@ struct Pos3D {
 	}
 	inline Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
 	inline Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	inline Pos3D operator * (const int128& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	inline Pos3D operator / (const int128& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+	inline Pos3D operator * (const int128& n) const { return { x * n, y * n, z * n }; }
+	inline Pos3D operator / (const int128& n) const { return { x / n, y / n, z / n }; }
 	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
-	Pos3D& operator *= (const int128& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
-	Pos3D& operator /= (const int128& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
+	Pos3D& operator *= (const int128& n) { x *= n; y *= n; z *= n; return *this; }
+	Pos3D& operator /= (const int128& n) { x /= n; y /= n; z /= n; return *this; }
 	inline int128 Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrt(Euc()); }
 	Pii pii() const { return { x, y }; }
