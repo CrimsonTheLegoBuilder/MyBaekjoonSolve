@@ -8,23 +8,191 @@
 #include <cassert>
 #include <array>
 #include <tuple>
+#include <deque>
 typedef long long ll;
 //typedef __int128 int128;
 typedef long long int128;
 typedef long double ld;
 //typedef double ld;
 typedef std::pair<int, int> pi;
+typedef std::vector<size_t> Vidx;
+typedef std::vector<int> Vint;
+typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
-const int LEN = 1e6;
+const int LEN = 1e5 + 5;
 const ld PI = acos(-1);
+inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
 inline ld sq(const ld& x) { return x * x; }
+inline ll sq(const ll& x) { return x * x; }
+inline int128 sq(const int& x) { return (int128)x * x; }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
+#define LINE 1
+#define CIRCLE 2
 
 int N, M, T, Q;
+struct Pii { ll x, y; };
+ll cross(const Pii& d1, const Pii& d2, const Pii& d3) {
+	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
+}
+struct Pos {
+	ld x, y;
+	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
+	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
+	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
+	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	ld operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
+	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
+	Pos operator ~ () const { return { -y, x }; }
+	Pos operator ! () const { return { -x, -y }; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
+	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
+	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
+	ld xy() const { return x * y; }
+	Pos rot(ld the) { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
+	ld Euc() const { return x * x + y * y; }
+	ld mag() const { return sqrt(Euc()); }
+	Pos unit() const { return *this / mag(); }
+	ld rad() const { return atan2(y, x); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
+	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
+	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
+};
+typedef std::vector<Pos> Polygon;
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
+bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
+bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
+bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return dot(d1, d2, d3) / (d1 - d2).mag(); }
+Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
+struct Seg {
+	Pos s, e;
+	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
+	Pos p(const ld& rt) const { return s + (e - s) * rt; }
+	ld green(const ld& lo, const ld& hi) const {
+		ld d = hi - lo;
+		ld ratio = (lo + hi) * .5;
+		Pos m = p(ratio);
+		return m.y * d * (s.x - e.x);
+	}
+};
+ld dot(const Seg& p, const Seg& q) { return dot(p.s, p.e, q.s, q.e); }
+bool collinear(const Seg& p, const Seg& q) { return collinear(p.s, p.e, q.s, q.e); }
+struct Circle {
+	Pos c;
+	int r;
+	Circle(Pos c_ = Pos(), int r_ = 0) : c(c_), r(r_) {}
+	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
+	bool operator < (const Circle& q) const { return c == q.c ? r < q.r : c < q.c; }
+	bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
+	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
+	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
+	ld rad(const Pos& p) const { return (p - c).rad(); }
+	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
+	ld green(const ld& lo, const ld& hi) const {
+		Pos s = Pos(cos(lo), sin(lo)), e = Pos(cos(hi), sin(hi));
+		ld fan = area(lo, hi);
+		Pos m = c + (s + e) * r * (ld).5;
+		ld tz = (cos(lo) - cos(hi)) * m.y * r;
+		return fan + tz - (s / e) * r * r * (ld).5;
+	}
+	inline friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
+	inline friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
+};
+typedef std::vector<Circle> Circles;
+Vld circle_line_intersections(const Seg& l, const Circle& q, const int& t = LINE) {
+	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
+	Pos s = l.s, e = l.e;
+	Pos vec = e - s;
+	Pos OM = s - q.c;
+	ld a = vec.Euc();
+	ld b = vec * OM;
+	ld c = OM.Euc() - q.r * q.r;
+	ld J = b * b - a * c;
+	if (J < -TOL) return {};
+	ld det = sqrt(std::max((ld)0, J));
+	ld lo = (-b - det) / a;
+	ld hi = (-b + det) / a;
+	Vld ret;
+	if (t == LINE) {
+		if (0 < lo && lo < 1) ret.push_back(lo);
+		if (zero(det)) return ret;
+		if (0 < hi && hi < 1) ret.push_back(hi);
+	}
+	else {//circle
+		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
+		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
+		if (zero(det)) return ret;
+		if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
+	}
+	return ret;
+}
+struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
+	Pos ps[2];
+	Pos dir_;
+	Pos& operator[](int i) { return ps[i]; }
+	Pos dir() const { return dir_; }
+	Linear(Pos a = Pos(0, 0), Pos b = Pos(0, 0)) {
+		ps[0] = a;
+		ps[1] = b;
+		dir_ = (ps[1] - ps[0]).unit();
+	}
+	bool include(const Pos& p) const { return sign(dir_ / (p - ps[0])) > 0; }
+	Linear push() const {//push eps outward
+		const double eps = 1e-8;
+		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
+		return Linear(ps[0] + delta, ps[1] + delta);
+	}
+	Linear operator + (const double eps) const {//push eps outward
+		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
+		return Linear(ps[0] + delta, ps[1] + delta);
+	}
+	Linear operator - (const double eps) const {//pull eps inward
+		Pos delta = ~(ps[1] - ps[0]).unit() * eps;
+		return Linear(ps[0] - delta, ps[1] - delta);
+	}
+	friend bool parallel(const Linear& l0, const Linear& l1) { return zero(l0.dir() / l1.dir()); }
+	friend bool same_dir(const Linear& l0, const Linear& l1) { return parallel(l0, l1) && l0.dir() * l1.dir() > 0; }
+	bool operator < (const Linear& l0) const {
+		if (same_dir(*this, l0)) return l0.include(ps[0]);
+		else return cmpq(this->dir(), l0.dir());
+	}
+};
+Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
+std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
+	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
+		return w.include(intersection(u, v));
+		};
+	std::sort(HP.begin(), HP.end());
+	std::deque<Linear> dq;
+	int sz = HP.size();
+	for (int i = 0; i < sz; ++i) {
+		if (i && same_dir(HP[i], HP[(i - 1) % sz])) continue;
+		while (dq.size() > 1 && !check(dq[dq.size() - 2], dq[dq.size() - 1], HP[i])) dq.pop_back();
+		while (dq.size() > 1 && !check(dq[1], dq[0], HP[i])) dq.pop_front();
+		dq.push_back(HP[i]);
+	}
+	while (dq.size() > 2 && !check(dq[dq.size() - 2], dq[dq.size() - 1], dq[0])) dq.pop_back();
+	while (dq.size() > 2 && !check(dq[1], dq[0], dq[dq.size() - 1])) dq.pop_front();
+	sz = dq.size();
+	if (sz < 3) return {};
+	std::vector<Pos> HPI;
+	for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
+	return HPI;
+}
 struct Pos3D {
 	int128 x, y, z;
 	int r;
@@ -50,6 +218,8 @@ struct Pos3D {
 	Pos3D& operator /= (const int128& scalar) { x /= scalar; y /= scalar; z /= scalar; return *this; }
 	inline int128 Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrt(Euc()); }
+	Pii pii() const { return { x, y }; }
+	Circle c() const { return Circle(Pos(x, y), r); }
 	//friend std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
 	//friend std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z << "\n"; return os; }
 };
@@ -65,7 +235,7 @@ inline bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) { return !
 inline bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) { return !(cross(a, b, c) * (p - a)); }
 inline bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) { return cross(a, b, c) * (p - a) > 0; }
 inline int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
-	shuffle(p.begin(), p.end(), std::mt19937(0x14004));
+	//shuffle(p.begin(), p.end(), std::mt19937(0x14004));
 	int dim = 1;
 	for (int i = 1; i < p.size(); i++) {
 		if (dim == 1) {
@@ -179,13 +349,56 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {//incremental const
 	for (int i = 0; i < faces.size(); i++) if (active[i]) hull3D.push_back(faces[i]);
 	return hull3D;
 }
+ll ccw(const Face& f) {
+	Pii d1 = C3D[f.v[0]].pii();
+	Pii d2 = C3D[f.v[1]].pii();
+	Pii d3 = C3D[f.v[2]].pii();
+	return sign(cross(d1, d2, d3));
+}
+struct Disk {
+	int x, y, r;
+	Disk(int x_ = 0, int y_ = 0, int r_ = 0) : x(x_), y(y_), r(r_) {}
+	friend std::istream& operator >> (std::istream& is, Disk& p) { is >> p.x >> p.y >> p.r; return is; }
+	Circle c() const { return Circle(Pos(x, y), r); }
+	Pos3D p3d() const { return Pos3D(x, y, sq(x) + sq(y) - sq(r), r); }
+};
+typedef std::vector<Disk> Disks;
+Circle seed[LEN];
+Vint ID[LEN];
+Polygon PD[LEN];//power diagram (Laguerre-Voronoi diagram)
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(3);
+	std::cout.precision(15);
 	std::cin >> N;
+	Disks D(N);
+	for (Disk& d : D) std::cin >> d;
+	D.push_back(Disk(2e6 + 1, 2e6 + 1));
+	D.push_back(Disk(-2e6 - 1, 2e6 + 1));
+	D.push_back(Disk(-2e6 - 1, -2e6 - 1));
+	D.push_back(Disk(2e6 + 1, -2e6 - 1));
+	N += 4;
+	shuffle(D.begin(), D.end(), std::mt19937(0x14004));
+	C3D.resize(N);
+	for (int i = 0; i < N; i++) {
+		C3D[i] = D[i].p3d();
+		seed[i] = C3D[i].c();
+	}
+	Hull3D = convex_hull_3D(C3D);
+	for (const Face& f : Hull3D) {
+		if (ccw(f) > 0) {
+			ID[f.v[0]].push_back(f.v[1]);
+			ID[f.v[0]].push_back(f.v[2]);
+			ID[f.v[1]].push_back(f.v[0]);
+			ID[f.v[1]].push_back(f.v[2]);
+			ID[f.v[2]].push_back(f.v[0]);
+			ID[f.v[2]].push_back(f.v[1]);
+		}
+	}
+	for (int i = 0; i < N; i++) {
 
+	}
 	return;
 }
-int main() { solve(); return 0; }//boj22601
+int main() { solve(); return 0; }//boj29432
