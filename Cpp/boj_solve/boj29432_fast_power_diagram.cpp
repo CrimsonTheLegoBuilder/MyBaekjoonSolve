@@ -401,7 +401,7 @@ ld green(const Circle& c, const Polygon& h) {
 	int sz = h.size();
 	ld a = 0;
 	for (int i = 0; i < sz; i++) {
-		int j = (i + 1) & sz;
+		int j = (i + 1) % sz;
 		const Pos& p1 = h[i], & p2 = h[j];
 		a += circle_cut(c, Seg(p1, p2));
 	}
@@ -434,10 +434,12 @@ void solve() {
 	}
 	for (int i = 0; i < N; i++) if (F[i]) V.push_back(D[i]);
 	std::swap(D, V);
-	D.push_back(Disk(2e6 + 1, 2e6 + 1));
-	D.push_back(Disk(-2e6 - 1, 2e6 + 1));
-	D.push_back(Disk(-2e6 - 1, -2e6 - 1));
-	D.push_back(Disk(2e6 + 1, -2e6 - 1));
+	int bnd = 2e4 + 1;
+	//int bnd = 2e6 + 1;
+	D.push_back(Disk(bnd, bnd));
+	D.push_back(Disk(-bnd, bnd));
+	D.push_back(Disk(-bnd, -bnd));
+	D.push_back(Disk(bnd, -bnd));
 	N = D.size();
 	shuffle(D.begin(), D.end(), std::mt19937(0x14004));
 	C3D.resize(N);
@@ -445,8 +447,13 @@ void solve() {
 		C3D[i] = D[i].p3d();
 		seed[i] = C3D[i].c();
 	}
+	//for (Pos3D& p : C3D) std::cout << "p.z:: " << p.z << "\n";
 	Hull3D = convex_hull_3D(C3D);
 	for (const Face& f : Hull3D) {
+		//std::cout << "f:: " << f.v[0] << " | " << f.v[1] << " | " << f.v[2] << "\n";
+		//std::cout << D[f.v[0]].x << " " << D[f.v[0]].y << "\n";
+		//std::cout << D[f.v[1]].x << " " << D[f.v[1]].y << "\n";
+		//std::cout << D[f.v[2]].x << " " << D[f.v[2]].y << "\nppp\n";
 		if (ccw(f) < 0) {
 			ID[f.v[0]].push_back(f.v[1]);
 			ID[f.v[0]].push_back(f.v[2]);
@@ -457,6 +464,9 @@ void solve() {
 		}
 	}
 	for (int s = 0; s < N; s++) {
+		//std::cout << "DEBUG\n";
+		//std::cout << s << "\n";
+		//std::cout << "DEBUG\n";
 		const Circle& a = seed[s];
 		const Pii ca = D[s].pii();
 		const ll ra = D[s].r;
@@ -464,13 +474,17 @@ void solve() {
 		std::sort(ID[s].begin(), ID[s].end());
 		ID[s].erase(unique(ID[s].begin(), ID[s].end()), ID[s].end());
 		Vlinear HP;
-		int bnd = 2e6 + 1;
 		HP.push_back(Linear(Pos(bnd, bnd), Pos(-bnd, bnd)));
 		HP.push_back(Linear(Pos(-bnd, bnd), Pos(-bnd, -bnd)));
 		HP.push_back(Linear(Pos(-bnd, -bnd), Pos(bnd, -bnd)));
 		HP.push_back(Linear(Pos(bnd, -bnd), Pos(bnd, bnd)));
 		bool f = 1;
+		//std::cout << "S[" << s << "]:: " << D[s].x << " " << D[s].y << " " << D[s].r << "\nD::\n";
 		for (const int& i : ID[s]) {
+			//std::cout << "D[" << i << "]:: " << D[i].x << " " << D[i].y << " " << D[i].r << "\n";
+			//std::cout << i << "\n";
+			//std::cout << " smaller then " << (D[i] >= D[s]) << "\n";
+			//std::cout << " bigger then " << (D[s] >= D[i]) << "\n";
 			if (D[i] >= D[s]) { f = 0; break; }
 			if (D[s] >= D[i]) continue;
 			const Circle& b = seed[i];
@@ -485,9 +499,34 @@ void solve() {
 		}
 		if (!f) continue;
 		Polygon HPI = half_plane_intersection(HP);
+		if (!HPI.size()) continue;
+		//std::cout << "HPI::\n";
+		//for (Pos& p : HPI) std::cout << p << "\n";
+		//std::cout << "HPI::\n";
 		A += green(a, HPI);
 	}
 	std::cout << A << "\n";
+	//std::cout << PI * 2 * 2 * 2 << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj29432
+//int main() { solve(); return 0; }//boj29432
+int main() {
+	std::cin >> Q;
+	while (Q--) {
+		for (int i = 0; i < 3001; i++) ID[i].clear();
+		Hull3D.clear();
+		solve();
+	}
+	return 0;
+}
+
+/*
+
+3
+0 0 1
+0 -1 2
+10 0 2
+
+25.132741228718345
+
+*/
