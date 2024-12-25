@@ -18,6 +18,7 @@ typedef std::pair<int, int> pi;
 typedef std::vector<size_t> Vidx;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
+typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const int LEN = 1e5 + 5;
@@ -36,7 +37,7 @@ inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >=
 int N, M, T, Q;
 struct Pii {
 	ll x, y;
-	Pii(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
+	Pii(ll x_ = 0, ll y_ = 0) : x(x_), y(y_) {}
 	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
 	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
 	Pii operator * (const ll& n) const { return { x * n, y * n }; }
@@ -129,7 +130,7 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	Pos OM = s - q.c;
 	ld a = vec.Euc();
 	ld b = vec * OM;
-	ld c = OM.Euc() - q.r * q.r;
+	ld c = OM.Euc() - (ll)q.r * q.r;
 	ld J = b * b - a * c;
 	if (J < -TOL) return {};
 	ld det = sqrt(std::max((ld)0, J));
@@ -210,23 +211,23 @@ struct Pos3D {
 	bool operator == (const Pos3D& p) const { return x == p.x && y == p.y && z == p.z; }
 	bool operator != (const Pos3D& p) const { return x != p.x || y != p.y || z != p.z; }
 	bool operator < (const Pos3D& p) const { return x == p.x ? y == p.y ? z < p.z : y < p.y : x < p.x; }
-	inline int128 operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
-	inline Pos3D operator / (const Pos3D& p) const {
+	int128 operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
+	Pos3D operator / (const Pos3D& p) const {
 		Pos3D ret;
 		ret.x = y * p.z - z * p.y;
 		ret.y = z * p.x - x * p.z;
 		ret.z = x * p.y - y * p.x;
 		return ret;
 	}
-	inline Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
-	inline Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	inline Pos3D operator * (const int128& n) const { return { x * n, y * n, z * n }; }
-	inline Pos3D operator / (const int128& n) const { return { x / n, y / n, z / n }; }
+	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
+	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
+	Pos3D operator * (const int128& n) const { return { x * n, y * n, z * n }; }
+	Pos3D operator / (const int128& n) const { return { x / n, y / n, z / n }; }
 	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
 	Pos3D& operator *= (const int128& n) { x *= n; y *= n; z *= n; return *this; }
 	Pos3D& operator /= (const int128& n) { x /= n; y /= n; z /= n; return *this; }
-	inline int128 Euc() const { return x * x + y * y + z * z; }
+	int128 Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrt(Euc()); }
 	Pii pii() const { return { x, y }; }
 	Circle c() const { return Circle(Pos(x, y), r); }
@@ -239,12 +240,12 @@ const Pos3D X_axis = { 1, 0, 0 };
 const Pos3D Y_axis = { 0, 1, 0 };
 const Pos3D Z_axis = { 0, 0, 1 };
 std::vector<Pos3D> C3D;//3D
-inline Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
-inline int128 dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
-inline bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) { return !((b - a) / (c - b)).Euc(); }
-inline bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) { return !(cross(a, b, c) * (p - a)); }
-inline bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) { return cross(a, b, c) * (p - a) > 0; }
-inline int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
+Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
+int128 dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
+bool collinear(const Pos3D& a, const Pos3D& b, const Pos3D& c) { return !((b - a) / (c - b)).Euc(); }
+bool coplanar(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) { return !(cross(a, b, c) * (p - a)); }
+bool above(const Pos3D& a, const Pos3D& b, const Pos3D& c, const Pos3D& p) { return cross(a, b, c) * (p - a) > 0; }
+int prep(std::vector<Pos3D>& p) {//refer to Koosaga'
 	//shuffle(p.begin(), p.end(), std::mt19937(0x14004));
 	int dim = 1;
 	for (int i = 1; i < p.size(); i++) {
@@ -368,9 +369,16 @@ ll ccw(const Face& f) {
 struct Disk {
 	int x, y, r;
 	Disk(int x_ = 0, int y_ = 0, int r_ = 0) : x(x_), y(y_), r(r_) {}
-	friend std::istream& operator >> (std::istream& is, Disk& p) { is >> p.x >> p.y >> p.r; return is; }
+	bool operator < (const Disk& d) const { return x == d.x ? y == d.y ? r < d.r : y < d.y : x < d.x; }
+	bool operator == (const Disk& d) const { return x == d.x && y == d.y && r == d.r; }
+	bool operator >= (const Disk& d) const {
+		bool f1 = r >= d.r;
+		bool f2 = sq((ll)x - d.x) + sq((ll)y - d.y) < sq((ll)r - d.r);
+		return f1 && f2;
+	}
 	Circle c() const { return Circle(Pos(x, y), r); }
 	Pos3D p3d() const { return Pos3D(x, y, sq(x) + sq(y) - sq(r), r); }
+	friend std::istream& operator >> (std::istream& is, Disk& p) { is >> p.x >> p.y >> p.r; return is; }
 };
 ld circle_cut(const Circle& c, const Seg& s) {
 	Pos v1 = s.s - c.c, v2 = s.e - c.c;
@@ -411,13 +419,26 @@ void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(15);
 	std::cin >> N;
-	Disks D(N);
+	Disks D(N), V;
 	for (Disk& d : D) std::cin >> d;
+	std::sort(D.rbegin(), D.rend());
+	D.erase(unique(D.begin(), D.end()), D.end());
+	N = D.size();
+	Vbool F(N, 1);
+	for (int i = 0, j; i < N; i = j) {
+		j = i + 1;
+		while (j < N && (D[i].x == D[j].x && D[i].y == D[j].y)) {
+			F[j] = 0;
+			j++;
+		}
+	}
+	for (int i = 0; i < N; i++) if (F[i]) V.push_back(D[i]);
+	std::swap(D, V);
 	D.push_back(Disk(2e6 + 1, 2e6 + 1));
 	D.push_back(Disk(-2e6 - 1, 2e6 + 1));
 	D.push_back(Disk(-2e6 - 1, -2e6 - 1));
 	D.push_back(Disk(2e6 + 1, -2e6 - 1));
-	N += 4;
+	N = D.size();
 	shuffle(D.begin(), D.end(), std::mt19937(0x14004));
 	C3D.resize(N);
 	for (int i = 0; i < N; i++) {
@@ -443,16 +464,21 @@ void solve() {
 		std::sort(ID[s].begin(), ID[s].end());
 		ID[s].erase(unique(ID[s].begin(), ID[s].end()), ID[s].end());
 		Vlinear HP;
+		bool f = 1;
 		for (const int& i : ID[s]) {
+			if (D[i] >= D[s]) { f = 0; break; }
+			if (D[s] >= D[i]) continue;
 			const Circle& b = seed[s];
 			const Pii cb = Pii(D[i].x, D[i].y);
 			const ll rb = D[i].r;
+			if (!rb) continue;
 			Pii v = cb - ca;//vec a -> b
 			ld distance = v.mag();
 			ld X = (ra * ra - rb * rb + v.Euc()) / (2 * distance);
 			Pos m = Pos(ca.x, ca.y) + Pos(v.x, v.y) * X / distance;
 			HP.push_back(Linear(m, m + ~Pos(v.x, v.y)));
 		}
+		if (!f) continue;
 		Polygon HPI = half_plane_intersection(HP);
 		A += green(a, HPI);
 	}
