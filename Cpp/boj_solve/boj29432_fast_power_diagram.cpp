@@ -509,16 +509,16 @@ void solve() {
 	//std::cout << PI * 2 * 2 * 2 << "\n";
 	return;
 }
-//int main() { solve(); return 0; }//boj29432
-int main() {
-	std::cin >> Q;
-	while (Q--) {
-		for (int i = 0; i < 3001; i++) ID[i].clear();
-		Hull3D.clear();
-		solve();
-	}
-	return 0;
-}
+int main() { solve(); return 0; }//boj29432
+//int main() {
+//	std::cin >> Q;
+//	while (Q--) {
+//		for (int i = 0; i < 3001; i++) ID[i].clear();
+//		Hull3D.clear();
+//		solve();
+//	}
+//	return 0;
+//}
 
 /*
 
