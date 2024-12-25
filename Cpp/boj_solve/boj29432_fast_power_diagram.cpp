@@ -137,9 +137,11 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	ld hi = (-b + det) / a;
 	Vld ret;
 	if (t == LINE) {
-		if (0 < lo && lo < 1) ret.push_back(lo);
+		//if (0 < lo && lo < 1) ret.push_back(lo);
+		ret.push_back(lo);
 		if (zero(det)) return ret;
-		if (0 < hi && hi < 1) ret.push_back(hi);
+		//if (0 < hi && hi < 1) ret.push_back(hi);
+		ret.push_back(hi);
 	}
 	else {//circle
 		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
@@ -232,8 +234,22 @@ struct Pos3D {
 	Pos3D& operator /= (const int128& n) { x /= n; y /= n; z /= n; return *this; }
 	int128 Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrt(Euc()); }
-	Pii pii() const { return { x, y }; }
+	Pii pii() const {
+		assert(x < 1e7);
+		assert(y < 1e7);
+		return { x, y };
+	}
+	Pos p() const {
+		assert(x < 1e7);
+		assert(y < 1e7);
+		return { (ld)x, (ld)y };
+	}
 	Circle c() const { return Circle(Pos(x, y), r); }
+	bool operator >= (const Pos3D& d) const {
+		bool f1 = r >= d.r;
+		bool f2 = sq((ll)x - d.x) + sq((ll)y - d.y) <= sq((ll)r - d.r);
+		return f1 && f2;
+	}
 	//friend std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
 	//friend std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z << "\n"; return os; }
 };
@@ -387,10 +403,11 @@ struct Disk {
 ld circle_cut(const Circle& c, const Seg& s) {
 	Pos v1 = s.s - c.c, v2 = s.e - c.c;
 	ll r = c.r;
-	Vld inx = circle_line_intersections(c, s, CIRCLE);
+	//Vld inx = circle_line_intersections(c, s, CIRCLE);
+	Vld inx = circle_line_intersections(c, s, LINE);
 	if (inx.empty()) return r * r * rad(v1, v2) * .5;
 	Pos m1, m2;
-	if (inx.size() == 2) m1 = c.p(inx[0]), m2 = c.p(inx[1]);
+	if (inx.size() == 2) m1 = s.p(inx[0]), m2 = s.p(inx[1]);
 	else m1 = m2 = c.p(inx[0]);
 	m1 -= c.c; m2 -= c.c;
 	bool d1 = dot(m1, v1, m2) > -TOL, d2 = dot(m1, v2, m2) > -TOL;
@@ -413,15 +430,16 @@ ld green(const Circle& c, const Polygon& h) {
 }
 typedef std::vector<Disk> Disks;
 Circle seed[LEN];
-Vint ID[LEN];
+Vint ID[LEN], I;
 //Polygon PD[LEN];//power diagram (Laguerre-Voronoi diagram)
 ld A;
 void solve() {
 	A = 0;
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-	std::cout << std::fixed;
-	std::cout.precision(15);
+	int bnd = 2e4 + 1;
+	//std::cin.tie(0)->sync_with_stdio(0);
+	//std::cout.tie(0);
+	//std::cout << std::fixed;
+	//std::cout.precision(15);
 	std::cin >> N;
 	Disks D(N), V;
 	for (Disk& d : D) std::cin >> d;
@@ -438,7 +456,6 @@ void solve() {
 	}
 	for (int i = 0; i < N; i++) if (F[i]) V.push_back(D[i]);
 	std::swap(D, V);
-	int bnd = 2e4 + 1;
 	//int bnd = 2e6 + 1;
 	D.push_back(Disk(bnd, bnd));
 	D.push_back(Disk(-bnd, bnd));
@@ -449,31 +466,46 @@ void solve() {
 	C3D.resize(N);
 	for (int i = 0; i < N; i++) {
 		C3D[i] = D[i].p3d();
-		seed[i] = C3D[i].c();
+		//seed[i] = C3D[i].c();
 	}
 	//for (Pos3D& p : C3D) std::cout << "p.z:: " << p.z << "\n";
+	//std::cout << "1\n"; return;
 	Hull3D = convex_hull_3D(C3D);
+	//std::cout << "h.sz:: " << Hull3D.size() << "\n";
 	for (const Face& f : Hull3D) {
 		//std::cout << "f:: " << f.v[0] << " | " << f.v[1] << " | " << f.v[2] << "\n";
-		//std::cout << D[f.v[0]].x << " " << D[f.v[0]].y << "\n";
-		//std::cout << D[f.v[1]].x << " " << D[f.v[1]].y << "\n";
-		//std::cout << D[f.v[2]].x << " " << D[f.v[2]].y << "\nppp\n";
+		//std::cout << D[f.v[0]].x << " " << D[f.v[0]].y << " " << C3D[f.v[0]].z << "\n";
+		//std::cout << D[f.v[1]].x << " " << D[f.v[1]].y << " " << C3D[f.v[1]].z << "\n";
+		//std::cout << D[f.v[2]].x << " " << D[f.v[2]].y << " " << C3D[f.v[2]].z << "\nppp\n";
+		//std::cout << "FUCK::\n";
+		//std::cout << C3D[f.v[0]].x << " " << C3D[f.v[0]].y << " " << C3D[f.v[0]].z << "\n";
+		//std::cout << C3D[f.v[1]].x << " " << C3D[f.v[1]].y << " " << C3D[f.v[1]].z << "\n";
+		//std::cout << C3D[f.v[2]].x << " " << C3D[f.v[2]].y << " " << C3D[f.v[2]].z << "\nppp\n";
 		if (ccw(f) < 0) {
+			//std::cout << "OK::\n";
 			ID[f.v[0]].push_back(f.v[1]);
 			ID[f.v[0]].push_back(f.v[2]);
 			ID[f.v[1]].push_back(f.v[0]);
 			ID[f.v[1]].push_back(f.v[2]);
 			ID[f.v[2]].push_back(f.v[0]);
 			ID[f.v[2]].push_back(f.v[1]);
+			I.push_back(f.v[0]);
+			I.push_back(f.v[1]);
+			I.push_back(f.v[2]);
 		}
+		//else { std::cout << "NO::\n"; }
 	}
-	for (int s = 0; s < N; s++) {
+	std::sort(I.begin(), I.end());
+	I.erase(unique(I.begin(), I.end()), I.end());
+	//for (int s = 0; s < N; s++) {
+	for (const int s : I) {
 		//std::cout << "DEBUG\n";
 		//std::cout << s << "\n";
 		//std::cout << "DEBUG\n";
-		const Circle& a = seed[s];
-		const Pii ca = D[s].pii();
-		const ll ra = D[s].r;
+		//const Circle& a = seed[s];
+		const Pii ca = C3D[s].pii();
+		const ll ra = C3D[s].r;
+		const Circle a = Circle(Pos(ca.x, ca.y), ra);
 		if (!ra) continue;
 		std::sort(ID[s].begin(), ID[s].end());
 		ID[s].erase(unique(ID[s].begin(), ID[s].end()), ID[s].end());
@@ -483,17 +515,19 @@ void solve() {
 		HP.push_back(Linear(Pos(-bnd, -bnd), Pos(bnd, -bnd)));
 		HP.push_back(Linear(Pos(bnd, -bnd), Pos(bnd, bnd)));
 		bool f = 1;
-		//std::cout << "S[" << s << "]:: " << D[s].x << " " << D[s].y << " " << D[s].r << "\nD::\n";
+		//std::cout << "DEBUG::\nS[" << s << "]:: " << D[s].x << " " << D[s].y << " " << D[s].r << "\nD::\n";
 		for (const int& i : ID[s]) {
 			//std::cout << "D[" << i << "]:: " << D[i].x << " " << D[i].y << " " << D[i].r << "\n";
 			//std::cout << i << "\n";
 			//std::cout << " smaller then " << (D[i] >= D[s]) << "\n";
 			//std::cout << " bigger then " << (D[s] >= D[i]) << "\n";
-			if (D[i] >= D[s]) { f = 0; break; }
-			if (D[s] >= D[i]) continue;
-			const Circle& b = seed[i];
-			const Pii cb = D[i].pii();
-			const ll rb = D[i].r;
+			//if (D[i] >= D[s]) { f = 0; break; }
+			//if (D[s] >= D[i]) continue;
+			if (C3D[i] >= C3D[s]) { f = 0; break; }
+			if (C3D[s] >= C3D[i]) continue;
+			//const Circle& b = seed[i];
+			const Pii cb = C3D[i].pii();
+			const ll rb = C3D[i].r;
 			if (!rb) continue;
 			Pii v = cb - ca;//vec a -> b
 			ld distance = v.mag();
@@ -507,18 +541,24 @@ void solve() {
 		//std::cout << "HPI::\n";
 		//for (Pos& p : HPI) std::cout << p << "\n";
 		//std::cout << "HPI::\n";
-		A += green(a, HPI);
+		ld cut = green(a, HPI);
+		//std::cout << "FUCK:: CUT:: " << cut << "\n";
+		A += cut;
 	}
 	std::cout << A << "\n";
 	//std::cout << PI * 2 * 2 * 2 << "\n";
+	//std::cout << PI * 200000000 + 400000000 << "\n";
 	return;
 }
 //int main() { solve(); return 0; }//boj29432
 int main() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(15);
 	std::cin >> Q;
 	while (Q--) {
 		for (int i = 0; i < 3001; i++) ID[i].clear();
-		Hull3D.clear();
 		solve();
 	}
 	return 0;
@@ -532,5 +572,33 @@ int main() {
 10 0 2
 
 25.132741228718345
+
+1
+4
+1 0 1
+-1 0 1
+0 1 1
+0 -1 1
+
+2
+4
+10000 0 10000
+-10000 0 10000
+0 10000 10000
+0 -10000 10000
+5
+10000 0 10000
+-10000 0 10000
+0 10000 10000
+0 -10000 10000
+0 0 1
+
+1
+5
+10000 0 10000
+-10000 0 10000
+0 10000 10000
+0 -10000 10000
+0 0 1
 
 */
