@@ -428,7 +428,7 @@ void solve() {
 	}
 	Hull3D = convex_hull_3D(C3D);
 	for (const Face& f : Hull3D) {
-		if (ccw(f) > 0) {
+		if (ccw(f) < 0) {
 			ID[f.v[0]].push_back(f.v[1]);
 			ID[f.v[0]].push_back(f.v[2]);
 			ID[f.v[1]].push_back(f.v[0]);
