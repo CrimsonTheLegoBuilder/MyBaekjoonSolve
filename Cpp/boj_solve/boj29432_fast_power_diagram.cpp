@@ -210,7 +210,11 @@ struct Pos3D {
 	bool operator == (const Pos3D& p) const { return x == p.x && y == p.y && z == p.z; }
 	bool operator != (const Pos3D& p) const { return x != p.x || y != p.y || z != p.z; }
 	bool operator < (const Pos3D& p) const { return x == p.x ? y == p.y ? z < p.z : y < p.y : x < p.x; }
-	int128 operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
+	int128 operator * (const Pos3D& p) const {
+		ld det = (ld)x * p.x + (ld)y * p.y + (ld)z * p.z;
+		if (fabs(det) > 1e17) return sign(det);
+		return x * p.x + y * p.y + z * p.z;
+	}
 	Pos3D operator / (const Pos3D& p) const {
 		Pos3D ret;
 		ret.x = y * p.z - z * p.y;
@@ -268,9 +272,9 @@ struct Face {
 	int v[3];
 	Face(int a = 0, int b = 0, int c = 0) { v[0] = a; v[1] = b; v[2] = c; }
 	inline Pos3D norm(std::vector<Pos3D>& C) const { return cross(C[v[0]], C[v[1]], C[v[2]]); }
-	int128 above(const Polyhedron& C, const Pos3D& p) const {
-		return cross(C[v[0]], C[v[1]], C[v[2]]) * (p - C[v[0]]);
-	}
+	//int128 above(const Polyhedron& C, const Pos3D& p) const {
+	//	return cross(C[v[0]], C[v[1]], C[v[2]]) * (p - C[v[0]]);
+	//}
 };
 std::vector<Face> Hull3D;
 struct Edge {
@@ -509,16 +513,16 @@ void solve() {
 	//std::cout << PI * 2 * 2 * 2 << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj29432
-//int main() {
-//	std::cin >> Q;
-//	while (Q--) {
-//		for (int i = 0; i < 3001; i++) ID[i].clear();
-//		Hull3D.clear();
-//		solve();
-//	}
-//	return 0;
-//}
+//int main() { solve(); return 0; }//boj29432
+int main() {
+	std::cin >> Q;
+	while (Q--) {
+		for (int i = 0; i < 3001; i++) ID[i].clear();
+		Hull3D.clear();
+		solve();
+	}
+	return 0;
+}
 
 /*
 
