@@ -34,7 +34,18 @@ inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >=
 #define CIRCLE 2
 
 int N, M, T, Q;
-struct Pii { ll x, y; };
+struct Pii {
+	ll x, y;
+	Pii(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
+	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
+	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
+	Pii operator * (const ll& n) const { return { x * n, y * n }; }
+	Pii operator / (const ll& n) const { return { x / n, y / n }; }
+	ll operator * (const Pii& p) const { return { x * p.x + y * p.y }; }
+	ll operator / (const Pii& p) const { return { x * p.y - y * p.x }; }
+	ll Euc() const { return x * x + y * y; }
+	ld mag() const { return sqrtl(Euc()); }
+};
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3) {
 	return (d2.x - d1.x) * (d3.y - d2.y) - (d2.y - d1.y) * (d3.x - d2.x);
 }
@@ -171,6 +182,7 @@ struct Linear {//ps[0] -> ps[1] :: refer to bulijiojiodibuliduo
 		else return cmpq(this->dir(), l0.dir());
 	}
 };
+typedef std::vector<Linear> Vlinear;
 Pos intersection(Linear& l1, Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
 std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {//refer to bulijiojiodibuliduo
 	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
@@ -366,7 +378,9 @@ typedef std::vector<Disk> Disks;
 Circle seed[LEN];
 Vint ID[LEN];
 Polygon PD[LEN];//power diagram (Laguerre-Voronoi diagram)
+ld A;
 void solve() {
+	A = 0;
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
@@ -396,7 +410,24 @@ void solve() {
 			ID[f.v[2]].push_back(f.v[1]);
 		}
 	}
-	for (int i = 0; i < N; i++) {
+	for (int s = 0; s < N; s++) {
+		const Circle& a = seed[s];
+		const Pii ca = Pii(D[s].x, D[s].y);
+		const ll ra = D[s].r;
+		std::sort(ID[s].begin(), ID[s].end());
+		ID[s].erase(unique(ID[s].begin(), ID[s].end()), ID[s].end());
+		Vlinear HP;
+		for (const int& i : ID[s]) {
+			const Circle& b = seed[s];
+			const Pii cb = Pii(D[i].x, D[i].y);
+			const ll rb = D[i].r;
+			Pii v = cb - ca;//vec a -> b
+			ld distance = v.mag();
+			ld X = (ra * ra - rb * rb + v.Euc()) / (2 * distance);
+			Pos m = Pos(ca.x, ca.y) + Pos(v.x, v.y) * X / distance;
+			HP.push_back(Linear(m, m + ~Pos(v.x, v.y)));
+		}
+		Polygon HPI = half_plane_intersection(HP);
 
 	}
 	return;
