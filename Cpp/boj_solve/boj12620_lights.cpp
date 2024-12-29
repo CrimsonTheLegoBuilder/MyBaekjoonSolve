@@ -129,6 +129,8 @@ struct Circle {
 	bool operator == (const Circle& q) const { return c == q.c && r == q.r; }
 	bool operator < (const Circle& q) const { return c == q.c ? r < q.r : c < q.c; }
 	bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
+	bool operator <= (const Pos& p) const { return sign(r - (c - p).mag()) <= 0; }
+	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
@@ -174,15 +176,15 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	}
 	return ret;
 }
-ld intersection(const Seg& s1, const Seg& s2) {
+ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	const Pos& p1 = s1.s, p2 = s1.e, q1 = s2.s, q2 = s2.e;
 	ld det = (q2 - q1) / (p2 - p1);
-	//if (zero(det)) return -1;
+	if (zero(det)) return -1;
 	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
 	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
-	return fit(a1, 0, 1);
-	//if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
-	//return -1;
+	if (f == WEAK) return fit(a1, 0, 1);
+	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
+	return -1;
 }
 Vld circle_line_intersections(const Seg& l, const Circle& q, const int& t = LINE) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
@@ -237,12 +239,27 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 		if (intersect(l, p1, q1, q2) && intersect(l, p2, q1, q2)) return Pos(0, 1);
 		else return Pos(0, 0);
 	}
-	Polygon tri = { p.s, p.e, l };
+	Polygon tri = { p1, p2, l };
 	if (!inner_check(tri, q1) && !inner_check(tri, q2)) return Pos(0, 0);
-	ld r1 = intersection(p, Seg(l, q1));
-	ld r2 = intersection(p, Seg(l, q2));
+	ld r1 = ccw(l, p2, q1) >= 0 ? 1 : ccw(l, p1, q1) <= 0 ? 0 : 0.5;
+	if (eq(r1, .5)) r1 = intersection(p, Seg(l, q1), WEAK);
+	ld r2 = ccw(l, p2, q2) >= 0 ? 1 : ccw(l, p1, q2) <= 0 ? 0 : 0.5;
+	if (eq(r2, .5)) r2 = intersection(p, Seg(l, q2), WEAK);
 	if (r2 < r1) std::swap(r1, r2);
 	return Pos(r1, r2);
+}
+int inner_check(const Pos& p, const int& f = LINE) {
+	int r = 0, g = 0;
+	if (f == LINE) {
+		for (int i = 0; i < N; i++) if (C[i] >= p) return 0;
+	}
+	for (const Polygon& tr : TR) {
+		if (inner_check(tr, p)) { r = 1; break; }
+	}
+	for (const Polygon& tg : TG) {
+		if (inner_check(tg, p)) { g = 2; break; }
+	}
+	return r + g;
 }
 void query(const int& q) {
 	TR.clear(); TG.clear();
@@ -295,6 +312,17 @@ void query(const int& q) {
 			else hi = std::max(hi, p.HI);
 		}
 	}
+	for (const Polygon& tr : TR) {
+		for (const Polygon& tg : TG) {
+
+		}
+	}
+	std::cout << "Case #" << q << ":\n";
+	std::cout << A[BLACK] << "\n";
+	std::cout << A[RED] << "\n";
+	std::cout << A[GREEN] << "\n";
+	std::cout << A[YELLOW] << "\n";
+	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
