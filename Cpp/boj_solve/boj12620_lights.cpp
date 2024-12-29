@@ -230,6 +230,12 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 	Pos r;
 	Pos p1 = p.s, p2 = p.e;
 	Pos q1 = q.s, q2 = q.e;
+	if (!inside(p2, l, p1, q1, WEAK) && !inside(p2, l, p1, q2, WEAK)) {
+		if (intersect(l, p1, q1, q2)) return Pos(0, 1);
+		else return Pos(0, 0);
+	}
+	Polygon tri = { p.s, p.e, l };
+	if (!inner_check(tri, q1) && !inner_check(tri, q2)) return Pos(0, 0);
 
 	return r;
 }
