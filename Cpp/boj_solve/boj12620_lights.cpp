@@ -31,10 +31,13 @@ inline ld sq(const ld& x) { return x * x; }
 inline ll sq(const ll& x) { return x * x; }
 inline int128 sq(const int& x) { return (int128)x * x; }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
+inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
 #define LINE 1
 #define CIRCLE 2
 #define STRONG 0
 #define WEAK 1
+#define LO x
+#define HI y
 #define BLACK 0
 #define RED 1
 #define GREEN 2
@@ -72,7 +75,7 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 } R, G;
 typedef std::vector<Pos> Polygon;
-Polygon TR[LEN * LEN], TG[LEN * LEN];
+std::vector<Polygon> TR, TG;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -174,11 +177,12 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 ld intersection(const Seg& s1, const Seg& s2) {
 	const Pos& p1 = s1.s, p2 = s1.e, q1 = s2.s, q2 = s2.e;
 	ld det = (q2 - q1) / (p2 - p1);
-	if (zero(det)) return -1;
+	//if (zero(det)) return -1;
 	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
 	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
-	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
-	return -1;
+	return fit(a1, 0, 1);
+	//if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
+	//return -1;
 }
 Vld circle_line_intersections(const Seg& l, const Circle& q, const int& t = LINE) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
@@ -215,7 +219,7 @@ struct Arc {
 	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
-Arcs AR, AG;
+Arcs AR[LEN], AG[LEN];
 Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	Pos v = c.c - p;
 	ld l = v.mag();
@@ -227,19 +231,22 @@ Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	return { lo, hi };
 }
 Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
-	Pos r;
 	Pos p1 = p.s, p2 = p.e;
 	Pos q1 = q.s, q2 = q.e;
 	if (!inside(p2, l, p1, q1, WEAK) && !inside(p2, l, p1, q2, WEAK)) {
-		if (intersect(l, p1, q1, q2)) return Pos(0, 1);
+		if (intersect(l, p1, q1, q2) && intersect(l, p2, q1, q2)) return Pos(0, 1);
 		else return Pos(0, 0);
 	}
 	Polygon tri = { p.s, p.e, l };
 	if (!inner_check(tri, q1) && !inner_check(tri, q2)) return Pos(0, 0);
-
-	return r;
+	ld r1 = intersection(p, Seg(l, q1));
+	ld r2 = intersection(p, Seg(l, q2));
+	if (r2 < r1) std::swap(r1, r2);
+	return Pos(r1, r2);
 }
 void query(const int& q) {
+	TR.clear(); TG.clear();
+	for (int i = 0; i <= 50; i++) AR[i].clear(), AG[i].clear();
 	std::cin >> R >> G;
 	std::cin >> N;
 	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };
@@ -256,10 +263,36 @@ void query(const int& q) {
 		SG[i] = Seg(s, e);
 	}
 	for (int i = 0; i < N; i++) {
-		Polygon VR, VG;
+		Polygon VR = { Pos(0, 0) }, VG = { Pos(0, 0) };
+		Pos se;
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
-
+			se = get_pos(R, SR[i], SR[j]);
+			if (!eq(se.x, se.y)) VR.push_back(se);
+			se = get_pos(R, SG[i], SG[j]);
+			if (!eq(se.x, se.y)) VG.push_back(se);
+		}
+		VR.push_back(Pos(1, 1));
+		VG.push_back(Pos(1, 1));
+		std::sort(VR.begin(), VR.end());
+		std::sort(VG.begin(), VG.end());
+		ld hi = 0;
+		for (const Pos& p : VR) {
+			if (hi < p.LO) {
+				Pos s = SR[i].p(hi);
+				Pos e = SR[i].p(p.LO);
+				TR.push_back({ R, s, e });
+			}
+			else hi = std::max(hi, p.HI);
+		}
+		hi = 0;
+		for (const Pos& p : VG) {
+			if (hi < p.LO) {
+				Pos s = SG[i].p(hi);
+				Pos e = SG[i].p(p.LO);
+				TR.push_back({ G, s, e });
+			}
+			else hi = std::max(hi, p.HI);
 		}
 	}
 }
