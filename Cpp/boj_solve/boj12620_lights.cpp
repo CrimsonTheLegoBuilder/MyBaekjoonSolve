@@ -312,10 +312,9 @@ void query(const int& q) {
 			else hi = std::max(hi, p.HI);
 		}
 	}
-	for (const Polygon& tr : TR) {
-		for (const Polygon& tg : TG) {
-
-		}
+	for (int i = 0; i < N; i++) {
+		const Seg& s = SR[i];
+		
 	}
 	std::cout << "Case #" << q << ":\n";
 	std::cout << A[BLACK] << "\n";
