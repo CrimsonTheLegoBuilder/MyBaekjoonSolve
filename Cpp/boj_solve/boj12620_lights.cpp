@@ -10,8 +10,6 @@
 #include <tuple>
 #include <deque>
 typedef long long ll;
-//typedef __int128 int128;
-typedef long long int128;
 typedef long double ld;
 //typedef double ld;
 typedef std::pair<int, int> pi;
@@ -29,7 +27,6 @@ inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
 inline ld sq(const ld& x) { return x * x; }
 inline ll sq(const ll& x) { return x * x; }
-inline int128 sq(const int& x) { return (int128)x * x; }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
 inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
 #define LINE 1
