@@ -110,7 +110,7 @@ struct Seg {
 		return m.y * d * (s.x - e.x);
 	}
 };
-Seg SR[LEN], SG[LEN];
+Seg SR[LEN], SG[LEN], SB[4];
 ld dot(const Seg& p, const Seg& q) { return dot(p.s, p.e, q.s, q.e); }
 bool collinear(const Seg& p, const Seg& q) { return collinear(p.s, p.e, q.s, q.e); }
 bool intersect(const Seg& u, const Seg& v) { return intersect(u.s, u.e, v.s, v.e); }
@@ -296,6 +296,40 @@ void query(const int& q) {
 		s = vp[1], e = vp[1];
 		SG[i] = Seg(s, e);
 	}
+	for (int t = 0; t < 4; t++) SB[t] = Seg(B[t], B[(t + 1) % 4]);
+	for (int t = 0; t < 4; t++) {
+		Polygon VR = { Pos(0, 0) }, VG = { Pos(0, 0) };
+		Seg b = Seg(B[t], B[(t + 1) % 4]);
+		for (int i = 0; i < N; i++) {
+			Pos se;
+			se = get_pos(R, b, SR[i]);
+			if (!eq(se.x, se.y)) VR.push_back(se);
+			se = get_pos(G, b, SG[i]);
+			if (!eq(se.x, se.y)) VG.push_back(se);
+		}
+		VR.push_back(Pos(1, 1));
+		VG.push_back(Pos(1, 1));
+		std::sort(VR.begin(), VR.end());
+		std::sort(VG.begin(), VG.end());
+		ld hi = 0;
+		for (const Pos& p : VR) {
+			if (hi < p.LO) {
+				Pos s = SB[t].p(hi);
+				Pos e = SB[t].p(p.LO);
+				TR.push_back({ R, s, e });
+			}
+			else hi = std::max(hi, p.HI);
+		}
+		hi = 0;
+		for (const Pos& p : VG) {
+			if (hi < p.LO) {
+				Pos s = SB[t].p(hi);
+				Pos e = SB[t].p(p.LO);
+				TR.push_back({ G, s, e });
+			}
+			else hi = std::max(hi, p.HI);
+		}
+	}
 	for (int i = 0; i < N; i++) {
 		Polygon VR = { Pos(0, 0) }, VG = { Pos(0, 0) };
 		Pos se;
@@ -303,7 +337,7 @@ void query(const int& q) {
 			if (i == j) continue;
 			se = get_pos(R, SR[i], SR[j]);
 			if (!eq(se.x, se.y)) VR.push_back(se);
-			se = get_pos(R, SG[i], SG[j]);
+			se = get_pos(G, SG[i], SG[j]);
 			if (!eq(se.x, se.y)) VG.push_back(se);
 		}
 		VR.push_back(Pos(1, 1));
@@ -330,65 +364,8 @@ void query(const int& q) {
 		}
 	}
 	for (int i = 0; i < N; i++) {
-		Seg se = SR[i];
-		int sz;
-		Pos s = se.s, e = se.e;
-		Pos dir;
-		Vld V;
-		V = { 0, 1 };
-		dir = s - R;
-		for (int j = 0; j < N; j++) {
-			for (int k = 0; k < 3; k++) {
-				const Pos& p1 = TR[j][k], & p2 = TR[j][(k + 1) % 3];
-				ld x = intersection(Seg(R, s), Seg(p1, p2));
-				if (x >= .5) V.push_back(x);
-			}
-			for (int k = 0; k < 3; k++) {
-				const Pos& p1 = TG[j][k], & p2 = TG[j][(k + 1) % 3];
-				ld x = intersection(Seg(G, s), Seg(p1, p2));
-				if (x >= .5) V.push_back(x);
-			}
-			Vld inxs = circle_line_intersections(C[j], se, LINE);
-			for (const ld& x : inxs) if (x > .5) V.push_back(x);
-		}
-		std::sort(V.begin(), V.end());
-		V.erase(unique(V.begin(), V.end()), V.end());
-		sz = V.size();
-		for (int j = 0; j < sz - 1; j++) {
-			ld m = (V[j] + V[(j + 1) % sz]) * .5;
-			Pos mid = se.p(m);
-			int f = inner_check(mid, dir, ~dir);
-			A[f] += se.green(V[j], V[(j + 1) % sz]);
-		}
-
-		V = { 0, 1 };
-		dir = e - R;
-		for (int j = 0; j < N; j++) {
-			for (int k = 0; k < 3; k++) {
-				const Pos& p1 = TR[j][k], & p2 = TR[j][(k + 1) % 3];
-				ld x = intersection(Seg(R, s), Seg(p1, p2));
-				if (x >= .5) V.push_back(x);
-			}
-			for (int k = 0; k < 3; k++) {
-				const Pos& p1 = TG[j][k], & p2 = TG[j][(k + 1) % 3];
-				ld x = intersection(Seg(G, s), Seg(p1, p2));
-				if (x >= .5) V.push_back(x);
-			}
-			Vld inxs = circle_line_intersections(C[j], se, LINE);
-			for (const ld& x : inxs) if (x > .5) V.push_back(x);
-		}
-		std::sort(V.begin(), V.end());
-		V.erase(unique(V.begin(), V.end()), V.end());
-		sz = V.size();
-		for (int j = 0; j < sz - 1; j++) {
-			ld m = (V[j] + V[(j + 1) % sz]) * .5;
-			Pos mid = se.p(m);
-			int f = inner_check(mid, dir, ~dir);
-			A[f] += se.green(V[j], V[(j + 1) % sz]);
-		}
-
 		const Circle& c = C[i];
-		V = { 0, 2 * PI };
+		Vld V = { 0, 2 * PI };
 		for (int j = 0; j < N; j++) {
 			const Seg& sr = SR[j], & sg = SG[j];
 			Seg s1 = Seg(R, sr.s), s2 = Seg(R, sr.e);
@@ -405,12 +382,83 @@ void query(const int& q) {
 		}
 		std::sort(V.begin(), V.end());
 		V.erase(unique(V.begin(), V.end()), V.end());
-		sz = V.size();
+		int sz = V.size();
+		Pos dir;
 		for (int j = 0; j < sz - 1; j++) {
 			ld m = (V[j] + V[(j + 1) % sz]) * .5;
 			Pos mid = c.p(m);
 			int f = inner_check(mid, dir, ~dir, CIRCLE);
 			A[f] += c.green(V[j], V[(j + 1) % sz]);
+		}
+	}
+	for (const Polygon& tr : TR) {
+		for (int t = 0; t < 3; t++) {
+			const Pos& p1 = tr[t], & p2 = tr[(t + 1) % 3];
+			Seg se = Seg(p1, p2);
+			Pos dir = p2 - p1;
+			Vld V = { 0, 1 };
+			for (int i = 0; i < N; i++) {
+				Vld inxs = circle_line_intersections(C[i], se, LINE);
+				for (const ld& x : inxs) if (x > .5) V.push_back(x);
+			}
+			for (const Polygon& qr : TR) {
+				for (int k = 0; k < 3; k++) {
+					const Pos& q1 = qr[k], & q2 = qr[(k + 1) % 3];
+					Seg qe = Seg(q1, q2);
+					V.push_back(fit(intersection(se, qe), 0, 1));
+				}
+			}
+			for (const Polygon& qg : TG) {
+				for (int k = 0; k < 3; k++) {
+					const Pos& q1 = qg[k], & q2 = qg[(k + 1) % 3];
+					Seg qe = Seg(q1, q2);
+					V.push_back(fit(intersection(se, qe), 0, 1));
+				}
+			}
+			std::sort(V.begin(), V.end());
+			V.erase(unique(V.begin(), V.end()), V.end());
+			int sz = V.size();
+			for (int j = 0; j < sz - 1; j++) {
+				ld m = (V[j] + V[(j + 1) % sz]) * .5;
+				Pos mid = se.p(m);
+				int f = inner_check(mid, dir, ~dir);
+				A[f] += se.green(V[j], V[(j + 1) % sz]);
+			}
+		}
+	}
+	for (const Polygon& tg : TG) {
+		for (int t = 0; t < 3; t++) {
+			const Pos& p1 = tg[t], & p2 = tg[(t + 1) % 3];
+			Seg se = Seg(p1, p2);
+			Pos dir = p2 - p1;
+			Vld V = { 0, 1 };
+			for (int i = 0; i < N; i++) {
+				Vld inxs = circle_line_intersections(C[i], se, LINE);
+				for (const ld& x : inxs) if (x > .5) V.push_back(x);
+			}
+			for (const Polygon& qr : TR) {
+				for (int k = 0; k < 3; k++) {
+					const Pos& q1 = qr[k], & q2 = qr[(k + 1) % 3];
+					Seg qe = Seg(q1, q2);
+					V.push_back(fit(intersection(se, qe), 0, 1));
+				}
+			}
+			for (const Polygon& qg : TG) {
+				for (int k = 0; k < 3; k++) {
+					const Pos& q1 = qg[k], & q2 = qg[(k + 1) % 3];
+					Seg qe = Seg(q1, q2);
+					V.push_back(fit(intersection(se, qe), 0, 1));
+				}
+			}
+			std::sort(V.begin(), V.end());
+			V.erase(unique(V.begin(), V.end()), V.end());
+			int sz = V.size();
+			for (int j = 0; j < sz - 1; j++) {
+				ld m = (V[j] + V[(j + 1) % sz]) * .5;
+				Pos mid = se.p(m);
+				int f = inner_check(mid, dir, ~dir);
+				A[f] += se.green(V[j], V[(j + 1) % sz]);
+			}
 		}
 	}
 	std::cout << "Case #" << q << ":\n";
