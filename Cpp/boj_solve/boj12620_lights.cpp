@@ -179,14 +179,14 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
-struct Arc {
-	ld lo, hi;
-	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
-	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
-	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
-};
-typedef std::vector<Arc> Arcs;
+//struct Arc {
+//	ld lo, hi;
+//	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
+//	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
+//	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
+//	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
+//};
+//typedef std::vector<Arc> Arcs;
 Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	Pos v = c.c - p;
 	ld l = v.mag();
