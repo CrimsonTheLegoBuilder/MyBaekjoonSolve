@@ -322,9 +322,87 @@ void query(const int& q) {
 		}
 	}
 	for (int i = 0; i < N; i++) {
-		const Seg& se = SR[i];
-		for (const Pos& p : { se.s, se.e }) {
+		Seg se = SR[i];
+		int sz;
+		Pos s = se.s, e = se.e;
+		Pos dir;
+		Vld V;
+		V = { 0, 1 };
+		dir = s - R;
+		for (int j = 0; j < N; j++) {
+			for (int k = 0; k < 3; k++) {
+				const Pos& p1 = TR[j][k], & p2 = TR[j][(k + 1) % 3];
+				ld x = intersection(Seg(R, s), Seg(p1, p2));
+				if (x >= .5) V.push_back(x);
+			}
+			for (int k = 0; k < 3; k++) {
+				const Pos& p1 = TG[j][k], & p2 = TG[j][(k + 1) % 3];
+				ld x = intersection(Seg(G, s), Seg(p1, p2));
+				if (x >= .5) V.push_back(x);
+			}
+			Vld inxs = circle_line_intersections(C[j], se, LINE);
+			for (const ld& x : inxs) if (x > .5) V.push_back(x);
+		}
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end()), V.end());
+		sz = V.size();
+		for (int j = 0; j < sz - 1; j++) {
+			ld m = (V[j] + V[(j + 1) % sz]) * .5;
+			Pos mid = se.p(m);
+			int f = inner_check(mid, dir, ~dir);
+			A[f] += se.green(V[j], V[(j + 1) % sz]);
+		}
 
+		V = { 0, 1 };
+		dir = e - R;
+		for (int j = 0; j < N; j++) {
+			for (int k = 0; k < 3; k++) {
+				const Pos& p1 = TR[j][k], & p2 = TR[j][(k + 1) % 3];
+				ld x = intersection(Seg(R, s), Seg(p1, p2));
+				if (x >= .5) V.push_back(x);
+			}
+			for (int k = 0; k < 3; k++) {
+				const Pos& p1 = TG[j][k], & p2 = TG[j][(k + 1) % 3];
+				ld x = intersection(Seg(G, s), Seg(p1, p2));
+				if (x >= .5) V.push_back(x);
+			}
+			Vld inxs = circle_line_intersections(C[j], se, LINE);
+			for (const ld& x : inxs) if (x > .5) V.push_back(x);
+		}
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end()), V.end());
+		sz = V.size();
+		for (int j = 0; j < sz - 1; j++) {
+			ld m = (V[j] + V[(j + 1) % sz]) * .5;
+			Pos mid = se.p(m);
+			int f = inner_check(mid, dir, ~dir);
+			A[f] += se.green(V[j], V[(j + 1) % sz]);
+		}
+
+		const Circle& c = C[i];
+		V = { 0, 2 * PI };
+		for (int j = 0; j < N; j++) {
+			const Seg& sr = SR[j], & sg = SG[j];
+			Seg s1 = Seg(R, sr.s), s2 = Seg(R, sr.e);
+			Seg s3 = Seg(G, sg.s), s4 = Seg(G, sg.e);
+			Vld inxs;
+			inxs = circle_line_intersections(C[j], s1, LINE);
+			for (const ld& x : inxs) V.push_back(x);
+			inxs = circle_line_intersections(C[j], s2, LINE);
+			for (const ld& x : inxs) V.push_back(x);
+			inxs = circle_line_intersections(C[j], s3, LINE);
+			for (const ld& x : inxs) V.push_back(x);
+			inxs = circle_line_intersections(C[j], s4, LINE);
+			for (const ld& x : inxs) V.push_back(x);
+		}
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end()), V.end());
+		sz = V.size();
+		for (int j = 0; j < sz - 1; j++) {
+			ld m = (V[j] + V[(j + 1) % sz]) * .5;
+			Pos mid = c.p(m);
+			int f = inner_check(mid, dir, ~dir, CIRCLE);
+			A[f] += c.green(V[j], V[(j + 1) % sz]);
 		}
 	}
 	std::cout << "Case #" << q << ":\n";
