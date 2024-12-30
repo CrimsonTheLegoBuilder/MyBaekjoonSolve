@@ -99,14 +99,6 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	//	on_seg_strong(d1, d2, s2);
 	//return (f1 && f2) || f3;
 }
-bool inner_check(const Polygon& H, const Pos& q) {
-	int sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		int j = (i + sz) % sz;
-		if (ccw(H[i], H[j], q) < 0) return 0;
-	}
-	return 1;
-}
 struct Seg {
 	Pos s, e;
 	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
@@ -232,6 +224,14 @@ Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	if (f) vp.push_back(c.p(lo)), vp.push_back(c.p(hi));
 	return { lo, hi };
 }
+bool inner_check(const Polygon& H, const Pos& q) {
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		int j = (i + sz) % sz;
+		if (ccw(H[i], H[j], q) < 0) return 0;
+	}
+	return 1;
+}
 Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 	Pos p1 = p.s, p2 = p.e;
 	Pos q1 = q.s, q2 = q.e;
@@ -248,16 +248,25 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 	if (r2 < r1) std::swap(r1, r2);
 	return Pos(r1, r2);
 }
-int inner_check(const Pos& p, const int& f = LINE) {
+bool inner_check(const Polygon& H, const Pos& q, const Pos& dir, const Pos& v) {
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		int j = (i + sz) % sz;
+		if (ccw(H[i], H[j], q) < 0) return 0;
+		if (on_seg_strong(H[i], H[j], q) && sign((H[j] - H[i]) * dir) > 0) return 1;
+	}
+	return 1;
+}
+int inner_check(const Pos& p, const Pos& dir, const Pos& v, const int& f = LINE) {
 	int r = 0, g = 0;
 	if (f == LINE) {
 		for (int i = 0; i < N; i++) if (C[i] >= p) return 0;
 	}
 	for (const Polygon& tr : TR) {
-		if (inner_check(tr, p)) { r = 1; break; }
+		if (inner_check(tr, p, dir, v)) { r = 1; break; }
 	}
 	for (const Polygon& tg : TG) {
-		if (inner_check(tg, p)) { g = 2; break; }
+		if (inner_check(tg, p, dir, v)) { g = 2; break; }
 	}
 	return r + g;
 }
@@ -313,8 +322,10 @@ void query(const int& q) {
 		}
 	}
 	for (int i = 0; i < N; i++) {
-		const Seg& s = SR[i];
-		
+		const Seg& se = SR[i];
+		for (const Pos& p : { se.s, se.e }) {
+
+		}
 	}
 	std::cout << "Case #" << q << ":\n";
 	std::cout << A[BLACK] << "\n";
