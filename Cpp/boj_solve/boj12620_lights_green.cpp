@@ -206,6 +206,7 @@ typedef std::vector<Arc> Arcs;
 //Arcs arcs[LEN];
 Vld X[LEN];
 Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
+	assert(c < p);
 	Pos v = c.c - p;
 	ld l = v.mag();
 	ld h = c.r, w = sqrtl(l * l - h * h);
@@ -219,7 +220,7 @@ bool inner_check(const Polygon& H, const Pos& q) {
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		int j = (i + sz) % sz;
-		if (ccw(H[i], H[j], q) <= 0) return 0;
+		if (ccw(H[i], H[j], q) < 0) return 0;
 	}
 	return 1;
 }
@@ -231,12 +232,21 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 		else return Pos(0, 0);
 	}
 	Polygon tri = { p1, p2, l };
-	if (!inner_check(tri, q1) && !inner_check(tri, q2)) return Pos(0, 0);
-	ld r1 = ccw(l, p2, q1) >= 0 ? 1 : ccw(l, p1, q1) <= 0 ? 0 : 0.5;
-	if (eq(r1, .5)) r1 = intersection(p, Seg(l, q1), WEAK);
-	ld r2 = ccw(l, p2, q2) >= 0 ? 1 : ccw(l, p1, q2) <= 0 ? 0 : 0.5;
-	if (eq(r2, .5)) r2 = intersection(p, Seg(l, q2), WEAK);
-	if (r2 < r1) std::swap(r1, r2);
+	bool in1 = inner_check(tri, q1), in2 = inner_check(tri, q2);
+	if (!in1 && !in2) return Pos(0, 0);
+	ld r1 = 0, r2 = 0;
+	if (in1 && in2) {
+		r1 = intersection(p, Seg(l, q1), WEAK);
+		r2 = intersection(p, Seg(l, q2), WEAK);
+	}
+	else if (in1) {
+		r1 = intersection(p, Seg(l, q1), WEAK);
+		r2 = 1;
+	}
+	else if (in2) {
+		r1 = 0;
+		r2 = intersection(p, Seg(l, q1), WEAK);
+	}
 	return Pos(r1, r2);
 }
 bool inner_check(const Polygon& H, const Pos& q, const Pos& dir, const Pos& v) {
@@ -267,9 +277,17 @@ void query(const int& q) {
 	Segs VS;
 	std::cin >> R >> G;
 	std::cin >> N;
+	if (!N) {
+		std::cout << "Case #" << q << ":\n"
+			<< 0. << "\n"
+			<< 0. << "\n"
+			<< 0. << "\n"
+			<< 10000. << "\n";
+		return;
+	}
 	C.resize(N);
 	for (Circle& c : C) std::cin >> c;
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < N; i++) {//preparing line sweeping
 		Polygon vp;
 		Pos s, e;
 		tangents(R, C[i], vp, 1);
@@ -280,8 +298,8 @@ void query(const int& q) {
 		s = vp[0], e = vp[1];
 		SG[i] = Seg(s, e);
 	}
-	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };
-	for (int t = 0; t < 4; t++) {
+	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };//boundary
+	for (int t = 0; t < 4; t++) {//dividing the boundary
 		SB[t] = Seg(B[t], B[(t + 1) % 4]);
 		Polygon VR = { Pos(0, 0) }, VG = { Pos(0, 0) };
 		Seg b = Seg(B[t], B[(t + 1) % 4]);
@@ -366,7 +384,7 @@ void query(const int& q) {
 		std::sort(VG.begin(), VG.end());
 		ld hi = 0;
 		Vld x;
-		for (const Pos& p : VR) {
+		for (const Pos& p : VR) {//get red area
 			if (hi < p.LO) {
 				Pos s = SR[i].p(hi);
 				Pos e = SR[i].p(p.LO);
@@ -395,7 +413,7 @@ void query(const int& q) {
 			else hi = std::max(hi, p.HI);
 		}
 		hi = 0;
-		for (const Pos& p : VG) {
+		for (const Pos& p : VG) {//get green grea
 			if (hi < p.LO) {
 				Pos s = SG[i].p(hi);
 				Pos e = SG[i].p(p.LO);
@@ -424,7 +442,7 @@ void query(const int& q) {
 			else hi = std::max(hi, p.HI);
 		}
 	}
-	for (const Seg& s1 : VSR) {
+	for (const Seg& s1 : VSR) {//dividing the boundary
 		Vld V;
 		const Pos& s = s1.s, & e = s1.e;
 		if (on_seg_strong(s, e, G)) V.push_back(s1.r(G));
@@ -439,7 +457,7 @@ void query(const int& q) {
 			VS.push_back(Seg(u, v));
 		}
 	}
-	for (const Seg& s1 : VSG) {
+	for (const Seg& s1 : VSG) {//dividing the boundary
 		Vld V;
 		const Pos& s = s1.s, & e = s1.e;
 		if (on_seg_strong(s, e, R)) V.push_back(s1.r(R));
@@ -456,12 +474,12 @@ void query(const int& q) {
 	}
 	std::sort(VS.begin(), VS.end());
 	VS.erase(unique(VS.begin(), VS.end()), VS.end());
-	for (const Seg& se : VS) {
+	for (const Seg& se : VS) {//get yellow area
 		Pos dir = se.e - se.s;
 		Pos v = ~dir;
 		if (inner_check(se.p(.5), dir, v) == 3) A[YELLOW] += se.green();
 	}
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < N; i++) {//get yellow area
 		Vld& V = X[i];
 		V.push_back(0);
 		V.push_back(2 * PI);
