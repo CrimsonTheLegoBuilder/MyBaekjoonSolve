@@ -477,4 +477,4 @@ void solve() {
 	for (int q = 1; q <= T; q++) query(q);
 	return;
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj12620 lights
