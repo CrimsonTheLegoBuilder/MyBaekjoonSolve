@@ -89,12 +89,12 @@ bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	return f1 && f2;
-	//bool f3 = on_seg_strong(s1, s2, d1) ||
-	//	on_seg_strong(s1, s2, d2) ||
-	//	on_seg_strong(d1, d2, s1) ||
-	//	on_seg_strong(d1, d2, s2);
-	//return (f1 && f2) || f3;
+	//return f1 && f2;
+	bool f3 = on_seg_strong(s1, s2, d1) ||
+		on_seg_strong(s1, s2, d2) ||
+		on_seg_strong(d1, d2, s1) ||
+		on_seg_strong(d1, d2, s2);
+	return (f1 && f2) || f3;
 }
 struct Seg {
 	Pos s, e;
