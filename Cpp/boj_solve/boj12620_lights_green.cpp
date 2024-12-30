@@ -262,6 +262,8 @@ int inner_check(const Pos& p, const Pos& dir = Pos(), const Pos& v = Pos()) {
 void query(const int& q) {
 	TR.clear(); TG.clear();
 	memset(A, 0, sizeof A);
+	for (int i = 0; i < LEN; i++) X[i].clear();
+	VSR.clear(), VSG.clear(), VSB.clear();
 	Segs VS;
 	std::cin >> R >> G;
 	std::cin >> N;
