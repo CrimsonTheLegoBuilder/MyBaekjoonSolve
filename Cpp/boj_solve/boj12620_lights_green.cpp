@@ -70,7 +70,7 @@ struct Pos {
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-} R, G;
+} R, G; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 std::vector<Polygon> TR, TG;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
@@ -99,8 +99,22 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 struct Seg {
 	Pos s, e;
 	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
+	bool operator == (const Seg& o) const { return s == o.s && e == o.e; }
+	bool operator < (const Seg& o) const {
+		Pos v1 = e - s;
+		Pos v2 = o.e - o.s;
+		if (zero(v1 / v2) && v1 * v2 > 0) {
+			if (!ccw(s, e, o.s)) return ccw(s, e, o.s) > 0;
+			return s == o.s ? e < o.e : s < o.s;
+		}
+		bool f1 = O < v1;
+		bool f2 = O < v2;
+		if (f1 != f2) return f1;
+		return v1 / v2 > 0;
+	}
+	ld r(const Pos& q) const { return projection(s, e, q); }
 	Pos p(const ld& rt) const { return s + (e - s) * rt; }
-	ld green(const ld& lo, const ld& hi) const {
+	ld green(const ld& lo = 0, const ld& hi = 1) const {
 		ld d = hi - lo;
 		ld ratio = (lo + hi) * .5;
 		Pos m = p(ratio);
@@ -108,6 +122,8 @@ struct Seg {
 	}
 };
 Seg SR[LEN], SG[LEN], SB[4];
+typedef std::vector<Seg> Segs;
+Segs VSR, VSG, VSB;
 ld dot(const Seg& p, const Seg& q) { return dot(p.s, p.e, q.s, q.e); }
 bool collinear(const Seg& p, const Seg& q) { return collinear(p.s, p.e, q.s, q.e); }
 bool intersect(const Seg& u, const Seg& v) { return intersect(u.s, u.e, v.s, v.e); }
@@ -124,8 +140,8 @@ struct Circle {
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
-	ld rad(const Pos& p) const { return (p - c).rad(); }
-	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
+	ld rad(const Pos& p) const { return norm((p - c).rad()); }
+	ld area(const ld& lo = 0, const ld& hi = 2 * PI) const { return (hi - lo) * r * r * .5; }
 	ld green(const ld& lo, const ld& hi) const {
 		Pos s = Pos(cos(lo), sin(lo)), e = Pos(cos(hi), sin(hi));
 		ld fan = area(lo, hi);
@@ -153,19 +169,19 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	ld hi = (-b + det) / a;
 	Vld ret;
 	if (t == LINE) {
-		//if (0 < lo && lo < 1) ret.push_back(lo);
-		ret.push_back(lo);
-		//if (zero(det)) return ret;
-		//if (0 < hi && hi < 1) ret.push_back(hi);
-		ret.push_back(hi);
+		if (0 < lo && lo < 1) ret.push_back(lo);
+		//ret.push_back(lo);
+		if (zero(det)) return ret;
+		if (0 < hi && hi < 1) ret.push_back(hi);
+		//ret.push_back(hi);
 	}
 	else {//circle
 		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
-		//if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
-		if (-TOL < lo) ret.push_back(the(lo));
+		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
+		//if (-TOL < lo) ret.push_back(the(lo));
 		if (zero(det)) return ret;
-		//if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
-		if (-TOL < hi) ret.push_back(the(hi));
+		if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
+		//if (-TOL < hi) ret.push_back(the(hi));
 	}
 	return ret;
 }
@@ -179,14 +195,16 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
-//struct Arc {
-//	ld lo, hi;
-//	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
-//	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-//	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
-//	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
-//};
-//typedef std::vector<Arc> Arcs;
+struct Arc {
+	ld lo, hi;
+	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
+	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
+	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
+	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
+};
+typedef std::vector<Arc> Arcs;
+//Arcs arcs[LEN];
+Vld X[LEN];
 Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	Pos v = c.c - p;
 	ld l = v.mag();
@@ -231,15 +249,8 @@ bool inner_check(const Polygon& H, const Pos& q, const Pos& dir, const Pos& v) {
 	}
 	return 1;
 }
-int inner_check(const Pos& p, const Pos& dir, const Pos& v, const int& f = LINE) {
+int inner_check(const Pos& p, const Pos& dir = Pos(), const Pos& v = Pos()) {
 	int r = 0, g = 0;
-	if (f == LINE) {
-		for (int i = 0; i < N; i++) {
-			const Circle& c = C[i];
-			if (c >= p) return 0;
-			//if (c == p && (c.c - p) * v > 0) return 0;
-		}
-	}
 	for (const Polygon& tr : TR) {
 		if (inner_check(tr, p, dir, v)) { r = 1; break; }
 	}
@@ -251,6 +262,7 @@ int inner_check(const Pos& p, const Pos& dir, const Pos& v, const int& f = LINE)
 void query(const int& q) {
 	TR.clear(); TG.clear();
 	memset(A, 0, sizeof A);
+	Segs VS;
 	std::cin >> R >> G;
 	std::cin >> N;
 	for (Circle& c : C) std::cin >> c;
@@ -260,34 +272,60 @@ void query(const int& q) {
 		Polygon V, vp;
 		Pos s, e;
 		tangents(R, C[i], vp, 1);
-		s = vp[1], e = vp[1];
+		s = vp[0], e = vp[1];
 		SR[i] = Seg(s, e);
 		vp.clear();
 		tangents(G, C[i], vp, 1);
-		s = vp[1], e = vp[1];
+		s = vp[0], e = vp[1];
 		SG[i] = Seg(s, e);
 	}
-	for (int t = 0; t < 4; t++) SB[t] = Seg(B[t], B[(t + 1) % 4]);
 	for (int t = 0; t < 4; t++) {
+		SB[t] = Seg(B[t], B[(t + 1) % 4]);
 		Polygon VR = { Pos(0, 0) }, VG = { Pos(0, 0) };
 		Seg b = Seg(B[t], B[(t + 1) % 4]);
+		Vld V = { 0, 1 };
 		for (int i = 0; i < N; i++) {
 			Pos se;
 			se = get_pos(R, b, SR[i]);
-			if (!eq(se.x, se.y)) VR.push_back(se);
+			if (!eq(se.x, se.y)) {
+				VR.push_back(se);
+				V.push_back(se.x);
+				V.push_back(se.y);
+			}
 			se = get_pos(G, b, SG[i]);
-			if (!eq(se.x, se.y)) VG.push_back(se);
+			if (!eq(se.x, se.y)) {
+				VG.push_back(se);
+				V.push_back(se.x);
+				V.push_back(se.y);
+			}
 		}
 		VR.push_back(Pos(1, 1));
 		VG.push_back(Pos(1, 1));
 		std::sort(VR.begin(), VR.end());
 		std::sort(VG.begin(), VG.end());
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end(), eq), V.end());
+		int sz = V.size();
+		for (int i = 0; i < sz - 1; i++) {
+			Pos u = SB[t].p(V[i]);
+			Pos v = SB[t].p(V[i + 1]);
+			VS.push_back(Seg(u, v));
+		}
 		ld hi = 0;
 		for (const Pos& p : VR) {
 			if (hi < p.LO) {
 				Pos s = SB[t].p(hi);
 				Pos e = SB[t].p(p.LO);
 				TR.push_back({ R, s, e });
+				Seg s1 = Seg(R, s);
+				VSR.push_back(s1);
+				A[RED] += s1.green(0, 1);
+				Seg s2 = Seg(s, e);
+				//VSR.push_back(s2);//ignore wall
+				A[RED] += s2.green(0, 1);
+				Seg s3 = Seg(e, R);
+				VSR.push_back(s3);
+				A[RED] += s3.green(0, 1);
 			}
 			else hi = std::max(hi, p.HI);
 		}
@@ -296,7 +334,16 @@ void query(const int& q) {
 			if (hi < p.LO) {
 				Pos s = SB[t].p(hi);
 				Pos e = SB[t].p(p.LO);
-				TR.push_back({ G, s, e });
+				TG.push_back({ G, s, e });
+				Seg s1 = Seg(G, s);
+				VSG.push_back(s1);
+				A[GREEN] += s1.green(0, 1);
+				Seg s2 = Seg(s, e);
+				//VSG.push_back(s2);//ignore wall
+				A[GREEN] += s2.green(0, 1);
+				Seg s3 = Seg(e, G);
+				VSG.push_back(s3);
+				A[GREEN] += s3.green(0, 1);
 			}
 			else hi = std::max(hi, p.HI);
 		}
@@ -316,11 +363,32 @@ void query(const int& q) {
 		std::sort(VR.begin(), VR.end());
 		std::sort(VG.begin(), VG.end());
 		ld hi = 0;
+		Vld x;
 		for (const Pos& p : VR) {
 			if (hi < p.LO) {
 				Pos s = SR[i].p(hi);
 				Pos e = SR[i].p(p.LO);
 				TR.push_back({ R, s, e });
+				Seg s1 = Seg(R, s);
+				x = circle_line_intersections(C[i], s1, LINE);
+				assert(x.size() && x[0] <= 1 + TOL);
+				s = s1.p(x[0]);
+				s1 = Seg(R, s);
+				VSR.push_back(s1);
+				A[RED] += s1.green(0, 1);
+				Seg s2 = Seg(R, e);
+				x = circle_line_intersections(C[i], s2, LINE);
+				assert(x.size() && x[0] <= 1 + TOL);
+				e = s2.p(x[0]);
+				s2 = Seg(e, R);
+				VSR.push_back(s2);
+				A[RED] += s2.green(0, 1);
+				ld lo = C[i].rad(e);
+				ld hi = C[i].rad(s);
+				X[i].push_back(lo);
+				X[i].push_back(hi);
+				if (lo < hi) A[RED] -= C[i].green(lo, hi);
+				else A[RED] += C[i].green(hi, 2 * PI), A[RED] -= C[i].green(0, lo);
 			}
 			else hi = std::max(hi, p.HI);
 		}
@@ -329,113 +397,85 @@ void query(const int& q) {
 			if (hi < p.LO) {
 				Pos s = SG[i].p(hi);
 				Pos e = SG[i].p(p.LO);
-				TR.push_back({ G, s, e });
+				TG.push_back({ G, s, e });
+				Seg s1 = Seg(G, s);
+				x = circle_line_intersections(C[i], s1, LINE);
+				assert(x.size() && x[0] <= 1 + TOL);
+				s = s1.p(x[0]);
+				s1 = Seg(G, s);
+				VSG.push_back(s1);
+				A[GREEN] += s1.green(0, 1);
+				Seg s2 = Seg(G, e);
+				x = circle_line_intersections(C[i], s2, LINE);
+				assert(x.size() && x[0] <= 1 + TOL);
+				e = s2.p(x[0]);
+				s2 = Seg(e, G);
+				VSR.push_back(s2);
+				A[GREEN] += s2.green(0, 1);
+				ld lo = C[i].rad(e);
+				ld hi = C[i].rad(s);
+				X[i].push_back(lo);
+				X[i].push_back(hi);
+				if (lo < hi) A[GREEN] += C[i].green(lo, hi);
+				else A[GREEN] += C[i].green(hi, 2 * PI), A[GREEN] += C[i].green(0, lo);
 			}
 			else hi = std::max(hi, p.HI);
 		}
 	}
-	for (int i = 0; i < N; i++) {
-		const Circle& c = C[i];
-		Vld V = { 0, 2 * PI };
-		for (int j = 0; j < N; j++) {
-			const Seg& sr = SR[j], & sg = SG[j];
-			Seg s1 = Seg(R, sr.s), s2 = Seg(R, sr.e);
-			Seg s3 = Seg(G, sg.s), s4 = Seg(G, sg.e);
-			Vld inxs;
-			inxs = circle_line_intersections(C[j], s1, LINE);
-			for (const ld& x : inxs) V.push_back(x);
-			inxs = circle_line_intersections(C[j], s2, LINE);
-			for (const ld& x : inxs) V.push_back(x);
-			inxs = circle_line_intersections(C[j], s3, LINE);
-			for (const ld& x : inxs) V.push_back(x);
-			inxs = circle_line_intersections(C[j], s4, LINE);
-			for (const ld& x : inxs) V.push_back(x);
+	for (const Seg& s1 : VSR) {
+		Vld V;
+		const Pos& s = s1.s, & e = s1.e;
+		if (on_seg_strong(s, e, G)) V.push_back(s1.r(G));
+		for (const Seg& s2 : VSG) {
+			ld inxs = intersection(s1, s2);
 		}
 		std::sort(V.begin(), V.end());
 		V.erase(unique(V.begin(), V.end()), V.end());
 		int sz = V.size();
-		Pos dir;
+		for (int i = 0; i < sz - 1; i++) {
+			Pos u = s1.p(V[i]), v = s1.p(V[i + 1]);
+			VS.push_back(Seg(u, v));
+		}
+	}
+	for (const Seg& s1 : VSG) {
+		Vld V;
+		const Pos& s = s1.s, & e = s1.e;
+		if (on_seg_strong(s, e, R)) V.push_back(s1.r(R));
+		for (const Seg& s2 : VSR) {
+			ld inxs = intersection(s1, s2);
+		}
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end()), V.end());
+		int sz = V.size();
+		for (int i = 0; i < sz - 1; i++) {
+			Pos u = s1.p(V[i]), v = s1.p(V[i + 1]);
+			VS.push_back(Seg(u, v));
+		}
+	}
+	std::sort(VS.begin(), VS.end());
+	VS.erase(unique(VS.begin(), VS.end()), VS.end());
+	for (const Seg& se : VS) {
+		Pos dir = se.e - se.s;
+		Pos v = ~dir;
+		if (inner_check(se.p(.5), dir, v) == 3) A[YELLOW] += se.green();
+	}
+	for (int i = 0; i < N; i++) {
+		Vld& V = X[i];
+		V.push_back(0);
+		V.push_back(2 * PI);
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end(), eq), V.end());
+		int sz = X[i].size();
 		for (int j = 0; j < sz - 1; j++) {
-			ld m = (V[j] + V[(j + 1) % sz]) * .5;
-			Pos mid = c.p(m);
-			int f = inner_check(mid, dir, ~dir, CIRCLE);
-			A[f] += c.green(V[j], V[(j + 1) % sz]);
+			ld m = (V[j] + V[j + 1]) * .5;
+			Pos mid = C[i].p(m);
+			if (inner_check(mid)) A[YELLOW] -= C[i].green(V[j], V[j + 1]);
 		}
 	}
-	for (const Polygon& tr : TR) {
-		for (int t = 0; t < 3; t++) {
-			const Pos& p1 = tr[t], & p2 = tr[(t + 1) % 3];
-			Seg se = Seg(p1, p2);
-			Pos dir = p2 - p1;
-			Vld V = { 0, 1 };
-			for (int i = 0; i < N; i++) {
-				Vld inxs = circle_line_intersections(C[i], se, LINE);
-				for (const ld& x : inxs) if (x > .5) V.push_back(x);
-			}
-			for (const Polygon& qr : TR) {
-				for (int k = 0; k < 3; k++) {
-					const Pos& q1 = qr[k], & q2 = qr[(k + 1) % 3];
-					Seg qe = Seg(q1, q2);
-					V.push_back(fit(intersection(se, qe), 0, 1));
-				}
-			}
-			for (const Polygon& qg : TG) {
-				for (int k = 0; k < 3; k++) {
-					const Pos& q1 = qg[k], & q2 = qg[(k + 1) % 3];
-					Seg qe = Seg(q1, q2);
-					V.push_back(fit(intersection(se, qe), 0, 1));
-				}
-			}
-			std::sort(V.begin(), V.end());
-			V.erase(unique(V.begin(), V.end()), V.end());
-			int sz = V.size();
-			for (int j = 0; j < sz - 1; j++) {
-				ld m = (V[j] + V[(j + 1) % sz]) * .5;
-				Pos mid = se.p(m);
-				int f = inner_check(mid, dir, ~dir);
-				A[f] += se.green(V[j], V[(j + 1) % sz]);
-			}
-		}
-	}
-	for (const Polygon& tg : TG) {
-		for (int t = 0; t < 3; t++) {
-			const Pos& p1 = tg[t], & p2 = tg[(t + 1) % 3];
-			Seg se = Seg(p1, p2);
-			Pos dir = p2 - p1;
-			Vld V = { 0, 1 };
-			for (int i = 0; i < N; i++) {
-				Vld inxs = circle_line_intersections(C[i], se, LINE);
-				for (const ld& x : inxs) if (x > .5) V.push_back(x);
-			}
-			for (const Polygon& qr : TR) {
-				for (int k = 0; k < 3; k++) {
-					const Pos& q1 = qr[k], & q2 = qr[(k + 1) % 3];
-					Seg qe = Seg(q1, q2);
-					V.push_back(fit(intersection(se, qe), 0, 1));
-				}
-			}
-			for (const Polygon& qg : TG) {
-				for (int k = 0; k < 3; k++) {
-					const Pos& q1 = qg[k], & q2 = qg[(k + 1) % 3];
-					Seg qe = Seg(q1, q2);
-					V.push_back(fit(intersection(se, qe), 0, 1));
-				}
-			}
-			std::sort(V.begin(), V.end());
-			V.erase(unique(V.begin(), V.end()), V.end());
-			int sz = V.size();
-			for (int j = 0; j < sz - 1; j++) {
-				ld m = (V[j] + V[(j + 1) % sz]) * .5;
-				Pos mid = se.p(m);
-				int f = inner_check(mid, dir, ~dir);
-				A[f] += se.green(V[j], V[(j + 1) % sz]);
-			}
-		}
-	}
-	A[BLACK] = 10000 - A[RED] - A[GREEN] - A[YELLOW];
-	for (int i = 0; i < N; i++) A[BLACK] -= C[i].area(0, 2 * PI);
+	ld black = 10000 - A[RED] - A[GREEN] + A[YELLOW];
+	for (int i = 0; i < N; i++) black -= C[i].area();
 	std::cout << "Case #" << q << ":\n";
-	std::cout << A[BLACK] << "\n";
+	std::cout << black << "\n";
 	std::cout << A[RED] << "\n";
 	std::cout << A[GREEN] << "\n";
 	std::cout << A[YELLOW] << "\n";
