@@ -432,6 +432,8 @@ void query(const int& q) {
 			}
 		}
 	}
+	A[BLACK] = 10000 - A[RED] - A[GREEN] - A[YELLOW];
+	for (int i = 0; i < N; i++) A[BLACK] -= C[i].area(0, 2 * PI);
 	std::cout << "Case #" << q << ":\n";
 	std::cout << A[BLACK] << "\n";
 	std::cout << A[RED] << "\n";
