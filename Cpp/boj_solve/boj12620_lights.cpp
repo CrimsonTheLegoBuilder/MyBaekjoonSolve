@@ -179,33 +179,6 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
-Vld circle_line_intersections(const Seg& l, const Circle& q, const int& t = LINE) {
-	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
-	Pos s = l.s, e = l.e;
-	Pos vec = e - s;
-	Pos OM = s - q.c;
-	ld a = vec.Euc();
-	ld b = vec * OM;
-	ld c = OM.Euc() - q.r * q.r;
-	ld J = b * b - a * c;
-	if (J < -TOL) return {};
-	ld det = sqrt(std::max((ld)0, J));
-	ld lo = (-b - det) / a;
-	ld hi = (-b + det) / a;
-	Vld ret;
-	if (t == LINE) {
-		if (0 < lo && lo < 1) ret.push_back(lo);
-		if (zero(det)) return ret;
-		if (0 < hi && hi < 1) ret.push_back(hi);
-	}
-	else {//circle
-		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
-		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
-		if (zero(det)) return ret;
-		if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
-	}
-	return ret;
-}
 struct Arc {
 	ld lo, hi;
 	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
