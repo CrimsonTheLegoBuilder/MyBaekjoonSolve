@@ -282,8 +282,9 @@ void query(const int& q) {
 	memset(A, 0, sizeof A);
 	std::cin >> R >> G;
 	std::cin >> N;
-	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };
 	for (Circle& c : C) std::cin >> c;
+	C.resize(N);
+	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };
 	for (int i = 0; i < N; i++) {
 		Polygon V, vp;
 		Pos s, e;
