@@ -408,7 +408,7 @@ void query(const int& q) {
 				X[i].push_back(lo);
 				X[i].push_back(hi);
 				if (lo < hi) A[RED] -= C[i].green(lo, hi);
-				else A[RED] += C[i].green(hi, 2 * PI), A[RED] -= C[i].green(0, lo);
+				else A[RED] -= C[i].green(hi, 2 * PI), A[RED] -= C[i].green(0, lo);
 			}
 			else hi = std::max(hi, p.HI);
 		}
@@ -436,8 +436,8 @@ void query(const int& q) {
 				ld hi = C[i].rad(s);
 				X[i].push_back(lo);
 				X[i].push_back(hi);
-				if (lo < hi) A[GREEN] += C[i].green(lo, hi);
-				else A[GREEN] += C[i].green(hi, 2 * PI), A[GREEN] += C[i].green(0, lo);
+				if (lo < hi) A[GREEN] -= C[i].green(lo, hi);
+				else A[GREEN] -= C[i].green(hi, 2 * PI), A[GREEN] -= C[i].green(0, lo);
 			}
 			else hi = std::max(hi, p.HI);
 		}
