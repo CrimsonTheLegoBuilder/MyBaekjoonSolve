@@ -227,6 +227,7 @@ bool inner_check(const Polygon& H, const Pos& q, const Pos& dir, const Pos& v) {
 		int j = (i + sz) % sz;
 		if (ccw(H[i], H[j], q) < 0) return 0;
 		if (on_seg_strong(H[i], H[j], q) && sign((H[j] - H[i]) * dir) > 0) return 1;
+		if (on_seg_strong(H[i], H[j], q) && sign((H[j] - H[i]) * dir) < 0) return 0;
 	}
 	return 1;
 }
