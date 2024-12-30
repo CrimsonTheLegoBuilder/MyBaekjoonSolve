@@ -162,9 +162,11 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	}
 	else {//circle
 		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
-		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
+		//if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
+		if (-TOL < lo) ret.push_back(the(lo));
 		if (zero(det)) return ret;
-		if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
+		//if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
+		if (-TOL < hi) ret.push_back(the(hi));
 	}
 	return ret;
 }
@@ -213,7 +215,6 @@ struct Arc {
 	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
-Arcs AR[LEN], AG[LEN];
 Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	Pos v = c.c - p;
 	ld l = v.mag();
@@ -272,7 +273,7 @@ int inner_check(const Pos& p, const Pos& dir, const Pos& v, const int& f = LINE)
 }
 void query(const int& q) {
 	TR.clear(); TG.clear();
-	for (int i = 0; i <= 50; i++) AR[i].clear(), AG[i].clear();
+	memset(A, 0, sizeof A);
 	std::cin >> R >> G;
 	std::cin >> N;
 	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };
