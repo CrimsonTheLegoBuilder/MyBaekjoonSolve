@@ -267,11 +267,10 @@ void query(const int& q) {
 	Segs VS;
 	std::cin >> R >> G;
 	std::cin >> N;
-	for (Circle& c : C) std::cin >> c;
 	C.resize(N);
-	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };
+	for (Circle& c : C) std::cin >> c;
 	for (int i = 0; i < N; i++) {
-		Polygon V, vp;
+		Polygon vp;
 		Pos s, e;
 		tangents(R, C[i], vp, 1);
 		s = vp[0], e = vp[1];
@@ -281,6 +280,7 @@ void query(const int& q) {
 		s = vp[0], e = vp[1];
 		SG[i] = Seg(s, e);
 	}
+	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };
 	for (int t = 0; t < 4; t++) {
 		SB[t] = Seg(B[t], B[(t + 1) % 4]);
 		Polygon VR = { Pos(0, 0) }, VG = { Pos(0, 0) };
