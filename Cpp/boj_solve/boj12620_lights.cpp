@@ -122,6 +122,8 @@ struct Circle {
 	bool operator < (const Circle& q) const { return c == q.c ? r < q.r : c < q.c; }
 	bool operator < (const Pos& p) const { return sign(r - (c - p).mag()) < 0; }
 	bool operator <= (const Pos& p) const { return sign(r - (c - p).mag()) <= 0; }
+	bool operator == (const Pos& p) const { return sign(r - (c - p).mag()) == 0; }
+	bool operator > (const Pos& p) const { return sign(r - (c - p).mag()) > 0; }
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
@@ -261,7 +263,11 @@ bool inner_check(const Polygon& H, const Pos& q, const Pos& dir, const Pos& v) {
 int inner_check(const Pos& p, const Pos& dir, const Pos& v, const int& f = LINE) {
 	int r = 0, g = 0;
 	if (f == LINE) {
-		for (int i = 0; i < N; i++) if (C[i] >= p) return 0;
+		for (int i = 0; i < N; i++) {
+			const Circle& c = C[i];
+			if (c >= p) return 0;
+			//if (c == p && (c.c - p) * v > 0) return 0;
+		}
 	}
 	for (const Polygon& tr : TR) {
 		if (inner_check(tr, p, dir, v)) { r = 1; break; }
