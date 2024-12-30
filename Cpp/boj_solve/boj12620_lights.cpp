@@ -201,7 +201,7 @@ bool inner_check(const Polygon& H, const Pos& q) {
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		int j = (i + sz) % sz;
-		if (ccw(H[i], H[j], q) < 0) return 0;
+		if (ccw(H[i], H[j], q) <= 0) return 0;
 	}
 	return 1;
 }
