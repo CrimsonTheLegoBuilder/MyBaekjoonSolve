@@ -424,8 +424,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	std::cin >> Q;
-	for (int q = 1; q <= Q; q++) query(q);
+	std::cin >> T;
+	for (int q = 1; q <= T; q++) query(q);
 	return;
 }
 int main() { solve(); return 0; }
