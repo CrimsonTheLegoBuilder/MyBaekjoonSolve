@@ -332,7 +332,7 @@ void query(const int& q) {
 			VS.push_back(Seg(u, v));
 		}
 		ld hi = 0;
-		for (const Pos& p : VR) {
+		for (const Pos& p : VR) {//get red area
 			if (hi < p.LO) {
 				Pos s = SB[t].p(hi);
 				Pos e = SB[t].p(p.LO);
@@ -350,7 +350,7 @@ void query(const int& q) {
 			else hi = std::max(hi, p.HI);
 		}
 		hi = 0;
-		for (const Pos& p : VG) {
+		for (const Pos& p : VG) {//get green area
 			if (hi < p.LO) {
 				Pos s = SB[t].p(hi);
 				Pos e = SB[t].p(p.LO);
@@ -395,14 +395,14 @@ void query(const int& q) {
 				s = s1.p(x[0]);
 				s1 = Seg(R, s);
 				VSR.push_back(s1);
-				A[RED] += s1.green(0, 1);
+				A[RED] += s1.green();
 				Seg s2 = Seg(R, e);
 				x = circle_line_intersections(C[i], s2, LINE);
 				assert(x.size() && x[0] <= 1 + TOL);
 				e = s2.p(x[0]);
 				s2 = Seg(e, R);
 				VSR.push_back(s2);
-				A[RED] += s2.green(0, 1);
+				A[RED] += s2.green();
 				ld lo = C[i].rad(e);
 				ld hi = C[i].rad(s);
 				X[i].push_back(lo);
@@ -424,14 +424,14 @@ void query(const int& q) {
 				s = s1.p(x[0]);
 				s1 = Seg(G, s);
 				VSG.push_back(s1);
-				A[GREEN] += s1.green(0, 1);
+				A[GREEN] += s1.green();
 				Seg s2 = Seg(G, e);
 				x = circle_line_intersections(C[i], s2, LINE);
 				assert(x.size() && x[0] <= 1 + TOL);
 				e = s2.p(x[0]);
 				s2 = Seg(e, G);
 				VSR.push_back(s2);
-				A[GREEN] += s2.green(0, 1);
+				A[GREEN] += s2.green();
 				ld lo = C[i].rad(e);
 				ld hi = C[i].rad(s);
 				X[i].push_back(lo);
