@@ -102,7 +102,7 @@ ld area(const Polygon& H) {
 	int sz = H.size();
 	ld a = 0;
 	for (int i = 0; i < sz; i++) a += H[i] / H[(i + 1) % sz];
-	return a;
+	return a * .5;
 }
 Polygon convex_cut(const std::vector<Pos>& ps, const Pos& b1, const Pos& b2) {
 	std::vector<Pos> qs;
