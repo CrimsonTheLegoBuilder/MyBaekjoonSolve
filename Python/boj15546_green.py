@@ -169,6 +169,10 @@ def circle_area(a):
     return sq(a[2]) * PI
 
 
+def eq(a, b):
+    return abs(a - b) < 1e-13
+
+
 def query() -> bool:
     global va
     n: int = int(INPUT())
