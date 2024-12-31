@@ -314,7 +314,7 @@ void query(const int& q) {
 			}
 		}
 	}
-	for (int color = 1; color <= 2; color++) {//triangulation
+	for (int color = 1; color <= 2; color++) {//light triangulation
 		for (int i = 0; i < N; i++) {
 			Polygon VP = { Pos(0, 0) };
 			for (int j = 0; j < N; j++) {
