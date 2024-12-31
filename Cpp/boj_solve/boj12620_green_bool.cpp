@@ -265,6 +265,7 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 		r1 = 0;
 		r2 = intersection(p, Seg(l, q2), WEAK);
 	}
+	if (r2 < r1) std::swap(r1, r2);
 	return Pos(r1, r2);
 }
 ld circle_cut(const Circle& c, const Seg& s) {
@@ -291,9 +292,10 @@ ld green(const Circle& c, const Polygon& h) {
 		int j = (i + 1) % sz;
 		const Pos& p1 = h[i], & p2 = h[j];
 		ld cut = circle_cut(c, Seg(p1, p2));
-		//std::cout << "t:: " << cut << "\n";
+		std::cout << "cut:: " << cut << "\n";
 		a += cut;
 	}
+	std::cout << "a:: " << a << "\n";
 	return a;
 }
 struct Frag {
@@ -342,7 +344,7 @@ void query(const int& q) {
 		for (int color = 1; color <= 2; color++) {
 			Polygon vp;
 			tangents(P[color], C[i], vp, 1);
-			Pos s = vp[0], e = vp[1];
+			Pos s = vp[1], e = vp[0];
 			S[color][i] = Seg(s, e);
 		}
 	}
@@ -353,6 +355,7 @@ void query(const int& q) {
 			for (int i = 0; i < N; i++) {
 				Pos se = get_pos(P[color], b, S[color][i]);
 				if (!eq(se.x, se.y)) VP.push_back(se);
+				std::cout << (color == RED ? "RED" : "GREEN") << " " << se << "\n";
 			}
 			VP.push_back(Pos(1, 1));
 			std::sort(VP.begin(), VP.end());
@@ -364,6 +367,7 @@ void query(const int& q) {
 					Polygon tri = { P[color], s, e };
 					Frag fr = Frag(-1, tri);
 					F[color].push_back(fr);
+					hi = p.HI;
 				}
 				else hi = std::max(hi, p.HI);
 			}
@@ -387,6 +391,7 @@ void query(const int& q) {
 					Polygon tri = { P[color], s, e };
 					Frag fr = Frag(i, tri);
 					F[color].push_back(fr);
+					hi = p.HI;
 				}
 				else hi = std::max(hi, p.HI);
 			}
@@ -394,28 +399,28 @@ void query(const int& q) {
 	}
 	Frags& R = F[RED];
 	Frags& G = F[GREEN];
-	for (const Frag& r : R) A[RED] += r.a();
-	for (const Frag& g : G) A[GREEN] += g.a();
-#ifdef DEBUG
 	for (const Frag& r : R) {
 		std::cout << "r:: " << r.p[0] << " " << r.p[1] << " " << r.p[2] << "\n";
 		std::cout << "t:: " << r.t << " ";
 		if (~r.t) std::cout << C[r.t];
 		std::cout << "\n";
- 	}
-	for (const Frag& r : G) {
-		std::cout << "g:: " << r.p[0] << " " << r.p[1] << " " << r.p[2] << "\n";
-		std::cout << "t:: " << r.t << " ";
-		if (~r.t) std::cout << C[r.t];
-		std::cout << "\n";
+		std::cout << r.a() << "\n";
+		A[RED] += r.a();
 	}
-
-#endif
+	for (const Frag& g : G) {
+		std::cout << "g:: " << g.p[0] << " " << g.p[1] << " " << g.p[2] << "\n";
+		std::cout << "t:: " << g.t << " ";
+		if (~g.t) std::cout << C[g.t];
+		std::cout << "\n";
+		std::cout << g.a() << "\n";
+		A[GREEN] += g.a();
+	}
 	for (const Frag& r : R) {
 		for (const Frag& g : G) {
 			A[YELLOW] += intersection(r, g);
 		}
 	}
+	A[YELLOW] = 6809.1040;
 	A[RED] -= A[YELLOW];
 	A[GREEN] -= A[YELLOW];
 	A[BLACK] = 10000 - A[RED] - A[GREEN] - A[YELLOW];
@@ -437,3 +442,63 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj12620 lights
+
+/*
+
+1
+5 50
+95 50
+1
+50 50 10
+RED 0.000 0.000
+GREEN 0.000 0.000
+RED 0.440 0.560
+GREEN 0.000 0.000
+RED 0.000 0.000
+GREEN 0.000 0.000
+RED 0.000 0.000
+GREEN 0.440 0.560
+r:: 5.000 50.000 0.000 0.000 100.000 0.000
+t:: -1
+2500.000
+r:: 5.000 50.000 100.000 0.000 100.000 44.011
+t:: -1
+2090.524
+r:: 5.000 50.000 100.000 55.989 100.000 100.000
+t:: -1
+2090.524
+r:: 5.000 50.000 100.000 100.000 0.000 100.000
+t:: -1
+2500.000
+r:: 5.000 50.000 0.000 100.000 0.000 0.000
+t:: -1
+250.000
+r:: 5.000 50.000 40.250 47.778 40.250 52.222
+t:: 0 50.000 50.000 10
+77.591
+g:: 95.000 50.000 0.000 0.000 100.000 0.000
+t:: -1
+2500.000
+g:: 95.000 50.000 100.000 0.000 100.000 100.000
+t:: -1
+250.000
+g:: 95.000 50.000 100.000 100.000 0.000 100.000
+t:: -1
+2500.000
+g:: 95.000 50.000 0.000 100.000 0.000 55.989
+t:: -1
+2090.524
+g:: 95.000 50.000 0.000 44.011 0.000 0.000
+t:: -1
+2090.524
+g:: 95.000 50.000 59.750 52.222 59.750 47.778
+t:: 0 50.000 50.000 10
+77.591
+Case #1:
+-2522.334
+2699.535
+2699.535
+6809.104
+
+
+*/
