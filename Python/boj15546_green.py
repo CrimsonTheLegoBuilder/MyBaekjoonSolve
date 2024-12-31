@@ -194,7 +194,7 @@ def query() -> bool:
     a = circle_area(vc[-1])
     for i in range(1, n):
         aa = union_up_to_x(vc, i)
-        if a != aa:
+        if not eq(a, aa):
             cnt += 1
         a = aa
     print(cnt)
