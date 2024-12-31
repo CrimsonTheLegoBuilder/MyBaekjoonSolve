@@ -262,7 +262,7 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 	}
 	else if (in2) {
 		r1 = 0;
-		r2 = intersection(p, Seg(l, q1), WEAK);
+		r2 = intersection(p, Seg(l, q2), WEAK);
 	}
 	return Pos(r1, r2);
 }
