@@ -40,7 +40,7 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define GREEN 2
 #define YELLOW 3
 
-#define ASSERT
+//#define ASSERT
 
 int N, M, T, Q;
 ld A[4];
