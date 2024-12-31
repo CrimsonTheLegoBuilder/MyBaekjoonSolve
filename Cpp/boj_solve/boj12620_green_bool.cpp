@@ -40,7 +40,7 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define GREEN 2
 #define YELLOW 3
 
-//#define ASSERT
+#define ASSERT
 
 int N, M, T, Q;
 ld A[4];
@@ -324,6 +324,8 @@ void query(const int& q) {
 	assert(inner_check(B, P[GREEN]));
 	for (int i = 0; i < N; i++) {
 		ld r = C[i].r; Pos p = C[i].c;
+		assert(C[i] < P[RED]);
+		assert(C[i] < P[GREEN]);
 		for (int j = 0; j < 4; j++) {
 			ld d = std::abs(cross(B[j], B[(j + 1) % 4], p) / 100);
 			assert(d > r);
