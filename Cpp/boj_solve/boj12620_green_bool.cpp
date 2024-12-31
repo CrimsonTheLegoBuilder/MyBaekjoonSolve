@@ -289,9 +289,9 @@ ld green(const Circle& c, const Polygon& h) {
 	for (int i = 0; i < sz; i++) {
 		int j = (i + 1) % sz;
 		const Pos& p1 = h[i], & p2 = h[j];
-		ld t = circle_cut(c, Seg(p1, p2));
-		//std::cout << "t:: " << t << "\n";
-		a += t;
+		ld cut = circle_cut(c, Seg(p1, p2));
+		//std::cout << "t:: " << cut << "\n";
+		a += cut;
 	}
 	return a;
 }
