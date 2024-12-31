@@ -11,8 +11,8 @@
 #include <deque>
 #include <iomanip>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<size_t> Vidx;
 typedef std::vector<int> Vint;
@@ -41,9 +41,6 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define GREEN 2
 #define YELLOW 3
 
-//#define ASSERT
-#define DEBUG
-
 int N, M, T, Q;
 ld A[4];
 struct Pos {
@@ -70,8 +67,6 @@ struct Pos {
 	Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
-	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 } P[4]; const Pos O = Pos(0, 0);
@@ -82,8 +77,6 @@ ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
-bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
-ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return dot(d1, d2, d3) / (d1 - d2).mag(); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
 bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int& f = STRONG) {
 	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
@@ -92,7 +85,6 @@ bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
-	//return f1 && f2;
 	bool f3 = on_seg_strong(s1, s2, d1) ||
 		on_seg_strong(s1, s2, d2) ||
 		on_seg_strong(d1, d2, s1) ||
@@ -128,20 +120,6 @@ Polygon sutherland_hodgman(const std::vector<Pos>& C, const std::vector<Pos>& cl
 struct Seg {
 	Pos s, e;
 	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
-	bool operator == (const Seg& o) const { return s == o.s && e == o.e; }
-	bool operator < (const Seg& o) const {
-		Pos v1 = e - s;
-		Pos v2 = o.e - o.s;
-		if (zero(v1 / v2) && v1 * v2 > 0) {
-			if (!ccw(s, e, o.s)) return ccw(s, e, o.s) > 0;
-			return s == o.s ? e < o.e : s < o.s;
-		}
-		bool f1 = O < v1;
-		bool f2 = O < v2;
-		if (f1 != f2) return f1;
-		return v1 / v2 > 0;
-	}
-	ld r(const Pos& q) const { return projection(s, e, q); }
 	Pos p(const ld& rt) const { return s + (e - s) * rt; }
 	ld green(const ld& lo = 0, const ld& hi = 1) const {
 		ld d = hi - lo;
@@ -153,7 +131,6 @@ struct Seg {
 Seg S[4][LEN];
 typedef std::vector<Seg> Segs;
 ld dot(const Seg& p, const Seg& q) { return dot(p.s, p.e, q.s, q.e); }
-bool collinear(const Seg& p, const Seg& q) { return collinear(p.s, p.e, q.s, q.e); }
 bool intersect(const Seg& u, const Seg& v) { return intersect(u.s, u.e, v.s, v.e); }
 struct Circle {
 	Pos c;
@@ -198,18 +175,18 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	Vld ret;
 	if (t == LINE) {
 		//if (0 < lo && lo < 1) ret.push_back(lo);
-		ret.push_back(lo);
 		//if (zero(det)) return ret;
 		//if (0 < hi && hi < 1) ret.push_back(hi);
+		ret.push_back(lo);
 		ret.push_back(hi);
 	}
 	else {//circle
 		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
 		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
-		//if (-TOL < lo) ret.push_back(the(lo));
 		if (zero(det)) return ret;
 		if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
-		//if (-TOL < hi) ret.push_back(the(hi));
+		//ret.push_back(the(lo));
+		//ret.push_back(the(hi));
 	}
 	return ret;
 }
@@ -228,23 +205,19 @@ Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	Pos v = p - c.c;
 	ld l = v.mag();
 	ld h = c.r, w = sqrtl(l * l - h * h);
-	ld t = v.rad();
-	ld lo = norm(t - atan2(w, h));
-	ld hi = norm(t + atan2(w, h));
+	ld t = v.rad(), r = atan2(w, h);
+	ld lo = norm(t - r);
+	ld hi = norm(t + r);
 	if (f) vp.push_back(c.p(lo)), vp.push_back(c.p(hi));
 	return { lo, hi };
 }
 bool inner_check(const Polygon& H, const Pos& q) {
 	int sz = H.size();
-	for (int i = 0; i < sz; i++) {
-		int j = (i + 1) % sz;
-		if (ccw(H[i], H[j], q) < 0) return 0;
-	}
+	for (int i = 0; i < sz; i++) if (ccw(H[i], H[(i + 1) % sz], q) < 0) return 0;
 	return 1;
 }
 Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
-	Pos p1 = p.s, p2 = p.e;
-	Pos q1 = q.s, q2 = q.e;
+	Pos p1 = p.s, p2 = p.e, q1 = q.s, q2 = q.e;
 	if (!inside(p2, l, p1, q1, WEAK) && !inside(p2, l, p1, q2, WEAK)) {
 		if (intersect(l, p1, q1, q2) && intersect(l, p2, q1, q2)) return Pos(0, 1);
 		else return Pos(0, 0);
@@ -252,19 +225,14 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 	Polygon tri = { p1, p2, l };
 	bool in1 = inner_check(tri, q1), in2 = inner_check(tri, q2);
 	if (!in1 && !in2) return Pos(0, 0);
-	ld r1 = 0, r2 = 0;
+	ld r1 = 0, r2 = 1;
 	if (in1 && in2) {
 		r1 = intersection(p, Seg(l, q1), WEAK);
 		r2 = intersection(p, Seg(l, q2), WEAK);
 	}
-	else if (in1) {
-		r1 = intersection(p, Seg(l, q1), WEAK);
-		r2 = 1;
-	}
-	else if (in2) {
-		r1 = 0;
-		r2 = intersection(p, Seg(l, q2), WEAK);
-	}
+	else if (in1) r1 = intersection(p, Seg(l, q1), WEAK);
+	else if (in2) r2 = intersection(p, Seg(l, q2), WEAK);
+	else r1 = r2 = 0;
 	if (r2 < r1) std::swap(r1, r2);
 	return Pos(r1, r2);
 }
@@ -288,14 +256,7 @@ ld circle_cut(const Circle& c, const Seg& s) {
 ld green(const Circle& c, const Polygon& h) {
 	int sz = h.size();
 	ld a = 0;
-	for (int i = 0; i < sz; i++) {
-		int j = (i + 1) % sz;
-		const Pos& p1 = h[i], & p2 = h[j];
-		ld cut = circle_cut(c, Seg(p1, p2));
-		//std::cout << "cut:: " << cut << "\n";
-		a += cut;
-	}
-	//std::cout << "a:: " << a << "\n";
+	for (int i = 0; i < sz; i++) a += circle_cut(c, Seg(h[i], h[(i + 1) % sz]));
 	return a;
 }
 struct Frag {
@@ -317,30 +278,10 @@ ld intersection(const Frag& a, const Frag& b) {
 void query(const int& q) {
 	memset(A, 0, sizeof A);
 	for (int i = 0; i < 4; i++) F[i].clear();
-	std::cin >> P[RED] >> P[GREEN];
-	std::cin >> N;
-	if (!N) { std::cout << "Case #" << q << ":\n0.00000\n0.00000\n0.00000\n10000.00000\n"; return; }
-	C.resize(N);
-	for (Circle& c : C) std::cin >> c;
+	std::cin >> P[RED] >> P[GREEN] >> N;
+	if (!N) { std::cout << "Case #" << q << ":\n0\n0\n0\n10000\n"; return; }
+	C.resize(N); for (Circle& c : C) std::cin >> c;
 	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };//boundary
-#ifdef ASSERT
-	assert(inner_check(B, P[RED]));
-	assert(inner_check(B, P[GREEN]));
-	for (int i = 0; i < N; i++) {
-		ld r = C[i].r; Pos p = C[i].c;
-		assert(C[i] < P[RED]);
-		assert(C[i] < P[GREEN]);
-		for (int j = 0; j < 4; j++) {
-			ld d = std::abs(cross(B[j], B[(j + 1) % 4], p) / 100);
-			assert(d > r);
-		}
-	}
-	for (int i = 0; i < N; i++) {
-		for (int j = i + 1; j < N; j++) {
-			assert(C[i].outside(C[j]));
-		}
-	}
-#endif
 	for (int i = 0; i < N; i++) {//preparing line sweeping
 		for (int color = 1; color <= 2; color++) {
 			Polygon vp;
@@ -356,7 +297,6 @@ void query(const int& q) {
 			for (int i = 0; i < N; i++) {
 				Pos se = get_pos(P[color], b, S[color][i]);
 				if (!eq(se.x, se.y)) VP.push_back(se);
-				//std::cout << (color == RED ? "RED" : "GREEN") << " " << se << "\n";
 			}
 			VP.push_back(Pos(1, 1));
 			std::sort(VP.begin(), VP.end());
@@ -422,8 +362,8 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	//std::cout << std::scientific;
-	std::cout.precision(15);
+	std::cout << std::scientific;
+	//std::cout.precision(15);
 	std::cin >> T;
 	for (int q = 1; q <= T; q++) query(q);
 	return;
