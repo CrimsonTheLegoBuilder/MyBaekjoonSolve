@@ -9,6 +9,7 @@
 #include <array>
 #include <tuple>
 #include <deque>
+#include <iomanip>
 typedef long long ll;
 typedef long double ld;
 //typedef double ld;
@@ -75,7 +76,6 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 } P[4]; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
-std::vector<Polygon> TR, TG;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -229,15 +229,15 @@ Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	ld l = v.mag();
 	ld h = c.r, w = sqrtl(l * l - h * h);
 	ld t = v.rad();
-	ld lo = norm(t - atan2(h, w));
-	ld hi = norm(t + atan2(h, w));
+	ld lo = norm(t - atan2(w, h));
+	ld hi = norm(t + atan2(w, h));
 	if (f) vp.push_back(c.p(lo)), vp.push_back(c.p(hi));
 	return { lo, hi };
 }
 bool inner_check(const Polygon& H, const Pos& q) {
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) {
-		int j = (i + sz) % sz;
+		int j = (i + 1) % sz;
 		if (ccw(H[i], H[j], q) < 0) return 0;
 	}
 	return 1;
@@ -292,10 +292,10 @@ ld green(const Circle& c, const Polygon& h) {
 		int j = (i + 1) % sz;
 		const Pos& p1 = h[i], & p2 = h[j];
 		ld cut = circle_cut(c, Seg(p1, p2));
-		std::cout << "cut:: " << cut << "\n";
+		//std::cout << "cut:: " << cut << "\n";
 		a += cut;
 	}
-	std::cout << "a:: " << a << "\n";
+	//std::cout << "a:: " << a << "\n";
 	return a;
 }
 struct Frag {
@@ -316,9 +316,10 @@ ld intersection(const Frag& a, const Frag& b) {
 }
 void query(const int& q) {
 	memset(A, 0, sizeof A);
+	for (int i = 0; i < 4; i++) F[i].clear();
 	std::cin >> P[RED] >> P[GREEN];
 	std::cin >> N;
-	if (!N) { std::cout << "Case #" << q << ":\n0.0\n0.0\n0.0\n10000.0\n"; return; }
+	if (!N) { std::cout << "Case #" << q << ":\n0.00000\n0.00000\n0.00000\n10000.00000\n"; return; }
 	C.resize(N);
 	for (Circle& c : C) std::cin >> c;
 	Polygon B = { Pos(0, 0), Pos(100, 0), Pos(100, 100), Pos(0, 100) };//boundary
@@ -355,7 +356,7 @@ void query(const int& q) {
 			for (int i = 0; i < N; i++) {
 				Pos se = get_pos(P[color], b, S[color][i]);
 				if (!eq(se.x, se.y)) VP.push_back(se);
-				std::cout << (color == RED ? "RED" : "GREEN") << " " << se << "\n";
+				//std::cout << (color == RED ? "RED" : "GREEN") << " " << se << "\n";
 			}
 			VP.push_back(Pos(1, 1));
 			std::sort(VP.begin(), VP.end());
@@ -399,28 +400,13 @@ void query(const int& q) {
 	}
 	Frags& R = F[RED];
 	Frags& G = F[GREEN];
-	for (const Frag& r : R) {
-		std::cout << "r:: " << r.p[0] << " " << r.p[1] << " " << r.p[2] << "\n";
-		std::cout << "t:: " << r.t << " ";
-		if (~r.t) std::cout << C[r.t];
-		std::cout << "\n";
-		std::cout << r.a() << "\n";
-		A[RED] += r.a();
-	}
-	for (const Frag& g : G) {
-		std::cout << "g:: " << g.p[0] << " " << g.p[1] << " " << g.p[2] << "\n";
-		std::cout << "t:: " << g.t << " ";
-		if (~g.t) std::cout << C[g.t];
-		std::cout << "\n";
-		std::cout << g.a() << "\n";
-		A[GREEN] += g.a();
-	}
+	for (const Frag& r : R) A[RED] += r.a();
+	for (const Frag& g : G) A[GREEN] += g.a();
 	for (const Frag& r : R) {
 		for (const Frag& g : G) {
 			A[YELLOW] += intersection(r, g);
 		}
 	}
-	A[YELLOW] = 6809.1040;
 	A[RED] -= A[YELLOW];
 	A[GREEN] -= A[YELLOW];
 	A[BLACK] = 10000 - A[RED] - A[GREEN] - A[YELLOW];
@@ -436,69 +422,10 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(3);
+	//std::cout << std::scientific;
+	std::cout.precision(15);
 	std::cin >> T;
 	for (int q = 1; q <= T; q++) query(q);
 	return;
 }
 int main() { solve(); return 0; }//boj12620 lights
-
-/*
-
-1
-5 50
-95 50
-1
-50 50 10
-RED 0.000 0.000
-GREEN 0.000 0.000
-RED 0.440 0.560
-GREEN 0.000 0.000
-RED 0.000 0.000
-GREEN 0.000 0.000
-RED 0.000 0.000
-GREEN 0.440 0.560
-r:: 5.000 50.000 0.000 0.000 100.000 0.000
-t:: -1
-2500.000
-r:: 5.000 50.000 100.000 0.000 100.000 44.011
-t:: -1
-2090.524
-r:: 5.000 50.000 100.000 55.989 100.000 100.000
-t:: -1
-2090.524
-r:: 5.000 50.000 100.000 100.000 0.000 100.000
-t:: -1
-2500.000
-r:: 5.000 50.000 0.000 100.000 0.000 0.000
-t:: -1
-250.000
-r:: 5.000 50.000 40.250 47.778 40.250 52.222
-t:: 0 50.000 50.000 10
-77.591
-g:: 95.000 50.000 0.000 0.000 100.000 0.000
-t:: -1
-2500.000
-g:: 95.000 50.000 100.000 0.000 100.000 100.000
-t:: -1
-250.000
-g:: 95.000 50.000 100.000 100.000 0.000 100.000
-t:: -1
-2500.000
-g:: 95.000 50.000 0.000 100.000 0.000 55.989
-t:: -1
-2090.524
-g:: 95.000 50.000 0.000 44.011 0.000 0.000
-t:: -1
-2090.524
-g:: 95.000 50.000 59.750 52.222 59.750 47.778
-t:: 0 50.000 50.000 10
-77.591
-Case #1:
--2522.334
-2699.535
-2699.535
-6809.104
-
-
-*/
