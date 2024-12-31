@@ -306,7 +306,7 @@ Frags F[4];
 ld intersection(const Frag& a, const Frag& b) {
 	Polygon P = sutherland_hodgman(a.p, b.p);
 	ld A = area(P);
-	if (zero(A)) return 0;
+	if (!P.size() || zero(A)) return 0;
 	if (~a.t) A -= green(C[a.t], P);
 	if (~b.t && b.t != a.t) A -= green(C[b.t], P);
 	return A;
