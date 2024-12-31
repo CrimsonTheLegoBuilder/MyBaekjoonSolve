@@ -299,7 +299,7 @@ struct Frag {
 	int t;
 	Polygon p;
 	Frag(int t_ = -1, Polygon p_ = {}) : t(t_), p(p_) {}
-	ld a() const { return area(p) - (!~t ? 0 : green(C[t], p)); }
+	ld a() const { return area(p) - (~t ? green(C[t], p) : 0); }
 };
 typedef std::vector<Frag> Frags;
 Frags F[4];
