@@ -28,6 +28,44 @@ inline ld norm(ld th) {
 //#define ASSERT
 
 int N, M, T, Q;
+struct Pii {
+	int x, y;
+	Pii(int X = 0, int Y = 0) : x(X), y(Y) {}
+	bool operator == (const Pii& p) const { return x == p.x && y == p.y; }
+	bool operator != (const Pii& p) const { return x != p.x || y != p.y; }
+	bool operator < (const Pii& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator <= (const Pii& p) const { return x == p.x ? y <= p.y : x <= p.x; }
+	Pii operator + (const Pii& p) const { return { x + p.x, y + p.y }; }
+	Pii operator - (const Pii& p) const { return { x - p.x, y - p.y }; }
+	Pii operator * (const int& n) const { return { x * n, y * n }; }
+	Pii operator / (const int& n) const { return { x / n, y / n }; }
+	ll operator * (const Pii& p) const { return { (ll)x * p.x + (ll)y * p.y }; }
+	ll operator / (const Pii& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
+	Pii& operator += (const Pii& p) { x += p.x; y += p.y; return *this; }
+	Pii& operator -= (const Pii& p) { x -= p.x; y -= p.y; return *this; }
+	Pii& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
+	Pii& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pii operator - () const { return { -x, -y }; }
+	Pii operator ~ () const { return { -y, x }; }
+	Pii operator ! () const { return { y, x }; }
+	ll xy() const { return (ll)x * y; }
+	inline ll Euc() const { return (ll)x * x + (ll)y * y; }
+	inline ld rad() const { return norm(atan2(y, x)); }
+	int Man() const { return std::abs(x) + std::abs(y); }
+	ld mag() const { return hypot(x, y); }
+	inline friend std::istream& operator >> (std::istream& is, Pii& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
+};
+const Pii Oii = { 0, 0 };
+const Pii INF_PT = { (int)INF, (int)INF };
+inline ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
+inline ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
+inline ll dot(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) * (d3 - d2); }
+inline ll dot(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) * (d4 - d3); }
+inline int ccw(const Pii& d1, const Pii& d2, const Pii& d3) {
+	ll ret = cross(d1, d2, d3);
+	return !ret ? 0 : ret > 0 ? 1 : -1;
+}
 struct Pos {
 	ld x, y;
 	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
@@ -226,7 +264,10 @@ bool query() {
 	std::cin >> N;
 	if (!N) return 0;
 	Disks VC(N);
-	for (Circle& c : VC) std::cin >> c, c *= 100000;
+	for (Circle& c : VC) {
+		std::cin >> c, c *= 100000;
+		std::cout << (ll)(c.c.x * 1e12) << " " << (ll)(c.c.y * 1e12) << " " << (ll)(c.r * 1e12) << "\n";
+	}
 	std::reverse(VC.begin(), VC.end());
 	arc_init(VC);
 	int sz = VC.size();
