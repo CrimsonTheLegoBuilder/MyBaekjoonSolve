@@ -41,6 +41,7 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define YELLOW 3
 
 //#define ASSERT
+#define DEBUG
 
 int N, M, T, Q;
 ld A[4];
@@ -224,7 +225,7 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 }
 Vld tangents(const Pos& p, const Circle& c, Polygon& vp, const bool& f = 0) {
 	assert(c < p);
-	Pos v = c.c - p;
+	Pos v = p - c.c;
 	ld l = v.mag();
 	ld h = c.r, w = sqrtl(l * l - h * h);
 	ld t = v.rad();
@@ -395,6 +396,21 @@ void query(const int& q) {
 	Frags& G = F[GREEN];
 	for (const Frag& r : R) A[RED] += r.a();
 	for (const Frag& g : G) A[GREEN] += g.a();
+#ifdef DEBUG
+	for (const Frag& r : R) {
+		std::cout << "r:: " << r.p[0] << " " << r.p[1] << " " << r.p[2] << "\n";
+		std::cout << "t:: " << r.t << " ";
+		if (~r.t) std::cout << C[r.t];
+		std::cout << "\n";
+ 	}
+	for (const Frag& r : G) {
+		std::cout << "g:: " << r.p[0] << " " << r.p[1] << " " << r.p[2] << "\n";
+		std::cout << "t:: " << r.t << " ";
+		if (~r.t) std::cout << C[r.t];
+		std::cout << "\n";
+	}
+
+#endif
 	for (const Frag& r : R) {
 		for (const Frag& g : G) {
 			A[YELLOW] += intersection(r, g);
@@ -415,7 +431,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(15);
+	std::cout.precision(3);
 	std::cin >> T;
 	for (int q = 1; q <= T; q++) query(q);
 	return;
