@@ -308,7 +308,7 @@ ld intersection(const Frag& a, const Frag& b) {
 	ld A = area(P);
 	if (zero(A)) return 0;
 	if (~a.t) A -= green(C[a.t], P);
-	if (~b.t) A -= green(C[b.t], P);
+	if (~b.t && b.t != a.t) A -= green(C[b.t], P);
 	return A;
 }
 void query(const int& q) {
