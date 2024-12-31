@@ -1560,7 +1560,7 @@
     <ClCompile Include="boj29432_power_diagram_nlogn.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj12620_shit.cpp">
+    <ClCompile Include="boj12620_green_bool.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj12620_lights_green.cpp">
