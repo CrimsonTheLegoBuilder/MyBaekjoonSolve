@@ -196,11 +196,11 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	ld hi = (-b + det) / a;
 	Vld ret;
 	if (t == LINE) {
-		if (0 < lo && lo < 1) ret.push_back(lo);
-		//ret.push_back(lo);
-		if (zero(det)) return ret;
-		if (0 < hi && hi < 1) ret.push_back(hi);
-		//ret.push_back(hi);
+		//if (0 < lo && lo < 1) ret.push_back(lo);
+		ret.push_back(lo);
+		//if (zero(det)) return ret;
+		//if (0 < hi && hi < 1) ret.push_back(hi);
+		ret.push_back(hi);
 	}
 	else {//circle
 		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
