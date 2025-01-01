@@ -266,7 +266,7 @@ bool query() {
 	Disks VC(N);
 	for (Circle& c : VC) {
 		std::cin >> c, c *= 100000;
-		std::cout << (ll)(c.c.x * 1e12) << " " << (ll)(c.c.y * 1e12) << " " << (ll)(c.r * 1e12) << "\n";
+		//std::cout << (ll)(c.c.x * 1e12) << " " << (ll)(c.c.y * 1e12) << " " << (ll)(c.r * 1e12) << "\n";
 	}
 	std::reverse(VC.begin(), VC.end());
 	arc_init(VC);
