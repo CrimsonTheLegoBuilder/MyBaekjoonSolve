@@ -164,6 +164,7 @@ def union_up_to_x(vc: list, x: int):
         # hi = Decimal(0)
         hi = 0
         # print("i:", i)
+        c = [vc[i][0] / scale, vc[i][1] / scale, vc[i][2] / scale]
         if F[i]:
             continue
         for arc in va[i]:
@@ -171,9 +172,9 @@ def union_up_to_x(vc: list, x: int):
             if arc[2] > x or F[arc[2]]:
                 continue
             if hi < arc[0]:
-                a += green(vc[i], hi, arc[0])
+                a += green(c, hi, arc[0])
                 # print("arc: ", arc)
-                # print("green: ", green(vc[i], hi, arc[0]))
+                # print("green: ", green(c, hi, arc[0]))
                 # print("theta: ", hi, arc[0])
                 hi = arc[1]
             else:
@@ -206,10 +207,10 @@ def query() -> bool:
         # print(vc[-1])
     vc.reverse()
     arc_init(vc)
-    for i in range(n):
-        vc[i][0] /= scale
-        vc[i][1] /= scale
-        vc[i][2] /= scale
+    # for i in range(n):
+        # vc[i][0] /= scale
+        # vc[i][1] /= scale
+        # vc[i][2] /= scale
         # print("va[", i, "]")
         # for aa in va[i]:
         #     print(aa)
