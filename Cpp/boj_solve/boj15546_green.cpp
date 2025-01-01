@@ -251,10 +251,17 @@ ld union_up_to_x(const std::vector<Circle>& VC, const int& x = -1) {
 	for (int i = 0; i <= x; i++) {
 		if (i > x || V[i]) continue;
 		ld hi = 0;
+		//std::cout << "i:: " << i << "\n";
 		for (const Arc& a : VA[i]) {
+			//std::cout << "x, a:: " << x << " " << a.i << "\n";
 			if (a.i > x || V[a.i]) continue;
 			//if (a.lo > hi) union_area += Arc(hi, a.lo).green(VC[i]), hi = a.hi;
-			if (a.lo > hi) union_area += VC[i].green(hi, a.lo), hi = a.hi;
+			if (a.lo > hi) {
+				//std::cout << "a:: " << a << "\n";
+				//std::cout << "g:: " << VC[i].green(hi, a.lo) << "\n";
+				//std::cout << "t:: " << hi << " " << a.lo << "\n";
+				union_area += VC[i].green(hi, a.lo), hi = a.hi;
+			}
 			else hi = std::max(hi, a.hi);
 		}
 	}
@@ -265,11 +272,17 @@ bool query() {
 	if (!N) return 0;
 	Disks VC(N);
 	for (Circle& c : VC) {
-		std::cin >> c, c *= 100000;
+		std::cin >> c;// , c *= 100000;
 		//std::cout << (ll)(c.c.x * 1e12) << " " << (ll)(c.c.y * 1e12) << " " << (ll)(c.r * 1e12) << "\n";
 	}
 	std::reverse(VC.begin(), VC.end());
 	arc_init(VC);
+	//for (int i = 0; i < N; i++) {
+	//	std::cout << "VA[" << i << "]\n";
+	//	for (Arc& aa : VA[i]) {
+	//		std::cout << aa.lo << " " << aa.hi << " " << aa.i << "\n";
+	//	}
+	//}
 	int sz = VC.size();
 	ld A = VC[0].area();
 	int cnt = 1;

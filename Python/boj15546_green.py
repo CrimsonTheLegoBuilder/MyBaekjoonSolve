@@ -6,7 +6,7 @@ INPUT = sys.stdin.readline
 fuck = Decimal(1)
 scale: int = 1000000000000
 PI = acos(-1)
-getcontext().prec = 30
+getcontext().prec = 50
 va = [[] for _ in range(100)]
 F = [0] * 105
 
@@ -36,7 +36,7 @@ def dist2(a, b):
 
 
 def cross_2(p1: list, p2: list):
-    return p1[0] * p1[1] - p1[1] * p2[0]
+    return p1[0] * p2[1] - p1[1] * p2[0]
 
 
 def cross_3(p1: list, p2: list, p3: list):
@@ -64,7 +64,7 @@ def circle_circle_pos(a: list, b: list) -> int:
 
 
 def circle_in(a: list, b: list) -> int:
-    if a == b:
+    if a[0] == b[0] and a[1] == b[1] and a[2] == b[2]:
         return 1
     return a[0] > b[0] and circle_circle_pos(a, b) > 0
 
@@ -78,10 +78,10 @@ def intersection(a, b) -> list:
     cv = [cb[0] - ca[0], cb[1] - ca[1]]
     ra = a[2]
     rb = b[2]
-    rd = atan2(cv[1], cv[0])
+    rd = norm(atan2(cv[1], cv[0]))
     dsq = dist2(ca, cb)
-    d = dsq ** .5
-    x = (sq(ra) - sq(rb) + dsq) / (2 * ra * d)
+    d = Decimal(dsq).sqrt()
+    x = Decimal(sq(ra) - sq(rb) + dsq) / (Decimal(2 * ra) * d)
     if x < -1:
         x = -1
     if x > 1:
@@ -108,7 +108,11 @@ def green(c: list, lo: float, hi: float):
     l_ = [cos(lo), sin(lo)]
     h_ = [cos(hi), sin(hi)]
     fan = (hi - lo) * c[2] * c[2] * .5
-    m = pos(c, (lo + hi) * .5)
+    m = mid(l_, h_)
+    m[0] *= c[2]
+    m[0] += c[0]
+    m[1] *= c[2]
+    m[1] += c[1]
     tz = (cos(lo) - cos(hi)) * m[1] * c[2]
     return fan + tz - (cross_2(l_, h_)) * c[2] * c[2] * .5
 
@@ -126,7 +130,9 @@ def arc_init(vc) -> None:
             # print("inx: ", ff)
             if ff < 0 or 0 < ff:
                 continue
-            inx = intersection(vc[i], vc[j])
+            aa = [vc[i][0] / scale, vc[i][1] / scale, vc[i][2] / scale]
+            bb = [vc[j][0] / scale, vc[j][1] / scale, vc[j][2] / scale]
+            inx = intersection(aa, bb)
             # print("inx: ", inx)
             lo = inx[0]
             hi = inx[1]
@@ -157,11 +163,18 @@ def union_up_to_x(vc: list, x: int):
     for i in range(x + 1):
         # hi = Decimal(0)
         hi = 0
+        # print("i:", i)
+        if F[i]:
+            continue
         for arc in va[i]:
-            if arc[2] >= x or F[arc[2]]:
+            # print("x & arc.i: ", x, arc[2])
+            if arc[2] > x or F[arc[2]]:
                 continue
             if hi < arc[0]:
-                a += green(vc[arc[2]], hi, arc[0])
+                a += green(vc[i], hi, arc[0])
+                # print("arc: ", arc)
+                # print("green: ", green(vc[i], hi, arc[0]))
+                # print("theta: ", hi, arc[0])
                 hi = arc[1]
             else:
                 hi = max(hi, arc[1])
@@ -197,18 +210,18 @@ def query() -> bool:
         vc[i][0] /= scale
         vc[i][1] /= scale
         vc[i][2] /= scale
-        # print("va[", i, "]", end="")
+        # print("va[", i, "]")
         # for aa in va[i]:
         #     print(aa)
     cnt: int = 1
     a = circle_area(vc[0])
 
-    # print("a: ", a)
+    print("a: ", a)
 
     for i in range(1, n):
         aa = union_up_to_x(vc, i)
 
-        # print("aa: ", aa)
+        print("a, aa: ", a, aa)
 
         if not eq(a, aa):
             cnt += 1
@@ -222,3 +235,30 @@ if __name__ == "__main__":
         f = query()
         if not f:
             break
+
+'''
+
+20
+6.680085599158 7.011510259986 2.697815879981
+3.376369230373 4.569784318725 2.524396111176
+-3.476172463314 5.175644027295 3.301830037151
+0.002861688970 4.782922948283 2.025085810404
+-2.742889191745 6.261428822928 3.448985657967
+6.124931814614 2.071116619077 1.770612229037
+2.257101835919 -1.171517209960 3.461365852625
+5.095221191808 -4.988154225517 3.695655232131
+-1.012719642802 -4.147837851795 3.683656931769
+1.264623529373 3.051424332588 0.443737043439
+3.725234720086 4.467703489904 3.897606432039
+5.855549255934 3.911720638193 0.446141148856
+2.924066257977 -0.279239820400 1.011991677204
+6.515406506526 -2.217101722088 3.298401060117
+0.568429105390 -0.911076923149 1.700190683754
+-2.987128928806 6.081423856507 1.044905179973
+-3.895092944064 -2.568316983654 2.905045581851
+-2.677962106405 4.713194740695 3.537712487130
+-2.460502482733 -2.689276360225 3.461555430577
+7.780342009959 0.366565980979 1.638131246998
+0
+
+'''
