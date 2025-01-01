@@ -6,7 +6,7 @@ INPUT = sys.stdin.readline
 fuck = Decimal(1)
 scale: int = 1000000000000
 PI = acos(-1)
-getcontext().prec = 50
+getcontext().prec = 13
 va = [[] for _ in range(100)]
 F = [0] * 105
 
@@ -66,7 +66,7 @@ def circle_circle_pos(a: list, b: list) -> int:
 def circle_in(a: list, b: list) -> int:
     if a[0] == b[0] and a[1] == b[1] and a[2] == b[2]:
         return 1
-    return a[0] > b[0] and circle_circle_pos(a, b) > 0
+    return a[2] > b[2] and circle_circle_pos(a, b) > 0
 
 
 def intersection(a, b) -> list:
@@ -133,7 +133,6 @@ def arc_init(vc) -> None:
             aa = [vc[i][0] / scale, vc[i][1] / scale, vc[i][2] / scale]
             bb = [vc[j][0] / scale, vc[j][1] / scale, vc[j][2] / scale]
             inx = intersection(aa, bb)
-            # print("inx: ", inx)
             lo = inx[0]
             hi = inx[1]
             if lo > hi:
@@ -154,28 +153,25 @@ def union_up_to_x(vc: list, x: int):
     for i in range(len(F)):
         F[i] = 0
     for i in range(x + 1):
+        if F[i]:
+            continue
         for j in range(i + 1, x + 1):
             if F[j]:
                 continue
             if circle_in(vc[i], vc[j]):
                 F[j] = 1
+            if vc[i][2] < vc[j][2] and circle_in(vc[j], vc[i]):
+                F[i] = 1
     a = 0
     for i in range(x + 1):
-        # hi = Decimal(0)
         hi = 0
-        # print("i:", i)
-        c = [vc[i][0] / scale, vc[i][1] / scale, vc[i][2] / scale]
         if F[i]:
             continue
         for arc in va[i]:
-            # print("x & arc.i: ", x, arc[2])
             if arc[2] > x or F[arc[2]]:
                 continue
             if hi < arc[0]:
-                a += green(c, hi, arc[0])
-                # print("arc: ", arc)
-                # print("green: ", green(c, hi, arc[0]))
-                # print("theta: ", hi, arc[0])
+                a += green(vc[i], hi, arc[0])
                 hi = arc[1]
             else:
                 hi = max(hi, arc[1])
@@ -187,7 +183,7 @@ def circle_area(a):
 
 
 def eq(a, b):
-    return abs(a - b) < 1e-13
+    return abs(a - b) < 1e-15
 
 
 def query() -> bool:
@@ -207,22 +203,16 @@ def query() -> bool:
         # print(vc[-1])
     vc.reverse()
     arc_init(vc)
-    # for i in range(n):
-        # vc[i][0] /= scale
-        # vc[i][1] /= scale
-        # vc[i][2] /= scale
-        # print("va[", i, "]")
-        # for aa in va[i]:
-        #     print(aa)
     cnt: int = 1
     a = circle_area(vc[0])
 
-    print("a: ", a)
+    # print("a: ", a)
+    # print("a: ", a / scale / scale)
 
     for i in range(1, n):
         aa = union_up_to_x(vc, i)
 
-        print("a, aa: ", a, aa)
+        # print("a, aa: ", a / scale / scale, aa / scale / scale)
 
         if not eq(a, aa):
             cnt += 1
