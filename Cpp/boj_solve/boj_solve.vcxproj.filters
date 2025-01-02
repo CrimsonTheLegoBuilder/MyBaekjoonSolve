@@ -1563,10 +1563,10 @@
     <ClCompile Include="boj12620_green_bool.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj12620_lights_green.cpp">
+    <ClCompile Include="boj15546_green.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj15546_green.cpp">
+    <ClCompile Include="boj22530.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
