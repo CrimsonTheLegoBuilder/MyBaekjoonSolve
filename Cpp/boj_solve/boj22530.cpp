@@ -285,6 +285,7 @@ bool V[LEN * LEN * LEN];
 void bfs() {
 	std::queue<int> Q;
 	memset(V, 0, sizeof V);
+	VP.clear();
 	Q.push(0);
 	while (Q.size()) {
 		int p = Q.front(); Q.pop();
@@ -438,7 +439,6 @@ void connect(const Polygon& H, const int& r) {
 			}
 		}
 	}
-	VP.clear();
 	bfs();
 	return;
 }
