@@ -513,15 +513,14 @@ ld green(const Polygon& H, const int& r) {
 			ld h = d - r;
 			ld w = sqrt(r * r - h * h);
 			Pos dir = ~v.unit() * h;
-			Pos m = p1 - dir + v.unit() * w;
-			lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
+			m = p1 - dir + v.unit() * w;
 		}
 		else {//se0 - se1
 			const Pos& p1 = H[se0.i];
 			const Pos& p2 = H[se0.j];
-			Seg s1 = Seg(p1, p2);
-			Seg s2 = Seg(q1, q2);
-			m = intersection(s1 - r, s2 - r);
+			Pos v1 = ~v.unit() * r;
+			Pos v2 = ~(p2 - p1).unit() * r;
+			m = intersection(q1 + v1, q2 + v1, p1 + v2, p2 + v2);
 		}
 		lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		if (!~se2.j) {//se1 - p2
@@ -530,15 +529,14 @@ ld green(const Polygon& H, const int& r) {
 			ld h = d - r;
 			ld w = sqrt(r * r - h * h);
 			Pos dir = ~v.unit() * h;
-			Pos m = p1 - dir - v.unit() * w;
-			hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
+			m = p1 - dir - v.unit() * w;
 		}
 		else {//se1 - se2
 			const Pos& p1 = H[se2.i];
 			const Pos& p2 = H[se2.j];
-			Seg s1 = Seg(p1, p2);
-			Seg s2 = Seg(q1, q2);
-			Pos m = intersection(s1 - r, s2 - r);
+			Pos v1 = ~v.unit() * r;
+			Pos v2 = ~(p2 - p1).unit() * r;
+			m = intersection(q1 + v1, q2 + v1, p1 + v2, p2 + v2);
 		}
 		hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		if (eq(lo, hi)) continue;
