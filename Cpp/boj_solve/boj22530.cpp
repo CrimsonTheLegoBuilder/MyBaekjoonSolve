@@ -109,9 +109,10 @@ bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int
 	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
 	return ccw(p0, p1, q) >= f && ccw(p1, p2, q) >= f;
 }
-bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
+bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, const int& f = STRONG) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
+	if (f == WEAK) return f1 && f2;
 	bool f3 = on_seg_weak(s1, s2, d1) ||
 		on_seg_weak(s1, s2, d2) ||
 		on_seg_weak(d1, d2, s1) ||
@@ -140,17 +141,6 @@ int inner_check_concave(const Polygon& H, const Pos& p) {//concave
 		cnt += ccw(cur, nxt, p) > 0;
 	}
 	return (cnt & 1) * 2;
-}
-bool cross_check(const Polygon& H, const Pos& s, const Pos& e) {
-	if (inner_check(H, s)) return 1;
-	if (inner_check(H, e)) return 1;
-	int sz = H.size();
-	assert(sz == 4);
-	bool f0 = intersect(s, e, H[0], H[1]);
-	bool f1 = intersect(s, e, H[1], H[2]);
-	bool f2 = intersect(s, e, H[2], H[3]);
-	bool f3 = intersect(s, e, H[3], H[0]);
-	return (f0 + f1 + f2 + f3) > 1;
 }
 Polygon convex_cut(const Polygon& ps, const Pos& b1, const Pos& b2) {
 	Polygon qs;
@@ -303,6 +293,26 @@ void bfs() {
 	}
 	return;
 }
+bool cross_check(const Polygon& H, const Polygon& C) {
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		if (inner_check_concave(C, H[i]) > 1) return 0;
+		const Pos& p1 = H[i], & p2 = H[(i + 1) % sz];
+		for (int j = 0; j < 4; j++) {
+			const Pos& q1 = C[j], & q2 = C[(j + 1) % 4];
+			if (intersect(p1, p2, q1, q2, WEAK)) return 0;
+			if (on_seg_weak(q1, q2, p1) && ccw(q1, q2, p2) > 0) return 0;
+			if (on_seg_weak(q1, q2, p2) && ccw(q1, q2, p1) > 0) return 0;
+			if (q2 == p1) {
+				if (ccw(q1, q2, p2) > 0 && dot(q1, q2, p2) < 0) return 0;
+			}
+			if (q2 == p2) {
+				if (ccw(q1, q2, p1) > 0 && dot(q1, q2, p1) < 0) return 0;
+			}
+		}
+	}
+	return 1;
+}
 bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const int& r, const Pos& q) {
 	Circle c = Circle(p1, r * 2);
 	bool f1 = c >= q;
@@ -314,6 +324,7 @@ bool connectable(const Polygon& H, const Pos& s, const Pos& e, const int& r, con
 	if (f == LINE) {
 		Pos v = ~(e - s).unit() * r;
 		Polygon clip = { s + v, s - v, e - v, e + v };
+		//return cross_check(H, clip);
 		Polygon cut = sutherland_hodgman(H, clip);
 		return eq(area(clip), area(cut));
 	}
@@ -348,7 +359,7 @@ bool valid_check(const Polygon& H, const Circle& c) {
 		Vld inxs = circle_line_intersections(c, Seg(p0, p1), CIRCLE);
 		if (inxs.size() > 1) return 0;
 	}
-	if (!inner_check_concave(H, c.c)) return 0;
+	if (inner_check_concave(H, c.c) < 2) return 0;
 	return 1;
 }
 Polygon get_node(const Polygon& H, const int& r, const int& i, int& tq) {
