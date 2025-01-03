@@ -450,6 +450,9 @@ ld green(const Polygon& H) {
 		else if (!~se0.j && ~se1.j) {
 
 		}
+		else if (~se0.j && !~se1.j) {
+
+		}
 		else if (!~se0.j && !~se1.j) {
 
 		}
