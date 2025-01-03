@@ -384,32 +384,23 @@ Polygon get_node(const Pos& p1, const Pos& p2, const int& r) {
 }
 Polygon get_node(const Seg& s, const Pos& p, const int& r) {
 	if (ccw(s.s, s.e, p) <= 0) return {};
-	ld d = cross(s.s, s.e, p) / s.mag();
+	ld d = std::abs(cross(s.s, s.e, p)) / s.mag();
 	if (d >= r * 2) return {};
-	Pos v = s.e - s.s;
+	Pos v = s.e - s.s, c1, c2;
 	Polygon ret;
 	if (eq(d, r)) {
 		v = v.unit() * r;
-		Pos c1 = p + v, c2 = p - v;
-		if (dot(s.s, s.e, c1) < 0 && dot(s.e, s.s, c1) < 0) ret.push_back(c1);
-		if (dot(s.s, s.e, c2) < 0 && dot(s.e, s.s, c2) < 0) ret.push_back(c2);
+		c1 = p + v, c2 = p - v;
 	}
-	if (d < r) {
-		ld h = r - d;
-		ld w = sqrt(r * r - h * h);
-		v = v.unit() * w;
-		Pos c1 = p + v, c2 = p - v;
-		if (dot(s.s, s.e, c1) < 0 && dot(s.e, s.s, c1) < 0) ret.push_back(c1);
-		if (dot(s.s, s.e, c2) < 0 && dot(s.e, s.s, c2) < 0) ret.push_back(c2);
-	}
-	if (d > r) {
+	else {
 		ld h = d - r;
 		ld w = sqrt(r * r - h * h);
 		v = v.unit() * w;
-		Pos c1 = p + v, c2 = p - v;
-		if (dot(s.s, s.e, c1) < 0 && dot(s.e, s.s, c1) < 0) ret.push_back(c1);
-		if (dot(s.s, s.e, c2) < 0 && dot(s.e, s.s, c2) < 0) ret.push_back(c2);
+		Pos dir = ~v.unit() * h;
+		c1 = p - dir + v, c2 = p - dir - v;
 	}
+	if (dot(s.s, s.e, c1) < 0 && dot(s.e, s.s, c1) < 0) ret.push_back(c1);
+	if (dot(s.s, s.e, c2) < 0 && dot(s.e, s.s, c2) < 0) ret.push_back(c2);
 	return ret;
 }
 void connect(const Polygon& H, const int& r) {
@@ -417,8 +408,7 @@ void connect(const Polygon& H, const int& r) {
 	for (int i = 0; i < np; i++) {
 		for (int j = 0; j < np; j++) {
 			if (i == j) continue;
-			const Pos& s = VX[i];
-			const Pos& e = VX[j];
+			const Pos& s = VX[i], & e = VX[j];
 			if (connectable(H, s, e, r)) {
 				G[i].push_back(j);
 				G[j].push_back(i);
@@ -427,6 +417,7 @@ void connect(const Polygon& H, const int& r) {
 	}
 	for (int i = 0; i < N; i++) {
 		Pos cen = H[i];
+		if (ccw(H[(i - 1 + N) % N], H[i], H[(i + 1) % N]) > 0) continue;
 		for (Pos& p : ROT[i]) p -= cen;
 		std::sort(ROT[i].begin(), ROT[i].end(), cmpt);
 		for (Pos& p : ROT[i]) p += cen;
@@ -452,10 +443,10 @@ ld green(const Polygon& H, const int& r) {
 		const Pii& se1 = VP[i];
 		const Pii& se2 = VP[(i + sz) % sz];
 		//arc integral
-		if (~se0.j && ~se1.j) {
+		if (~se0.j && ~se1.j) {//e - e
 			const Pos& p1 = H[se0.i];
 			const Pos& p2 = H[se0.j];
-			const Pos& q1 = H[se1.j];
+			const Pos& q1 = H[se1.i];
 			const Pos& q2 = H[se1.j];
 			Seg s1 = Seg(p1, p2);
 			Seg s2 = Seg(q1, q2);
@@ -467,7 +458,7 @@ ld green(const Polygon& H, const int& r) {
 			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
 			else A += c.green(lo, hi);
 		}
-		else if (!~se0.j && ~se1.j) {
+		else if (!~se0.j && ~se1.j) {//v - e
 			const Pos& p1 = H[se0.i];
 			const Pos& q1 = H[se1.i];
 			const Pos& q2 = H[se1.j];
@@ -483,7 +474,7 @@ ld green(const Polygon& H, const int& r) {
 			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
 			else A += c.green(lo, hi);
 		}
-		else if (~se0.j && !~se1.j) {
+		else if (~se0.j && !~se1.j) {//e - v
 			const Pos& p1 = H[se0.i];
 			const Pos& p2 = H[se0.j];
 			const Pos& q1 = H[se1.i];
@@ -499,7 +490,7 @@ ld green(const Polygon& H, const int& r) {
 			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
 			else A += c.green(lo, hi);
 		}
-		else if (!~se0.j && !~se1.j) {
+		else if (!~se0.j && !~se1.j) {//v - v
 			const Pos& p = H[se0.i];
 			const Pos& q = H[se1.i];
 			Pos v = q - p;
@@ -517,7 +508,7 @@ ld green(const Polygon& H, const int& r) {
 		if (!~se1.j) continue;//ignore point
 		ld lo = 0; ld hi = 1;
 		Seg seg = Seg(H[se1.i], H[se1.j]);
-		if (!~se0.j) {//se0 - se1
+		if (!~se0.j) {//p0 - se1
 			const Pos& p1 = H[se0.i];
 			const Pos& q1 = H[se1.i];
 			const Pos& q2 = H[se1.j];
@@ -529,10 +520,10 @@ ld green(const Polygon& H, const int& r) {
 			Pos m = p1 - dir * h + v.unit() * w;
 			lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		}
-		else {
+		else {//se0 - se1
 			const Pos& p1 = H[se0.i];
 			const Pos& p2 = H[se0.j];
-			const Pos& q1 = H[se1.j];
+			const Pos& q1 = H[se1.i];
 			const Pos& q2 = H[se1.j];
 			Pos v = q2 - q1;
 			Seg s1 = Seg(p1, p2);
@@ -540,7 +531,7 @@ ld green(const Polygon& H, const int& r) {
 			Pos m = intersection(s1 - r, s2 - r);
 			lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		}
-		if (!~se2.j) {//se1 - se2
+		if (!~se2.j) {//se1 - p2
 			const Pos& q1 = H[se1.i];
 			const Pos& q2 = H[se1.j];
 			const Pos& p1 = H[se2.i];
@@ -552,7 +543,7 @@ ld green(const Polygon& H, const int& r) {
 			Pos m = p1 - dir * h - v.unit() * w;
 			hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		}
-		else {
+		else {//se1 - se2
 			const Pos& q1 = H[se1.j];
 			const Pos& q2 = H[se1.j];
 			const Pos& p1 = H[se2.i];
@@ -647,8 +638,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 			inxs = get_node(i12, j1, r);
 			for (Pos& p : inxs) {
 				if (valid_check(H, Circle(p, r))) {
-					p.i = np;
-					ROT[j].push_back(p);
+					p.i = np; ROT[j].push_back(p);
 					VX[vp++] = p;
 					ND[np] = { np, i, (i + 1) % N, j, -1 }; np++;
 				}
