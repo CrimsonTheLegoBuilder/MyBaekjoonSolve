@@ -303,9 +303,9 @@ void bfs() {
 	return;
 }
 bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const int& r, const Pos& q) {
-	Circle c = Circle(p1, r);
+	Circle c = Circle(p1, r * 2);
 	bool f1 = c >= q;
-	bool f2 = inside(p0, p1, p2, q);
+	bool f2 = inside(p0, p1, p2, q, WEAK);
 	return f1 && f2;
 }
 bool connectable(const Polygon& H, const Pos& s, const Pos& e, const int& r, const int& idx = -1, const int& f = LINE) {
@@ -320,12 +320,13 @@ bool connectable(const Polygon& H, const Pos& s, const Pos& e, const int& r, con
 		int sz = H.size();
 		if (s.i == -1 || e.i == -1) return 0;
 		const Pos& p0 = H[(idx - 1) & sz], & p1 = H[idx], & p2 = H[(idx + 1) % sz];
-		Circle c = Circle(p1, r);
-		ld lo = (s - p1).rad();
-		ld hi = (s - p2).rad();
-		ld m = (lo + hi) * .5;
-		Pos mid = c.p(m);
-		if (!inside(p0, p1, p2, mid)) return 0;
+		if (inside(p2, p1, p0, s, WEAK) || inside(p2, p1, p0, e, WEAK)) return 0;
+		Circle c = Circle(p1, r * 2);
+		//ld lo = (s - p1).rad();
+		//ld hi = (s - p2).rad();
+		//ld m = (lo + hi) * .5;
+		//Pos mid = c.p(m);
+		//if (!inside(p0, p1, p2, mid)) return 0;
 		for (int i = 0; i < sz; i++) {
 			if ((i - 1 + sz) % sz == idx || i == idx || (i + 1) % sz == idx) continue;
 			Vld inxs = circle_line_intersections(c, Seg(H[i], H[(i + 1) % N]), CIRCLE);
@@ -442,7 +443,16 @@ ld green(const Polygon& H) {
 		const Pii& se0 = VP[(i - 1 + sz) % sz];
 		const Pii& se1 = VP[i];
 		const Pii& se2 = VP[(i + sz) % sz];
-		
+		//arc integral
+		if (~se0.j && ~se1.j) {
+
+		}
+		else if (!~se0.j && ~se1.j) {
+
+		}
+		else if (!~se0.j && !~se1.j) {
+
+		}
 	}
 }
 bool query() {
@@ -468,6 +478,11 @@ bool query() {
 	for (int i = 0; i < N; i++) {//node init
 		Polygon inxs;
 		Pos inx;
+		const Pos& p0 = H[(i - 1 + N) % N], & p1 = H[i], & p2 = H[(i + 1) % N];
+		ld lo = (p0 - p1).rad();
+		ld hi = (p2 - p1).rad();
+		Pos m = Circle(p1, r).p((lo + hi) * .5);
+		m.i = -1; ROT[i].push_back(m);
 		int tq;
 		inxs = get_node(H, r, i, tq);
 		if (tq < 0) {
@@ -478,14 +493,12 @@ bool query() {
 				VX[vp++] = c1;
 				ND[np] = { np, (i - 1 + N) % N, i, i, -1 }; np++;
 			}
-			else { c1.i = -1; ROT[i].push_back(c1); }
 			Pos c2 = inxs[0];
 			if (valid_check(H, Circle(c2, r))) {
 				c2.i = np; ROT[i].push_back(c2);
 				VX[vp++] = c2;
 				ND[np] = { np, i, i + 1, i, -1 }; np++;
 			}
-			else { c2.i = -1; ROT[i].push_back(c2); }
 		}
 		Pos i1 = H[i], i2 = H[(i + 1) % N];
 		Seg i12 = Seg(i1, i2);
