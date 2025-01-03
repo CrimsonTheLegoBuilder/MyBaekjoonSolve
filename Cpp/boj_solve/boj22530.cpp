@@ -343,8 +343,8 @@ bool connectable(const Polygon& H, const Pos& s, const Pos& e, const int& r, con
 			if ((i - 1 + sz) % sz == idx || i == idx || (i + 1) % sz == idx) continue;
 			Vld inxs = circle_line_intersections(c, Seg(H[i], H[(i + 1) % N]), CIRCLE);
 			if (inxs.size() < 2) continue;
-			Pos q1 = inxs[0];
-			Pos q2 = inxs[0];
+			Pos q1 = c.p(inxs[0]);
+			Pos q2 = c.p(inxs[1]);
 			if (inside(e, p1, s, r, q1) && inside(e, p1, s, r, q2)) return 0;
 		}
 		return 1;
