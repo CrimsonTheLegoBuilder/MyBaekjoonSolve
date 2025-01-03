@@ -443,6 +443,8 @@ ld green(const Polygon& H, const int& r) {
 		const Pii& se1 = VP[i];
 		const Pii& se2 = VP[(i + sz) % sz];
 		//arc integral
+		Circle c;
+		ld lo = 0, hi = 2 * PI;
 		if (~se0.j && ~se1.j) {//e - e
 			const Pos& p1 = H[se0.i];
 			const Pos& p2 = H[se0.j];
@@ -453,10 +455,9 @@ ld green(const Polygon& H, const int& r) {
 			Pos m = intersection(s1 - r, s2 - r);
 			Pos v1 = -~(p2 - p1);
 			Pos v2 = -~(q2 - q1);
-			ld lo = v1.rad(), hi = v2.rad();
 			Circle c = Circle(m, r);
-			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
-			else A += c.green(lo, hi);
+			ld lo = v1.rad();
+			ld hi = v2.rad();
 		}
 		else if (!~se0.j && ~se1.j) {//v - e
 			const Pos& p1 = H[se0.i];
@@ -469,10 +470,8 @@ ld green(const Polygon& H, const int& r) {
 			ld w = sqrt(r * r - h * h);
 			Pos m = p1 - dir * h + v.unit() * w;
 			Circle c = Circle(m, r);
-			ld lo = (p1 - m).rad();
-			ld hi = (-~v).rad();
-			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
-			else A += c.green(lo, hi);
+			ld lo = (-~v).rad();
+			ld hi = (p1 - m).rad();
 		}
 		else if (~se0.j && !~se1.j) {//e - v
 			const Pos& p1 = H[se0.i];
@@ -487,8 +486,6 @@ ld green(const Polygon& H, const int& r) {
 			Circle c = Circle(m, r);
 			ld lo = (p1 - m).rad();
 			ld hi = (-~v).rad();
-			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
-			else A += c.green(lo, hi);
 		}
 		else if (!~se0.j && !~se1.j) {//v - v
 			const Pos& p = H[se0.i];
@@ -498,12 +495,12 @@ ld green(const Polygon& H, const int& r) {
 			ld h = sqrt(r * r - w * w);
 			Pos mid = (p + q) * .5;
 			Pos m = mid + ~v.unit() * h;
+			Circle c = Circle(m, r);
 			ld lo = (p - m).rad();
 			ld hi = (q - m).rad();
-			Circle c = Circle(m, r);
-			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
-			else A += c.green(lo, hi);
 		}
+		if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
+		else A += c.green(lo, hi);
 		//seg integral
 		if (!~se1.j) continue;//ignore point
 		ld lo = 0; ld hi = 1;
