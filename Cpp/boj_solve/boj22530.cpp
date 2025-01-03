@@ -435,7 +435,8 @@ void connect(const Polygon& H, const int& r) {
 	bfs();
 	return;
 }
-ld green(const Polygon& H) {
+ld green(const Polygon& H, const int& r) {
+	ld A = 0;
 	std::sort(VP.begin(), VP.end());
 	VP.erase(unique(VP.begin(), VP.end()), VP.end());
 	int sz = VP.size();
@@ -445,17 +446,119 @@ ld green(const Polygon& H) {
 		const Pii& se2 = VP[(i + sz) % sz];
 		//arc integral
 		if (~se0.j && ~se1.j) {
-
+			const Pos& p1 = H[se0.i];
+			const Pos& p2 = H[se0.j];
+			const Pos& q1 = H[se1.j];
+			const Pos& q2 = H[se1.j];
+			Seg s1 = Seg(p1, p2);
+			Seg s2 = Seg(q1, q2);
+			Pos m = intersection(s1 - r, s2 - r);
+			Pos v1 = -~(p2 - p1);
+			Pos v2 = -~(q2 - q1);
+			ld lo = v1.rad(), hi = v2.rad();
+			Circle c = Circle(m, r);
+			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
+			else A += c.green(lo, hi);
 		}
 		else if (!~se0.j && ~se1.j) {
-
+			const Pos& p1 = H[se0.i];
+			const Pos& q1 = H[se1.i];
+			const Pos& q2 = H[se1.j];
+			Pos v = q2 - q1;
+			Pos dir = ~v.unit();
+			ld d = std::abs(cross(q1, q2, p1)) / v.mag();
+			ld h = d - r;
+			ld w = sqrt(r * r - h * h);
+			Pos m = p1 - dir * h + v.unit() * w;
+			Circle c = Circle(m, r);
+			ld lo = (p1 - m).rad();
+			ld hi = (-~v).rad();
+			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
+			else A += c.green(lo, hi);
 		}
 		else if (~se0.j && !~se1.j) {
-
+			const Pos& p1 = H[se0.i];
+			const Pos& p2 = H[se0.j];
+			const Pos& q1 = H[se1.i];
+			Pos v = p2 - p1;
+			Pos dir = ~v.unit();
+			ld d = std::abs(cross(p1, p2, q1)) / v.mag();
+			ld h = d - r;
+			ld w = sqrt(r * r - h * h);
+			Pos m = p1 - dir * h - v.unit() * w;
+			Circle c = Circle(m, r);
+			ld lo = (p1 - m).rad();
+			ld hi = (-~v).rad();
+			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
+			else A += c.green(lo, hi);
 		}
 		else if (!~se0.j && !~se1.j) {
-
+			const Pos& p = H[se0.i];
+			const Pos& q = H[se1.i];
+			Pos v = q - p;
+			ld w = v.mag() * .5;
+			ld h = sqrt(r * r - w * w);
+			Pos mid = (p + q) * .5;
+			Pos m = mid + ~v.unit() * h;
+			ld lo = (p - m).rad();
+			ld hi = (q - m).rad();
+			Circle c = Circle(m, r);
+			if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
+			else A += c.green(lo, hi);
 		}
+		//seg integral
+		if (!~se1.j) continue;//ignore point
+		ld lo = 0; ld hi = 1;
+		Seg seg = Seg(H[se1.i], H[se1.j]);
+		if (!~se0.j) {//se0 - se1
+			const Pos& p1 = H[se0.i];
+			const Pos& q1 = H[se1.i];
+			const Pos& q2 = H[se1.j];
+			Pos v = q2 - q1;
+			Pos dir = ~v.unit();
+			ld d = std::abs(cross(q1, q2, p1)) / v.mag();
+			ld h = d - r;
+			ld w = sqrt(r * r - h * h);
+			Pos m = p1 - dir * h + v.unit() * w;
+			lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
+		}
+		else {
+			const Pos& p1 = H[se0.i];
+			const Pos& p2 = H[se0.j];
+			const Pos& q1 = H[se1.j];
+			const Pos& q2 = H[se1.j];
+			Pos v = q2 - q1;
+			Seg s1 = Seg(p1, p2);
+			Seg s2 = Seg(q1, q2);
+			Pos m = intersection(s1 - r, s2 - r);
+			lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
+		}
+		if (!~se2.j) {//se1 - se2
+			const Pos& q1 = H[se1.i];
+			const Pos& q2 = H[se1.j];
+			const Pos& p1 = H[se2.i];
+			Pos v = q2 - q1;
+			Pos dir = ~v.unit();
+			ld d = std::abs(cross(q1, q2, p1)) / v.mag();
+			ld h = d - r;
+			ld w = sqrt(r * r - h * h);
+			Pos m = p1 - dir * h - v.unit() * w;
+			hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
+		}
+		else {
+			const Pos& q1 = H[se1.j];
+			const Pos& q2 = H[se1.j];
+			const Pos& p1 = H[se2.i];
+			const Pos& p2 = H[se2.j];
+			Pos v = q2 - q1;
+			Seg s1 = Seg(p1, p2);
+			Seg s2 = Seg(q1, q2);
+			Pos m = intersection(s1 - r, s2 - r);
+			hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
+		}
+		if (eq(lo, hi)) continue;
+		assert(lo < hi);
+		A += seg.green(lo, hi);
 	}
 }
 bool query() {
@@ -549,7 +652,7 @@ bool query() {
 		}
 	}
 	connect(H, r);
-	std::cout << green(H) << "\n";
+	std::cout << green(H, r) << "\n";
 	return;
 }
 void solve() {
