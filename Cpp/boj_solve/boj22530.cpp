@@ -365,7 +365,13 @@ Polygon get_node(const Polygon& H, const int& r, const int& i, int& tq) {
 Pos get_node(const Seg& s1, const Seg& s2, const int& r) {
 	Seg e1 = s1 - r;
 	Seg e2 = s2 - r;
-	return intersection(e1, e2);
+	Pos m = intersection(e1, e2);
+	Circle c = Circle(m, r);
+	Vld x1 = circle_line_intersections(c, s1, LINE);
+	Vld x2 = circle_line_intersections(c, s2, LINE);
+	m.i = -1;
+	if (x1.size() == 1 && x2.size() == 1) m.i = 0;
+	return m;
 }
 Polygon get_node(const Pos& p1, const Pos& p2, const int& r) {
 	Pos v = p2 - p1;
@@ -422,12 +428,13 @@ void connect(const Polygon& H, const int& r) {
 		Pos cen = H[i];
 		for (Pos& p : ROT[i]) p -= cen;
 		std::sort(ROT[i].begin(), ROT[i].end(), cmpt);
+		for (Pos& p : ROT[i]) p += cen;
 		int sz = ROT[i].size();
 		for (int j = 0; j < sz; j++) {
 			const Pos& s = ROT[i][j], & e = ROT[i][(j + 1) % sz];
 			if (connectable(H, s, e, r, i, CIRCLE)) {
-				G[i].push_back(j);
-				G[j].push_back(i);
+				G[s.i].push_back(e.i);
+				G[e.i].push_back(s.i);
 			}
 		}
 	}
@@ -587,7 +594,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 		m.i = -1; ROT[i].push_back(m);
 		int tq;
 		inxs = get_node(H, r, i, tq);
-		if (tq < 0) {
+		if (tq < 0) {//v
 			assert(inxs.size() == 2);
 			Pos c1 = inxs[0];
 			if (valid_check(H, Circle(c1, r))) {
@@ -599,12 +606,12 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 			if (valid_check(H, Circle(c2, r))) {
 				c2.i = np; ROT[i].push_back(c2);
 				VX[vp++] = c2;
-				ND[np] = { np, i, i + 1, i, -1 }; np++;
+				ND[np] = { np, i, (i + 1) % N, i, -1 }; np++;
 			}
 		}
 		Pos i1 = H[i], i2 = H[(i + 1) % N];
 		Seg i12 = Seg(i1, i2);
-		for (int j = i + 1; j < N; j++) {
+		for (int j = i + 1; j < N; j++) {//v - v
 			Pos j1 = H[j], j2 = H[(j + 1) % N];
 			if (i + 1 != j && j + 1 != i) {
 				inxs = get_node(i1, j1, r);
@@ -628,12 +635,12 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 			}
 			Seg j12 = Seg(j1, j2);
 			inx = get_node(i12, j12, r);
-			if (valid_check(H, Circle(inx, r))) {
+			if (valid_check(H, Circle(inx, r)) && !inx.i) {//e - e
 				VX[vp++] = inx;
-				ND[np] = { np, i, i + 1, j, j + 1 }; np++;
+				ND[np] = { np, i, (i + 1) % N, j, (j + 1) % N }; np++;
 			}
 		}
-		for (int j = 0; j < N; j++) {
+		for (int j = 0; j < N; j++) {//v - e
 			if (j == i || j == (i + 1) % N) continue;
 			Pos j1 = H[j];
 			inxs = get_node(i12, j1, r);
@@ -642,7 +649,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 					p.i = np;
 					ROT[j].push_back(p);
 					VX[vp++] = p;
-					ND[np] = { np, i, i + 1, j, -1 }; np++;
+					ND[np] = { np, i, (i + 1) % N, j, -1 }; np++;
 				}
 			}
 		}
