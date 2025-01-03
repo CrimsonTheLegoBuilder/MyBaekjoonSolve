@@ -567,6 +567,7 @@ ld green(const Polygon& H, const int& r) {
 		assert(lo < hi);
 		A += seg.green(lo, hi);
 	}
+	return A;
 }
 void init(Polygon& H, const int& x, const int& y, const int& r) {
 	vp = 0; np = 0;
