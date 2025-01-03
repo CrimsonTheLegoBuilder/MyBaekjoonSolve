@@ -675,3 +675,4 @@ void solve() {
 	while (query());
 	return;
 }
+int main() { solve(); return 0; }//boj22530 Intelligent Circular Perfect Cleaner
