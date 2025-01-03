@@ -294,9 +294,9 @@ void bfs() {
 				Q.push(w);
 				Pii se;
 				se = ND[w].p1();
-				if (se.i != -1) VP.push_back(se);
+				if (!~se.i) VP.push_back(se);
 				se = ND[w].p2();
-				if (se.i != -1) VP.push_back(se);
+				if (!~se.i) VP.push_back(se);
 			}
 		}
 	}
@@ -582,6 +582,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 		const Pos& p0 = H[(i - 1 + N) % N], & p1 = H[i], & p2 = H[(i + 1) % N];
 		ld lo = (p0 - p1).rad();
 		ld hi = (p2 - p1).rad();
+		if (hi < lo) hi += 2 * PI;
 		Pos m = Circle(p1, r).p((lo + hi) * .5);
 		m.i = -1; ROT[i].push_back(m);
 		int tq;
