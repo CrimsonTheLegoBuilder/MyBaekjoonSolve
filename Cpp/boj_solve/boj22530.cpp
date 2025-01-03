@@ -561,16 +561,11 @@ ld green(const Polygon& H, const int& r) {
 		A += seg.green(lo, hi);
 	}
 }
-bool query() {
-	int x, y, r;
-	std::cin >> N >> x >> y >> r;
-	if (!N && !x && !y && !r) return 0;
+void init(Polygon& H, const int& x, const int& y, const int& r) {
 	vp = 0; np = 0;
 	C0 = Circle(Pos(x, y), r);
 	VX[vp++] = Pos(x, y);
 	ND[np++] = { 0, -1, -1, -1, -1 };
-	Polygon H(N);
-	for (Pos& p : H) std::cin >> p;
 	Vbool F(N, 0);
 	for (int i = 0; i < N; i++) {
 		const Pos& p0 = H[(i - 1 + N) % N], & p1 = H[i], & p2 = H[(i + 1) % N];
@@ -623,7 +618,7 @@ bool query() {
 				}
 				Pos c2 = inxs[0];
 				if (valid_check(H, Circle(c2, r))) {
-					c2.i = np; 
+					c2.i = np;
 					ROT[i].push_back(c2);
 					ROT[j].push_back(c2);
 					VX[vp++] = c2;
@@ -651,6 +646,15 @@ bool query() {
 			}
 		}
 	}
+	return;
+}
+bool query() {
+	int x, y, r;
+	std::cin >> N >> x >> y >> r;
+	if (!N && !x && !y && !r) return 0;
+	Polygon H(N);
+	for (Pos& p : H) std::cin >> p;
+	init(H, x, y, r);
 	connect(H, r);
 	std::cout << green(H, r) << "\n";
 	return;
