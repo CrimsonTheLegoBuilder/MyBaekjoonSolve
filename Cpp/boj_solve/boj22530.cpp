@@ -389,15 +389,13 @@ Polygon get_node(const Seg& s, const Pos& p, const int& r) {
 	Pos v = s.e - s.s, c1, c2;
 	Polygon ret;
 	if (eq(d, r)) {
-		v = v.unit() * r;
-		c1 = p + v, c2 = p - v;
+		c1 = p + v.unit() * r, c2 = p - v.unit() * r;
 	}
 	else {
 		ld h = d - r;
 		ld w = sqrt(r * r - h * h);
-		v = v.unit() * w;
 		Pos dir = ~v.unit() * h;
-		c1 = p - dir + v, c2 = p - dir - v;
+		c1 = p - dir + v.unit() * w, c2 = p - dir - v.unit() * w;
 	}
 	if (dot(s.s, s.e, c1) < 0 && dot(s.e, s.s, c1) < 0) ret.push_back(c1);
 	if (dot(s.s, s.e, c2) < 0 && dot(s.e, s.s, c2) < 0) ret.push_back(c2);
@@ -505,52 +503,44 @@ ld green(const Polygon& H, const int& r) {
 		if (!~se1.j) continue;//ignore point
 		ld lo = 0; ld hi = 1;
 		Seg seg = Seg(H[se1.i], H[se1.j]);
+		const Pos& q1 = H[se1.i];
+		const Pos& q2 = H[se1.j];
+		const Pos& q2 = H[se1.j];
+		Pos m, v = q2 - q1;
 		if (!~se0.j) {//p0 - se1
 			const Pos& p1 = H[se0.i];
-			const Pos& q1 = H[se1.i];
-			const Pos& q2 = H[se1.j];
-			Pos v = q2 - q1;
-			Pos dir = ~v.unit();
 			ld d = std::abs(cross(q1, q2, p1)) / v.mag();
 			ld h = d - r;
 			ld w = sqrt(r * r - h * h);
-			Pos m = p1 - dir * h + v.unit() * w;
+			Pos dir = ~v.unit() * h;
+			Pos m = p1 - dir + v.unit() * w;
 			lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		}
 		else {//se0 - se1
 			const Pos& p1 = H[se0.i];
 			const Pos& p2 = H[se0.j];
-			const Pos& q1 = H[se1.i];
-			const Pos& q2 = H[se1.j];
-			Pos v = q2 - q1;
 			Seg s1 = Seg(p1, p2);
 			Seg s2 = Seg(q1, q2);
-			Pos m = intersection(s1 - r, s2 - r);
-			lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
+			m = intersection(s1 - r, s2 - r);
 		}
+		lo = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		if (!~se2.j) {//se1 - p2
-			const Pos& q1 = H[se1.i];
-			const Pos& q2 = H[se1.j];
 			const Pos& p1 = H[se2.i];
-			Pos v = q2 - q1;
-			Pos dir = ~v.unit();
 			ld d = std::abs(cross(q1, q2, p1)) / v.mag();
 			ld h = d - r;
 			ld w = sqrt(r * r - h * h);
-			Pos m = p1 - dir * h - v.unit() * w;
+			Pos dir = ~v.unit() * h;
+			Pos m = p1 - dir - v.unit() * w;
 			hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		}
 		else {//se1 - se2
-			const Pos& q1 = H[se1.j];
-			const Pos& q2 = H[se1.j];
 			const Pos& p1 = H[se2.i];
 			const Pos& p2 = H[se2.j];
-			Pos v = q2 - q1;
 			Seg s1 = Seg(p1, p2);
 			Seg s2 = Seg(q1, q2);
 			Pos m = intersection(s1 - r, s2 - r);
-			hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		}
+		hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
 		if (eq(lo, hi)) continue;
 		assert(lo < hi);
 		A += seg.green(lo, hi);
