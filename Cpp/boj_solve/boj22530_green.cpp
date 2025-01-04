@@ -35,8 +35,8 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define CIRCLE 2
 #define STRONG 0
 #define WEAK 1
-#define LO x
-#define HI y
+//#define LO x
+//#define HI y
 
 int N, M, T;
 ld RET[1000];
@@ -173,7 +173,7 @@ struct Seg {
 		Pos m = p(ratio);
 		return m.y * d * (s.x - e.x);
 	}
-	Seg operator - (const ld& n) const  {
+	Seg operator - (const ld& n) const {
 		Pos v = ~(e - s).unit();
 		return { s + v * n, e + v * n };
 	}
@@ -184,7 +184,6 @@ struct Seg {
 	}
 	ld mag() const { return (e - s).mag(); }
 };
-Seg S[4][LEN];
 typedef std::vector<Seg> Segs;
 ld dot(const Seg& p, const Seg& q) { return dot(p.s, p.e, q.s, q.e); }
 bool intersect(const Seg& u, const Seg& v) { return intersect(u.s, u.e, v.s, v.e); }
@@ -281,7 +280,6 @@ void bfs() {
 	V[0] = 1;
 	while (Q.size()) {
 		int p = Q.front(); Q.pop();
-		//std::cout << "p:: " << p << "\n";
 		for (const int& w : G[p]) {
 			if (!V[w]) {
 				V[w] = 1;
@@ -375,8 +373,6 @@ Polygon get_node(const Polygon& H, const int& r, const int& i, int& tq) {
 	return ret;
 }
 Pos get_node(const Seg& s1, const Seg& s2, const int& r) {
-	//std::cout << "s1:: " << s1.s << " " << s1.e << "\n";
-	//std::cout << "s2:: " << s2.s << " " << s2.e << "\n";
 	Seg e1 = s1 - r;
 	Seg e2 = s2 - r;
 	Pos m = intersection(e1.s, e1.e, e2.s, e2.e);
@@ -422,11 +418,6 @@ void connect(const Polygon& H, const int& r) {
 		for (int j = 0; j < np; j++) {
 			if (i == j) continue;
 			const Pos& s = VX[i], & e = VX[j];
-			//std::cout << "s:: " << s << "\n";
-			//std::cout << "seg i.s:: " << ND[i].s1 << " i.e:: " << ND[i].e1 << "\n";
-			//std::cout << "e:: " << e << "\n";
-			//std::cout << "seg j.s:: " << ND[j].s1 << " j.e:: " << ND[j].e1 << "\n";
-			//std::cout << (connectable(H, s, e, r) ? "ok\n" : "fuck\n") << "\n";
 			if (connectable(H, s, e, r)) {
 				G[i].push_back(j);
 				G[j].push_back(i);
@@ -443,7 +434,6 @@ void connect(const Polygon& H, const int& r) {
 		for (int j = 0; j < sz; j++) {
 			const Pos& s = ROT[i][j], & e = ROT[i][(j + 1) % sz];
 			if (connectable(H, s, e, r, i, CIRCLE)) {
-				//std::cout << "i, j:: " << s.i << " | " << e.i << "\n";
 				G[s.i].push_back(e.i);
 				G[e.i].push_back(s.i);
 			}
@@ -457,16 +447,10 @@ ld green(const Polygon& H, const int& r) {
 	std::sort(VP.begin(), VP.end());
 	VP.erase(unique(VP.begin(), VP.end()), VP.end());
 	int sz = VP.size();
-	//std::cout << "VP.sz:: " << sz << "\n";
-	//for (Pii& p : VP) std::cout << p.i << " " << p.j << "\n";
-	//std::cout << "VP\n";
 	for (int i = 0; i < sz; i++) {
 		const Pii& se0 = VP[(i - 1 + sz) % sz];
 		const Pii& se1 = VP[i];
 		const Pii& se2 = VP[(i + 1) % sz];
-		//std::cout << "se0:: " << se0.i << " " << se0.j << "\n";
-		//std::cout << "se1:: " << se1.i << " " << se1.j << "\n";
-		//std::cout << "se2:: " << se2.i << " " << se2.j << "\n";
 		//std::cout << "arc integral::\n";
 		Circle c;
 		ld lo = 0, hi = 2 * PI;
@@ -488,16 +472,12 @@ ld green(const Polygon& H, const int& r) {
 			const Pos& p1 = H[se0.i];
 			const Pos& q1 = H[se1.i];
 			const Pos& q2 = H[se1.j];
-			//std::cout << "p1:: " << p1 << "\n";
-			//std::cout << "q1:: " << q1 << "\n";
-			//std::cout << "q2:: " << q2 << "\n";
 			Pos v = q2 - q1;
 			Pos dir = ~v.unit();
 			ld d = std::abs(cross(q1, q2, p1)) / v.mag();
 			ld h = d - r;
 			ld w = sqrt(r * r - h * h);
 			Pos m = p1 - dir * h + v.unit() * w;
-			//std::cout << "m:: " << m << "\n";
 			c = Circle(m, r);
 			lo = (p1 - m).rad();
 			hi = (-~v).rad();
@@ -506,16 +486,12 @@ ld green(const Polygon& H, const int& r) {
 			const Pos& p1 = H[se0.i];
 			const Pos& p2 = H[se0.j];
 			const Pos& q1 = H[se1.i];
-			//std::cout << "p1:: " << p1 << "\n";
-			//std::cout << "p2:: " << p2 << "\n";
-			//std::cout << "q1:: " << q1 << "\n";
 			Pos v = p2 - p1;
 			Pos dir = ~v.unit();
 			ld d = std::abs(cross(p1, p2, q1)) / v.mag();
 			ld h = d - r;
 			ld w = sqrt(r * r - h * h);
 			Pos m = q1 - dir * h - v.unit() * w;
-			//std::cout << "m:: " << m << "\n";
 			c = Circle(m, r);
 			lo = (-~v).rad();
 			hi = (q1 - m).rad();
@@ -532,16 +508,8 @@ ld green(const Polygon& H, const int& r) {
 			lo = (p - m).rad();
 			hi = (q - m).rad();
 		}
-		//std::cout << "lo:: " << lo << " hi:: " << hi << "\n";
-		//std::cout << "circle:: " << c << "\n";
 		if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
 		else A += c.green(lo, hi);
-		//if (lo > hi) {
-			//std::cout << "green, rev::: " << c.green(lo, 2 * PI) + c.green(0, hi) << "\n";
-		//}
-		//else {
-			//std::cout << "green, std::: " << c.green(lo, hi) << "\n";
-		//}
 		//std::cout << "seg integral::\n";
 		if (!~se1.j) continue;//ignore point
 		lo = 0, hi = 1;
@@ -549,8 +517,6 @@ ld green(const Polygon& H, const int& r) {
 		const Pos& q1 = H[se1.i];
 		const Pos& q2 = H[se1.j];
 		Pos m, v = q2 - q1;
-		//std::cout << "se1:: " << se1.i << " " << se1.j << "\n";
-		//std::cout << "se0:: " << se0.i << " " << se0.j << "\n";
 		if (!~se0.j) {//p0 - se1
 			const Pos& p1 = H[se0.i];
 			ld d = std::abs(cross(q1, q2, p1)) / v.mag();
@@ -566,9 +532,7 @@ ld green(const Polygon& H, const int& r) {
 			Pos v2 = ~(p2 - p1).unit() * r;
 			m = intersection(q1 + v1, q2 + v1, p1 + v2, p2 + v2);
 		}
-		//std::cout << "m:: " << m << "\n";
 		lo = intersection(Seg(q1, q2), Seg(m, m + ~v), WEAK);
-		//std::cout << "se2:: " << se2.i << " " << se2.j << "\n";
 		if (!~se2.j) {//se1 - p2
 			const Pos& p1 = H[se2.i];
 			ld d = std::abs(cross(q1, q2, p1)) / v.mag();
@@ -584,14 +548,10 @@ ld green(const Polygon& H, const int& r) {
 			Pos v2 = ~(p2 - p1).unit() * r;
 			m = intersection(q1 + v1, q2 + v1, p1 + v2, p2 + v2);
 		}
-		//std::cout << "m:: " << m << "\n";
 		hi = intersection(Seg(q1, q2), Seg(m, m + ~v), WEAK);
-		//std::cout << "lo:: " << lo << " hi:: " << hi << "\n";
-		//std::cout << "integral::\n";
 		if (eq(lo, hi) || eq(q1.x, q2.x)) continue;
 		assert(lo < hi);
 		A += seg.green(lo, hi);
-		//std::cout << "green, seg:: " << seg.green(lo, hi) << "\n";
 	}
 	return A;
 }
@@ -626,17 +586,13 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 		if (tq < 0) {//v
 			assert(inxs.size() == 2);
 			Pos c1 = inxs[0];
-			//std::cout << "i:: " << i << " c1:: " << c1 << "\n";
 			if (valid_check(H, Circle(c1, r))) {
-				//std::cout << "ok::\n";
 				c1.i = np; ROT[i].push_back(c1);
 				VX[vp++] = c1;
 				ND[np] = { np, (i - 1 + N) % N, i, i, -1 }; np++;
 			}
 			Pos c2 = inxs[1];
-			//std::cout << "i:: " << i << " c2:: " << c2 << "\n";
 			if (valid_check(H, Circle(c2, r))) {
-				//std::cout << "ok::\n";
 				c2.i = np; ROT[i].push_back(c2);
 				VX[vp++] = c2;
 				ND[np] = { np, i, (i + 1) % N, i, -1 }; np++;
@@ -647,14 +603,9 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 		for (int j = i + 1; j < N; j++) {//v - v
 			Pos j1 = H[j], j2 = H[(j + 1) % N];
 			if ((i + 1) % N != j && (j + 1) % N != i) {
-				//std::cout << "v - v\n";
-				//std::cout << "i1:: " << i1 << "\n";
-				//std::cout << "j1:: " << j1 << "\n";
 				inxs = get_node(i1, j1, r);
-				//std::cout << "inxs.sz:: " << inxs.size() << "\n";
 				if (inxs.size() == 1) {
 					Pos c1 = inxs[0];
-					//std::cout << "c1:: " << c1 << "\n";
 					if (valid_check(H, Circle(c1, r))) {
 						c1.i = np;
 						ROT[i].push_back(c1);
@@ -666,9 +617,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 				}
 				else if (inxs.size() == 2) {
 					Pos c1 = inxs[0];
-					//std::cout << "c1:: " << c1 << "\n";
 					if (valid_check(H, Circle(c1, r))) {
-						//std::cout << "ok::\n";
 						c1.i = np;
 						ROT[i].push_back(c1);
 						ROT[j].push_back(c1);
@@ -676,9 +625,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 						ND[np] = { np, i, -1, j, -1 }; np++;
 					}
 					Pos c2 = inxs[1];
-					//std::cout << "c2:: " << c2 << "\n";
 					if (valid_check(H, Circle(c2, r))) {
-						//std::cout << "ok::\n";
 						c2.i = np;
 						ROT[i].push_back(c2);
 						ROT[j].push_back(c2);
@@ -690,7 +637,6 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 			if (zero(ccw(i1, i2, j1, j2))) continue;
 			Seg j12 = Seg(j1, j2);
 			inx = get_node(i12, j12, r);
-			//std::cout << "inx:::::: " << inx << "\n";
 			if (valid_check(H, Circle(inx, r)) && !inx.i) {//e - e
 				VX[vp++] = inx;
 				ND[np] = { np, i, (i + 1) % N, j, (j + 1) % N }; np++;
@@ -709,15 +655,6 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 			}
 		}
 	}
-	//std::cout << "vp:: " << vp << "\n";
-	//for (int i = 0; i < vp; i++) {
-		//std::cout << "VX[" << i << "]:: " << VX[i].x << " " << VX[i].y << "\n";
-	//}
-	//std::cout << "np:: " << np << "\n";
-	//for (int i = 0; i < np; i++) {
-		//std::cout << "ND[" << i << "]:: " << ND[i].s1 << " " << ND[i].e1 << " ";
-		//std::cout << ND[i].s2 << " " << ND[i].e2 << "\n";
-	//}
 	return;
 }
 bool query() {
@@ -726,19 +663,10 @@ bool query() {
 	if (!N && !x && !y && !r) return 0;
 	Polygon H(N);
 	for (Pos& p : H) std::cin >> p;
-	//std::cout << "init::\n";
 	init(H, x, y, r);
-	//std::cout << "init::\n";
-	//std::cout << "connect::\n";
 	connect(H, r);
-	//std::cout << "connect::\n";
-	//std::cout << "green::\n";
-	//std::cout << green(H, r) << "\n";
 	ld A = green(H, r);
-	//std::cout << "AREA:: " << A << "\n";
 	RET[T++] = A;
-	//std::cout << A << "\n";
-	//std::cout << "green::\n\n";
 	return 1;
 }
 void solve() {
@@ -751,50 +679,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj22530 Intelligent Circular Perfect Cleaner
-
-/*
-
-4 5 5 1
-0 0
-10 0
-10 10
-0 10
-0 0 0 0
-
-12 8 8 1
--1 0
-6 0
-6 6
-3 6
-3 3
-2 3
-2 7
-7 7
-7 0
-10 0
-10 10
--1 10
-20 5 5 1
-0 0
-3 0
-3 1
-7 1
-7 0
-10 0
-10 3
-9 3
-9 7
-10 7
-10 10
-7 10
-7 9
-3 9
-3 10
-0 10
-0 7
-1 7
-1 3
-0 3
-0 0 0 0
-
-*/
