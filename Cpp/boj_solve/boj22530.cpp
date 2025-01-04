@@ -509,7 +509,7 @@ ld green(const Polygon& H, const int& r) {
 		else A += c.green(lo, hi);
 		//seg integral
 		if (!~se1.j) continue;//ignore point
-		lo = 0; ld hi = 1;
+		lo = 0, hi = 1;
 		Seg seg = Seg(H[se1.i], H[se1.j]);
 		const Pos& q1 = H[se1.i];
 		const Pos& q2 = H[se1.j];
