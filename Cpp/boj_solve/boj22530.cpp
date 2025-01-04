@@ -277,17 +277,19 @@ void bfs() {
 	memset(V, 0, sizeof V);
 	VP.clear();
 	Q.push(0);
+	V[0] = 1;
 	while (Q.size()) {
 		int p = Q.front(); Q.pop();
+		std::cout << "p:: " << p << "\n";
 		for (const int& w : G[p]) {
 			if (!V[w]) {
 				V[w] = 1;
 				Q.push(w);
 				Pii se;
 				se = ND[w].p1();
-				if (!~se.i) VP.push_back(se);
+				if (~se.i) VP.push_back(se);
 				se = ND[w].p2();
-				if (!~se.i) VP.push_back(se);
+				if (~se.i) VP.push_back(se);
 			}
 		}
 	}
@@ -331,7 +333,7 @@ bool connectable(const Polygon& H, const Pos& s, const Pos& e, const int& r, con
 	else if (f == CIRCLE) {
 		int sz = H.size();
 		if (s.i == -1 || e.i == -1) return 0;
-		const Pos& p0 = H[(idx - 1 + sz) & sz], & p1 = H[idx], & p2 = H[(idx + 1) % sz];
+		const Pos& p0 = H[(idx - 1 + sz) % sz], & p1 = H[idx], & p2 = H[(idx + 1) % sz];
 		if (inside(p2, p1, p0, s, WEAK) || inside(p2, p1, p0, e, WEAK)) return 0;
 		Circle c = Circle(p1, r * 2);
 		for (int i = 0; i < sz; i++) {
@@ -372,9 +374,11 @@ Polygon get_node(const Polygon& H, const int& r, const int& i, int& tq) {
 	return ret;
 }
 Pos get_node(const Seg& s1, const Seg& s2, const int& r) {
+	//std::cout << "s1:: " << s1.s << " " << s1.e << "\n";
+	//std::cout << "s2:: " << s2.s << " " << s2.e << "\n";
 	Seg e1 = s1 - r;
 	Seg e2 = s2 - r;
-	Pos m = intersection(e1, e2);
+	Pos m = intersection(e1.s, e1.e, e2.s, e2.e);
 	Circle c = Circle(m, r);
 	Vld x1 = circle_line_intersections(c, s1, LINE);
 	Vld x2 = circle_line_intersections(c, s2, LINE);
@@ -415,6 +419,11 @@ void connect(const Polygon& H, const int& r) {
 		for (int j = 0; j < np; j++) {
 			if (i == j) continue;
 			const Pos& s = VX[i], & e = VX[j];
+			std::cout << "s:: " << s << "\n";
+			std::cout << "seg i.s:: " << ND[i].s1 << " i.e:: " << ND[i].e1 << "\n";
+			std::cout << "e:: " << e << "\n";
+			std::cout << "seg j.s:: " << ND[j].s1 << " j.e:: " << ND[j].e1 << "\n";
+			std::cout << (connectable(H, s, e, r) ? "ok\n" : "fuck\n") << "\n";
 			if (connectable(H, s, e, r)) {
 				G[i].push_back(j);
 				G[j].push_back(i);
@@ -431,6 +440,7 @@ void connect(const Polygon& H, const int& r) {
 		for (int j = 0; j < sz; j++) {
 			const Pos& s = ROT[i][j], & e = ROT[i][(j + 1) % sz];
 			if (connectable(H, s, e, r, i, CIRCLE)) {
+				//std::cout << "i, j:: " << s.i << " | " << e.i << "\n";
 				G[s.i].push_back(e.i);
 				G[e.i].push_back(s.i);
 			}
@@ -444,6 +454,9 @@ ld green(const Polygon& H, const int& r) {
 	std::sort(VP.begin(), VP.end());
 	VP.erase(unique(VP.begin(), VP.end()), VP.end());
 	int sz = VP.size();
+	std::cout << "VP.sz:: " << sz << "\n";
+	for (Pii& p : VP) std::cout << p.i << " " << p.j << "\n";
+	std::cout << "VP\n";
 	for (int i = 0; i < sz; i++) {
 		const Pii& se0 = VP[(i - 1 + sz) % sz];
 		const Pii& se1 = VP[i];
@@ -505,6 +518,7 @@ ld green(const Polygon& H, const int& r) {
 			ld lo = (p - m).rad();
 			ld hi = (q - m).rad();
 		}
+		std::cout << "lo:: " << lo << " hi:: " << hi << "\n";
 		if (lo > hi) A += c.green(lo, 2 * PI), A += c.green(0, hi);
 		else A += c.green(lo, hi);
 		//seg integral
@@ -546,6 +560,7 @@ ld green(const Polygon& H, const int& r) {
 			m = intersection(q1 + v1, q2 + v1, p1 + v2, p2 + v2);
 		}
 		hi = intersection(Seg(q1, q2), Seg(m, m + ~v));
+		std::cout << "lo:: " << lo << " hi:: " << hi << "\n";
 		if (eq(lo, hi)) continue;
 		assert(lo < hi);
 		A += seg.green(lo, hi);
@@ -553,6 +568,7 @@ ld green(const Polygon& H, const int& r) {
 	return A;
 }
 void init(Polygon& H, const int& x, const int& y, const int& r) {
+	for (int i = 0; i < np; i++) G[i].clear();
 	vp = 0; np = 0;
 	C0 = Circle(Pos(x, y), r);
 	VX[vp++] = Pos(x, y);
@@ -597,7 +613,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 		Seg i12 = Seg(i1, i2);
 		for (int j = i + 1; j < N; j++) {//v - v
 			Pos j1 = H[j], j2 = H[(j + 1) % N];
-			if (i + 1 != j && j + 1 != i) {
+			if ((i + 1) % N != j && (j + 1) % N != i) {
 				inxs = get_node(i1, j1, r);
 				assert(inxs.size() == 2);
 				Pos c1 = inxs[0];
@@ -617,8 +633,10 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 					ND[np] = { np, i, -1, j, -1 }; np++;
 				}
 			}
+			if (zero(ccw(i1, i2, j1, j2))) continue;
 			Seg j12 = Seg(j1, j2);
 			inx = get_node(i12, j12, r);
+			std::cout << "inx:::::: " << inx << "\n";
 			if (valid_check(H, Circle(inx, r)) && !inx.i) {//e - e
 				VX[vp++] = inx;
 				ND[np] = { np, i, (i + 1) % N, j, (j + 1) % N }; np++;
@@ -637,6 +655,15 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 			}
 		}
 	}
+	std::cout << "vp:: " << vp << "\n";
+	for (int i = 0; i < vp; i++) {
+		std::cout << "VX[" << i << "]:: " << VX[i].x << " " << VX[i].y << "\n";
+	}
+	std::cout << "np:: " << np << "\n";
+	for (int i = 0; i < np; i++) {
+		std::cout << "ND[" << i << "]:: " << ND[i].s1 << " " << ND[i].e1 << " ";
+		std::cout << ND[i].s2 << " " << ND[i].e2 << "\n";
+	}
 	return;
 }
 bool query() {
@@ -645,9 +672,17 @@ bool query() {
 	if (!N && !x && !y && !r) return 0;
 	Polygon H(N);
 	for (Pos& p : H) std::cin >> p;
+	std::cout << "init::\n";
 	init(H, x, y, r);
+	std::cout << "init::\n";
+	std::cout << "connect::\n";
 	connect(H, r);
-	std::cout << green(H, r) << "\n";
+	std::cout << "connect::\n";
+	std::cout << "green::\n";
+	//std::cout << green(H, r) << "\n";
+	ld A = green(H, r);
+	std::cout << "AREA:: " << A << "\n";
+	std::cout << "green::\n\n";
 	return 1;
 }
 void solve() {
@@ -659,3 +694,14 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj22530 Intelligent Circular Perfect Cleaner
+
+/*
+
+4 5 5 1
+0 0
+10 0
+10 10
+0 10
+0 0 0 0
+
+*/
