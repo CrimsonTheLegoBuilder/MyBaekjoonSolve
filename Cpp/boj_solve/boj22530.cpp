@@ -509,10 +509,9 @@ ld green(const Polygon& H, const int& r) {
 		else A += c.green(lo, hi);
 		//seg integral
 		if (!~se1.j) continue;//ignore point
-		ld lo = 0; ld hi = 1;
+		lo = 0; ld hi = 1;
 		Seg seg = Seg(H[se1.i], H[se1.j]);
 		const Pos& q1 = H[se1.i];
-		const Pos& q2 = H[se1.j];
 		const Pos& q2 = H[se1.j];
 		Pos m, v = q2 - q1;
 		if (!~se0.j) {//p0 - se1
@@ -649,7 +648,7 @@ bool query() {
 	init(H, x, y, r);
 	connect(H, r);
 	std::cout << green(H, r) << "\n";
-	return;
+	return 1;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
