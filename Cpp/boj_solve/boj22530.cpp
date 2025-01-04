@@ -315,7 +315,7 @@ bool cross_check(const Polygon& H, const Polygon& C) {
 }
 bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const int& r, const Pos& q) {
 	Circle c = Circle(p1, r * 2);
-	bool f1 = c >= q;
+	bool f1 = c > q;
 	bool f2 = inside(p0, p1, p2, q, WEAK);
 	return f1 && f2;
 }
@@ -324,25 +324,22 @@ bool connectable(const Polygon& H, const Pos& s, const Pos& e, const int& r, con
 	if (f == LINE) {
 		Pos v = ~(e - s).unit() * r;
 		Polygon clip = { s + v, s - v, e - v, e + v };
-		//return cross_check(H, clip);
-		Polygon cut = sutherland_hodgman(H, clip);
-		return eq(area(clip), area(cut));
+		return cross_check(H, clip);
+		//Polygon cut = sutherland_hodgman(H, clip);
+		//return eq(area(clip), area(cut));
 	}
 	else if (f == CIRCLE) {
 		int sz = H.size();
 		if (s.i == -1 || e.i == -1) return 0;
-		const Pos& p0 = H[(idx - 1) & sz], & p1 = H[idx], & p2 = H[(idx + 1) % sz];
+		const Pos& p0 = H[(idx - 1 + sz) & sz], & p1 = H[idx], & p2 = H[(idx + 1) % sz];
 		if (inside(p2, p1, p0, s, WEAK) || inside(p2, p1, p0, e, WEAK)) return 0;
 		Circle c = Circle(p1, r * 2);
-		//ld lo = (s - p1).rad();
-		//ld hi = (s - p2).rad();
-		//ld m = (lo + hi) * .5;
-		//Pos mid = c.p(m);
-		//if (!inside(p0, p1, p2, mid)) return 0;
 		for (int i = 0; i < sz; i++) {
-			if ((i - 1 + sz) % sz == idx || i == idx || (i + 1) % sz == idx) continue;
+			if (i != idx && inside(e, p1, s, r, H[i])) return 0;
+			if ((i - 1 + sz) % sz == idx || i == idx) continue;
 			Vld inxs = circle_line_intersections(c, Seg(H[i], H[(i + 1) % N]), CIRCLE);
 			if (inxs.size() < 2) continue;
+			//return 0;
 			Pos q1 = c.p(inxs[0]);
 			Pos q2 = c.p(inxs[1]);
 			if (inside(e, p1, s, r, q1) && inside(e, p1, s, r, q2)) return 0;
@@ -479,8 +476,8 @@ ld green(const Polygon& H, const int& r) {
 			ld w = sqrt(r * r - h * h);
 			Pos m = p1 - dir * h + v.unit() * w;
 			Circle c = Circle(m, r);
-			ld lo = (-~v).rad();
-			ld hi = (p1 - m).rad();
+			ld lo = (p1 - m).rad();
+			ld hi = (-~v).rad();
 		}
 		else if (~se0.j && !~se1.j) {//e - v
 			const Pos& p1 = H[se0.i];
@@ -493,8 +490,8 @@ ld green(const Polygon& H, const int& r) {
 			ld w = sqrt(r * r - h * h);
 			Pos m = p1 - dir * h - v.unit() * w;
 			Circle c = Circle(m, r);
-			ld lo = (p1 - m).rad();
-			ld hi = (-~v).rad();
+			ld lo = (-~v).rad();
+			ld hi = (p1 - m).rad();
 		}
 		else if (!~se0.j && !~se1.j) {//v - v
 			const Pos& p = H[se0.i];
@@ -590,7 +587,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 				VX[vp++] = c1;
 				ND[np] = { np, (i - 1 + N) % N, i, i, -1 }; np++;
 			}
-			Pos c2 = inxs[0];
+			Pos c2 = inxs[1];
 			if (valid_check(H, Circle(c2, r))) {
 				c2.i = np; ROT[i].push_back(c2);
 				VX[vp++] = c2;
@@ -612,7 +609,7 @@ void init(Polygon& H, const int& x, const int& y, const int& r) {
 					VX[vp++] = c1;
 					ND[np] = { np, i, -1, j, -1 }; np++;
 				}
-				Pos c2 = inxs[0];
+				Pos c2 = inxs[1];
 				if (valid_check(H, Circle(c2, r))) {
 					c2.i = np;
 					ROT[i].push_back(c2);
