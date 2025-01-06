@@ -445,6 +445,11 @@ void solve() {
 	for (int i = 0; i < N; i++) if (!F[i]) tmp.push_back(P[i]);
 	P = tmp;
 	N = P.size();
+	if (connectable(P, s, e, -1, -1)) {
+		ld t = angle(s, e, s) * R;
+		std::cout << t << "\n";
+		return;
+	}
 	Polyhedron inxs;
 	for (int i = 0; i < N; i++) {
 		ld t1 = (ld)P[i].r / R;
@@ -453,11 +458,11 @@ void solve() {
 		inxs = intersections(s, P[i]);
 		for (Pos3D& p : inxs) {
 			if (connectable(P, s, p, i, -1)) {
-				update_sc(P[i]);
-				Pos ix = convert(p, n1);
 				ld t = angle(s, P[i], s) * R;
 				G[0].push_back(Info(vp, t));
 				G[vp].push_back(Info(0, t));
+				update_sc(P[i]);
+				Pos ix = convert(p, n1);
 				Node n = Node(vp, ix.rad());
 				ND[i].push_back(n);
 				vp++;
@@ -466,12 +471,12 @@ void solve() {
 		inxs = intersections(e, P[i]);
 		for (Pos3D& p : inxs) {
 			if (connectable(P, e, p, i, -1)) {
-				update_sc(P[i]);
-				Pos ix = convert(p, n1);
-				Node n = Node(vp, ix.rad());
 				ld t = angle(e, P[i], e) * R;
 				G[1].push_back(Info(vp, t));
 				G[vp].push_back(Info(1, t));
+				update_sc(P[i]); 
+				Pos ix = convert(p, n1);
+				Node n = Node(vp, ix.rad());
 				ND[i].push_back(n);
 				vp++;
 			}
