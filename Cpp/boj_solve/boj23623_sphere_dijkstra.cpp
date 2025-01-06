@@ -529,11 +529,19 @@ void solve() {
 		std::sort(ND[i].begin(), ND[i].end());
 		int szr = ROT[i].size();
 		int szn = ND[i].size();
-		ld hi = 0;
+		ld hi = 0, lo = 2 * PI;
+		for (const Pos& p : ROT[i]) hi = std::max(hi, p.HI), lo = std::min(lo, p.LO);
+		if (hi < ND[i][szn - 1].t && ND[i][0].t < lo) {
+			ld t = norm((ND[i][0].t - ND[i][szn - 1].t)) * r;
+			G[ND[i][0].i].push_back(Info(ND[i][szn - 1].i, t));
+			G[ND[i][szn - 1].i].push_back(Info(ND[i][0].i, t));
+		}
+		ROT[i].push_back(Pos(2 * PI, 2 * PI));
+		hi = 0;
 		ld r = sin((ld)P[i].r / R) * R;
 		for (const Pos& p : ROT[i]) {
 			if (p.LO > hi) {
-				while (k < szn - 1 && ND[i][k].t < hi) k++;
+				while (k < szn && ND[i][k].t < hi) k++;
 				while (k < szn - 1 && ND[i][k + 1].t < p.LO) {
 					ld t = (ND[i][k + 1].t - ND[i][k].t) * r;
 					G[ND[i][k].i].push_back(Info(ND[i][k + 1].i, t));
@@ -544,11 +552,7 @@ void solve() {
 			}
 			else hi = std::max(hi, p.HI);
 		}
-		if (ROT[i][szr - 1].HI < ND[i][szn - 1].t && ND[i][0].t < ROT[i][0].LO) {
-			ld t = norm((ND[i][0].t - ND[i][szn - 1].t)) * r;
-			G[ND[i][0].i].push_back(Info(ND[i][szn - 1].i, t));
-			G[ND[i][szn - 1].i].push_back(Info(ND[i][0].i, t));
-		}
+
 	}
 	ld cost = dijkstra(0, 1);
 	if (cost > 1e16) std::cout << "-1\n";
