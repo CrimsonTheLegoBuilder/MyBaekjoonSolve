@@ -38,13 +38,13 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define WEAK 1
 #define LO x
 #define HI y
-ld sc[4];
 
 int N, T, q;
+int R; ld TH;
 struct Pos {
 	ld x, y;
-	int i;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { i = -1; }
+	int i, ni;
+	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { i = -1; ni = -1; }
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -90,40 +90,10 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2,
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-
-int R; ld TH;
-ld COST[LEN];
-Vint G[LEN];
-struct Info {
-	int i;
-	ld c;
-	Info(int I = 0, ld C = 0) : i(I), c(C) {}
-	bool operator < (const Info& x) const { return zero(c - x.c) ? i < x.i : c > x.c; }
-};
-std::priority_queue<Info> Q;
-ld dijkstra(const int& v, const int& g, const int& sz, const ld& limit) {
-	for (int i = 0; i < sz; i++) COST[i] = INF;
-	Q.push({ v, 0 });
-	COST[v] = 0;
-	while (Q.size()) {
-		Info p = Q.top(); Q.pop();
-		if (p.c > COST[p.i]) continue;
-		for (int i = 0; i < sz; i++) {
-			ld w = G[p.i][i];
-			if (w > limit) continue;
-			ld cost = p.c + w;
-			if (COST[i] > cost) {
-				COST[i] = cost;
-				Q.push({ i, cost });
-			}
-		}
-	}
-	return COST[g];
-}
 struct Pos3D {
 	ld x, y, z;
-	int r;
-	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) { r = 0; }
+	int r, i;
+	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) { r = 0; i = -1; }
 	bool operator == (const Pos3D& p) const { return zero(x - p.x) && zero(y - p.y) && zero(z - p.z); }
 	bool operator != (const Pos3D& p) const { return !zero(x - p.x) || !zero(y - p.y) || !zero(z - p.z); }
 	bool operator < (const Pos3D& p) const { return zero(x - p.x) ? zero(y - p.y) ? z < p.z : y < p.y : x < p.x; }
@@ -176,6 +146,7 @@ struct Plane {
 } knife;
 typedef std::vector<Plane> Surfaces;
 Plane plane(const Pos3D& p, const ld& n) { return Plane(p.x, p.y, p.z, n); }
+ld sc[4];
 void update_sc(const Plane& p) {
 	ld angle1 = -atan2l(p.b, p.a);
 	ld dx = sqrtl(p.a * p.a + p.b * p.b);
@@ -300,7 +271,6 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 	Pos3D X = a.unit();//X-axis
 	Pos3D Y = (perp / a).unit();//Y-axis
 	ld ang = angle(X, Y, b);
-	std::vector<Info> tmp = { { 0, 0 }, { 0, ang } };
 	std::vector<Pos3D> inxs;
 	for (int k = 0; k < N; k++) {//sweeping
 		if (k == i || k == j) continue;
@@ -315,29 +285,40 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 	}
 	return 1;
 }
-Pos3D VX[LEN]; int vp;
-Info ND[LEN]; int np;
-void connect(const Polygon& H, const int& r) {
-	assert(vp == np);
-	for (int i = 0; i < np; i++) {
-		for (int j = 0; j < np; j++) {
-			if (i == j) continue;
-
+ld C[LEN];
+struct Info {
+	int i;
+	ld c;
+	Info(int i_ = 0, ld c_ = 0) : i(i_), c(c_) {}
+	bool operator < (const Info& x) const { return zero(c - x.c) ? i < x.i : c > x.c; }
+};
+std::vector<Info> G[LEN];
+std::priority_queue<Info> Q;
+ld dijkstra(const int& v, const int& g) {
+	for (int i = 0; i < LEN; i++) C[i] = INF;
+	Q.push(Info(v, 0));
+	C[v] = 0;
+	while (Q.size()) {
+		Info p = Q.top(); Q.pop();
+		if (p.c > C[p.i]) continue;
+		for (Info& w : G[p.i]) {
+			ld cost = p.c + w.c;
+			if (C[w.i] > cost) {
+				C[w.i] = cost;
+				Q.push({ w.i, cost });
+			}
 		}
 	}
-	for (int i = 0; i < N; i++) {
-		Pos cen = H[i];
-		if (ccw(H[(i - 1 + N) % N], H[i], H[(i + 1) % N]) > 0) continue;
-		for (Pos& p : ROT[i]) p -= cen;
-		std::sort(ROT[i].begin(), ROT[i].end(), cmpt);
-		for (Pos& p : ROT[i]) p += cen;
-		int sz = ROT[i].size();
-		for (int j = 0; j < sz; j++) {
-			const Pos& s = ROT[i][j], & e = ROT[i][(j + 1) % sz];
-		}
-	}
-	return;
+	return C[g];
 }
+Pos3D VX[LEN]; int vp;
+struct Node {
+	ld t;
+	int i;
+	Node(ld t_ = 0, int i_ = 0) : t(t_), i(i_) {}
+	bool operator < (const Node& x) const { return t < x.t; }
+};
+std::vector<Node> ND[25];
 bool inner_check(const Pos3D& p, const Pos3D& q) {
 	ld ang = angle(p, q, p);
 	ld t1 = (ld)p.r / R;
@@ -382,6 +363,15 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	Pos3D pp = n1 + v1;
 	Pos3D v2 = (perp / n2).unit() * sin(t2);
 	Pos3D qq = n2 + v2;
+	if (!p.r) {
+		ld B = std::abs(t1 - t2);
+		ld a = PI * .5;
+		ld det = sin(a) / sin(A);
+		ld b = asin(det * sin(B));
+		Pos3D w1 = qq.rodrigues_rotate(b, n2);
+		Pos3D w2 = qq.rodrigues_rotate(-b, n2);
+		return { w1, w2 };
+	}
 	if (t1 + t2 < A) {
 		ld B = t1 + t2;
 		ld a = PI * .5;
@@ -440,9 +430,12 @@ void solve() {
 		p = s2c(phi, psi); p.r = r;
 	}
 	std::cin >> phi >> psi;
-	s = s2c(phi, psi); s.r = -1;
+	s = s2c(phi, psi); s.r = 0; s.i = -1;
 	std::cin >> phi >> psi;
-	e = s2c(phi, psi); e.r = -1;
+	e = s2c(phi, psi); e.r = 0; e.i = -2;
+	vp = 0;
+	VX[vp++] = s;
+	VX[vp++] = e;
 	std::sort(P.begin(), P.end(), [&](const Pos3D& p, const Pos3D& q) -> bool { return p.r > q.r; });
 	Vbool F(N);
 	for (int i = 0; i < N; i++) 
@@ -451,16 +444,43 @@ void solve() {
 	Polyhedron tmp;
 	for (int i = 0; i < N; i++) if (!F[i]) tmp.push_back(P[i]);
 	P = tmp;
+	N = P.size();
 	Polyhedron inxs;
 	for (int i = 0; i < N; i++) {
 		ld t1 = (ld)P[i].r / R;
 		ld d1 = cos(t1);
 		Pos3D n1 = P[i] * d1;
+		inxs = intersections(s, P[i]);
+		for (Pos3D& p : inxs) {
+			if (connectable(P, s, p, i, -1)) {
+				update_sc(P[i]);
+				Pos ix = convert(p, n1);
+				ld t = angle(s, P[i], s) * R;
+				G[0].push_back(Info(vp, t));
+				G[vp].push_back(Info(0, t));
+				Node n = Node(vp, ix.rad());
+				ND[i].push_back(n);
+				vp++;
+			}
+		}
+		inxs = intersections(e, P[i]);
+		for (Pos3D& p : inxs) {
+			if (connectable(P, e, p, i, -1)) {
+				update_sc(P[i]);
+				Pos ix = convert(p, n1);
+				Node n = Node(vp, ix.rad());
+				ld t = angle(e, P[i], e) * R;
+				G[1].push_back(Info(vp, t));
+				G[vp].push_back(Info(1, t));
+				ND[i].push_back(n);
+				vp++;
+			}
+		}
 		for (int j = i + 1; j < N; j++) {
 			ld t2 = (ld)P[j].r / R;
 			ld d2 = cos(t2);
 			Pos3D n2 = P[j] * d2;
-			Polyhedron inxs = intersections(P[i], P[j]);
+			inxs = intersections(P[i], P[j]);
 			if (inxs.size()) {
 				Pos3D l_ = inxs[0], h_ = inxs[1];
 				update_sc(P[i]);
@@ -469,12 +489,16 @@ void solve() {
 				ld lo = cl.rad();
 				ld hi = ch.rad();
 				if (eq(lo, hi)) { lo = norm(lo - TOL); hi = norm(hi + TOL); }
+				if (lo < hi) ROT[i].push_back(Pos(lo, hi));
+				else ROT[i].push_back(Pos(0, hi)), ROT[i].push_back(Pos(lo, 2 * PI));
 				update_sc(P[j]);
 				cl = convert(h_, n2);
 				ch = convert(l_, n2);
 				lo = cl.rad();
 				hi = ch.rad();
 				if (eq(lo, hi)) { lo = norm(lo - TOL); hi = norm(hi + TOL); }
+				if (lo < hi) ROT[j].push_back(Pos(lo, hi));
+				else ROT[j].push_back(Pos(0, hi)), ROT[j].push_back(Pos(lo, 2 * PI));
 			}
 			Polyhedron tans = tangents(P[i], P[j]);
 			if (tans.size()) {
@@ -482,19 +506,53 @@ void solve() {
 				for (int k = 0; k < sz; k += 2) {
 					Pos3D I = inxs[k + 0], J = inxs[k + 1];
 					if (connectable(P, P[i], P[j], i, j)) {
+						ld t = angle(P[i], P[j], P[i]) * R;
+						G[vp].push_back(Info(vp + 1, t));
+						G[vp + 1].push_back(Info(vp, t));
 						update_sc(P[i]);
-						Pos ii = convert(I, n1);
-						ld ti = ii.rad();
+						Pos ix = convert(I, n1);
+						Node n = Node(vp, ix.rad());
+						ND[i].push_back(n);
 						update_sc(P[j]);
-						Pos jj = convert(J, n2);
-						ld tj = jj.rad();
+						ix = convert(J, n2);
+						n = Node(vp + 1, ix.rad());
+						ND[j].push_back(n);
+						vp += 2;
 					}
 				}
 			}
 		}
 	}
-
-
+	for (int i = 0, k; i < N; i++) {
+		k = 0;
+		std::sort(ROT[i].begin(), ROT[i].end());
+		std::sort(ND[i].begin(), ND[i].end());
+		int szr = ROT[i].size();
+		int szn = ND[i].size();
+		ld hi = 0;
+		ld r = sin((ld)P[i].r / R) * R;
+		for (const Pos& p : ROT[i]) {
+			if (p.LO > hi) {
+				while (k < szn - 1 && ND[i][k].t < hi) k++;
+				while (k < szn - 1 && ND[i][k + 1].t < p.LO) {
+					ld t = (ND[i][k + 1].t - ND[i][k].t) * r;
+					G[ND[i][k].i].push_back(Info(ND[i][k + 1].i, t));
+					G[ND[i][k + 1].i].push_back(Info(ND[i][k].i, t));
+					k++;
+				}
+				hi = p.HI;
+			}
+			else hi = std::max(hi, p.HI);
+		}
+		if (ROT[i][szr - 1].HI < ND[i][szn - 1].t && ND[i][0].t < ROT[i][0].LO) {
+			ld t = norm((ND[i][0].t - ND[i][szn - 1].t)) * r;
+			G[ND[i][0].i].push_back(Info(ND[i][szn - 1].i, t));
+			G[ND[i][szn - 1].i].push_back(Info(ND[i][0].i, t));
+		}
+	}
+	ld cost = dijkstra(0, 1);
+	if (cost > 1e16) std::cout << "-1\n";
+	else std::cout << cost << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj23623 In search of the chair
