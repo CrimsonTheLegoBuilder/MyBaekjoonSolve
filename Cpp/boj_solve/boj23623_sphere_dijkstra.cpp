@@ -77,7 +77,7 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
-Polygon ROT[LEN];
+Polygon ROT[25];
 bool cmpt(const Pos& p, const Pos& q) {
 	bool f1 = O < p;
 	bool f2 = O < q;
@@ -143,7 +143,7 @@ struct Plane {
 	Plane& operator -= (const ld& n) { d -= n; return *this; }
 	friend std::istream& operator >> (std::istream& is, Plane& f) { is >> f.a >> f.b >> f.c >> f.d; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Plane& f) { os << f.a << " " << f.b << " " << f.c << " " << f.d; return os; }
-} knife;
+};
 typedef std::vector<Plane> Surfaces;
 Plane plane(const Pos3D& p, const ld& n) { return Plane(p.x, p.y, p.z, n); }
 ld sc[4];
@@ -262,9 +262,9 @@ ld angle(const Pos3D Xaxis, const Pos3D Yaxis, const Pos3D& p) {
 	ld th = atan2(Y, X);
 	return th;
 }
-bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t, const Pos3D& nrm) {
-	return ccw(O3D, d1, t, nrm) >= 0 && ccw(O3D, d2, t, nrm) <= 0;
-}
+//bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t, const Pos3D& nrm) {
+//	return ccw(O3D, d1, t, nrm) >= 0 && ccw(O3D, d2, t, nrm) <= 0;
+//}
 bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int& i, const int& j) {
 	if (a == b) return 1;
 	Pos3D perp = (a / b).unit();
@@ -305,7 +305,7 @@ ld dijkstra(const int& v, const int& g) {
 			ld cost = p.c + w.c;
 			if (C[w.i] > cost) {
 				C[w.i] = cost;
-				Q.push({ w.i, cost });
+				Q.push(Info(w.i, cost));
 			}
 		}
 	}
@@ -324,7 +324,7 @@ bool inner_check(const Pos3D& p, const Pos3D& q) {
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
 	assert(t1 <= PI * .5); assert(t2 <= PI * .5);
-	if (p.r > q.r && std::abs(t1 - t2) > ang) return 1;
+	if (p.r > q.r && std::abs(t1 - t2) >= ang) return 1;
 	return 0;
 }
 Polyhedron intersections(const Pos3D& p, const Pos3D& q) {
@@ -332,7 +332,7 @@ Polyhedron intersections(const Pos3D& p, const Pos3D& q) {
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
 	assert(t1 <= PI * .5); assert(t2 <= PI * .5);
-	if (t1 + t2 < ang || std::abs(t1 - t2) > ang) return {};
+	if (t1 + t2 < ang || std::abs(t1 - t2) >= ang) return {};
 	ld d1 = cos(t1);
 	Pos3D n1 = p * d1;
 	Plane p1 = plane(p, d1);
