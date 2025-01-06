@@ -272,7 +272,7 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 	Pos3D Y = (perp / a).unit();//Y-axis
 	ld ang = angle(X, Y, b);
 	std::vector<Pos3D> inxs;
-	for (int k = 0; k < N; k++) {//sweeping
+	for (int k = 0; k < N; k++) {
 		if (k == i || k == j) continue;
 		if (plane_circle_intersection(P[k], perp, inxs)) {
 			for (Pos3D& p : inxs) {
