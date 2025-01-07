@@ -438,8 +438,8 @@ void solve() {
 	VX[vp++] = e;
 	std::sort(P.begin(), P.end(), [&](const Pos3D& p, const Pos3D& q) -> bool { return p.r > q.r; });
 	Vbool F(N);
-	for (int i = 0; i < N; i++) 
-		for (int j = i + 1; j < N; j++) 
+	for (int i = 0; i < N; i++)
+		for (int j = i + 1; j < N; j++)
 			if (inner_check(P[i], P[j]) || P[i] == P[j]) F[j] = 1;
 	Polyhedron tmp;
 	for (int i = 0; i < N; i++) if (!F[i]) tmp.push_back(P[i]);
