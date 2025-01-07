@@ -39,8 +39,8 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define LO x
 #define HI y
 
-int N, T, q;
-int R; ld TH;
+int N, T, R;
+ld TH;
 struct Pos {
 	ld x, y;
 	int i, ni;
@@ -250,12 +250,13 @@ bool plane_circle_intersection(const Pos3D& perp, const Pos3D& a, std::vector<Po
 	ld ratio = sqrtl(1 - x * x);
 	Pos3D h = (vec.unit() / perp) * ratio;
 	inxs.push_back(w + h);
-	if (!zero(ratio)) inxs.push_back(w - h);
+	inxs.push_back(w - h);
+	//if (!zero(ratio)) inxs.push_back(w - h);
 	return 1;
 }
-Pos3D point(const Pos3D Xaxis, const Pos3D Yaxis, const ld& th) {
-	return Xaxis * cos(th) + Yaxis * sin(th);
-}
+//Pos3D point(const Pos3D Xaxis, const Pos3D Yaxis, const ld& th) {
+//	return Xaxis * cos(th) + Yaxis * sin(th);
+//}
 ld angle(const Pos3D Xaxis, const Pos3D Yaxis, const Pos3D& p) {
 	ld X = Xaxis * p;
 	ld Y = Yaxis * p;
@@ -353,73 +354,95 @@ Polyhedron circle_circle_intersections(const Pos3D& p, const Pos3D& q) {
 	Pos3D v = inx.dir;
 	return { inx.p0 + v * h, inx.p0 - v * h };
 }
+ld sin_cos_law(const ld& a, const ld& b, const ld& A, const ld& B) {
+	ld num = sin(A) * sin(B) * cos(a) * cos(b) - cos(A) * cos(B);
+	ld den = 1 - sin(A) * sin(B) * sin(a) * sin(b);
+	ld cosC = num / den;
+	return acos(cosC);
+}
 Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
-	Polyhedron ret = {};
-	ld A = angle(p, q);
+	if (zero((p / q).Euc())) return {};
+	Polyhedron ret;
+	if (!p.r) {
+		ld a = angle(q, p);
+		ld b = (ld)q.r / R;
+		if (a + b >= PI) return {};
+		ld A = PI * .5;
+		ld B = asin(sin(A) * sin(b) / sin(a));
+		ld C = std::abs(sin_cos_law(a, b, A, B));
+		Pos3D perp = (q / p).unit();
+		Pos3D m = q.rodrigues_rotate(b, perp);
+		Pos3D hi = m.rodrigues_rotate(C, q);
+		Pos3D lo = m.rodrigues_rotate(C, q);
+		return { hi, lo };
+	}
+	assert(p.r * q.r);
+	ld ang = angle(p, q);
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
-	if (std::abs(t1 - t2) > A) return {};
-	ld d1 = cos(t1);
-	Pos3D n1 = p * d1;
-	Plane p1 = plane(p, d1);
-	ld d2 = cos(t2);
-	Pos3D n2 = q * d2;
-	Plane p2 = plane(q, d2);
-	Pos3D perp = n2 / n1;
-	Pos3D v1 = (n1 / perp).unit() * sin(t1);
-	Pos3D pp = n1 + v1;
-	Pos3D v2 = (perp / n2).unit() * sin(t2);
-	Pos3D qq = n2 + v2;
-	if (!p.r) {
-		ld B = std::abs(t1 - t2);
-		ld a = PI * .5;
-		ld det = sin(a) / sin(A);
-		ld b = asin(det * sin(B));
-		Pos3D w1 = qq.rodrigues_rotate(b, n2);
-		Pos3D w2 = qq.rodrigues_rotate(-b, n2);
-		return { w1, w2 };
+	if (std::abs(t1 - t2) > ang) {//inner tangent
+		if (p.r == q.r) {
+			Pos3D m = ((p + q) * .5).unit();
+			m.r = 0;
+			Polyhedron ptan = tangents(m, p);
+			Polyhedron qtan = tangents(m, q);
+			if (qtan.size() == 2 && ptan.size() == 2) {
+				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
+				ret.insert(ret.end(), tmp.begin(), tmp.end());
+			}
+		}
+		else {
+			ld A = PI * .5;
+			ld a_ = angle(p, q);
+			ld bp = (ld)p.r / R;
+			ld bq = (ld)q.r / R;
+			ld ap = atan2((sin(bq) / sin(bp)) + cos(a_), sin(a_));
+			Pos3D perp = (p / q).unit();
+			Pos3D m = p.rodrigues_rotate(ap, perp);
+			m.r = 0;
+			Polyhedron ptan = tangents(m, p);
+			Polyhedron qtan = tangents(m, q);
+			if (qtan.size() == 2 && ptan.size() == 2) {
+				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
+				ret.insert(ret.end(), tmp.begin(), tmp.end());
+			}
+		}
 	}
-	if (t1 + t2 < A) {
-		ld B = t1 + t2;
-		ld a = PI * .5;
-		ld det = sin(a) / sin(A);
-		ld b = asin(det * sin(B));
-		b = PI * .5 - b;
-		Pos3D u1 = pp.rodrigues_rotate(b, n1);
-		Pos3D w1 = qq.rodrigues_rotate(b, n2);
-		ret.push_back(u1); ret.push_back(w1);
-		Pos3D u2 = pp.rodrigues_rotate(-b, n1);
-		Pos3D w2 = qq.rodrigues_rotate(-b, n2);
-		ret.push_back(u2); ret.push_back(w2);
-	}
-	ld B = std::abs(t1 - t2);
-	ld a = PI * .5;
-	ld det = sin(a) / sin(A);
-	ld b = asin(det * sin(B));
-	Pos3D u1, w1, u2, w2;
-	if (p.r == q.r) {
-		Pos3D u1 = pp.rodrigues_rotate(PI * .5, n1);
-		Pos3D w1 = qq.rodrigues_rotate(PI * -.5, n2);
-		ret.push_back(u1); ret.push_back(w1);
-		Pos3D u2 = pp.rodrigues_rotate(PI * -.5, n1);
-		Pos3D w2 = qq.rodrigues_rotate(PI * .5, n2);
-		ret.push_back(u2); ret.push_back(w2);
-	}
-	else if (p.r < q.r) {
-		Pos3D u1 = pp.rodrigues_rotate(PI * .5 + b, n1);
-		Pos3D w1 = qq.rodrigues_rotate(PI * -.5 + b, n2);
-		ret.push_back(u1); ret.push_back(w1);
-		Pos3D u2 = pp.rodrigues_rotate(PI * -.5 - b, n1);
-		Pos3D w2 = qq.rodrigues_rotate(PI * .5 - b, n2);
-		ret.push_back(u2); ret.push_back(w2);
-	}
-	else {
-		Pos3D u1 = pp.rodrigues_rotate(PI * .5 - b, n1);
-		Pos3D w1 = qq.rodrigues_rotate(PI * -.5 - b, n2);
-		ret.push_back(u1); ret.push_back(w1);
-		Pos3D u2 = pp.rodrigues_rotate(PI * -.5 + b, n1);
-		Pos3D w2 = qq.rodrigues_rotate(PI * .5 + b, n2);
-		ret.push_back(u2); ret.push_back(w2);
+	if ((std::abs(ang) + std::abs(t1) + std::abs(t2)) < PI) {//outer tangent
+		if (p.r == q.r) {
+			Pos3D top = (q - p).unit();
+			top.r = 0;
+			Polyhedron qtan = tangents(top, q);
+			Pos3D bot = (p - q).unit();
+			bot.r = 0;
+			Polyhedron ptan = tangents(bot, p);
+			if (qtan.size() == 2 && ptan.size() == 2) {
+				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
+				ret.insert(ret.end(), tmp.begin(), tmp.end());
+			}
+		}
+		else {
+			Pos3D L = p.r > q.r ? p : q;
+			Pos3D S = p.r > q.r ? q : p;
+			ld A = PI * .5;
+			ld a_ = angle(L, S);
+			ld bl = (ld)L.r / R;
+			ld bs = (ld)S.r / R;
+			ld as = atan2((sin(bl) / sin(bs)) - cos(a_), sin(a_));
+			ld B = asin(sin(A) * sin(bs) / sin(as));
+			ld al = as + a_;
+			Pos3D perp = (L / S).unit();
+			Pos3D top = L.rodrigues_rotate(al, perp);
+			top.r = 0;
+			Polyhedron ltan = tangents(top, L);
+			Polyhedron stan = tangents(top, S);
+			Polyhedron tmp;
+			if (ltan.size() == 2 && stan.size() == 2) {
+				if (p.r > q.r) tmp = { ltan[0], stan[0], ltan[1], stan[1] };
+				else if (p.r < q.r) tmp = { stan[0], ltan[0], stan[1], ltan[1] };
+			}
+			ret.insert(ret.end(), tmp.begin(), tmp.end());
+		}
 	}
 	return ret;
 }
