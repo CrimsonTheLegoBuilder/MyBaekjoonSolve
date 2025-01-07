@@ -285,8 +285,6 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 		if (k == i || k == j) continue;
 		if (plane_circle_intersection(P[k], perp, inxs)) {
 			for (Pos3D& p : inxs) {
-				Pos3D axis = (P[k] / perp).unit();
-				Pos3D mid = (perp / axis).unit();
 				ld th = angle(X, Y, p);
 				if (0 <= th && th <= ang) return 0;
 			}
