@@ -262,6 +262,15 @@ ld angle(const Pos3D Xaxis, const Pos3D Yaxis, const Pos3D& p) {
 	ld th = atan2(Y, X);
 	return th;
 }
+ld angle(const Pos3D& a, const Pos3D& b) {
+	Pos3D perp = (a / b).unit();
+	Pos3D X = a.unit();//X-axis
+	Pos3D Y = (perp / a).unit();//Y-axis
+	ld x = X * b;
+	ld y = Y * b;
+	ld th = atan2(y, x);
+	return th;
+}
 //bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t, const Pos3D& nrm) {
 //	return ccw(O3D, d1, t, nrm) >= 0 && ccw(O3D, d2, t, nrm) <= 0;
 //}
@@ -320,7 +329,7 @@ struct Node {
 };
 std::vector<Node> ND[25];
 bool inner_check(const Pos3D& p, const Pos3D& q) {
-	ld ang = angle(p, q, p);
+	ld ang = angle(p, q);
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
 	assert(t1 <= PI * .5); assert(t2 <= PI * .5);
@@ -328,7 +337,7 @@ bool inner_check(const Pos3D& p, const Pos3D& q) {
 	return 0;
 }
 Polyhedron intersections(const Pos3D& p, const Pos3D& q) {
-	ld ang = angle(p, q, p);
+	ld ang = angle(p, q);
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
 	assert(t1 <= PI * .5); assert(t2 <= PI * .5);
@@ -348,7 +357,7 @@ Polyhedron intersections(const Pos3D& p, const Pos3D& q) {
 }
 Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	Polyhedron ret = {};
-	ld A = angle(p, q, p);
+	ld A = angle(p, q);
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
 	if (std::abs(t1 - t2) > A) return {};
@@ -446,7 +455,7 @@ void solve() {
 	P = tmp;
 	N = P.size();
 	if (connectable(P, s, e, -1, -1)) {
-		ld t = angle(s, e, s) * R;
+		ld t = angle(s, e) * R;
 		std::cout << t << "\n";
 		return;
 	}
@@ -458,7 +467,7 @@ void solve() {
 		inxs = intersections(s, P[i]);
 		for (Pos3D& p : inxs) {
 			if (connectable(P, s, p, i, -1)) {
-				ld t = angle(s, P[i], s) * R;
+				ld t = angle(s, P[i]) * R;
 				G[0].push_back(Info(vp, t));
 				G[vp].push_back(Info(0, t));
 				update_sc(P[i]);
@@ -471,7 +480,7 @@ void solve() {
 		inxs = intersections(e, P[i]);
 		for (Pos3D& p : inxs) {
 			if (connectable(P, e, p, i, -1)) {
-				ld t = angle(e, P[i], e) * R;
+				ld t = angle(e, P[i]) * R;
 				G[1].push_back(Info(vp, t));
 				G[vp].push_back(Info(1, t));
 				update_sc(P[i]); 
@@ -511,7 +520,7 @@ void solve() {
 				for (int k = 0; k < sz; k += 2) {
 					Pos3D I = inxs[k + 0], J = inxs[k + 1];
 					if (connectable(P, P[i], P[j], i, j)) {
-						ld t = angle(P[i], P[j], P[i]) * R;
+						ld t = angle(P[i], P[j]) * R;
 						G[vp].push_back(Info(vp + 1, t));
 						G[vp + 1].push_back(Info(vp, t));
 						update_sc(P[i]);
