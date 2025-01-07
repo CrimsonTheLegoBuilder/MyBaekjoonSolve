@@ -226,20 +226,20 @@ Pos3D s2c(const ld& phi, const ld& psi) {//Spherical to Cartesian
 	ld lat = psi * PI / 180;
 	return Pos3D(cos(lon) * cos(lat), sin(lon) * cos(lat), sin(lat));
 }
-bool circle_intersection(const Pos3D& a, const Pos3D& b, const ld& th, std::vector<Pos3D>& inxs) {
-	inxs.clear();
-	Pos3D mid = (a + b) * .5;
-	if (zero(mid.mag())) return 0;
-	ld x = cos(th) / mid.mag();
-	if (x < -1 || 1 < x) return 0;
-	Pos3D w = mid.unit() * x;
-	ld ratio = sqrtl(1 - x * x);
-	Pos3D h = (mid / (b - a)).unit() * ratio;
-	inxs.push_back(w + h);
-	if (!zero(ratio)) inxs.push_back(w - h);
-	return 1;
-}
-bool plane_circle_intersection(const Pos3D& a, const Pos3D& perp, std::vector<Pos3D>& inxs) {
+//bool circle_intersection(const Pos3D& a, const Pos3D& b, const ld& th, std::vector<Pos3D>& inxs) {
+//	inxs.clear();
+//	Pos3D mid = (a + b) * .5;
+//	if (zero(mid.mag())) return 0;
+//	ld x = cos(th) / mid.mag();
+//	if (x < -1 || 1 < x) return 0;
+//	Pos3D w = mid.unit() * x;
+//	ld ratio = sqrtl(1 - x * x);
+//	Pos3D h = (mid / (b - a)).unit() * ratio;
+//	inxs.push_back(w + h);
+//	if (!zero(ratio)) inxs.push_back(w - h);
+//	return 1;
+//}
+bool plane_circle_intersection(const Pos3D& perp, const Pos3D& a, std::vector<Pos3D>& inxs) {
 	inxs.clear();
 	Pos3D vec = a - (perp * (perp * a));
 	if (zero(vec.mag())) return 0;
@@ -283,7 +283,7 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 	std::vector<Pos3D> inxs;
 	for (int k = 0; k < N; k++) {
 		if (k == i || k == j) continue;
-		if (plane_circle_intersection(P[k], perp, inxs)) {
+		if (plane_circle_intersection(perp, P[k], inxs)) {
 			for (Pos3D& p : inxs) {
 				ld th = angle(X, Y, p);
 				if (0 <= th && th <= ang) return 0;
@@ -334,7 +334,7 @@ bool inner_check(const Pos3D& p, const Pos3D& q) {
 	if (p.r > q.r && std::abs(t1 - t2) >= ang) return 1;
 	return 0;
 }
-Polyhedron intersections(const Pos3D& p, const Pos3D& q) {
+Polyhedron circle_circle_intersections(const Pos3D& p, const Pos3D& q) {
 	ld ang = angle(p, q);
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
@@ -462,7 +462,7 @@ void solve() {
 		ld t1 = (ld)P[i].r / R;
 		ld d1 = cos(t1);
 		Pos3D n1 = P[i] * d1;
-		inxs = intersections(s, P[i]);
+		inxs = circle_circle_intersections(s, P[i]);
 		for (Pos3D& p : inxs) {
 			if (connectable(P, s, p, i, -1)) {
 				ld t = angle(s, P[i]) * R;
@@ -475,7 +475,7 @@ void solve() {
 				vp++;
 			}
 		}
-		inxs = intersections(e, P[i]);
+		inxs = circle_circle_intersections(e, P[i]);
 		for (Pos3D& p : inxs) {
 			if (connectable(P, e, p, i, -1)) {
 				ld t = angle(e, P[i]) * R;
@@ -492,7 +492,7 @@ void solve() {
 			ld t2 = (ld)P[j].r / R;
 			ld d2 = cos(t2);
 			Pos3D n2 = P[j] * d2;
-			inxs = intersections(P[i], P[j]);
+			inxs = circle_circle_intersections(P[i], P[j]);
 			if (inxs.size()) {
 				Pos3D l_ = inxs[0], h_ = inxs[1];
 				update_sc(P[i]);
