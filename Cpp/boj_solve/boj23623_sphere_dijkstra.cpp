@@ -273,9 +273,9 @@ ld angle(const Pos3D& a, const Pos3D& b) {
 	ld th = atan2(y, x);
 	return th;
 }
-//bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t, const Pos3D& nrm) {
-//	return ccw(O3D, d1, t, nrm) >= 0 && ccw(O3D, d2, t, nrm) <= 0;
-//}
+bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t, const Pos3D& nrm) {
+	return ccw(O3D, d1, t, nrm) >= 0 && ccw(O3D, d2, t, nrm) <= 0;
+}
 bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int& i, const int& j) {
 	if (a == b) return 1;
 	Pos3D perp = (a / b).unit();
@@ -285,12 +285,21 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 	std::vector<Pos3D> inxs;
 	for (int k = 0; k < N; k++) {
 		if (k == i || k == j) continue;
-		if (plane_circle_intersection(perp, P[k], inxs)) {
-			for (Pos3D& p : inxs) {
-				ld th = angle(X, Y, p);
-				if (0 <= th && th <= ang) return 0;
-			}
+		Pos3D axis = (P[k] / perp).unit();
+		if (zero(axis.Euc())) {
+			if ((ld)P[k].r / R < PI * .5) continue;
+			else return 0;
 		}
+		Pos3D mid = (perp / axis).unit();
+		bool f = plane_circle_intersection(perp, P[k], inxs);
+		if (!f) continue;
+		if (inxs.size() == 1) {
+			if (inner_check(a, b, inxs[0], perp)) return 0;
+			continue;
+		}
+		Pos3D hi = inxs[0], lo = inxs[1];
+		if (ccw(O3D, mid, lo, perp) > 0) std::swap(hi, lo);
+		if (inner_check(lo, hi, a, perp) || inner_check(lo, hi, b, perp)) return 0;
 	}
 	return 1;
 }
@@ -400,7 +409,7 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			m.r = 0;
 			Polyhedron ptan = tangents(m, p);
 			Polyhedron qtan = tangents(m, q);
-			if (qtan.size() == 2 && ptan.size() == 2) {
+			if (ptan.size() == 2 && qtan.size() == 2) {
 				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
 			}
@@ -416,7 +425,7 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			m.r = 0;
 			Polyhedron ptan = tangents(m, p);
 			Polyhedron qtan = tangents(m, q);
-			if (qtan.size() == 2 && ptan.size() == 2) {
+			if (ptan.size() == 2 && qtan.size() == 2) {
 				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
 			}
@@ -428,7 +437,7 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			top.r = 0;
 			Polyhedron qtan = tangents(top, q);
 			Polyhedron ptan = tangents(top, p);
-			if (qtan.size() == 2 && ptan.size() == 2) {
+			if (ptan.size() == 2 && qtan.size() == 2) {
 				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
 			}
@@ -493,7 +502,7 @@ void solve() {
 		ld t1 = (ld)P[i].r / R;
 		ld d1 = cos(t1);
 		Pos3D n1 = P[i] * d1;
-		inxs = tangents(s, P[i]);
+		inxs = tangents(s, P[i]);//s - P[i]
 		for (Pos3D& p : inxs) {
 			if (connectable(P, s, p, i, -1)) {
 				ld t = angle(s, P[i]) * R;
@@ -506,7 +515,7 @@ void solve() {
 				vp++;
 			}
 		}
-		inxs = tangents(e, P[i]);
+		inxs = tangents(e, P[i]);//e - P[i]
 		for (Pos3D& p : inxs) {
 			if (connectable(P, e, p, i, -1)) {
 				ld t = angle(e, P[i]) * R;
@@ -523,7 +532,7 @@ void solve() {
 			ld t2 = (ld)P[j].r / R;
 			ld d2 = cos(t2);
 			Pos3D n2 = P[j] * d2;
-			inxs = circle_circle_intersections(P[i], P[j]);
+			inxs = circle_circle_intersections(P[i], P[j]);//block rotating
 			if (inxs.size()) {
 				Pos cl, ch;
 				ld lo, hi;
@@ -547,18 +556,19 @@ void solve() {
 				if (lo < hi) ROT[j].push_back(Pos(lo, hi));
 				else ROT[j].push_back(Pos(0, hi)), ROT[j].push_back(Pos(lo, 2 * PI));
 			}
-			Polyhedron tans = tangents(P[i], P[j]);
+			Polyhedron tans = tangents(P[i], P[j]);//P[i] - P[j]
 			if (tans.size()) {
-				int sz = tans.size();
+				int sz = tans.size(); assert(!(sz & 1));
 				for (int k = 0; k < sz; k += 2) {
 					Pos3D I = inxs[k + 0], J = inxs[k + 1];
 					if (connectable(P, P[i], P[j], i, j)) {
 						ld t = angle(P[i], P[j]) * R;
 						G[vp].push_back(Info(vp + 1, t));
 						G[vp + 1].push_back(Info(vp, t));
+						Pos ix; Node n;
 						update_sc(P[i]);
-						Pos ix = convert(I, n1);
-						Node n = Node(vp, ix.rad());
+						ix = convert(I, n1);
+						n = Node(vp, ix.rad());
 						ND[i].push_back(n);
 						update_sc(P[j]);
 						ix = convert(J, n2);
@@ -577,20 +587,20 @@ void solve() {
 		int szr = ROT[i].size();
 		int szn = ND[i].size();
 		ld hi = 0, lo = 2 * PI;
+		ld rr = R * sin((ld)P[i].r / R);
 		for (const Pos& p : ROT[i]) hi = std::max(hi, p.HI), lo = std::min(lo, p.LO);
 		if (hi < ND[i][szn - 1].t && ND[i][0].t < lo) {
-			ld t = norm((ND[i][0].t - ND[i][szn - 1].t)) * r;
+			ld t = norm((ND[i][0].t - ND[i][szn - 1].t)) * rr;
 			G[ND[i][0].i].push_back(Info(ND[i][szn - 1].i, t));
 			G[ND[i][szn - 1].i].push_back(Info(ND[i][0].i, t));
 		}
 		ROT[i].push_back(Pos(2 * PI, 2 * PI));
 		hi = 0;
-		ld r = sin((ld)P[i].r / R) * R;
 		for (const Pos& p : ROT[i]) {
 			if (p.LO > hi) {
-				while (k < szn && ND[i][k].t < hi) k++;
+				while (k < szn && ND[i][k].t < hi) { k++; }
 				while (k < szn - 1 && ND[i][k + 1].t < p.LO) {
-					ld t = (ND[i][k + 1].t - ND[i][k].t) * r;
+					ld t = (ND[i][k + 1].t - ND[i][k].t) * rr;
 					G[ND[i][k].i].push_back(Info(ND[i][k + 1].i, t));
 					G[ND[i][k + 1].i].push_back(Info(ND[i][k].i, t));
 					k++;
