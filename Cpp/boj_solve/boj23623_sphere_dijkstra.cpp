@@ -111,7 +111,7 @@ struct Pos3D {
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
 	Pos3D operator * (const ld& n) const { return { x * n, y * n, z * n }; }
 	Pos3D operator / (const ld& n) const { return { x / n, y / n, z / n }; }
-	Pos3D operator - () const { return { -x, -y, -z, r }; }
+	Pos3D operator - () const { return { -x, -y, -z }; }
 	Pos3D& operator *= (const ld& n) { x *= n; y *= n; z *= n; return *this; }
 	ld Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
