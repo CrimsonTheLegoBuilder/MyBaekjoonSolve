@@ -373,7 +373,7 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 		Pos3D perp = (q / p).unit();
 		Pos3D m = q.rodrigues_rotate(b, perp);
 		Pos3D hi = m.rodrigues_rotate(C, q);
-		Pos3D lo = m.rodrigues_rotate(C, q);
+		Pos3D lo = m.rodrigues_rotate(-C, q);
 		return { hi, lo };
 	}
 	assert(p.r * q.r);
