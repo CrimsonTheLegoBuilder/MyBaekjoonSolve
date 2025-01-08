@@ -223,8 +223,8 @@ int intersection(const Plane& p1, const Plane& p2, Line3D& l) {
 	return 1;
 }
 Pos3D s2c(const ld& phi, const ld& psi) {//Spherical to Cartesian
-	ld lon = phi * PI / 180;
-	ld lat = psi * PI / 180;
+	ld lat = phi * PI / 180;
+	ld lon = psi * PI / 180;
 	return Pos3D(cos(lon) * cos(lat), sin(lon) * cos(lat), sin(lat));
 }
 //bool circle_intersection(const Pos3D& a, const Pos3D& b, const ld& th, std::vector<Pos3D>& inxs) {
