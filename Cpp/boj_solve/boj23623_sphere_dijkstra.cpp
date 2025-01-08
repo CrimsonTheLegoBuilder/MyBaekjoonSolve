@@ -375,7 +375,8 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 		if (a + b >= PI) return {};
 		ld A = PI * .5;
 		ld B = asin(sin(A) * sin(b) / sin(a));
-		ld C = std::abs(sin_cos_law(a, b, A, B));
+		//ld C = std::abs(sin_cos_law(a, b, A, B));
+		ld C = std::abs(spherical_pythagorean(a, b, A, B));
 		Pos3D perp = (q / p).unit();
 		Pos3D m = q.rodrigues_rotate(b, perp);
 		Pos3D hi = m.rodrigues_rotate(C, q);
