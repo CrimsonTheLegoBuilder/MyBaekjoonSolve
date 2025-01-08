@@ -413,9 +413,7 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			Pos3D top = (q - p).unit();
 			top.r = 0;
 			Polyhedron qtan = tangents(top, q);
-			Pos3D bot = (p - q).unit();
-			bot.r = 0;
-			Polyhedron ptan = tangents(bot, p);
+			Polyhedron ptan = tangents(top, p);
 			if (qtan.size() == 2 && ptan.size() == 2) {
 				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
