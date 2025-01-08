@@ -486,7 +486,7 @@ void solve() {
 		ld t1 = (ld)P[i].r / R;
 		ld d1 = cos(t1);
 		Pos3D n1 = P[i] * d1;
-		inxs = circle_circle_intersections(s, P[i]);
+		inxs = tangents(s, P[i]);
 		for (Pos3D& p : inxs) {
 			if (connectable(P, s, p, i, -1)) {
 				ld t = angle(s, P[i]) * R;
@@ -499,7 +499,7 @@ void solve() {
 				vp++;
 			}
 		}
-		inxs = circle_circle_intersections(e, P[i]);
+		inxs = tangents(e, P[i]);
 		for (Pos3D& p : inxs) {
 			if (connectable(P, e, p, i, -1)) {
 				ld t = angle(e, P[i]) * R;
@@ -518,15 +518,19 @@ void solve() {
 			Pos3D n2 = P[j] * d2;
 			inxs = circle_circle_intersections(P[i], P[j]);
 			if (inxs.size()) {
+				Pos cl, ch;
+				ld lo, hi;
 				Pos3D l_ = inxs[0], h_ = inxs[1];
+
 				update_sc(P[i]);
-				Pos cl = convert(l_, n1);
-				Pos ch = convert(h_, n1);
-				ld lo = cl.rad();
-				ld hi = ch.rad();
+				cl = convert(l_, n1);
+				ch = convert(h_, n1);
+				lo = cl.rad();
+				hi = ch.rad();
 				if (eq(lo, hi)) { lo = norm(lo - TOL); hi = norm(hi + TOL); }
 				if (lo < hi) ROT[i].push_back(Pos(lo, hi));
 				else ROT[i].push_back(Pos(0, hi)), ROT[i].push_back(Pos(lo, 2 * PI));
+				
 				update_sc(P[j]);
 				cl = convert(h_, n2);
 				ch = convert(l_, n2);
