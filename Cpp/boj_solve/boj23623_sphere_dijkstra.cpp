@@ -360,6 +360,12 @@ ld sin_cos_law(const ld& a, const ld& b, const ld& A, const ld& B) {
 	ld cosC = num / den;
 	return acos(cosC);
 }
+ld spherical_pythagorean(const ld& a, const ld& b, const ld& A, const ld& B) {
+	ld cosc = cos(a) / cos(b);
+	ld c = acos(cosc);
+	ld sinC = sin(c) * sin(A) / sin(a);
+	return asin(sinC);
+}
 Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	if (zero((p / q).Euc())) return {};
 	Polyhedron ret;
