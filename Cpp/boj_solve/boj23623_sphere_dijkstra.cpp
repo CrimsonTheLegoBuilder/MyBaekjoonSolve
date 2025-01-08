@@ -480,11 +480,7 @@ void solve() {
 	for (int i = 0; i < N; i++) if (!F[i]) tmp.push_back(P[i]);
 	P = tmp;
 	N = P.size();
-	if (connectable(P, s, e, -1, -1)) {
-		ld t = angle(s, e) * R;
-		std::cout << t << "\n";
-		return;
-	}
+	if (connectable(P, s, e, -1, -1)) { std::cout << angle(s, e) * R << "\n"; return; }
 	Polyhedron inxs;
 	for (int i = 0; i < N; i++) {
 		ld t1 = (ld)P[i].r / R;
