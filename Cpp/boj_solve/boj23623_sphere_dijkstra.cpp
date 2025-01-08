@@ -111,6 +111,7 @@ struct Pos3D {
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
 	Pos3D operator * (const ld& n) const { return { x * n, y * n, z * n }; }
 	Pos3D operator / (const ld& n) const { return { x / n, y / n, z / n }; }
+	Pos3D operator - () const { return { -x, -y, -z, r }; }
 	Pos3D& operator *= (const ld& n) { x *= n; y *= n; z *= n; return *this; }
 	ld Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
@@ -207,7 +208,6 @@ int intersection(const Plane& p1, const Plane& p2, Line3D& l) {
 	Pos3D n1 = p1.norm();
 	Pos3D n2 = p2.norm();
 	Pos3D dir = n2 / n1;
-	dir = dir.unit();
 	if (zero(dir.mag())) {
 		ld f = n1 * n2;
 		ld d1 = dist(p1, O3D);
@@ -215,6 +215,7 @@ int intersection(const Plane& p1, const Plane& p2, Line3D& l) {
 		if (sign(f) > 0) return sign(d2 - d1) >= 0 ? 0 : -1;
 		else return sign(d2 + d1) >= 0 ? 0 : -2;
 	}
+	dir = dir.unit();
 	Pos3D q1 = intersection(p1, Line3D(n1, O3D));
 	Pos3D v1 = n1 / dir;
 	Pos3D p0 = intersection(p2, Line3D(v1, q1));
@@ -349,19 +350,21 @@ Polyhedron circle_circle_intersections(const Pos3D& p, const Pos3D& q) {
 	Plane p2 = plane(q, d2);
 	Line3D inx;
 	if (intersection(p1, p2, inx) != 1) return {};
-	ld w = (n1 - inx.p0).mag();
-	ld h = sqrt(sq(sin(t1)) - sq(w));
+	ld w = inx.p0.mag();
+	ld h = sqrt(1 - sq(w));
 	Pos3D v = inx.dir;
 	return { inx.p0 + v * h, inx.p0 - v * h };
 }
-ld sin_cos_law(const ld& a, const ld& b, const ld& A, const ld& B) {
-	ld num = sin(A) * sin(B) * cos(a) * cos(b) - cos(A) * cos(B);
-	ld den = 1 - sin(A) * sin(B) * sin(a) * sin(b);
-	ld cosC = num / den;
-	return acos(cosC);
-}
+//ld sin_cos_law(const ld& a, const ld& b, const ld& A, const ld& B) {
+//	ld num = sin(A) * sin(B) * cos(a) * cos(b) - cos(A) * cos(B);
+//	ld den = 1 - sin(A) * sin(B) * sin(a) * sin(b);
+//	ld cosC = num / den;
+//	return acos(cosC);
+//}
 ld spherical_pythagorean(const ld& a, const ld& b, const ld& A, const ld& B) {
+	assert(sin(a) > 0); assert(cos(b) > 0);
 	ld cosc = cos(a) / cos(b);
+	cosc = fit(cosc, -1, 1);
 	ld c = acos(cosc);
 	ld sinC = sin(c) * sin(A) / sin(a);
 	return asin(sinC);
@@ -387,7 +390,11 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	ld ang = angle(p, q);
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
-	if (std::abs(t1 - t2) > ang) {//inner tangent
+	ld ful = std::abs(ang) + std::abs(t1) + std::abs(t2);
+	Pos3D rq = -q;
+	rq.r = q.r;
+	bool f = inner_check(p, rq) || inner_check(rq, p);
+	if (ang > (t1 + t2) && !f) {//inner tangent
 		if (p.r == q.r) {
 			Pos3D m = ((p + q) * .5).unit();
 			m.r = 0;
@@ -415,7 +422,7 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			}
 		}
 	}
-	if ((std::abs(ang) + std::abs(t1) + std::abs(t2)) < PI) {//outer tangent
+	if (ful < PI) {//outer tangent
 		if (p.r == q.r) {
 			Pos3D top = (q - p).unit();
 			top.r = 0;
@@ -592,7 +599,6 @@ void solve() {
 			}
 			else hi = std::max(hi, p.HI);
 		}
-
 	}
 	ld cost = dijkstra(0, 1);
 	if (cost > 1e16) std::cout << "-1\n";
