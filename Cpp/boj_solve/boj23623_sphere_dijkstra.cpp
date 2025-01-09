@@ -534,12 +534,12 @@ void solve() {
 	int phi, psi, r;
 	for (Pos3D& p : P) {
 		std::cin >> phi >> psi >> r;
-		p = s2c(phi, psi); p.r = r;
+		p = s2c(phi, -psi); p.r = r;
 	}
 	std::cin >> phi >> psi;
-	s = s2c(phi, psi); s.r = 0; s.i = -1;
+	s = s2c(phi, -psi); s.r = 0; s.i = -1;
 	std::cin >> phi >> psi;
-	e = s2c(phi, psi); e.r = 0; e.i = -2;
+	e = s2c(phi, -psi); e.r = 0; e.i = -2;
 	//std::cout << "s:: " << s << " | e:: " << e << "\n";
 	vp = 0;
 	VX[vp++] = s;
@@ -557,10 +557,10 @@ void solve() {
 	for (int i = 0; i < N; i++) P[i].i = i;
 	//for (int i = 0; i < N; i++) std::cout << "P[" << i << "]:: " << P[i] << "\n";
 	if (connectable(P, s, e, -1, -1)) { std::cout << angle(s, e) * R << "\n"; return; }
-	std::cout << "FUCK:: " << angle(s, e) * R << "\n";
+	//std::cout << "FUCK:: " << angle(s, e) * R << "\n";
 	Polyhedron inxs;
 	for (int i = 0; i < N; i++) {
-		//std::cout << "P[" << i << "]:: " << P[i] << "\n";
+		std::cout << "P[" << i << "]:: " << P[i] << "\n";
 		ld t1 = (ld)P[i].r / R;
 		//std::cout << "t1:: " << t1 << "\n";
 		ld d1 = cos(t1);
@@ -569,9 +569,9 @@ void solve() {
 		inxs = tangents(s, P[i]);//s - P[i]
 		for (Pos3D& p : inxs) {
 			//std::cout << "s - tan P[" << i << "]:: " << p << "\n";
-			std::cout << "P[i].r / R:: " << (ld)P[i].r / R << " ";
-			std::cout << "angle:: " << angle(p, P[i]) << "\n";
-			std::cout << "dot debug:: s-P[" << i << "]:: " << dot(s / cos(angle(s, P[i])), p, P[i] / cos(t1)) << "\n";
+			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << " ";
+			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
+			//std::cout << "dot debug:: s-P[" << i << "]:: " << dot(s / cos(angle(s, P[i])), p, P[i] / cos(t1)) << "\n";
 			if (connectable(P, s, p, i, -1)) {
 				ld t = angle(s, P[i]) * R;
 				//std::cout << "s - tan P[" << i << "]:: " << p << "\n";
@@ -590,9 +590,9 @@ void solve() {
 		inxs = tangents(e, P[i]);//e - P[i]
 		for (Pos3D& p : inxs) {
 			//std::cout << "e - tan P[" << i << "]:: " << p << "\n";
-			std::cout << "P[i].r / R:: " << (ld)P[i].r / R << " ";
-			std::cout << "angle:: " << angle(p, P[i]) << "\n";
-			std::cout << "dot debug:: e-P[" << i << "]:: " << dot(e / cos(angle(e, P[i])), p, P[i] / cos(t1)) << "\n";
+			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << " ";
+			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
+			//std::cout << "dot debug:: e-P[" << i << "]:: " << dot(e / cos(angle(e, P[i])), p, P[i] / cos(t1)) << "\n";
 			if (connectable(P, e, p, i, -1)) {
 				ld t = angle(e, P[i]) * R;
 				//std::cout << "e - tan P[" << i << "]:: " << p << "\n";
@@ -609,13 +609,15 @@ void solve() {
 		}
 		//std::cout << "FUCK3::\n";
 		for (int j = i + 1; j < N; j++) {
-			//std::cout << "j:: " << j << "\n";
+			std::cout << "j:: " << j << "\n";
  			ld t2 = (ld)P[j].r / R;
 			ld d2 = cos(t2);
 			Pos3D n2 = P[j] * d2;
 			//std::cout << "fuck1::\n";
 			inxs = circle_circle_intersections(P[i], P[j]);//block rotating
 			if (inxs.size() == 2) {
+				std::cout << "P[" << i << "].r:: " << P[i].r << " P[" << j << "].r:: " << P[j].r << "\n";
+				std::cout << "FUCK::\n";
 				Pos cl, ch;
 				ld lo, hi;
 				Pos3D l_ = inxs[1], h_ = inxs[0];
@@ -649,7 +651,7 @@ void solve() {
 					//std::cout << tans[k + 1] << "\n";
 					Pos3D I = tans[k + 0], J = tans[k + 1];
 					if (connectable(P, P[i], P[j], i, j)) {
-						tangent_debug(P[i], P[j], I, J);
+						//tangent_debug(P[i], P[j], I, J);
 						//std::cout << "I, J:: I:: " << I << " J:: " << J << "\n";
 						//std::cout << "suck1::\n";
 						ld t = angle(I, J) * R;
