@@ -546,6 +546,7 @@ void solve() {
 	VX[vp++] = e;
 	std::sort(P.begin(), P.end(), [&](const Pos3D& p, const Pos3D& q) -> bool { return p.r > q.r; });
 	Vbool F(N);
+	//for (int i = 0; i < N; i++) std::cout << inner_check(P[i], s) << " " << inner_check(P[i], e) << "\n";
 	for (int i = 0; i < N; i++)
 		for (int j = i + 1; j < N; j++)
 			if (inner_check(P[i], P[j]) || P[i] == P[j]) F[j] = 1;
@@ -617,7 +618,7 @@ void solve() {
 			if (inxs.size() == 2) {
 				Pos cl, ch;
 				ld lo, hi;
-				Pos3D l_ = inxs[0], h_ = inxs[1];
+				Pos3D l_ = inxs[1], h_ = inxs[0];
 
 				update_sc(P[i]);
 				cl = convert(l_, n1);
@@ -657,12 +658,12 @@ void solve() {
 						G[vp + 1].push_back(Info(vp, t));
 						Pos ix; Node n;
 						update_sc(P[i]);
-						ix = convert(I, P[i]);
+						ix = convert(I, n1);
 						n = Node(vp, ix.rad());
 						//std::cout << "vp:: " << vp << " i:: " << i << " rad:: " << ix.rad() << "\n";
 						ND[i].push_back(n);
 						update_sc(P[j]);
-						ix = convert(J, P[j]);
+						ix = convert(J, n2);
 						n = Node(vp + 1, ix.rad());
 						//std::cout << "vp:: " << vp + 1 << " j:: " << j << " rad:: " << ix.rad() << "\n";
 						ND[j].push_back(n);
