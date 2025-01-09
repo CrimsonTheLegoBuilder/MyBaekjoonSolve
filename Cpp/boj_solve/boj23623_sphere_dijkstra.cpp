@@ -482,6 +482,9 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(13);
+	//Pos3D p = { 1, 1, 1 };
+	//std::cout << p.rodrigues_rotate(PI * .25, Pos3D(1, 0, 0));
+	//return;
 	std::cin >> R >> N;
 	Polyhedron P(N);
 	Pos3D s, e;
