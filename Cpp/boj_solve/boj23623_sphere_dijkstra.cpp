@@ -119,8 +119,8 @@ struct Pos3D {
 	Pos3D norm(const Pos3D& p) const { return (*this / p).unit(); }
 	Pos3D rodrigues_rotate(const ld& th, const Pos3D& axis) const {
 		ld s = sin(th), c = cos(th);
-		Pos3D u = axis.unit();
-		return u * (*this * u) * (1 - c) + (*this * c) - (*this / u) * s;
+		Pos3D n = axis.unit();
+		return n * (*this * n) * (1 - c) + (*this * c) + (n / *this) * s;
 	}
 	friend std::istream& operator >> (std::istream& is, Pos3D& p) { is >> p.x >> p.y >> p.z; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos3D& p) { os << p.x << " " << p.y << " " << p.z; return os; }
@@ -341,9 +341,9 @@ ld dijkstra(const int& v, const int& g) {
 }
 Pos3D VX[LEN]; int vp;
 struct Node {
-	ld t;
 	int i;
-	Node(ld t_ = 0, int i_ = 0) : t(t_), i(i_) {}
+	ld t;
+	Node(int i_ = 0, ld t_ = 0) : t(t_), i(i_) {}
 	bool operator < (const Node& x) const { return t < x.t; }
 };
 std::vector<Node> ND[25];
@@ -389,6 +389,8 @@ ld spherical_pythagorean(const ld& a, const ld& b, const ld& A, const ld& B) {
 	return asin(sinC);
 }
 void tangent_debug(const Pos3D& p, const Pos3D& q, const Pos3D& tp, const Pos3D& tq ) {
+	std::cout << "FUCKING DEBUG:: " << p.mag() << " " << tp.mag() << "\n";
+	std::cout << "FUCKING DEBUG:: " << q.mag() << " " << tq.mag() << "\n";
 	ld rp = (ld)p.r / R;
 	std::cout << "rp:: " << rp << " angle(p, tp):: " << angle(p, tp) << "\n";
 	ld rq = (ld)q.r / R;
@@ -407,10 +409,16 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	Polyhedron ret;
 	if (!p.r) {
 		ld a = angle(q, p);
+		//std::cout << "a:: " << a << "\n";
 		ld b = (ld)q.r / R;
 		if (a + b >= PI) return {};
+		if (a > PI * .5) {
+			Pos3D pp = -p;
+			Polyhedron tmp = tangents(pp, q);
+			return { tmp[1], tmp[0] };
+		}
 		ld A = PI * .5;
-		ld B = asin(sin(A) * sin(b) / sin(a));
+		ld B = asin(fit(sin(A) * sin(b) / sin(a), -1, 1));
 		//ld C = std::abs(sin_cos_law(a, b, A, B));
 		ld C = std::abs(spherical_pythagorean(a, b, A, B));
 		Pos3D perp = (q / p).unit();
@@ -443,7 +451,7 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			ld a_ = angle(p, q);
 			ld bp = (ld)p.r / R;
 			ld bq = (ld)q.r / R;
-			ld ap = atan2((sin(bq) / sin(bp)) + cos(a_), sin(a_));
+			ld ap = atan2(sin(a_), (sin(bq) / sin(bp)) + cos(a_));
 			Pos3D perp = (p / q).unit();
 			Pos3D m = p.rodrigues_rotate(ap, perp);
 			m.r = 0;
@@ -474,7 +482,7 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			ld a_ = angle(L, S);
 			ld bl = (ld)L.r / R;
 			ld bs = (ld)S.r / R;
-			ld as = atan2((sin(bl) / sin(bs)) - cos(a_), sin(a_));
+			ld as = atan2(sin(a_), (sin(bl) / sin(bs)) - cos(a_));
 			ld B = asin(sin(A) * sin(bs) / sin(as));
 			ld al = as + a_;
 			Pos3D perp = (L / S).unit();
@@ -483,12 +491,12 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			top.r = 0;
 			Polyhedron ltan = tangents(top, L);
 			Polyhedron stan = tangents(top, S);
-			Polyhedron tmp;
 			if (ltan.size() == 2 && stan.size() == 2) {
+				Polyhedron tmp;
 				if (p.r > q.r) tmp = { ltan[0], stan[0], ltan[1], stan[1] };
 				else if (p.r < q.r) tmp = { stan[0], ltan[0], stan[1], ltan[1] };
+				ret.insert(ret.end(), tmp.begin(), tmp.end());
 			}
-			ret.insert(ret.end(), tmp.begin(), tmp.end());
 		}
 	}
 	return ret;
@@ -498,10 +506,28 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(13);
+
 	//Pos3D p = { 1, 1, 1 };
 	//std::cout << p.rodrigues_rotate(PI * .25, Pos3D(1, 0, 0));
+	//std::cout << Pos3D(1, 0, 0) * Pos3D(0, 1, 0) << "\n";
+	//R = 100;
+	//Pos3D top = s2c(90, 0); top.r = 0;
+	//Pos3D a = s2c(45, 0); a.r = 11;
+	//Pos3D b = s2c(-45, 0); b.r = 10;
+	//Polyhedron tana = tangents(top, a);
+	//std::cout << "tana:: " << tana.size() << "\n";
+	//for (Pos3D& p : tana) std::cout << p << "\n";
+	//Polyhedron tanb = tangents(top, b);
+	//std::cout << "tanb:: " << tanb.size() << "\n";
+	//for (Pos3D& p : tanb) std::cout << p << "\n";
+	//Polyhedron tans = tangents(a, b);
+	//std::cout << "tans:: " << tans.size() << "\n";
+	//for (Pos3D& p : tans) std::cout << p << "\n";
+	//for (int i = 0; i < tans.size(); i += 2) {
+	//	tangent_debug(a, b, tans[i], tans[i + 1]);
+	//}
 	//return;
-	std::cout << Pos3D(1, 0, 0) * Pos3D(0, 1, 0) << "\n";
+
 	std::cin >> R >> N;
 	Polyhedron P(N);
 	Pos3D s, e;
@@ -514,7 +540,7 @@ void solve() {
 	s = s2c(phi, psi); s.r = 0; s.i = -1;
 	std::cin >> phi >> psi;
 	e = s2c(phi, psi); e.r = 0; e.i = -2;
-	std::cout << "s:: " << s << " | e:: " << e << "\n";
+	//std::cout << "s:: " << s << " | e:: " << e << "\n";
 	vp = 0;
 	VX[vp++] = s;
 	VX[vp++] = e;
@@ -528,28 +554,33 @@ void solve() {
 	P = tmp;
 	N = P.size();
 	for (int i = 0; i < N; i++) P[i].i = i;
+	//for (int i = 0; i < N; i++) std::cout << "P[" << i << "]:: " << P[i] << "\n";
 	if (connectable(P, s, e, -1, -1)) { std::cout << angle(s, e) * R << "\n"; return; }
+	std::cout << "FUCK:: " << angle(s, e) * R << "\n";
 	Polyhedron inxs;
 	for (int i = 0; i < N; i++) {
-		std::cout << "P[" << i << "]:: " << P[i] << "\n";
+		//std::cout << "P[" << i << "]:: " << P[i] << "\n";
 		ld t1 = (ld)P[i].r / R;
-		std::cout << "t1:: " << t1 << "\n";
+		//std::cout << "t1:: " << t1 << "\n";
 		ld d1 = cos(t1);
 		Pos3D n1 = P[i] * d1;
 		//std::cout << "FUCK1::\n";
 		inxs = tangents(s, P[i]);//s - P[i]
 		for (Pos3D& p : inxs) {
 			//std::cout << "s - tan P[" << i << "]:: " << p << "\n";
-			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << "\n";
-			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
+			std::cout << "P[i].r / R:: " << (ld)P[i].r / R << " ";
+			std::cout << "angle:: " << angle(p, P[i]) << "\n";
 			std::cout << "dot debug:: s-P[" << i << "]:: " << dot(s / cos(angle(s, P[i])), p, P[i] / cos(t1)) << "\n";
 			if (connectable(P, s, p, i, -1)) {
 				ld t = angle(s, P[i]) * R;
+				//std::cout << "s - tan P[" << i << "]:: " << p << "\n";
+				//std::cout << "cost:: s, tan:: " << t << "\n";
 				G[0].push_back(Info(vp, t));
 				G[vp].push_back(Info(0, t));
 				update_sc(P[i]);
 				Pos ix = convert(p, n1);
 				Node n = Node(vp, ix.rad());
+				//std::cout << "vp:: " << vp << " i:: " << i << " rad:: " << ix.rad() << "\n";
 				ND[i].push_back(n);
 				vp++;
 			}
@@ -558,16 +589,19 @@ void solve() {
 		inxs = tangents(e, P[i]);//e - P[i]
 		for (Pos3D& p : inxs) {
 			//std::cout << "e - tan P[" << i << "]:: " << p << "\n";
-			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << "\n";
-			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
+			std::cout << "P[i].r / R:: " << (ld)P[i].r / R << " ";
+			std::cout << "angle:: " << angle(p, P[i]) << "\n";
 			std::cout << "dot debug:: e-P[" << i << "]:: " << dot(e / cos(angle(e, P[i])), p, P[i] / cos(t1)) << "\n";
 			if (connectable(P, e, p, i, -1)) {
 				ld t = angle(e, P[i]) * R;
+				//std::cout << "e - tan P[" << i << "]:: " << p << "\n";
+				//std::cout << "cost:: e, tan:: " << t << "\n";
 				G[1].push_back(Info(vp, t));
 				G[vp].push_back(Info(1, t));
 				update_sc(P[i]); 
 				Pos ix = convert(p, n1);
 				Node n = Node(vp, ix.rad());
+				//std::cout << "vp:: " << vp << " i:: " << i <<  " rad:: " << ix.rad() << "\n";
 				ND[i].push_back(n);
 				vp++;
 			}
@@ -606,7 +640,7 @@ void solve() {
 			//std::cout << "fuck2::\n";
 			Polyhedron tans = tangents(P[i], P[j]);//P[i] - P[j]
 			if (tans.size()) {
-				std::cout << "tangents:: \n";
+				//std::cout << "tangents:: \n";
 				//std::cout << "dot debug:: e-P[" << i << "]:: " << dot(n1, p, P[i]) << "\n";
 				int sz = tans.size(); assert(!(sz & 1));
 				for (int k = 0; k < sz; k += 2) {
@@ -615,19 +649,22 @@ void solve() {
 					Pos3D I = tans[k + 0], J = tans[k + 1];
 					if (connectable(P, P[i], P[j], i, j)) {
 						tangent_debug(P[i], P[j], I, J);
-						std::cout << "I, J:: I:: " << I << " J:: " << J << "\n";
+						//std::cout << "I, J:: I:: " << I << " J:: " << J << "\n";
 						//std::cout << "suck1::\n";
-						ld t = angle(P[i], P[j]) * R;
+						ld t = angle(I, J) * R;
+						//std::cout << "cost:: P[" << i << "], P[" << j << "]:: " << t << "\n";
 						G[vp].push_back(Info(vp + 1, t));
 						G[vp + 1].push_back(Info(vp, t));
 						Pos ix; Node n;
 						update_sc(P[i]);
-						ix = convert(I, n1);
+						ix = convert(I, P[i]);
 						n = Node(vp, ix.rad());
+						//std::cout << "vp:: " << vp << " i:: " << i << " rad:: " << ix.rad() << "\n";
 						ND[i].push_back(n);
 						update_sc(P[j]);
-						ix = convert(J, n2);
+						ix = convert(J, P[j]);
 						n = Node(vp + 1, ix.rad());
+						//std::cout << "vp:: " << vp + 1 << " j:: " << j << " rad:: " << ix.rad() << "\n";
 						ND[j].push_back(n);
 						vp += 2;
 					}
@@ -639,6 +676,7 @@ void solve() {
 	}
 	//std::cout << "FUCK::\n";
 	for (int i = 0, k; i < N; i++) {
+		//std::cout << "DEBUG:: P[" << i << "] :: " << P[i] << "\n";
 		k = 0;
 		std::sort(ROT[i].begin(), ROT[i].end());
 		std::sort(ND[i].begin(), ND[i].end());
@@ -646,9 +684,12 @@ void solve() {
 		int szn = ND[i].size();
 		ld hi = 0, lo = 2 * PI;
 		ld rr = R * sin((ld)P[i].r / R);
+		//std::cout << "rr:: " << rr << "\n";
 		for (const Pos& p : ROT[i]) hi = std::max(hi, p.HI), lo = std::min(lo, p.LO);
 		if (hi < ND[i][szn - 1].t && ND[i][0].t < lo) {
 			ld t = norm((ND[i][0].t - ND[i][szn - 1].t)) * rr;
+			//std::cout << "t:: " << norm((ND[i][0].t - ND[i][szn - 1].t)) << "\n";
+			//std::cout << "ROT[" << i << "]:: cost:: " << t << "\n";
 			G[ND[i][0].i].push_back(Info(ND[i][szn - 1].i, t));
 			G[ND[i][szn - 1].i].push_back(Info(ND[i][0].i, t));
 		}
@@ -659,6 +700,8 @@ void solve() {
 				while (k < szn && ND[i][k].t < hi) { k++; }
 				while (k < szn - 1 && ND[i][k + 1].t < p.LO) {
 					ld t = (ND[i][k + 1].t - ND[i][k].t) * rr;
+					//std::cout << "t:: " << ND[i][k + 1].t - ND[i][k].t << "\n";
+					//std::cout << "ROT[" << i << "]:: cost:: " << t << "\n";
 					G[ND[i][k].i].push_back(Info(ND[i][k + 1].i, t));
 					G[ND[i][k + 1].i].push_back(Info(ND[i][k].i, t));
 					k++;
