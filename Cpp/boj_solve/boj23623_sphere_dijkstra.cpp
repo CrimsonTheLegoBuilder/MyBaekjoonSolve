@@ -481,7 +481,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(3);
+	std::cout.precision(13);
 	std::cin >> R >> N;
 	Polyhedron P(N);
 	Pos3D s, e;
@@ -521,6 +521,7 @@ void solve() {
 			//std::cout << "s - tan P[" << i << "]:: " << p << "\n";
 			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << "\n";
 			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
+			std::cout << "dot debug:: s-P[" << i << "]:: " << dot(s, p, n1) << "\n";
 			if (connectable(P, s, p, i, -1)) {
 				ld t = angle(s, P[i]) * R;
 				G[0].push_back(Info(vp, t));
@@ -538,6 +539,7 @@ void solve() {
 			//std::cout << "e - tan P[" << i << "]:: " << p << "\n";
 			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << "\n";
 			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
+			std::cout << "dot debug:: e-P[" << i << "]:: " << dot(e, p, n1) << "\n";
 			if (connectable(P, e, p, i, -1)) {
 				ld t = angle(e, P[i]) * R;
 				G[1].push_back(Info(vp, t));
@@ -584,6 +586,7 @@ void solve() {
 			Polyhedron tans = tangents(P[i], P[j]);//P[i] - P[j]
 			if (tans.size()) {
 				std::cout << "tangents:: \n";
+				//std::cout << "dot debug:: e-P[" << i << "]:: " << dot(n1, p, P[i]) << "\n";
 				int sz = tans.size(); assert(!(sz & 1));
 				for (int k = 0; k < sz; k += 2) {
 					//std::cout << "sz:: " << sz << " k:: " << k << "\n";
