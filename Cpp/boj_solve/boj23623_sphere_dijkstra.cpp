@@ -485,6 +485,7 @@ void solve() {
 	//Pos3D p = { 1, 1, 1 };
 	//std::cout << p.rodrigues_rotate(PI * .25, Pos3D(1, 0, 0));
 	//return;
+	std::cout << Pos3D(1, 0, 0) * Pos3D(0, 1, 0) << "\n";
 	std::cin >> R >> N;
 	Polyhedron P(N);
 	Pos3D s, e;
@@ -516,6 +517,7 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		std::cout << "P[" << i << "]:: " << P[i] << "\n";
 		ld t1 = (ld)P[i].r / R;
+		std::cout << "t1:: " << t1 << "\n";
 		ld d1 = cos(t1);
 		Pos3D n1 = P[i] * d1;
 		//std::cout << "FUCK1::\n";
@@ -524,7 +526,7 @@ void solve() {
 			//std::cout << "s - tan P[" << i << "]:: " << p << "\n";
 			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << "\n";
 			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
-			std::cout << "dot debug:: s-P[" << i << "]:: " << dot(s, p, n1) << "\n";
+			std::cout << "dot debug:: s-P[" << i << "]:: " << dot(s / cos(angle(s, P[i])), p, P[i] / cos(t1)) << "\n";
 			if (connectable(P, s, p, i, -1)) {
 				ld t = angle(s, P[i]) * R;
 				G[0].push_back(Info(vp, t));
@@ -542,7 +544,7 @@ void solve() {
 			//std::cout << "e - tan P[" << i << "]:: " << p << "\n";
 			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << "\n";
 			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
-			std::cout << "dot debug:: e-P[" << i << "]:: " << dot(e, p, n1) << "\n";
+			std::cout << "dot debug:: e-P[" << i << "]:: " << dot(e / cos(angle(e, P[i])), p, P[i] / cos(t1)) << "\n";
 			if (connectable(P, e, p, i, -1)) {
 				ld t = angle(e, P[i]) * R;
 				G[1].push_back(Info(vp, t));
