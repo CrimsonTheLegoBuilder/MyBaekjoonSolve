@@ -388,6 +388,20 @@ ld spherical_pythagorean(const ld& a, const ld& b, const ld& A, const ld& B) {
 	ld sinC = sin(c) * sin(A) / sin(a);
 	return asin(sinC);
 }
+void tangent_debug(const Pos3D& p, const Pos3D& q, const Pos3D& tp, const Pos3D& tq ) {
+	ld rp = (ld)p.r / R;
+	std::cout << "rp:: " << rp << " angle(p, tp):: " << angle(p, tp) << "\n";
+	ld rq = (ld)q.r / R;
+	std::cout << "rq:: " << rq << " angle(q, tq):: " << angle(q, tq) << "\n";
+	ld to = angle(tp, tq);
+	Pos3D pp = p / cos(rp);
+	Pos3D tqq = tq / cos(to);
+	std::cout << "dot debug:: pp - tp - tqq:: " << dot(pp, tp, tqq) << "\n";
+	Pos3D qq = q / cos(rq);
+	Pos3D tpp = tp / cos(to);
+	std::cout << "dot debug:: qq - tq - tpp:: " << dot(qq, tq, tpp) << "\n";
+	return;
+}
 Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	if (zero((p / q).Euc())) return {};
 	Polyhedron ret;
@@ -444,11 +458,12 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	if (ful < PI) {//outer tangent
 		if (p.r == q.r) {
 			Pos3D top = (q - p).unit();
-			top.r = 0;
+			Pos3D bot = (p - q).unit();
+			top.r = 0; bot.r = 0;
 			Polyhedron qtan = tangents(top, q);
-			Polyhedron ptan = tangents(top, p);
+			Polyhedron ptan = tangents(bot, p);
 			if (ptan.size() == 2 && qtan.size() == 2) {
-				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
+				Polyhedron tmp = { ptan[0], qtan[1], ptan[1], qtan[0] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
 			}
 		}
@@ -463,7 +478,8 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			ld B = asin(sin(A) * sin(bs) / sin(as));
 			ld al = as + a_;
 			Pos3D perp = (L / S).unit();
-			Pos3D top = L.rodrigues_rotate(al, perp);
+			//Pos3D top = L.rodrigues_rotate(al, perp);
+			Pos3D top = S.rodrigues_rotate(as, perp);
 			top.r = 0;
 			Polyhedron ltan = tangents(top, L);
 			Polyhedron stan = tangents(top, S);
@@ -598,6 +614,7 @@ void solve() {
 					//std::cout << tans[k + 1] << "\n";
 					Pos3D I = tans[k + 0], J = tans[k + 1];
 					if (connectable(P, P[i], P[j], i, j)) {
+						tangent_debug(P[i], P[j], I, J);
 						std::cout << "I, J:: I:: " << I << " J:: " << J << "\n";
 						//std::cout << "suck1::\n";
 						ld t = angle(P[i], P[j]) * R;
