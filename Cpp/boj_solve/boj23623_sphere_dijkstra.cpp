@@ -363,10 +363,10 @@ Polyhedron circle_circle_intersections(const Pos3D& p, const Pos3D& q) {
 	if (t1 + t2 < ang || std::abs(t1 - t2) >= ang) return {};
 	ld d1 = cos(t1);
 	Pos3D n1 = p * d1;
-	Plane p1 = plane(p, d1);
+	Plane p1 = plane(p, -d1);
 	ld d2 = cos(t2);
 	Pos3D n2 = q * d2;
-	Plane p2 = plane(q, d2);
+	Plane p2 = plane(q, -d2);
 	Line3D inx;
 	if (intersection(p1, p2, inx) != 1) return {};
 	ld w = inx.p0.mag();
@@ -620,7 +620,7 @@ void solve() {
 				std::cout << "FUCK::\n";
 				Pos cl, ch;
 				ld lo, hi;
-				Pos3D l_ = inxs[1], h_ = inxs[0];
+				Pos3D l_ = inxs[0], h_ = inxs[1];
 
 				update_sc(P[i]);
 				cl = convert(l_, n1);
