@@ -534,12 +534,12 @@ void solve() {
 	int phi, psi, r;
 	for (Pos3D& p : P) {
 		std::cin >> phi >> psi >> r;
-		p = s2c(phi, -psi); p.r = r;
+		p = s2c(phi, psi); p.r = r;
 	}
 	std::cin >> phi >> psi;
-	s = s2c(phi, -psi); s.r = 0; s.i = -1;
+	s = s2c(phi, psi); s.r = 0; s.i = -1;
 	std::cin >> phi >> psi;
-	e = s2c(phi, -psi); e.r = 0; e.i = -2;
+	e = s2c(phi, psi); e.r = 0; e.i = -2;
 	//std::cout << "s:: " << s << " | e:: " << e << "\n";
 	vp = 0;
 	VX[vp++] = s;
