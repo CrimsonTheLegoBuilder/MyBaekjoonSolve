@@ -481,7 +481,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(15);
+	std::cout.precision(3);
 	std::cin >> R >> N;
 	Polyhedron P(N);
 	Pos3D s, e;
@@ -494,7 +494,7 @@ void solve() {
 	s = s2c(phi, psi); s.r = 0; s.i = -1;
 	std::cin >> phi >> psi;
 	e = s2c(phi, psi); e.r = 0; e.i = -2;
-	//std::cout << "s:: " << s << " | e:: " << e << "\n";
+	std::cout << "s:: " << s << " | e:: " << e << "\n";
 	vp = 0;
 	VX[vp++] = s;
 	VX[vp++] = e;
@@ -507,15 +507,20 @@ void solve() {
 	for (int i = 0; i < N; i++) if (!F[i]) tmp.push_back(P[i]);
 	P = tmp;
 	N = P.size();
+	for (int i = 0; i < N; i++) P[i].i = i;
 	if (connectable(P, s, e, -1, -1)) { std::cout << angle(s, e) * R << "\n"; return; }
 	Polyhedron inxs;
 	for (int i = 0; i < N; i++) {
+		std::cout << "P[" << i << "]:: " << P[i] << "\n";
 		ld t1 = (ld)P[i].r / R;
 		ld d1 = cos(t1);
 		Pos3D n1 = P[i] * d1;
 		//std::cout << "FUCK1::\n";
 		inxs = tangents(s, P[i]);//s - P[i]
 		for (Pos3D& p : inxs) {
+			//std::cout << "s - tan P[" << i << "]:: " << p << "\n";
+			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << "\n";
+			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
 			if (connectable(P, s, p, i, -1)) {
 				ld t = angle(s, P[i]) * R;
 				G[0].push_back(Info(vp, t));
@@ -530,6 +535,9 @@ void solve() {
 		//std::cout << "FUCK2::\n";
 		inxs = tangents(e, P[i]);//e - P[i]
 		for (Pos3D& p : inxs) {
+			//std::cout << "e - tan P[" << i << "]:: " << p << "\n";
+			//std::cout << "P[i].r / R:: " << (ld)P[i].r / R << "\n";
+			//std::cout << "angle:: " << angle(p, P[i]) << "\n";
 			if (connectable(P, e, p, i, -1)) {
 				ld t = angle(e, P[i]) * R;
 				G[1].push_back(Info(vp, t));
@@ -575,12 +583,14 @@ void solve() {
 			//std::cout << "fuck2::\n";
 			Polyhedron tans = tangents(P[i], P[j]);//P[i] - P[j]
 			if (tans.size()) {
+				std::cout << "tangents:: \n";
 				int sz = tans.size(); assert(!(sz & 1));
 				for (int k = 0; k < sz; k += 2) {
 					//std::cout << "sz:: " << sz << " k:: " << k << "\n";
 					//std::cout << tans[k + 1] << "\n";
 					Pos3D I = tans[k + 0], J = tans[k + 1];
 					if (connectable(P, P[i], P[j], i, j)) {
+						std::cout << "I, J:: I:: " << I << " J:: " << J << "\n";
 						//std::cout << "suck1::\n";
 						ld t = angle(P[i], P[j]) * R;
 						G[vp].push_back(Info(vp + 1, t));
