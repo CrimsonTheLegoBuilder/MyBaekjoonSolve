@@ -22,7 +22,6 @@ typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
-const ld ERAD = 6370;
 const int LEN = 25 * 25 * 25 * 5;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
