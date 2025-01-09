@@ -284,6 +284,7 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 	ld ang = angle(X, Y, b);
 	std::vector<Pos3D> inxs;
 	for (int k = 0; k < N; k++) {
+		//std::cout << "cntble:: k:: " << k << "\n";
 		if (k == i || k == j) continue;
 		Pos3D axis = (P[k] / perp).unit();
 		if (zero(axis.Euc())) {
@@ -292,14 +293,23 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 		}
 		Pos3D mid = (perp / axis).unit();
 		bool f = plane_circle_intersection(perp, P[k], inxs);
+		//std::cout << "f:: " << f << "\n";
 		if (!f) continue;
+		//std::cout << "inxs.sz:: " << inxs.size() << "\n";
 		if (inxs.size() == 1) {
 			if (inner_check(a, b, inxs[0], perp)) return 0;
 			continue;
 		}
 		Pos3D hi = inxs[0], lo = inxs[1];
-		if (ccw(O3D, mid, lo, perp) > 0) std::swap(hi, lo);
+		if (ccw(O3D, mid, lo, perp) < 0) std::swap(hi, lo);
+		//std::cout << "ccw_lo:: " << ccw(O3D, mid, lo, perp) << " ";
+		//std::cout << "ccw_hi:: " << ccw(O3D, mid, hi, perp) << "\n";
+		//std::cout << inner_check(lo, hi, a, perp) << "\n";
+		//std::cout << inner_check(lo, hi, b, perp) << "\n";
+		//std::cout << inner_check(a, b, lo, perp) << "\n";
+		//std::cout << inner_check(a, b, hi, perp) << "\n";
 		if (inner_check(lo, hi, a, perp) || inner_check(lo, hi, b, perp)) return 0;
+		if (inner_check(a, b, lo, perp) || inner_check(a, b, hi, perp)) return 0;
 	}
 	return 1;
 }
@@ -484,6 +494,7 @@ void solve() {
 	s = s2c(phi, psi); s.r = 0; s.i = -1;
 	std::cin >> phi >> psi;
 	e = s2c(phi, psi); e.r = 0; e.i = -2;
+	//std::cout << "s:: " << s << " | e:: " << e << "\n";
 	vp = 0;
 	VX[vp++] = s;
 	VX[vp++] = e;
@@ -502,6 +513,7 @@ void solve() {
 		ld t1 = (ld)P[i].r / R;
 		ld d1 = cos(t1);
 		Pos3D n1 = P[i] * d1;
+		//std::cout << "FUCK1::\n";
 		inxs = tangents(s, P[i]);//s - P[i]
 		for (Pos3D& p : inxs) {
 			if (connectable(P, s, p, i, -1)) {
@@ -515,6 +527,7 @@ void solve() {
 				vp++;
 			}
 		}
+		//std::cout << "FUCK2::\n";
 		inxs = tangents(e, P[i]);//e - P[i]
 		for (Pos3D& p : inxs) {
 			if (connectable(P, e, p, i, -1)) {
@@ -528,12 +541,15 @@ void solve() {
 				vp++;
 			}
 		}
+		//std::cout << "FUCK3::\n";
 		for (int j = i + 1; j < N; j++) {
-			ld t2 = (ld)P[j].r / R;
+			//std::cout << "j:: " << j << "\n";
+ 			ld t2 = (ld)P[j].r / R;
 			ld d2 = cos(t2);
 			Pos3D n2 = P[j] * d2;
+			//std::cout << "fuck1::\n";
 			inxs = circle_circle_intersections(P[i], P[j]);//block rotating
-			if (inxs.size()) {
+			if (inxs.size() == 2) {
 				Pos cl, ch;
 				ld lo, hi;
 				Pos3D l_ = inxs[0], h_ = inxs[1];
@@ -556,12 +572,16 @@ void solve() {
 				if (lo < hi) ROT[j].push_back(Pos(lo, hi));
 				else ROT[j].push_back(Pos(0, hi)), ROT[j].push_back(Pos(lo, 2 * PI));
 			}
+			//std::cout << "fuck2::\n";
 			Polyhedron tans = tangents(P[i], P[j]);//P[i] - P[j]
 			if (tans.size()) {
 				int sz = tans.size(); assert(!(sz & 1));
 				for (int k = 0; k < sz; k += 2) {
-					Pos3D I = inxs[k + 0], J = inxs[k + 1];
+					//std::cout << "sz:: " << sz << " k:: " << k << "\n";
+					//std::cout << tans[k + 1] << "\n";
+					Pos3D I = tans[k + 0], J = tans[k + 1];
 					if (connectable(P, P[i], P[j], i, j)) {
+						//std::cout << "suck1::\n";
 						ld t = angle(P[i], P[j]) * R;
 						G[vp].push_back(Info(vp + 1, t));
 						G[vp + 1].push_back(Info(vp, t));
@@ -578,8 +598,11 @@ void solve() {
 					}
 				}
 			}
+			//std::cout << "fuck3::\n";
 		}
+		//std::cout << "FUCK4::\n";
 	}
+	//std::cout << "FUCK::\n";
 	for (int i = 0, k; i < N; i++) {
 		k = 0;
 		std::sort(ROT[i].begin(), ROT[i].end());
@@ -610,6 +633,7 @@ void solve() {
 			else hi = std::max(hi, p.HI);
 		}
 	}
+	//std::cout << "FUCK::\n";
 	ld cost = dijkstra(0, 1);
 	if (cost > 1e16) std::cout << "-1\n";
 	else std::cout << cost << "\n";
