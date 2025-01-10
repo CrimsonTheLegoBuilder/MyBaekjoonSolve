@@ -373,12 +373,6 @@ Polyhedron circle_circle_intersections(const Pos3D& p, const Pos3D& q) {
 	Pos3D v = inx.dir;
 	return { inx.p0 + v * h, inx.p0 - v * h };
 }
-//ld sin_cos_law(const ld& a, const ld& b, const ld& A, const ld& B) {
-//	ld num = sin(A) * sin(B) * cos(a) * cos(b) - cos(A) * cos(B);
-//	ld den = 1 - sin(A) * sin(B) * sin(a) * sin(b);
-//	ld cosC = num / den;
-//	return acos(cosC);
-//}
 ld spherical_pythagorean(const ld& a, const ld& b, const ld& A, const ld& B) {
 	assert(sin(a) > 0); assert(cos(b) > 0);
 	ld cosc = cos(a) / cos(b);
@@ -418,7 +412,6 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 		}
 		ld A = PI * .5;
 		ld B = asin(fit(sin(A) * sin(b) / sin(a), -1, 1));
-		//ld C = std::abs(sin_cos_law(a, b, A, B));
 		ld C = std::abs(spherical_pythagorean(a, b, A, B));
 		Pos3D perp = (q / p).unit();
 		Pos3D m = q.rodrigues_rotate(b, perp);
