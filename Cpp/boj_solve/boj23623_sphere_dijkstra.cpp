@@ -693,7 +693,7 @@ void solve() {
 		for (const Pos& p : ROT[i]) {
 			if (p.LO > hi) {
 				while (k < szn && ND[i][k].t < hi) { k++; }
-				while (k < szn - 1 && ND[i][k + 1].t < p.LO) {
+				while (k < szn - 1 && ND[i][k + 1].t <= p.LO) {
 					ld t = (ND[i][k + 1].t - ND[i][k].t) * rr;
 					//std::cout << "t:: " << ND[i][k + 1].t - ND[i][k].t << "\n";
 					//std::cout << "ROT[" << i << "]:: cost:: " << t << "\n";

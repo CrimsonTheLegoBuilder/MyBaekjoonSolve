@@ -572,7 +572,7 @@ void solve() {
 		for (const Pos& p : ROT[i]) {
 			if (p.LO > hi) {
 				while (k < szn && ND[i][k].t < hi) { k++; }
-				while (k < szn - 1 && ND[i][k + 1].t < p.LO) {
+				while (k < szn - 1 && ND[i][k + 1].t <= p.LO) {
 					ld t = (ND[i][k + 1].t - ND[i][k].t) * rr;
 					G[ND[i][k].i].push_back(Info(ND[i][k + 1].i, t));
 					G[ND[i][k + 1].i].push_back(Info(ND[i][k].i, t));
