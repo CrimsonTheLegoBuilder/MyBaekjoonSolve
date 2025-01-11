@@ -253,16 +253,17 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	ld t1 = (ld)p.r / R;
 	ld t2 = (ld)q.r / R;
 	ld ful = std::abs(ang) + std::abs(t1) + std::abs(t2);
+	Polyhedron ptan, qtan, tmp;
 	Pos3D rq = -q;
 	rq.r = q.r;
 	bool f = inner_check(p, rq) || inner_check(rq, p);
 	if (ang > (t1 + t2) && !f) {//inner tangent
 		if (p.r == q.r) {
 			Pos3D m = ((p + q) * .5).unit(); m.r = 0;
-			Polyhedron ptan = tangents(m, p);
-			Polyhedron qtan = tangents(m, q);
+			ptan = tangents(m, p);
+			qtan = tangents(m, q);
 			if (ptan.size() == 2 && qtan.size() == 2) {
-				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
+				tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
 			}
 		}
@@ -273,10 +274,10 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			ld ap = atan2(sin(a_), (sin(bq) / sin(bp)) + cos(a_));
 			Pos3D perp = (p / q).unit();
 			Pos3D m = p.rodrigues_rotate(ap, perp); m.r = 0;
-			Polyhedron ptan = tangents(m, p);
-			Polyhedron qtan = tangents(m, q);
+			ptan = tangents(m, p);
+			qtan = tangents(m, q);
 			if (ptan.size() == 2 && qtan.size() == 2) {
-				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
+				tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
 			}
 		}
@@ -284,10 +285,10 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	if (ful < PI) {//outer tangent
 		if (p.r == q.r) {
 			Pos3D top = (q - p).unit(); top.r = 0;
-			Polyhedron qtan = tangents(top, q);
-			Polyhedron ptan = tangents(top, p);
+			qtan = tangents(top, q);
+			ptan = tangents(top, p);
 			if (ptan.size() == 2 && qtan.size() == 2) {
-				Polyhedron tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
+				tmp = { ptan[0], qtan[0], ptan[1], qtan[1] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
 			}
 		}
@@ -304,7 +305,6 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 			Polyhedron ltan = tangents(top, L);
 			Polyhedron stan = tangents(top, S);
 			if (ltan.size() == 2 && stan.size() == 2) {
-				Polyhedron tmp;
 				if (p.r > q.r) tmp = { ltan[0], stan[0], ltan[1], stan[1] };
 				else if (p.r < q.r) tmp = { stan[0], ltan[0], stan[1], ltan[1] };
 				ret.insert(ret.end(), tmp.begin(), tmp.end());
@@ -445,6 +445,7 @@ void solve() {
 		std::sort(ROT[i].begin(), ROT[i].end());
 		std::sort(ND[i].begin(), ND[i].end());
 		int sz = ND[i].size();
+		if (sz < 2) continue;
 		ld hi = 0, lo = 2 * PI;
 		ld rr = R * sin((ld)P[i].r / R);
 		for (const Pos& p : ROT[i]) hi = std::max(hi, p.HI), lo = std::min(lo, p.LO);
