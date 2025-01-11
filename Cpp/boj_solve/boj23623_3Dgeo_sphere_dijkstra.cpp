@@ -51,10 +51,7 @@ struct Pos3D {
 	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
 	Pos3D operator * (const ld& n) const { return { x * n, y * n, z * n }; }
 	Pos3D operator / (const ld& n) const { return { x / n, y / n, z / n }; }
-	Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
 	Pos3D& operator -= (const Pos3D& p) { x -= p.x; y -= p.y; z -= p.z; return *this; }
-	Pos3D& operator *= (const ld& n) { x *= n; y *= n; z *= n; return *this; }
-	Pos3D& operator /= (const ld& n) { x /= n; y /= n; z /= n; return *this; }
 	Pos3D operator - () const { return { -x, -y, -z }; }
 	ld Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
@@ -109,7 +106,6 @@ Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1
 ld dot(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) * (d3 - d2); }
 int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) { return sign(cross(d1, d2, d3) * norm); }
 bool on_seg_strong(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return zero(cross(d1, d2, d3).mag()) && sign(dot(d1, d3, d2)) >= 0; }
-bool on_seg_weak(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return zero(cross(d1, d2, d3).mag()) && sign(dot(d1, d3, d2)) > 0; }
 Line3D line(const Pos3D& p1, const Pos3D& p2) { return { p2 - p1, p1 }; }
 ld dist(const Plane& s, const Pos3D& p) { return (s.norm() * p + s.d) / s.norm().mag(); }
 Pos3D intersection(const Plane& S, const Line3D& l) {
@@ -157,13 +153,11 @@ bool plane_circle_intersection(const Pos3D& perp, const Pos3D& a, Polyhedron& in
 	ld ratio = sqrtl(1 - x * x);
 	Pos3D h = (vec.unit() / perp) * ratio;
 	inxs.push_back(w + h);
-	inxs.push_back(w - h);
-	//if (!zero(ratio)) inxs.push_back(w - h);
+	if (!zero(ratio)) inxs.push_back(w - h);
 	return 1;
 }
 ld angle(const Pos3D Xaxis, const Pos3D Yaxis, const Pos3D& p) {
-	ld X = Xaxis * p;
-	ld Y = Yaxis * p;
+	ld X = Xaxis * p, Y = Yaxis * p;
 	ld th = atan2(Y, X);
 	return th;
 }
@@ -201,48 +195,6 @@ bool connectable(const Polyhedron& P, const Pos3D& a, const Pos3D& b, const int&
 	}
 	return 1;
 }
-ld C[LEN];
-struct Info {
-	int i;
-	ld c;
-	Info(int i_ = 0, ld c_ = 0) : i(i_), c(c_) {}
-	bool operator < (const Info& x) const { return zero(c - x.c) ? i < x.i : c > x.c; }
-};
-std::vector<Info> G[LEN];
-std::priority_queue<Info> Q;
-ld dijkstra(const int& v, const int& g) {
-	for (int i = 0; i < LEN; i++) C[i] = INF;
-	Q.push(Info(v, 0));
-	C[v] = 0;
-	while (Q.size()) {
-		Info p = Q.top(); Q.pop();
-		if (p.c > C[p.i]) continue;
-		for (Info& w : G[p.i]) {
-			ld cost = p.c + w.c;
-			if (C[w.i] > cost) {
-				C[w.i] = cost;
-				Q.push(Info(w.i, cost));
-			}
-		}
-	}
-	return C[g];
-}
-int vp;
-struct Node {
-	int i;
-	ld t;
-	Node(int i_ = 0, ld t_ = 0) : i(i_), t(t_) {}
-	bool operator < (const Node& x) const { return t < x.t; }
-};
-std::vector<Node> ND[25];
-bool inner_check(const Pos3D& p, const Pos3D& q) {
-	ld ang = angle(p, q);
-	ld t1 = (ld)p.r / R;
-	ld t2 = (ld)q.r / R;
-	assert(t1 <= PI * .5); assert(t2 <= PI * .5);
-	if (p.r > q.r && std::abs(t1 - t2) >= ang) return 1;
-	return 0;
-}
 Polyhedron circle_circle_intersections(const Pos3D& p, const Pos3D& q) {
 	ld ang = angle(p, q);
 	ld t1 = (ld)p.r / R;
@@ -266,6 +218,14 @@ ld spherical_pythagorean(const ld& a, const ld& b, const ld& A, const ld& B) {
 	ld c = acos(cosc);
 	ld sinC = sin(c) * sin(A) / sin(a);
 	return asin(sinC);
+}
+bool inner_check(const Pos3D& p, const Pos3D& q) {
+	ld ang = angle(p, q);
+	ld t1 = (ld)p.r / R;
+	ld t2 = (ld)q.r / R;
+	assert(t1 <= PI * .5); assert(t2 <= PI * .5);
+	if (p.r > q.r && std::abs(t1 - t2) >= ang) return 1;
+	return 0;
 }
 Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	if (zero((p / q).Euc())) return {};
@@ -353,6 +313,39 @@ Polyhedron tangents(const Pos3D& p, const Pos3D& q) {
 	}
 	return ret;
 }
+ld C[LEN]; int vp;
+struct Info {
+	int i;
+	ld c;
+	Info(int i_ = 0, ld c_ = 0) : i(i_), c(c_) {}
+	bool operator < (const Info& x) const { return zero(c - x.c) ? i < x.i : c > x.c; }
+};
+std::vector<Info> G[LEN];
+std::priority_queue<Info> Q;
+ld dijkstra(const int& v, const int& g) {
+	for (int i = 0; i < LEN; i++) C[i] = INF;
+	Q.push(Info(v, 0));
+	C[v] = 0;
+	while (Q.size()) {
+		Info p = Q.top(); Q.pop();
+		if (p.c > C[p.i]) continue;
+		for (Info& w : G[p.i]) {
+			ld cost = p.c + w.c;
+			if (C[w.i] > cost) {
+				C[w.i] = cost;
+				Q.push(Info(w.i, cost));
+			}
+		}
+	}
+	return C[g];
+}
+struct Node {
+	int i;
+	ld t;
+	Node(int i_ = 0, ld t_ = 0) : i(i_), t(t_) {}
+	bool operator < (const Node& x) const { return t < x.t; }
+};
+std::vector<Node> ND[25];
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
