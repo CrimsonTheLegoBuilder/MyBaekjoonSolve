@@ -11,22 +11,29 @@ const int LEN = 1e6 + 1;
 ll sq(ll x) { return x * x; }
 int diff(int x, int y) { return std::abs(x - y); }
 
-int N, P[11];
+int A, B, D, N, M;
 int main() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	for (int i = 0; i < 10; i++) {
-		std::cin >> N;
-		for (int j = i; j < 10; j++) P[j] += N;
+	N = M = 0;
+	std::cin >> A >> B;
+	D = 1;
+	while (A) {
+		int r = A % 10;
+		if (r == 5 || r == 6) { N += 5 * D; M += 6 * D; }
+		else { N += r * D; M += r * D; }
+		D *= 10;
+		A /= 10;
 	}
-	int df = 1e9, ret = 0;
-	for (int i = 0; i < 10; i++) {
-		int tmp = diff(P[i], 100);
-		if (tmp == df && ret < P[i]) df = tmp, ret = P[i];
-		else if (tmp < df) df = tmp, ret = P[i];
-
+	D = 1;
+	while (B) {
+		int r = B % 10;
+		if (r == 5 || r == 6) { N += 5 * D; M += 6 * D; }
+		else { N += r * D; M += r * D; }
+		D *= 10;
+		B /= 10;
 	}
-	//std::cout << ret << "\n";
+	//std::cout << N << " " << M << "\n";
 }
