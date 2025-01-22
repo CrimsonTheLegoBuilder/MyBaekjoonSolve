@@ -12,13 +12,16 @@ int main() {
 	std::cout << std::fixed;
 	std::cout.precision(9);
 	std::cin >> N;
-	C = 1;
-	while (N) {
-		T++;
-		if (N < C) C = 1;
-		N -= C;
-		C++;
+	while (N--) {
+		std::string s;
+		std::cin >> s;
+		int t = s.size();
+		int cnt = 0;
+		for (int i = 0; i < t; i++) {
+			if (s[i] == 'U') cnt++;
+			else break;
+		}
+		std::cout << cnt << "\n";
 	}
-	std::cout << T << "\n";
 	return 0;
 }
