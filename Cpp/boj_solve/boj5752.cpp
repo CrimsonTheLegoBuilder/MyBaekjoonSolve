@@ -445,7 +445,8 @@ bool query() {
 			Vld inxs = circle_line_intersections(R[i], b, CIRCLE);
 			for (const ld& x : inxs) ND[i].push_back(Node(0, x));
 		}
-
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end(), eqti), V.end());
 	}
 	//informer - circle intersection : connect
 	//informer - hull intersection : connect
