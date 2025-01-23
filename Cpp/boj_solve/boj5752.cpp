@@ -20,7 +20,7 @@ typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-10;
 const int LEN = 1005;
 const ld PI = acos(-1);
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
@@ -37,6 +37,11 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define WEAK 1
 #define LO x
 #define HI y
+
+#define XX 0
+#define SX 1
+#define XE 2
+#define SE 3
 
 int B, N, M, T;
 ld RET[LEN];
@@ -210,6 +215,7 @@ struct Circle {
 	bool operator > (const Pos& p) const { return sign(r - (c - p).mag()) > 0; }
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
+	bool inside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r - q.r)) <= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	ld rad(const Pos& p) const { return norm((p - c).rad()); }
 	ld area(const ld& lo = 0, const ld& hi = 2 * PI) const { return (hi - lo) * r * r * .5; }
@@ -225,6 +231,32 @@ struct Circle {
 } C0;
 typedef std::vector<Circle> Circles;
 Circles C;
+Vld intersections(const Circle& a, const Circle& b) {
+	Pos ca = a.c, cb = b.c;
+	Pos vec = cb - ca;
+	ll ra = a.r, rb = b.r;
+	ld distance = vec.mag();
+	ld rd = vec.rad();
+	if (vec.Euc() > sq(ra + rb) + TOL) return {};
+	if (vec.Euc() < sq(ra - rb) - TOL) return {};
+	ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance * ra);
+	if (X < -1) X = -1;
+	if (X > 1) X = 1;
+	ld h = acos(X);
+	Vld ret = {};
+	ret.push_back(norm(rd - h));
+	if (zero(h)) return ret;
+	ret.push_back(norm(rd + h));
+	return ret;
+}
+struct Arc {
+	ld lo, hi;
+	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
+	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
+	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
+	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
+};
+typedef std::vector<Arc> Arcs;
 Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
 	Pos s = l.s, e = l.e;
@@ -238,6 +270,7 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	ld det = sqrt(std::max((ld)0, J));
 	ld lo = (-b - det) / a;
 	ld hi = (-b + det) / a;
+	if (hi < lo) std::swap(hi, lo);
 	Vld ret;
 	if (t == LINE) {
 		if (0 < lo && lo < 1) ret.push_back(lo);
@@ -301,15 +334,119 @@ struct Node {
 	Node(int i_ = 0, ld t_ = 0) : i(i_), t(t_) {}
 	bool operator < (const Node& x) const { return t < x.t; }
 };
-std::vector<Node> ND[LEN];
+Arcs BLK[LEN];//block
+typedef std::vector<Node> Vnode;
+Vnode ND[LEN];
+bool cmpti(const Node& p, const Node& q) { return eq(p.t, q.t) ? p.i < q.i : p.t < q.t; }
+bool eqti(const Node& p, const Node& q) { return eq(p.t, q.t) && p.i == q.i; }
+int cross_check(const Seg& b, const Circle& c, ld& s, ld& e) {//SEXSEX
+	Vld inxs = circle_line_intersections(c, b, CIRCLE);
+	int sz = inxs.size();
+	if (!sz) return XX;
+	if (sz == 2) {
+		s = inxs[0];
+		e = inxs[1];
+		if (c == b.e) e = norm(e + TOL);
+		if (c == b.s) s = norm(s - TOL);
+		return SE;
+	}
+	ld x = inxs[0];
+	bool fs = c >= b.s;
+	bool fe = c >= b.e;
+	if (fs && fe) {
+		if (c == b.e) {
+			x = norm(x - TOL);
+			s = x;
+			return SX;
+		}
+		else if (c == b.s) {
+			x = norm(x + TOL);
+			e = x;
+			return XE;
+		}
+		assert(0);
+	}
+	if (fe) {
+		s = x;
+		if (c == b.e) s = norm(s - TOL);
+		return SX;
+	}
+	else if (fs) {
+		e = x;
+		if (c == b.s) e = norm(e + TOL);
+		return XE;
+	}
+	assert(0);
+}
 bool query() {
 	std::cin >> B; Polygon H(B); for (Pos& p : H) std::cin >> p;
 	std::cin >> N; Polygon I(N); for (Pos& p : I) std::cin >> p;
 	std::cin >> M; Circles R(M); for (Circle& r : R) std::cin >> r;
 	//inner circle remove
+	std::sort(R.rbegin(), R.rend());
+	Vbool F(M, 0);
+	for (int i = 0; i < M; i++) {
+		for (int j = i + 1; j < M; j++) {
+			if (R[j].inside(R[i]) || R[j] == R[i]) F[j] = 1;
+		}
+	}
+	Circles R_;
+	for (int i = 0; i < M; i++) if (!F[i]) R_.push_back(R[i]);
+	R = R_; M = R.size();
 	//inner informer remove
+	F.resize(N);
+	for (int i = 0; i < N; i++) {
+		F[i] = 0;
+		for (int j = 0; j < M; j++) {
+			if (R[j] >= I[i]) { F[i] = 1; break; }
+		}
+	}
+	Polygon I_;
+	for (int i = 0; i < N; i++) if (!F[i]) I_.push_back(I[i]);
+	I = I_; N = I.size();
 	//circle - circle intersecions : block and connect
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < M; j++) {
+			if (i == j) continue;
+			Vld inxs = intersections(R[i], R[j]);
+			int sz = inxs.size();
+			if (!sz) continue;
+			ld hi, lo;
+			if (sz == 1) {
+				ld x = inxs[0];
+				hi = norm(x + TOL);
+				lo = norm(x - TOL);
+			}
+			else {
+				lo = norm(inxs[0]);
+				hi = norm(inxs[1]);
+			}
+			ND[i].push_back(Node(j, lo));
+			ND[i].push_back(Node(j, hi));
+			if (lo < hi) BLK[i].push_back(Arc(lo, hi));
+			else {
+				BLK[i].push_back(Arc(lo, 2 * PI));
+				BLK[i].push_back(Arc(0, hi));
+			}
+		}
+	}
 	//circle - hull intersections : block and connect
+	for (int i = 0; i < M; i++) {
+		Vnode V;
+		for (int j = 0; j < B; j++) {
+			const Pos& p0 = H[j], & p1 = H[(j + 1) % B];
+			Seg b = Seg(p0, p1);
+			ld s, e;
+			int f = cross_check(b, R[i], s, e);
+			if (f == XX) continue;
+			if (f == SE) V.push_back(Node(1, s)), V.push_back(Node(0, e));
+			if (f == SX) V.push_back(Node(1, s));
+			if (f == XE) V.push_back(Node(0, e));
+			Vld inxs = circle_line_intersections(R[i], b, CIRCLE);
+			for (const ld& x : inxs) ND[i].push_back(Node(0, x));
+		}
+
+	}
 	//informer - circle intersection : connect
 	//informer - hull intersection : connect
 	//informer - hull dist check
