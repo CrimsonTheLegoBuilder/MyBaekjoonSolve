@@ -249,7 +249,7 @@ struct Arc {
 	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
 };
 typedef std::vector<Arc> Arcs;
-Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE) {
+Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE, const int& f = STRONG) {
 	//https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
 	Pos s = l.s, e = l.e;
 	Pos vec = e - s;
@@ -265,19 +265,27 @@ Vld circle_line_intersections(const Circle& q, const Seg& l, const int& t = LINE
 	if (hi < lo) std::swap(hi, lo);
 	Vld ret;
 	if (t == LINE) {
-		if (0 < lo && lo < 1) ret.push_back(lo);
-		if (zero(det)) return ret;
-		if (0 < hi && hi < 1) ret.push_back(hi);
-		//ret.push_back(lo);
-		//ret.push_back(hi);
+		if (f == STRONG) {
+			if (0 < lo && lo < 1) ret.push_back(lo);
+			if (zero(det)) return ret;
+			if (0 < hi && hi < 1) ret.push_back(hi);
+		}
+		else if (f == WEAK) {
+			ret.push_back(lo);
+			ret.push_back(hi);
+		}
 	}
 	else {//circle
 		auto the = [&](ld rt) { return q.rad(s + (e - s) * rt); };
-		if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
-		if (zero(det)) return ret;
-		if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
-		//ret.push_back(the(lo));
-		//ret.push_back(the(hi));
+		if (f == STRONG) {
+			if (-TOL < lo && lo < 1 + TOL) ret.push_back(the(lo));
+			if (zero(det)) return ret;
+			if (-TOL < hi && hi < 1 + TOL) ret.push_back(the(hi));
+		}
+		else if (f == WEAK) {
+			ret.push_back(the(lo));
+			ret.push_back(the(hi));
+		}
 	}
 	return ret;
 }
@@ -513,8 +521,13 @@ bool query() {
 
 	//circle - hull connect
 	for (int i = 0; i < M; i++) {
+		Pos c = R[i].c, c0 = c - Pos(R[i].r, 0);
+		ld y = c.y, r = R[i].r;
+		Seg s = Seg(c, c0);
+		ld x = 1;
 		for (int j = 0; j < M; j++) {
 			if (i == j) continue;
+			if (y < R[j].c.y - R[j].r || y > R[j].c.y - R[j].r) continue;
 
 		}
 		for (int j = 0; j < B; j++) {
