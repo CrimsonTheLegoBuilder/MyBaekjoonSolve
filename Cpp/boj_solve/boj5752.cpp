@@ -97,17 +97,9 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2,
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = dot(d1, d3, d2);
-	return !ccw(d1, d2, d3) && (ret > 0 || zero(ret));
-}
-bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = dot(d1, d3, d2);
-	return !ccw(d1, d2, d3) && ret > 0;
-}
-inline ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
-	return (d2 - d1) * (d4 - d3) / (d2 - d1).mag();
-}
+bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
+bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3) / (d2 - d1).mag(); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
