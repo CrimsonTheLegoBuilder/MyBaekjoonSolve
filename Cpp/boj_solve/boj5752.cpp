@@ -397,48 +397,68 @@ bool query() {
 	for (int i = 0; i < N; i++) if (!F[i]) I_.push_back(I[i]);
 	I = I_; N = I.size();
 	//circle - circle intersecions : block and connect
+	//for (int i = 0; i < M; i++) {
+	//	for (int j = 0; j < M; j++) {
+	//		if (i == j) continue;
+	//		Vld inxs = intersections(R[i], R[j]);
+	//		int sz = inxs.size();
+	//		if (!sz) continue;
+	//		ld hi, lo;
+	//		if (sz == 1) {
+	//			ld x = inxs[0];
+	//			hi = norm(x + TOL);
+	//			lo = norm(x - TOL);
+	//		}
+	//		else {
+	//			lo = norm(inxs[0]);
+	//			hi = norm(inxs[1]);
+	//		}
+	//		ND[i].push_back(Node(j, lo));
+	//		ND[i].push_back(Node(j, hi));
+	//		if (lo < hi) BLK[i].push_back(Arc(lo, hi));
+	//		else {
+	//			BLK[i].push_back(Arc(lo, 2 * PI));
+	//			BLK[i].push_back(Arc(0, hi));
+	//		}
+	//	}
+	//}
+	//circle - hull intersections : block and connect
+	//for (int i = 0; i < M; i++) {
+	//	Vnode V;
+	//	for (int j = 0; j < B; j++) {
+	//		const Pos& p0 = H[j], & p1 = H[(j + 1) % B];
+	//		Seg b = Seg(p0, p1);
+	//		ld s, e;
+	//		int f = cross_check(b, R[i], s, e);
+	//		if (f == XX) continue;
+	//		if (f == SE) V.push_back(Node(1, s)), V.push_back(Node(0, e));
+	//		if (f == SX) V.push_back(Node(1, s));
+	//		if (f == XE) V.push_back(Node(0, e));
+	//		Vld inxs = circle_line_intersections(R[i], b, CIRCLE);
+	//		for (const ld& x : inxs) ND[i].push_back(Node(0, x));
+	//	}
+	//	std::sort(V.begin(), V.end());
+	//	V.erase(unique(V.begin(), V.end(), eqti), V.end());
+	//}
+
+	//circle - circle && circle - hull intersections - block && get node
 	for (int i = 0; i < M; i++) {
+		Vld X;
 		for (int j = 0; j < M; j++) {
 			if (i == j) continue;
 			Vld inxs = intersections(R[i], R[j]);
 			int sz = inxs.size();
 			if (!sz) continue;
-			ld hi, lo;
-			if (sz == 1) {
-				ld x = inxs[0];
-				hi = norm(x + TOL);
-				lo = norm(x - TOL);
-			}
-			else {
-				lo = norm(inxs[0]);
-				hi = norm(inxs[1]);
-			}
-			ND[i].push_back(Node(j, lo));
-			ND[i].push_back(Node(j, hi));
-			if (lo < hi) BLK[i].push_back(Arc(lo, hi));
-			else {
-				BLK[i].push_back(Arc(lo, 2 * PI));
-				BLK[i].push_back(Arc(0, hi));
-			}
+			for (const ld& x : inxs) X.push_back(x);
 		}
-	}
-	//circle - hull intersections : block and connect
-	for (int i = 0; i < M; i++) {
-		Vnode V;
 		for (int j = 0; j < B; j++) {
 			const Pos& p0 = H[j], & p1 = H[(j + 1) % B];
 			Seg b = Seg(p0, p1);
-			ld s, e;
-			int f = cross_check(b, R[i], s, e);
-			if (f == XX) continue;
-			if (f == SE) V.push_back(Node(1, s)), V.push_back(Node(0, e));
-			if (f == SX) V.push_back(Node(1, s));
-			if (f == XE) V.push_back(Node(0, e));
 			Vld inxs = circle_line_intersections(R[i], b, CIRCLE);
-			for (const ld& x : inxs) ND[i].push_back(Node(0, x));
+			int sz = inxs.size();
+			if (!sz) continue;
+			for (const ld& x : inxs) X.push_back(x);
 		}
-		std::sort(V.begin(), V.end());
-		V.erase(unique(V.begin(), V.end(), eqti), V.end());
 	}
 	//informer - circle intersection : connect
 	//informer - hull intersection : connect
