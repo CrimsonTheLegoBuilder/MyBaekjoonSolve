@@ -443,7 +443,7 @@ bool query() {
 
 	//circle - circle && circle - hull intersections - block && get node
 	for (int i = 0; i < M; i++) {
-		Vld X;
+		Vld X = { 0, 2 * PI };
 		for (int j = 0; j < M; j++) {
 			if (i == j) continue;
 			Vld inxs = intersections(R[i], R[j]);
@@ -459,6 +459,16 @@ bool query() {
 			if (!sz) continue;
 			for (const ld& x : inxs) X.push_back(x);
 		}
+		std::sort(X.begin(), X.end());
+		X.erase(unique(X.begin(), X.end(), eqti), X.end());
+		int sz = X.size();
+		for (int j = 0; j < sz - 1; j++) {
+			const ld& s = X[j], e = X[j + 1];
+			ld m = (s + e) * .5;
+			Pos mid = R[i].p(m);
+			
+		}
+
 	}
 	//informer - circle intersection : connect
 	//informer - hull intersection : connect
