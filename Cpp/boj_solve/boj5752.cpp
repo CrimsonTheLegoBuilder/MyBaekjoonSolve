@@ -460,6 +460,14 @@ bool query() {
 			int sz = inxs.size();
 			if (!sz) continue;
 			for (const ld& x : inxs) X.push_back(x);
+			if (sz == 1) {
+				ld lo = norm(inxs[0] - TOL), hi = norm(inxs[0] + TOL);
+				if (hi < lo) {
+					VA.push_back(Arc(lo, 2 * PI));
+					VA.push_back(Arc(0, hi));
+				}
+				else VA.push_back(Arc(lo, hi));
+			}
 		}
 		for (int j = 0; j < B; j++) {
 			const Pos& p0 = H[j], & p1 = H[(j + 1) % B];
