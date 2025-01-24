@@ -405,6 +405,7 @@ bool query() {
 	Polygon I_;
 	for (int i = 0; i < N; i++) if (!F[i]) I_.push_back(I[i]);
 	I = I_; N = I.size();
+
 	//circle - circle intersecions : block and connect
 	//for (int i = 0; i < M; i++) {
 	//	for (int j = 0; j < M; j++) {
@@ -431,6 +432,7 @@ bool query() {
 	//		}
 	//	}
 	//}
+	
 	//circle - hull intersections : block and connect
 	//for (int i = 0; i < M; i++) {
 	//	Vnode V;
@@ -459,7 +461,10 @@ bool query() {
 			Vld inxs = intersections(R[i], R[j]);
 			int sz = inxs.size();
 			if (!sz) continue;
-			for (const ld& x : inxs) X.push_back(x);
+			for (const ld& x : inxs) {
+				X.push_back(x);
+				ND[i].push_back(Node(j, x));
+			}
 			if (sz == 1) {
 				ld lo = norm(inxs[0] - TOL), hi = norm(inxs[0] + TOL);
 				if (hi < lo) {
@@ -470,12 +475,28 @@ bool query() {
 			}
 		}
 		for (int j = 0; j < B; j++) {
-			const Pos& p0 = H[j], & p1 = H[(j + 1) % B];
-			Seg b = Seg(p0, p1);
+			const Pos& p0 = H[(j - 1 + B) % B], & p1 = H[j], & p2 = H[(j + 1) % B];
+			Seg b = Seg(p1, p2);
 			Vld inxs = circle_line_intersections(R[i], b, CIRCLE);
 			int sz = inxs.size();
 			if (!sz) continue;
-			for (const ld& x : inxs) X.push_back(x);
+			for (const ld& x : inxs) {
+				X.push_back(x);
+				ND[i].push_back(Node(0, x));
+			}
+			//if (R[i] == p1) {
+			//	Pos c = R[i].c;
+			//	if (dot(p0, p1, c) < 0 && dot(p2, p1, c) < 0) continue;
+			//	if (dot(p0, p1, c) >= 0 && dot(p2, p1, c) >= 0) {
+			//		ld x = R[i].rad(p1);
+			//		ld lo = norm(x - TOL), hi = norm(x + TOL);
+			//		if (hi < lo) {
+			//			VA.push_back(Arc(lo, 2 * PI));
+			//			VA.push_back(Arc(0, hi));
+			//		}
+			//		else VA.push_back(Arc(lo, hi));
+			//	}
+			//}
 		}
 		std::sort(X.begin(), X.end());
 		X.erase(unique(X.begin(), X.end(), eqti), X.end());
@@ -486,8 +507,21 @@ bool query() {
 			Pos mid = R[i].p(m);
 			if (!valid_check(H, R, mid, i)) VA.push_back(Arc(s, e));
 		}
-
+		std::sort(VA.begin(), VA.end());
+		VA.erase(unique(VA.begin(), VA.end()), VA.end());
 	}
+
+	//circle - hull connect
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < M; j++) {
+			if (i == j) continue;
+
+		}
+		for (int j = 0; j < B; j++) {
+
+		}
+	}
+
 	//informer - circle intersection : connect
 	//informer - hull intersection : connect
 	//informer - hull dist check
