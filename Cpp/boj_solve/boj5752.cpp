@@ -453,6 +453,7 @@ bool query() {
 	//circle - circle && circle - hull intersections - block && get node
 	for (int i = 0; i < M; i++) {
 		Vld X = { 0, 2 * PI };
+		Arcs VA;
 		for (int j = 0; j < M; j++) {
 			if (i == j) continue;
 			Vld inxs = intersections(R[i], R[j]);
@@ -475,7 +476,7 @@ bool query() {
 			const ld& s = X[j], e = X[j + 1];
 			ld m = (s + e) * .5;
 			Pos mid = R[i].p(m);
-			
+			if (!valid_check(H, R, mid, i)) VA.push_back(Arc(s, e));
 		}
 
 	}
