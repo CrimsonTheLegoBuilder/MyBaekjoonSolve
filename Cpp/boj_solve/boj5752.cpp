@@ -308,8 +308,8 @@ struct Info {
 	Pii p1() const { return { s1, e1 }; }
 	Pii p2() const { return { s2, e2 }; }
 };
-Vint G[LEN << 1];
-bool V[LEN << 1];
+Vint G[(LEN << 1) + 10];
+bool V[(LEN << 1) + 10];
 void bfs() {
 	std::queue<int> Q;
 	memset(V, 0, sizeof V);
@@ -339,50 +339,11 @@ struct Node {
 	Node(int i_ = 0, ld t_ = 0) : i(i_), t(t_) {}
 	bool operator < (const Node& x) const { return t < x.t; }
 };
-Arcs BLK[LEN];//block
+Arcs BLK[33];//block
 typedef std::vector<Node> Vnode;
 Vnode ND[LEN];
 bool cmpti(const Node& p, const Node& q) { return eq(p.t, q.t) ? p.i < q.i : p.t < q.t; }
 bool eqti(const Node& p, const Node& q) { return eq(p.t, q.t) && p.i == q.i; }
-int cross_check(const Seg& b, const Circle& c, ld& s, ld& e) {//SEXSEX
-	Vld inxs = circle_line_intersections(c, b, CIRCLE);
-	int sz = inxs.size();
-	if (!sz) return XX;
-	if (sz == 2) {
-		s = inxs[0];
-		e = inxs[1];
-		if (c == b.e) e = norm(e + TOL);
-		if (c == b.s) s = norm(s - TOL);
-		return SE;
-	}
-	ld x = inxs[0];
-	bool fs = c >= b.s;
-	bool fe = c >= b.e;
-	if (fs && fe) {
-		if (c == b.e) {
-			x = norm(x - TOL);
-			s = x;
-			return SX;
-		}
-		else if (c == b.s) {
-			x = norm(x + TOL);
-			e = x;
-			return XE;
-		}
-		assert(0);
-	}
-	if (fe) {
-		s = x;
-		if (c == b.e) s = norm(s - TOL);
-		return SX;
-	}
-	else if (fs) {
-		e = x;
-		if (c == b.s) e = norm(e + TOL);
-		return XE;
-	}
-	assert(0);
-}
 bool valid_check(const Polygon& H, const Circles& C, const Pos& p, const int& k) {
 	if (inner_check(H, p) < 0) return 0;
 	int sz = C.size();
@@ -396,6 +357,9 @@ bool query() {
 	std::cin >> B; Polygon H(B); for (Pos& p : H) std::cin >> p;
 	std::cin >> N; Polygon I(N); for (Pos& p : I) std::cin >> p;
 	std::cin >> M; Circles R(M); for (Circle& r : R) std::cin >> r;
+	if (!B && !N && !M) return 0;
+	for (int i = 0; i < N + M + 10; i++) G[i].clear();
+	for (int i = 0; i < 33; i++) ND[i].clear(), BLK[i].clear();
 	//inner circle remove
 	std::sort(R.rbegin(), R.rend());
 	Vbool F(M, 0);
@@ -430,7 +394,7 @@ bool query() {
 			if (!sz) continue;
 			for (const ld& x : inxs) {
 				X.push_back(x);
-				ND[i].push_back(Node(j, x));
+				ND[i + 1].push_back(Node(j + 1, x));
 			}
 			if (sz == 1) {
 				ld lo = norm(inxs[0] - TOL), hi = norm(inxs[0] + TOL);
@@ -449,29 +413,29 @@ bool query() {
 			if (!sz) continue;
 			for (const ld& x : inxs) {
 				X.push_back(x);
-				ND[i].push_back(Node(0, x));
+				ND[i + 1].push_back(Node(0, x));
 			}
 		}
 		std::sort(X.begin(), X.end());
 		X.erase(unique(X.begin(), X.end(), eqti), X.end());
 		int sz = X.size();
 		for (int j = 0; j < sz - 1; j++) {
-			const ld& s = X[j], e = X[j + 1];
+			const ld& s = X[j], & e = X[j + 1];
 			ld m = (s + e) * .5;
 			Pos mid = R[i].p(m);
 			if (!valid_check(H, R, mid, i)) VA.push_back(Arc(s, e));
 		}
 		std::sort(VA.begin(), VA.end());
 		VA.erase(unique(VA.begin(), VA.end()), VA.end());
+		BLK[i] = VA;
 	}
 
 	//circle - hull connect
 	for (int i = 0; i < M; i++) {
 		Pos c = R[i].c, c0 = c - Pos(R[i].r, 0);
 		if (!inner_check_concave(H, c0)) continue;
-		ld y = c.y, r = R[i].r;
+		ld x = INF, y = c.y, r = R[i].r;
 		Seg s = Seg(c, c0);
-		ld x = INF;
 		int t = -1;
 		for (int j = 0; j < M; j++) {
 			if (i == j) continue;
@@ -502,10 +466,78 @@ bool query() {
 				}
 			}
 		}
+		assert(t != -1);
+		ND[i + 1].push_back(Node(t, 0));
 	}
 
 	//informer - circle && hull intersection : connect
-	
+	for (int i = 0; i < N; i++) {
+		const Pos& c = I[i];
+		const Pos c0 = c - Pos(1, 0);
+		ld x = INF, y = c.y;
+		Seg s = Seg(c, c0);
+		int t = -1;
+		for (int j = 0; j < M; j++) {
+			if (i == j) continue;
+			if (y < R[j].c.y - R[j].r || y > R[j].c.y - R[j].r) continue;
+			if (dot(c0, c, R[j].c) > 0) continue;
+			Vld inxs = circle_line_intersections(R[j], s, LINE, WEAK);
+			for (const ld& z : inxs) {
+				if (x > z) {
+					x = z;
+					t = j + 1;
+				}
+			}
+		}
+		for (int j = 0; j < B; j++) {
+			Pos p0 = H[j], p1 = H[(j + 1) % B];
+			Seg p = Seg(p0, p1);
+			ld yl = std::min(p0.y, p1.y);
+			ld yh = std::max(p0.y, p1.y);
+			if (yl > y || yh < y) continue;
+			if (eq(yl, yh)) continue;
+			else {
+				if (p0.y > p1.y) std::swap(p0, p1);
+				if (ccw(p0, p1, c) > 0) continue;
+				ld z = intersection(s, p, WEAK);
+				if (x > z) {
+					x = z;
+					t = 0;
+				}
+			}
+		}
+		assert(t != -1);
+		if (t) ND[t].push_back(Node(i + LEN, 0));
+		else G[0].push_back(i + LEN)
+	}
+
+	//radar round connect
+	for (int i = 0, k; i < N; i++) {
+		std::sort(BLK[i].begin(), BLK[i].end());
+		std::sort(ND[i].begin(), ND[i].end());
+		int sz = ND[i].size();
+		if (sz < 2) continue;
+		ld hi = 0, lo = 2 * PI;
+		for (const Arc& a : BLK[i]) hi = std::max(hi, a.hi), lo = std::min(lo, a.lo);
+		if (hi < ND[i][sz - 1].t && ND[i][0].t < lo) {
+			G[ND[i][0].i].push_back(ND[i][sz - 1].i);
+			G[ND[i][sz - 1].i].push_back(ND[i][0].i);
+		}
+		BLK[i].push_back(Arc(2 * PI, 2 * PI));
+		hi = 0; k = 0;
+		for (const Arc& a : BLK[i]) {
+			if (a.lo > hi) {
+				while (k < sz && ND[i][k].t < hi) k++;
+				while (k < sz - 1 && ND[i][k + 1].t <= a.lo) {
+					G[ND[i][k].i].push_back(ND[i][k + 1].i);
+					G[ND[i][k + 1].i].push_back(ND[i][k].i);
+					k++;
+				}
+				hi = a.hi;
+			}
+			else hi = std::max(hi, a.hi);
+		}
+	}
 
 	//bfs
 	bfs();
@@ -514,7 +546,7 @@ bool query() {
 	int idx = -1;
 	ld ret = INF;
 	for (int i = 0; i < N; i++) {
-		if (!V[i + 1005]) continue;
+		if (!V[i + LEN]) continue;
 		const Pos& p = I[i];
 		for (int j = 0; j < B; j++) {
 			const Pos& p0 = H[j], & p1 = H[(j + 1) % B];
@@ -525,7 +557,9 @@ bool query() {
 			}
 		}
 	}
-
+	if (!~idx) std::cout << "Mission impossible\n";
+	else std::cout << "Contact informer " << idx << "\n";
+	return 1;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
