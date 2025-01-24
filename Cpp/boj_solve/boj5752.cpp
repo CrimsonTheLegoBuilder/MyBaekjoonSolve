@@ -161,6 +161,11 @@ Polygon sutherland_hodgman(const Polygon& C, const Polygon& clip) {
 	}
 	return ret;
 }
+ld dist(const Pos& q, const Pos& p0, const Pos& p1) {
+	if (sign(dot(p0, p1, q)) >= 0) return (p0 - q).mag();
+	if (sign(dot(p1, p0, q)) >= 0) return (p1 - q).mag();
+	return std::abs(cross(p0, p1, q) / (p0 - p1).mag());
+}
 struct Seg {
 	Pos s, e;
 	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
@@ -191,7 +196,7 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (zero(det)) return -1;
 	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
 	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
-	if (f == WEAK) return fit(a1, 0, 1);
+	if (f == WEAK) return a1;
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
@@ -303,8 +308,8 @@ struct Info {
 	Pii p1() const { return { s1, e1 }; }
 	Pii p2() const { return { s2, e2 }; }
 };
-Vint G[LEN];
-bool V[LEN];
+Vint G[LEN << 1];
+bool V[LEN << 1];
 void bfs() {
 	std::queue<int> Q;
 	memset(V, 0, sizeof V);
@@ -414,52 +419,6 @@ bool query() {
 	for (int i = 0; i < N; i++) if (!F[i]) I_.push_back(I[i]);
 	I = I_; N = I.size();
 
-	//circle - circle intersecions : block and connect
-	//for (int i = 0; i < M; i++) {
-	//	for (int j = 0; j < M; j++) {
-	//		if (i == j) continue;
-	//		Vld inxs = intersections(R[i], R[j]);
-	//		int sz = inxs.size();
-	//		if (!sz) continue;
-	//		ld hi, lo;
-	//		if (sz == 1) {
-	//			ld x = inxs[0];
-	//			hi = norm(x + TOL);
-	//			lo = norm(x - TOL);
-	//		}
-	//		else {
-	//			lo = norm(inxs[0]);
-	//			hi = norm(inxs[1]);
-	//		}
-	//		ND[i].push_back(Node(j, lo));
-	//		ND[i].push_back(Node(j, hi));
-	//		if (lo < hi) BLK[i].push_back(Arc(lo, hi));
-	//		else {
-	//			BLK[i].push_back(Arc(lo, 2 * PI));
-	//			BLK[i].push_back(Arc(0, hi));
-	//		}
-	//	}
-	//}
-	
-	//circle - hull intersections : block and connect
-	//for (int i = 0; i < M; i++) {
-	//	Vnode V;
-	//	for (int j = 0; j < B; j++) {
-	//		const Pos& p0 = H[j], & p1 = H[(j + 1) % B];
-	//		Seg b = Seg(p0, p1);
-	//		ld s, e;
-	//		int f = cross_check(b, R[i], s, e);
-	//		if (f == XX) continue;
-	//		if (f == SE) V.push_back(Node(1, s)), V.push_back(Node(0, e));
-	//		if (f == SX) V.push_back(Node(1, s));
-	//		if (f == XE) V.push_back(Node(0, e));
-	//		Vld inxs = circle_line_intersections(R[i], b, CIRCLE);
-	//		for (const ld& x : inxs) ND[i].push_back(Node(0, x));
-	//	}
-	//	std::sort(V.begin(), V.end());
-	//	V.erase(unique(V.begin(), V.end(), eqti), V.end());
-	//}
-
 	//circle - circle && circle - hull intersections - block && get node
 	for (int i = 0; i < M; i++) {
 		Vld X = { 0, 2 * PI };
@@ -492,19 +451,6 @@ bool query() {
 				X.push_back(x);
 				ND[i].push_back(Node(0, x));
 			}
-			//if (R[i] == p1) {
-			//	Pos c = R[i].c;
-			//	if (dot(p0, p1, c) < 0 && dot(p2, p1, c) < 0) continue;
-			//	if (dot(p0, p1, c) >= 0 && dot(p2, p1, c) >= 0) {
-			//		ld x = R[i].rad(p1);
-			//		ld lo = norm(x - TOL), hi = norm(x + TOL);
-			//		if (hi < lo) {
-			//			VA.push_back(Arc(lo, 2 * PI));
-			//			VA.push_back(Arc(0, hi));
-			//		}
-			//		else VA.push_back(Arc(lo, hi));
-			//	}
-			//}
 		}
 		std::sort(X.begin(), X.end());
 		X.erase(unique(X.begin(), X.end(), eqti), X.end());
@@ -522,24 +468,64 @@ bool query() {
 	//circle - hull connect
 	for (int i = 0; i < M; i++) {
 		Pos c = R[i].c, c0 = c - Pos(R[i].r, 0);
+		if (!inner_check_concave(H, c0)) continue;
 		ld y = c.y, r = R[i].r;
 		Seg s = Seg(c, c0);
-		ld x = 1;
+		ld x = INF;
+		int t = -1;
 		for (int j = 0; j < M; j++) {
 			if (i == j) continue;
 			if (y < R[j].c.y - R[j].r || y > R[j].c.y - R[j].r) continue;
-
+			if (dot(c0, c, R[j].c) > 0) continue;
+			Vld inxs = circle_line_intersections(R[j], s, LINE, WEAK);
+			for (const ld& z : inxs) {
+				if (x > z) {
+					x = z;
+					t = j + 1;
+				}
+			}
 		}
 		for (int j = 0; j < B; j++) {
-
+			Pos p0 = H[j], p1 = H[(j + 1) % B];
+			Seg p = Seg(p0, p1);
+			ld yl = std::min(p0.y, p1.y);
+			ld yh = std::max(p0.y, p1.y);
+			if (yl > y || yh < y) continue;
+			if (eq(yl, yh)) continue;
+			else {
+				if (p0.y > p1.y) std::swap(p0, p1);
+				if (ccw(p0, p1, c) > 0) continue;
+				ld z = intersection(s, p, WEAK);
+				if (x > z) {
+					x = z;
+					t = 0;
+				}
+			}
 		}
 	}
 
-	//informer - circle intersection : connect
-	//informer - hull intersection : connect
-	//informer - hull dist check
+	//informer - circle && hull intersection : connect
+	
+
 	//bfs
-	//get optimal solution
+	bfs();
+
+	//informer - hull dist check
+	int idx = -1;
+	ld ret = INF;
+	for (int i = 0; i < N; i++) {
+		if (!V[i + 1005]) continue;
+		const Pos& p = I[i];
+		for (int j = 0; j < B; j++) {
+			const Pos& p0 = H[j], & p1 = H[(j + 1) % B];
+			ld d = dist(p, p0, p1);
+			if (ret > d) {
+				ret = d;
+				idx = i + 1;
+			}
+		}
+	}
+
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
