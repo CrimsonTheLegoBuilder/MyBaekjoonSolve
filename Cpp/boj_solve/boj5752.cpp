@@ -370,6 +370,15 @@ int cross_check(const Seg& b, const Circle& c, ld& s, ld& e) {//SEXSEX
 	}
 	assert(0);
 }
+bool valid_check(const Polygon& H, const Circles& C, const Pos& p, const int& k) {
+	if (inner_check(H, p) < 0) return 0;
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		if (i == k) continue;
+		if (C[i] > p) return 0;
+	}
+	return 1;
+}
 bool query() {
 	std::cin >> B; Polygon H(B); for (Pos& p : H) std::cin >> p;
 	std::cin >> N; Polygon I(N); for (Pos& p : I) std::cin >> p;
