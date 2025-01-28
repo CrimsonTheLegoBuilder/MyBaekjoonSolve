@@ -224,7 +224,6 @@ void solve() {
 		int sz = P[i].size();
 		for (int j = 0; j < sz; j++) {
 			const Pos& s = P[i][j], & e = P[i][(j + 1) % sz];
-			//std::cout << "\ns:: " << s << " e:: " << e << "\n";
 			Seg l = Seg(s, e);
 			ld len = l.mag();
 			Vld X = { 0, 1 };
@@ -237,12 +236,10 @@ void solve() {
 			int szx = X.size();
 			for (int x = 0; x < szx - 1; x++) {
 				const ld& lo = X[x], & hi = X[x + 1];
-				//std::cout << "l.lo:: " << l.p(lo) << " l.hi:: " << l.p(hi) << "\n";
 				ld m = (lo + hi) * .5;
 				Pos mid = l.p(m);
 				int t = 0;
 				for (int k = i + 1; k < N; k++) if (inner_check(P[k], mid)) t++;
-				//std::cout << "t:: " << t << "\n";
 				A += len * (hi - lo) / (t + 1);
 			}
 		}
