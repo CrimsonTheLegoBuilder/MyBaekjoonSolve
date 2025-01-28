@@ -21,7 +21,7 @@ typedef std::vector<ld> Vld;
 typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
 const ld TOL = 1e-7;
-const int LEN = 50;
+const int LEN = 20;
 const ld PI = acos(-1);
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -35,11 +35,10 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 #define CIRCLE 2
 #define STRONG 0
 #define WEAK 1
-//#define LO x
-//#define HI y
+#define LO x
+#define HI y
 
-int N, M, T;
-ld RET[1000];
+int N, M;
 struct Pos {
 	ld x, y;
 	int i;
@@ -82,6 +81,7 @@ bool cmpt(const Pos& p, const Pos& q) {
 	return p / q > 0;
 }
 typedef std::vector<Pos> Polygon;
+Polygon P[LEN];
 bool cmpx(const Pos& p, const Pos& q) { return p.x == q.x ? p.y < q.y : p.x < q.x; }
 bool cmpy(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 //bool cmpi(const Pos& p, const Pos& q) { return p.i < q.i; }
@@ -93,9 +93,10 @@ ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
-inline ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) {
 	return (d2 - d1) * (d4 - d3) / (d2 - d1).mag();
 }
+bool parallel(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3, d4); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
@@ -187,16 +188,66 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (zero(det)) return -1;
 	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
 	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
-	if (f == WEAK) return fit(a1, 0, 1);
+	if (f == WEAK) return a1;
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
+}
+Vld intersections(const Seg& l, const Polygon& H) {
+	int sz = H.size();
+	Vld ret;
+	const Pos& s = l.s, & e = l.e;
+	for (int i = 0; i < sz; i++) {
+		const Pos& p0 = H[i], & p1 = H[(i + 1) % sz];
+		if (parallel(s, e, p0, p1)) continue;
+		if (ccw(s, e, p0) * ccw(s, e, p1) <= 0) {
+			ld x = intersection(Seg(s, e), Seg(p0, p1));
+			ret.push_back(x);
+		}
+	}
+	std::sort(ret.begin(), ret.end());
+	ret.erase(unique(ret.begin(), ret.end(), eq), ret.end());
+	return ret;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-
+	std::cin >> N;
+	ld A = 0;
+	for (int i = 0; i < N; i++) {
+		std::cin >> M;
+		P[i].resize(M);
+		for (Pos& p : P[i]) std::cin >> p;
+	}
+	for (int i = 0; i < N; i++) {
+		int sz = P[i].size();
+		for (int j = 0; j < sz; j++) {
+			const Pos& s = P[i][j], & e = P[i][(j + 1) % sz];
+			//std::cout << "\ns:: " << s << " e:: " << e << "\n";
+			Seg l = Seg(s, e);
+			ld len = l.mag();
+			Vld X = { 0, 1 };
+			for (int k = i + 1; k < N; k++) {
+				Vld inxs = intersections(l, P[k]);
+				for (const ld& x : inxs) X.push_back(fit(x, 0, 1));
+			}
+			std::sort(X.begin(), X.end());
+			X.erase(unique(X.begin(), X.end(), eq), X.end());
+			int szx = X.size();
+			for (int x = 0; x < szx - 1; x++) {
+				const ld& lo = X[x], & hi = X[x + 1];
+				//std::cout << "l.lo:: " << l.p(lo) << " l.hi:: " << l.p(hi) << "\n";
+				ld m = (lo + hi) * .5;
+				Pos mid = l.p(m);
+				int t = 0;
+				for (int k = i + 1; k < N; k++) if (inner_check(P[k], mid)) t++;
+				//std::cout << "t:: " << t << "\n";
+				A += len * (hi - lo) / (t + 1);
+			}
+		}
+	}
+	std::cout << A << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj22530 Intelligent Circular Perfect Cleaner
+int main() { solve(); return 0; }//boj15200 Presjek
