@@ -38,18 +38,12 @@ struct Pos {
 	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return { x * p.x + y * p.y }; }
 	ld operator / (const Pos& p) const { return { x * p.y - y * p.x }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { -x, -y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
 	Pos rot(const ld& t) { return { x * cos(t) - y * sin(t), x * sin(t) + y * cos(t) }; }
 	ld Euc() const { return x * x + y * y; }
 	ld mag() const { return sqrt(Euc()); }
-	Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
@@ -88,7 +82,6 @@ struct Circle {
 	ld r;
 	Circle(Pos c_ = Pos(), ld r_ = 0) : c(c_), r(r_) {}
 	bool operator > (const Pos& p) const { return sign(r - (c - p).mag()) > 0; }
-	bool outside(const Circle& q) const { return sign((c - q.c).Euc() - sq((ll)r + q.r)) >= 0; }
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
 	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
@@ -99,8 +92,7 @@ struct Circle {
 		ld tz = (cos(lo) - cos(hi)) * m.y * r;
 		return fan + tz - (s / e) * r * r * (ld).5;
 	}
-} C[LEN];
-typedef std::vector<Circle> Circles;
+};
 Vld intersections(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
 	Pos vec = cb - ca;
@@ -162,9 +154,8 @@ void query(const int& t) {
 			S.push_back(R[i]);
 		}
 		int sz = S.size();
-		for (int i = 0; i < sz; i++) {
+		for (int i = 0; i < sz; i++) 
 			A[j] += green(O, S[(i - 1 + sz) % sz], S[i], S[(i + 1) % sz]);
-		}
 	}
 	std::cout << "Case #" << t << ": ";
 	for (int j = 0; j < M; j++) std::cout << A[j] << " ";
