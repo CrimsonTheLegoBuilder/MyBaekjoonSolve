@@ -292,7 +292,9 @@ bool query() {
 	Polygon B = { Pos(-bnd, -bnd), Pos(bnd, -bnd), Pos(bnd, bnd), Pos(-bnd, bnd) };
 	B = convex_cut(B, p0, p1);
 	B = convex_cut(B, p2, p0);
-	std::cout << green(c, B) << "\n";
+	ld ret = green(c, B);
+	if (zero(ret)) ret = 0;
+	std::cout << ret << "\n";
 	return 1;
 }
 void solve() {
