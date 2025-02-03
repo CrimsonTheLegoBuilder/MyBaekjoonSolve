@@ -631,24 +631,18 @@ void solve() {
 		Seg a01 = Seg(a0, a1);
 		for (int j = 0; j < M; j++) {
 			const Pos& b0 = B[j], & b1 = B[(j + 1) % M];
-			//const Pos& b0 = B[(j - 1 + M) % M], & b1 = B[j], & b2 = B[(j + 1) % M];
-			//std::cout << "a0:: " << a0 << " ";
-			//std::cout << "a1:: " << a1 << " ";
-			//std::cout << "b0:: " << b0 << " ";
-			//std::cout << "b1:: " << b1 << "\n";
+
 			Seg sb = Seg(O, b1);
 			Seg b01 = Seg(b0, b1);
 			if (ccw(O, b0, b1) >= 0) {
 				x = intersection(sa, b01, WEAK);
-				//std::cout << "ax:: " << x << " ";
 				if (x > 0) {
 					R.push_back(x);
 					mxa[i] = std::max(mxa[i], x);
 				}
 			}
-			if (ccw(O, a0, a1) > 0) {
+			if (ccw(O, a0, a1) < 0) {
 				x = intersection(sb, a01, WEAK);
-				//std::cout << "bx:: " << 1 / x << "\n";
 				if (x > 0) {
 					R.push_back(1 / x);
 					mxb[j] = std::max(mxb[j], 1 / x);
@@ -656,25 +650,6 @@ void solve() {
 			}
 		}
 	}
-	ld limit = INF;
-	for (int i = 0; i < N; i++) limit = std::min(limit, mxa[i]);
-	for (int i = 0; i < M; i++) limit = std::min(limit, mxb[i]);
-	std::sort(R.begin(), R.end());
-	R.erase(unique(R.begin(), R.end(), eq), R.end());
-	ld ret = 0;
-	for (const ld& x : R) {
-		if (x > limit) break;
-		Polygon NA = A;
-		for (Pos& p : NA) p *= x;
-		//std::cout << "x:: " << x << "\nNA::\n";
-		//for (Pos& p : NA) std::cout << p << "\n";
-		//std::cout << "B::\n";
-		//for (Pos& p : B) std::cout << p << "\n";
-		bool f = inner_check(B, NA);
-		//std::cout << "f:: " << f << "\n";
-		if (f) ret = std::max(ret, x);
-	}
-	std::cout << ret << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj32567 Hedge Topiary

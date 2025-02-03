@@ -1599,6 +1599,9 @@
     <ClCompile Include="boj32567_sweep.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="boj32567_fast.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
