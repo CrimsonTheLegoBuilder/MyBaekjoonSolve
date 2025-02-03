@@ -275,8 +275,10 @@ bool intersect(const int& a, const int& b) {
 	if (A.h != 0) std::swap(A, B);
 	if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
 	assert((A.s.i + 1) % len[A.h] == A.e.i);
-	if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
-	if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
+	if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) < 0;
+	if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) < 0;
+	if (on_seg_weak(B.s, B.e, A.s)) return ccw(B.s, B.e, A.e) > 0;
+	if (on_seg_weak(B.s, B.e, A.e)) return ccw(B.s, B.e, A.s) > 0;
 	return 0;
 }
 //struct Event {
@@ -493,6 +495,43 @@ void bnd_init(const Polygon& h1, const Polygon& h2, std::vector<Bound>& V, const
 	std::sort(V.begin(), V.end());
 	return;
 }
+void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
+	//ld rmv = 0;
+	int sz = V.size();
+	for (int i = 0, j; i < sz; i = j) {
+		j = i;
+		while (j < sz && collinear(V[i], V[j])) j++;
+		for (int k = i; k < j - 1; k++) {
+			int nxt = k + 1;
+			if (V[k].e < V[nxt].s) continue;
+			else if (V[k].e == V[nxt].s) {
+				if (!merge) continue;
+				std::swap(V[k].s, V[nxt].s);
+			}
+			else if (V[nxt].e < V[k].e) {
+				//rmv += (V[nxt].e - V[nxt].s).mag();
+				int s = V[k].s.i;
+				int e = V[k].e.i;
+				std::swap(V[k].e, V[nxt].e);
+				std::swap(V[k].e, V[nxt].s);
+				V[nxt].i = V[k].i;
+				V[k].s.i = V[nxt].s.i = s;
+				V[k].e.i = V[nxt].e.i = e;
+				V[k].e.d = V[nxt].s.d = 1;
+			}
+			else if (V[k].e <= V[nxt].e) {
+				//rmv += (V[k].e - V[nxt].s).mag();
+				std::swap(V[k].e, V[nxt].s);
+				std::swap(V[k].e.i, V[nxt].s.i);
+				V[k].e.d = V[nxt].s.d = 1;
+			}
+		}
+		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
+	}
+	//std::sort(V2.begin(), V2.end());
+	//return rmv;
+	return;
+}
 bool bnd_check(const Polygon& A, const Polygon& B) {
 	std::vector<Bound> V;
 	int sza = A.size(), szb = B.size();
@@ -510,42 +549,6 @@ bool bnd_check(const Polygon& A, const Polygon& B) {
 		}
 	}
 	return 1;
-}
-ld bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
-	ld rmv = 0;
-	int sz = V.size();
-	for (int i = 0, j; i < sz; i = j) {
-		j = i;
-		while (j < sz && collinear(V[i], V[j])) j++;
-		for (int k = i; k < j - 1; k++) {
-			int nxt = k + 1;
-			if (V[k].e < V[nxt].s) continue;
-			else if (V[k].e == V[nxt].s) {
-				if (!merge) continue;
-				std::swap(V[k].s, V[nxt].s);
-			}
-			else if (V[nxt].e < V[k].e) {
-				rmv += (V[nxt].e - V[nxt].s).mag();
-				int s = V[k].s.i;
-				int e = V[k].e.i;
-				std::swap(V[k].e, V[nxt].e);
-				std::swap(V[k].e, V[nxt].s);
-				V[nxt].i = V[k].i;
-				V[k].s.i = V[nxt].s.i = s;
-				V[k].e.i = V[nxt].e.i = e;
-				V[k].e.d = V[nxt].s.d = 1;
-			}
-			else if (V[k].e <= V[nxt].e) {
-				rmv += (V[k].e - V[nxt].s).mag();
-				std::swap(V[k].e, V[nxt].s);
-				std::swap(V[k].e.i, V[nxt].s.i);
-				V[k].e.d = V[nxt].s.d = 1;
-			}
-		}
-		for (int k = i; k < j; k++) if (V[k].s != V[k].e) V2.push_back(V[k]);
-	}
-	//std::sort(V2.begin(), V2.end());
-	return rmv;
 }
 bool inner_check(const Polygon& B, const Polygon& A) {
 	if (!bnd_check(A, B)) return 0;
