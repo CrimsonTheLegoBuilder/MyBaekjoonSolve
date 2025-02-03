@@ -45,8 +45,6 @@ inline ld norm(ld th) {
 //#define DEBUG
 //#define EVENT_COUNT
 
-#define STRONG 1
-#define WEAK 0
 #define NO_MERGE 0
 #define EDGE 1
 #define EDGE_IGNORE 0
@@ -167,23 +165,20 @@ bool inner_check(const Polygon& B, const int& b, const Polygon& A, const int& a)
 		&& !inside(a0, a1, a2, b0)
 		&& !inside(a0, a1, a2, b2);
 }
-bool inner_check(const Pos& a0, const Pos& a1, const Pos& a2, const Pos& b0, const Pos& b1, const Pos& b2) {
-	int CCW;
-
-	CCW = ccw(a0, a1, a2);
-	if (CCW > 0 && ccw(a1, a0, b0) < 0 && ccw(a1, a2, b0) > 0) return 1;
-	if (CCW < 0 && !(ccw(a1, a0, b0) >= 0 && ccw(a1, a2, b0) <= 0)) return 1;
-	if (CCW > 0 && ccw(a1, a0, b2) < 0 && ccw(a1, a2, b2) > 0) return 1;
-	if (CCW < 0 && !(ccw(a1, a0, b2) >= 0 && ccw(a1, a2, b2) <= 0)) return 1;
-
-	CCW = ccw(b0, b1, b2);
-	if (CCW > 0 && ccw(b1, b0, a0) < 0 && ccw(b1, b2, a0) > 0) return 1;
-	if (CCW < 0 && !(ccw(b1, b0, a0) >= 0 && ccw(b1, b2, a0) <= 0)) return 1;
-	if (CCW > 0 && ccw(b1, b0, a2) < 0 && ccw(b1, b2, a2) > 0) return 1;
-	if (CCW < 0 && !(ccw(b1, b0, a2) >= 0 && ccw(b1, b2, a2) <= 0)) return 1;
-
-	return 0;
-}
+//bool inner_check(const Pos& a0, const Pos& a1, const Pos& a2, const Pos& b0, const Pos& b1, const Pos& b2) {
+//	int CCW;
+//	CCW = ccw(a0, a1, a2);
+//	if (CCW > 0 && ccw(a1, a0, b0) < 0 && ccw(a1, a2, b0) > 0) return 1;
+//	if (CCW < 0 && !(ccw(a1, a0, b0) >= 0 && ccw(a1, a2, b0) <= 0)) return 1;
+//	if (CCW > 0 && ccw(a1, a0, b2) < 0 && ccw(a1, a2, b2) > 0) return 1;
+//	if (CCW < 0 && !(ccw(a1, a0, b2) >= 0 && ccw(a1, a2, b2) <= 0)) return 1;
+//	CCW = ccw(b0, b1, b2);
+//	if (CCW > 0 && ccw(b1, b0, a0) < 0 && ccw(b1, b2, a0) > 0) return 1;
+//	if (CCW < 0 && !(ccw(b1, b0, a0) >= 0 && ccw(b1, b2, a0) <= 0)) return 1;
+//	if (CCW > 0 && ccw(b1, b0, a2) < 0 && ccw(b1, b2, a2) > 0) return 1;
+//	if (CCW < 0 && !(ccw(b1, b0, a2) >= 0 && ccw(b1, b2, a2) <= 0)) return 1;
+//	return 0;
+//}
 //Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t, Pos& v) {
 //	int sz = B.size();
 //	for (int j = 0; j < sz; j++) B[j] = B[j].rot(t);
@@ -275,31 +270,31 @@ bool collinear(const Bound& a, const Bound& b) { return collinear(a.s, a.e, b.s,
 bool intersect(const int& a, const int& b) {
 	Seg A = seg[a], B = seg[b];
 	if (A.h == B.h) return 0;
-	if (intersect(A.s, A.e, B.s, B.e, WEAK, EDGE_IGNORE)) return 1;
 	if (!intersect(A.s, A.e, B.s, B.e, STRONG)) return 0;
-	if (A.h != ai) std::swap(A, B);
+	if (intersect(A.s, A.e, B.s, B.e, WEAK, EDGE_IGNORE)) return 1;
+	if (A.h != 0) std::swap(A, B);
 	if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
 	assert((A.s.i + 1) % len[A.h] == A.e.i);
 	if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
 	if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
 	return 0;
 }
-struct Event {
-	ld t;
-	Pos v;
-	Event(ld t_ = 0, Pos v_ = Pos()) : t(t_), v(v_) {}
-	bool operator < (const Event& e) const { return zero(t - e.t) ? v < e.v : t < e.t; }
-	bool operator == (const Event& e) const { return zero(t - e.t) && v == e.v; }
-};
-std::vector<Event> events;
-inline void conv(const Polygon& B, const Event& E, Polygon& B2) {
-	for (const Pos& p : B) B2.push_back(p.rot(E.t) + E.v);
-	T = 0; for (Pos& p : B2) p.i = T, T++, p.d = 0;
-	return;
-}
-#define __WHAT_THE__ !
-#define __FUCK_YOU__ 1
-bool ST_DEBUG = __WHAT_THE__ __FUCK_YOU__;
+//struct Event {
+//	ld t;
+//	Pos v;
+//	Event(ld t_ = 0, Pos v_ = Pos()) : t(t_), v(v_) {}
+//	bool operator < (const Event& e) const { return zero(t - e.t) ? v < e.v : t < e.t; }
+//	bool operator == (const Event& e) const { return zero(t - e.t) && v == e.v; }
+//};
+//std::vector<Event> events;
+//inline void conv(const Polygon& B, const Event& E, Polygon& B2) {
+//	for (const Pos& p : B) B2.push_back(p.rot(E.t) + E.v);
+//	T = 0; for (Pos& p : B2) p.i = T, T++, p.d = 0;
+//	return;
+//}
+//#define __WHAT_THE__ !
+//#define __FUCK_YOU__ 1
+//bool ST_DEBUG = __WHAT_THE__ __FUCK_YOU__;
 class SplayTree {
 	struct Node {
 		int i;
@@ -498,6 +493,24 @@ void bnd_init(const Polygon& h1, const Polygon& h2, std::vector<Bound>& V, const
 	std::sort(V.begin(), V.end());
 	return;
 }
+bool bnd_check(const Polygon& A, const Polygon& B) {
+	std::vector<Bound> V;
+	int sza = A.size(), szb = B.size();
+	for (int i = 0; i < sza; i++) V.push_back(Bound(A[i], A[(i + 1) % sza], 0));
+	for (int i = 0; i < szb; i++) V.push_back(Bound(B[(i + 1) % szb], B[i], 1));
+	int sz = V.size();
+	for (int i = 0, j; i < sz; i = j) {
+		j = i;
+		while (j < sz && collinear(V[i], V[j])) j++;
+		for (int k = i; k < j - 1; k++) {
+			int nxt = k + 1;
+			if (V[k].e <= V[nxt].s) continue;
+			if (on_seg_weak(V[k].s, V[k].e, V[nxt].s)) return 0;
+			if (on_seg_weak(V[nxt].s, V[nxt].e, V[k].s)) return 0;
+		}
+	}
+	return 1;
+}
 ld bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 	ld rmv = 0;
 	int sz = V.size();
@@ -535,6 +548,7 @@ ld bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 	return rmv;
 }
 bool inner_check(const Polygon& B, const Polygon& A) {
+	if (!bnd_check(A, B)) return 0;
 	Polygon tmp;
 	for (Pos p : A) p.d = 1, tmp.push_back(p);
 	for (Pos p : B) p.d = 0, tmp.push_back(p);
