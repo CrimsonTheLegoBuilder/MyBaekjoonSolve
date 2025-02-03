@@ -90,6 +90,7 @@ struct Pos {
 	Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+	
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
@@ -111,6 +112,11 @@ bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, 
 bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
 bool parallel(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3, d4); }
+bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int& f = STRONG) {
+	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
+	return ccw(p0, p1, q) >= f && ccw(p1, p2, q) >= f;
+}
+ld rad(const Pos& p1, const Pos& p2, const Pos& p3) { return rad(p2 - p1, p3 - p2); }
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool weak = WEAK, bool edge = EDGE) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
@@ -151,27 +157,15 @@ int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
 	}
 	return (cnt & 1) * 2;
 }
-bool inner_check(const Polygon& A, const int& a, const Polygon& B, const int& b) {
+bool inner_check(const Polygon& B, const int& b, const Polygon& A, const int& a) {
 	int sza = A.size();
 	int szb = B.size();
-	int CCW;
-
 	const Pos& a0 = A[(a - 1 + sza) % sza], & a1 = A[a], & a2 = A[(a + 1) % sza];
 	const Pos& b0 = B[(b - 1 + szb) % szb], & b1 = B[b], & b2 = B[(b + 1) % szb];
-
-	CCW = ccw(a0, a1, a2);
-	if (CCW > 0 && ccw(a1, a0, b0) < 0 && ccw(a1, a2, b0) > 0) return 1;
-	if (CCW < 0 && !(ccw(a1, a0, b0) >= 0 && ccw(a1, a2, b0) <= 0)) return 1;
-	if (CCW > 0 && ccw(a1, a0, b2) < 0 && ccw(a1, a2, b2) > 0) return 1;
-	if (CCW < 0 && !(ccw(a1, a0, b2) >= 0 && ccw(a1, a2, b2) <= 0)) return 1;
-
-	CCW = ccw(b0, b1, b2);
-	if (CCW > 0 && ccw(b1, b0, a0) < 0 && ccw(b1, b2, a0) > 0) return 1;
-	if (CCW < 0 && !(ccw(b1, b0, a0) >= 0 && ccw(b1, b2, a0) <= 0)) return 1;
-	if (CCW > 0 && ccw(b1, b0, a2) < 0 && ccw(b1, b2, a2) > 0) return 1;
-	if (CCW < 0 && !(ccw(b1, b0, a2) >= 0 && ccw(b1, b2, a2) <= 0)) return 1;
-
-	return 0;
+	return inside(b0, b1, b2, a0, WEAK)
+		&& inside(b0, b1, b2, a2, WEAK)
+		&& !inside(a0, a1, a2, b0)
+		&& !inside(a0, a1, a2, b2);
 }
 bool inner_check(const Pos& a0, const Pos& a1, const Pos& a2, const Pos& b0, const Pos& b1, const Pos& b2) {
 	int CCW;
@@ -190,13 +184,13 @@ bool inner_check(const Pos& a0, const Pos& a1, const Pos& a2, const Pos& b0, con
 
 	return 0;
 }
-Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t, Pos& v) {
-	int sz = B.size();
-	for (int j = 0; j < sz; j++) B[j] = B[j].rot(t);
-	v = A[i0] - B[j0];
-	for (int j = 0; j < sz; j++) B[j] += v;
-	return B;
-}
+//Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i0, const ld& t, Pos& v) {
+//	int sz = B.size();
+//	for (int j = 0; j < sz; j++) B[j] = B[j].rot(t);
+//	v = A[i0] - B[j0];
+//	for (int j = 0; j < sz; j++) B[j] += v;
+//	return B;
+//}
 struct Seg {
 	Pos s, e;
 	int h, i;
@@ -239,22 +233,22 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
-Vld intersections(const Seg& l, const Polygon& H) {
-	int sz = H.size();
-	Vld ret;
-	const Pos& s = l.s, & e = l.e;
-	for (int i = 0; i < sz; i++) {
-		const Pos& p0 = H[i], & p1 = H[(i + 1) % sz];
-		if (parallel(s, e, p0, p1)) continue;
-		if (ccw(s, e, p0) * ccw(s, e, p1) <= 0) {
-			ld x = intersection(Seg(s, e), Seg(p0, p1));
-			ret.push_back(x);
-		}
-	}
-	std::sort(ret.begin(), ret.end());
-	ret.erase(unique(ret.begin(), ret.end(), eq), ret.end());
-	return ret;
-}
+//Vld intersections(const Seg& l, const Polygon& H) {
+//	int sz = H.size();
+//	Vld ret;
+//	const Pos& s = l.s, & e = l.e;
+//	for (int i = 0; i < sz; i++) {
+//		const Pos& p0 = H[i], & p1 = H[(i + 1) % sz];
+//		if (parallel(s, e, p0, p1)) continue;
+//		if (ccw(s, e, p0) * ccw(s, e, p1) <= 0) {
+//			ld x = intersection(Seg(s, e), Seg(p0, p1));
+//			ret.push_back(x);
+//		}
+//	}
+//	std::sort(ret.begin(), ret.end());
+//	ret.erase(unique(ret.begin(), ret.end(), eq), ret.end());
+//	return ret;
+//}
 struct Bound {
 	Pos s, e;
 	int i;
@@ -540,59 +534,27 @@ ld bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 	//std::sort(V2.begin(), V2.end());
 	return rmv;
 }
-ld polygon_cross_check(const Polygon& A, const Polygon& B) {
-	ld ret = -1.;
-	ai = bi = -1;
-
-	std::vector<Bound> VS, V, VA, VB;
-	std::vector<Bound>().swap(VS);
-	std::vector<Bound>().swap(V);
-	bnd_init(A, B, VS, 0, 1);
-	ret = bnd_remove(VS, V, NO_MERGE);
-	//std::cout << ret << "\n";
-	if (ret <= RET) return -1.;
-
+bool inner_check(const Polygon& B, const Polygon& A) {
 	Polygon tmp;
-	for (Pos p : A) p.d = 0, tmp.push_back(p);
-	for (Pos p : B) p.d = 1, tmp.push_back(p);
+	for (Pos p : A) p.d = 1, tmp.push_back(p);
+	for (Pos p : B) p.d = 0, tmp.push_back(p);
 	std::sort(tmp.begin(), tmp.end());
 	int sz = tmp.size();
 	for (int i = 0; i < sz - 1; i++) {
 		if (tmp[i] == tmp[i + 1]) {
-			if (inner_check(A, tmp[i].i, B, tmp[i + 1].i)) return -1;
+			if (!inner_check(B, tmp[i].i, A, tmp[i + 1].i)) return 0;
 		}
 	}
-
+	std::vector<Bound> VS, V, VA, VB;
+	bnd_init(A, B, VS, 0, 1);
+	bnd_remove(VS, V, NO_MERGE);
 	sz = V.size();
 	for (int i = 0; i < sz; i++) {
 		if (V[i].i == 0) VA.push_back(V[i]);
 		if (V[i].i == 1) VB.push_back(V[i]);
 	}
-	if (two_polygon_cross_check(A, VB, 0, 1) || two_polygon_cross_check(B, VA, 1, 0)) {
-#ifdef DEBUG
-		std::cout << "FUCK:: SUCK:: SEX::\n";
-#endif
-		return -1.;
-	}
-
-	//if (inner_check(A, B[0]) == 2 || inner_check(B, A[0]) == 2) return -1.;
-
-#ifdef DEBUG
-	std::cout << "WHAT THE FUCK::\n";
-#endif
-	return ret;
-}
-bool inner_check(const Polygon& A, const Polygon& B) {
-	Polygon tmp;
-	for (Pos p : A) p.d = 0, tmp.push_back(p);
-	for (Pos p : B) p.d = 1, tmp.push_back(p);
-	std::sort(tmp.begin(), tmp.end());
-	int sz = tmp.size();
-	for (int i = 0; i < sz - 1; i++) {
-		if (tmp[i] == tmp[i + 1]) {
-			if (inner_check(A, tmp[i].i, B, tmp[i + 1].i)) return -1;
-		}
-	}
+	if (two_polygon_cross_check(A, VB, 0, 1) ||
+		two_polygon_cross_check(B, VA, 1, 0)) { return 0; }
 	return 1;
 }
 void solve() {
@@ -628,7 +590,7 @@ void solve() {
 	for (const ld& x : R) {
 		Polygon NA = A;
 		for (Pos& p : NA) p *= x;
-		if (inner_check(NA, B)) ret = std::max(ret, x);
+		if (inner_check(B, NA)) ret = std::max(ret, x);
 	}
 	std::cout << ret << "\n";
 	return;
