@@ -583,7 +583,16 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 	return ret;
 }
 bool inner_check(const Polygon& A, const Polygon& B) {
-
+	Polygon tmp;
+	for (Pos p : A) p.d = 0, tmp.push_back(p);
+	for (Pos p : B) p.d = 1, tmp.push_back(p);
+	std::sort(tmp.begin(), tmp.end());
+	int sz = tmp.size();
+	for (int i = 0; i < sz - 1; i++) {
+		if (tmp[i] == tmp[i + 1]) {
+			if (inner_check(A, tmp[i].i, B, tmp[i + 1].i)) return -1;
+		}
+	}
 	return 1;
 }
 void solve() {
@@ -617,9 +626,9 @@ void solve() {
 	R.erase(unique(R.begin(), R.end(), eq), R.end());
 	ld ret = 0;
 	for (const ld& x : R) {
-		Polygon C = A;
-		for (Pos& p : C) p *= x;
-		if (inner_check(C, B)) ret = std::max(ret, x);
+		Polygon NA = A;
+		for (Pos& p : NA) p *= x;
+		if (inner_check(NA, B)) ret = std::max(ret, x);
 	}
 	std::cout << ret << "\n";
 	return;
