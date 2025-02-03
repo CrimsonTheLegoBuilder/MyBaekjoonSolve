@@ -9,15 +9,15 @@
 #include <set>
 #include <map>
 typedef long long ll;
-typedef double ld;
-//typedef long double ld;
+//typedef double ld;
+typedef long double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
 const ll INF = 1e17;
 const int LEN = 505;
-const ld TOL = 1e-6;
+const ld TOL = 1e-9;
 const ld PI = acos(-1);
 //const ll MOD = 1'000'000'007;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
@@ -152,10 +152,10 @@ bool inner_check(const Polygon& B, const int& b, const Polygon& A, const int& a)
 	int szb = B.size();
 	const Pos& a0 = A[(a - 1 + sza) % sza], & a1 = A[a], & a2 = A[(a + 1) % sza];
 	const Pos& b0 = B[(b - 1 + szb) % szb], & b1 = B[b], & b2 = B[(b + 1) % szb];
-	return inside(b0, b1, b2, a0, WEAK)
-		&& inside(b0, b1, b2, a2, WEAK)
-		&& !inside(a0, a1, a2, b0)
-		&& !inside(a0, a1, a2, b2);
+	return inside(b0, b1, b2, a0)
+		&& inside(b0, b1, b2, a2)
+		&& !inside(a0, a1, a2, b0, WEAK)
+		&& !inside(a0, a1, a2, b2, WEAK);
 }
 //bool inner_check(const Pos& a0, const Pos& a1, const Pos& a2, const Pos& b0, const Pos& b1, const Pos& b2) {
 //	int CCW;
@@ -532,10 +532,17 @@ void bnd_remove(std::vector<Bound>& V, std::vector<Bound>& V2, bool merge = 1) {
 	return;
 }
 bool bnd_check(const Polygon& A, const Polygon& B) {
-	std::vector<Bound> V;
+	std::vector<Bound> V, R;
 	int sza = A.size(), szb = B.size();
-	for (int i = 0; i < sza; i++) V.push_back(Bound(A[i], A[(i + 1) % sza], 0));
-	for (int i = 0; i < szb; i++) V.push_back(Bound(B[(i + 1) % szb], B[i], 1));
+	for (int i = 0; i < sza; i++) {
+		if (A[i] < A[(i + 1) % sza]) V.push_back(Bound(A[i], A[(i + 1) % sza], 0));
+		else R.push_back(Bound(A[(i + 1) % sza], A[i], 0));
+	}
+	for (int i = 0; i < szb; i++) {
+		if (B[i] < B[(i + 1) % szb]) R.push_back(Bound(B[i], B[(i + 1) % szb], 1));
+		else V.push_back(Bound(B[(i + 1) % szb], B[i], 1));
+	}
+	std::sort(V.begin(), V.end());
 	int sz = V.size();
 	for (int i = 0, j; i < sz; i = j) {
 		j = i;
@@ -544,7 +551,23 @@ bool bnd_check(const Polygon& A, const Polygon& B) {
 			int nxt = k + 1;
 			if (V[k].e <= V[nxt].s) continue;
 			if (on_seg_weak(V[k].s, V[k].e, V[nxt].s)) return 0;
+			if (on_seg_weak(V[k].s, V[k].e, V[nxt].e)) return 0;
 			if (on_seg_weak(V[nxt].s, V[nxt].e, V[k].s)) return 0;
+			if (on_seg_weak(V[nxt].s, V[nxt].e, V[k].e)) return 0;
+		}
+	}
+	std::sort(R.begin(), R.end());
+	sz = R.size();
+	for (int i = 0, j; i < sz; i = j) {
+		j = i;
+		while (j < sz && collinear(R[i], R[j])) j++;
+		for (int k = i; k < j - 1; k++) {
+			int nxt = k + 1;
+			if (R[k].e <= R[nxt].s) continue;
+			if (on_seg_weak(R[k].s, R[k].e, R[nxt].s)) return 0;
+			if (on_seg_weak(R[k].s, R[k].e, R[nxt].e)) return 0;
+			if (on_seg_weak(R[nxt].s, R[nxt].e, R[k].s)) return 0;
+			if (on_seg_weak(R[nxt].s, R[nxt].e, R[k].e)) return 0;
 		}
 	}
 	return 1;
@@ -558,7 +581,10 @@ bool inner_check(const Polygon& B, const Polygon& A) {
 	int sz = tmp.size();
 	for (int i = 0; i < sz - 1; i++) {
 		if (tmp[i] == tmp[i + 1]) {
-			if (!inner_check(B, tmp[i].i, A, tmp[i + 1].i)) return 0;
+			if (!inner_check(B, tmp[i].i, A, tmp[i + 1].i)) {
+				//std::cout << "SEX::\n";
+				return 0;
+			}
 		}
 	}
 	std::vector<Bound> VS, V, VA, VB;
@@ -617,7 +643,9 @@ void solve() {
 		for (Pos& p : NA) p *= x;
 		//std::cout << "x:: " << x << "\np::\n";
 		//for (Pos& p : NA) std::cout << p << "\n";
-		if (inner_check(B, NA)) ret = std::max(ret, x);
+		bool f = inner_check(B, NA);
+		//std::cout << "f:: " << f << "\n";
+		if (f) ret = std::max(ret, x);
 	}
 	std::cout << ret << "\n";
 	return;
