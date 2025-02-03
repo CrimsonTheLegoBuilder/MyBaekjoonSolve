@@ -690,6 +690,14 @@ void solve() {
 	norm(B);
 	T = 0; for (Pos& p : B) p.i = T, T++, p.d = 0;
 
+	for (int i = 0; i < N; i++) {
+		const Pos& a0 = A[i], & a1 = A[(i + 1) % M];
+		Seg sa = Seg(O, a0);
+		Seg a01 = Seg(a0, a1);
+		for (int j = 0; j < M; j++) {
+			const Pos& b0 = B[j], & b1 = B[(j + 1) % M];
+		}
+	}
 	
 	return;
 }
