@@ -579,12 +579,12 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	std::cin >> N;
+	std::cin >> N; len[0] = N;
 	Polygon A(N); for (Pos& p : A) std::cin >> p; norm(A);
 	T = 0; for (Pos& p : A) p.i = T, T++, p.d = 0;
-	std::cin >> M;
+	std::cin >> M; len[1] = M;
 	Polygon B(M); for (Pos& p : B) std::cin >> p; norm(B);
-	T = 0; for (Pos& p : B) p.i = T, T++, p.d = 0;
+	T = 0; for (Pos& p : B) p.i = T, T++, p.d = 1;
 	Vld R;
 	for (int i = 0; i < N; i++) {
 		ld x;
