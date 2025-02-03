@@ -16,7 +16,7 @@ typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
 const ll INF = 1e17;
-const int LEN = 105;
+const int LEN = 505;
 const ld TOL = 1e-6;
 const ld PI = acos(-1);
 //const ll MOD = 1'000'000'007;
@@ -28,26 +28,19 @@ inline ld sq(const ld& x) { return x * x; }
 inline ll sq(const ll& x) { return x * x; }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
 inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
+int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 #define LINE 1
 #define CIRCLE 2
 #define STRONG 0
 #define WEAK 1
 #define LO x
 #define HI y
-int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
-inline ld norm(ld th) {
-	while (th < 0) th += 2 * PI;
-	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
-	return th;
-}
-
-//#define AUTO_CHECK
-//#define DEBUG
-//#define EVENT_COUNT
-
 #define NO_MERGE 0
 #define EDGE 1
 #define EDGE_IGNORE 0
+//#define AUTO_CHECK
+//#define DEBUG
+//#define EVENT_COUNT
 
 #ifdef AUTO_CHECK
 #include <fstream>
@@ -69,15 +62,15 @@ struct Pos {
 	bool operator <= (const Pos& p) const { return *this < p || *this == p; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
-	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	Pos operator * (const ld& n) const { return { x * n, y * n }; }
+	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const ld& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const ld& scale) { x /= scale; y /= scale; return *this; }
+	Pos& operator *= (const ld& n) { x *= n; y *= n; return *this; }
+	Pos& operator /= (const ld& n) { x /= n; y /= n; return *this; }
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
@@ -88,7 +81,6 @@ struct Pos {
 	Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-	
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
@@ -275,13 +267,17 @@ bool intersect(const int& a, const int& b) {
 	if (A.h == B.h) return 0;
 	if (!intersect(A.s, A.e, B.s, B.e, STRONG)) return 0;
 	if (intersect(A.s, A.e, B.s, B.e, WEAK, EDGE_IGNORE)) return 1;
-	if (A.h != 0) std::swap(A, B);
+	if (A.h != ai) std::swap(A, B);
 	if (A.e.i != (A.s.i + 1) % len[A.h]) std::swap(A.s, A.e);
 	assert((A.s.i + 1) % len[A.h] == A.e.i);
-	if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) < 0;
-	if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) < 0;
-	if (on_seg_weak(B.s, B.e, A.s)) return ccw(B.s, B.e, A.e) > 0;
-	if (on_seg_weak(B.s, B.e, A.e)) return ccw(B.s, B.e, A.s) > 0;
+	if (ai == 0) {
+		if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) > 0;
+		if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) > 0;
+	}
+	else {
+		if (on_seg_weak(A.s, A.e, B.s)) return ccw(A.s, A.e, B.e) < 0;
+		if (on_seg_weak(A.s, A.e, B.e)) return ccw(A.s, A.e, B.s) < 0;
+	}
 	return 0;
 }
 //struct Event {
@@ -574,7 +570,10 @@ bool inner_check(const Polygon& B, const Polygon& A) {
 		if (V[i].i == 1) VB.push_back(V[i]);
 	}
 	if (two_polygon_cross_check(A, VB, 0, 1) ||
-		two_polygon_cross_check(B, VA, 1, 0)) { return 0; }
+		two_polygon_cross_check(B, VA, 1, 0)) {
+		//std::cout << "FUCK::\n";
+		return 0;
+	}
 	return 1;
 }
 void solve() {
@@ -596,12 +595,18 @@ void solve() {
 		Seg a01 = Seg(a0, a1);
 		for (int j = 0; j < M; j++) {
 			const Pos& b0 = B[j], & b1 = B[(j + 1) % M];
+			//std::cout << "a0:: " << a0 << " ";
+			//std::cout << "a1:: " << a1 << " ";
+			//std::cout << "b0:: " << b0 << " ";
+			//std::cout << "b1:: " << b1 << "\n";
 			Seg sb = Seg(O, b0);
 			Seg b01 = Seg(b0, b1);
 			x = intersection(sa, b01, WEAK);
+			//std::cout << "ax:: " << x << " ";
 			if (x > 0) R.push_back(x);
 			x = intersection(sb, a01, WEAK);
-			if (x > 0) R.push_back(x);
+			//std::cout << "bx:: " << 1 / x << "\n";
+			if (x > 0) R.push_back(1 / x);
 		}
 	}
 	std::sort(R.begin(), R.end());
@@ -610,6 +615,8 @@ void solve() {
 	for (const ld& x : R) {
 		Polygon NA = A;
 		for (Pos& p : NA) p *= x;
+		//std::cout << "x:: " << x << "\np::\n";
+		//for (Pos& p : NA) std::cout << p << "\n";
 		if (inner_check(B, NA)) ret = std::max(ret, x);
 	}
 	std::cout << ret << "\n";
