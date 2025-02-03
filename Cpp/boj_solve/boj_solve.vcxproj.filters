@@ -1590,7 +1590,7 @@
     <ClCompile Include="boj13669_circle_cut.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj15200_green.cpp">
+    <ClCompile Include="boj15200_seg.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj30820_sweep.cpp">

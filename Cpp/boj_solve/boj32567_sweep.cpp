@@ -20,8 +20,20 @@ const int LEN = 105;
 const ld TOL = 1e-6;
 const ld PI = acos(-1);
 //const ll MOD = 1'000'000'007;
+inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
+inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
+inline ld sq(const ld& x) { return x * x; }
+inline ll sq(const ll& x) { return x * x; }
+inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
+inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
+#define LINE 1
+#define CIRCLE 2
+#define STRONG 0
+#define WEAK 1
+#define LO x
+#define HI y
 int gcd(int a, int b) { return !b ? a : gcd(b, a % b); }
 inline ld norm(ld th) {
 	while (th < 0) th += 2 * PI;
@@ -98,6 +110,7 @@ bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
 bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
+bool parallel(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3, d4); }
 bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool weak = WEAK, bool edge = EDGE) {
 	bool f1 = ccw(s1, s2, d1) * ccw(s2, s1, d2) > 0;
 	bool f2 = ccw(d1, d2, s1) * ccw(d2, d1, s2) > 0;
@@ -187,7 +200,7 @@ Polygon rotate_and_norm(Polygon B, const int& j0, const Polygon& A, const int& i
 struct Seg {
 	Pos s, e;
 	int h, i;
-	Seg(Pos S = Pos(0, 0), Pos E = Pos(0, 0)) : s(S), e(E) { h = 0; i = 0; }
+	Seg(Pos s_ = Pos(0, 0), Pos e_ = Pos(0, 0)) : s(s_), e(e_) { h = 0; i = 0; }
 	bool operator == (const Seg& S) const { return s == S.s && e == S.e; }
 	bool operator != (const Seg& S) const { return !(*this == S); }
 	//bool operator < (const Seg& S) const { return (s == S.s) ? e < S.e : s < S.s; }
@@ -196,8 +209,52 @@ struct Seg {
 		if (rhs.s < s) return ccw(rhs.s, rhs.e, s) < 0;
 		return ccw(rhs.s, rhs.e, e) < 0;
 	}
+	Pos p(const ld& rt) const { return s + (e - s) * rt; }
+	ld green(const ld& lo = 0, const ld& hi = 1) const {
+		ld d = hi - lo;
+		ld ratio = (lo + hi) * .5;
+		Pos m = p(ratio);
+		return m.y * d * (s.x - e.x);
+	}
+	Seg operator - (const ld& n) const {
+		Pos v = ~(e - s).unit();
+		return { s + v * n, e + v * n };
+	}
+	Seg& operator -= (const ld& n) {
+		Pos v = ~(e - s).unit();
+		s += v * n; e += v * n;
+		return *this;
+	}
+	ld mag() const { return (e - s).mag(); }
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) { os << "DEBUG::Seg s: " << S.s << " | e: " << S.e << " DEBUG::Seg\n"; return os; }
 } seg[LEN << 3];
+bool intersect(const Seg& u, const Seg& v) { return intersect(u.s, u.e, v.s, v.e); }
+ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
+	const Pos& p1 = s1.s, p2 = s1.e, q1 = s2.s, q2 = s2.e;
+	ld det = (q2 - q1) / (p2 - p1);
+	if (zero(det)) return -1;
+	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
+	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
+	if (f == WEAK) return a1;
+	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
+	return -1;
+}
+Vld intersections(const Seg& l, const Polygon& H) {
+	int sz = H.size();
+	Vld ret;
+	const Pos& s = l.s, & e = l.e;
+	for (int i = 0; i < sz; i++) {
+		const Pos& p0 = H[i], & p1 = H[(i + 1) % sz];
+		if (parallel(s, e, p0, p1)) continue;
+		if (ccw(s, e, p0) * ccw(s, e, p1) <= 0) {
+			ld x = intersection(Seg(s, e), Seg(p0, p1));
+			ret.push_back(x);
+		}
+	}
+	std::sort(ret.begin(), ret.end());
+	ret.erase(unique(ret.begin(), ret.end(), eq), ret.end());
+	return ret;
+}
 struct Bound {
 	Pos s, e;
 	int i;
