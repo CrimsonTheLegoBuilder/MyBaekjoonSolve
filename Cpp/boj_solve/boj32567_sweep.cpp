@@ -224,7 +224,10 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (zero(det)) return -1;
 	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
 	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
-	if (f == WEAK) return a1;
+	if (f == WEAK) {
+		if (ccw(s1.s, s1.e, s2.s) * ccw(s1.s, s1.e, s2.e) > 0) return -1;
+		return a1;
+	}
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
