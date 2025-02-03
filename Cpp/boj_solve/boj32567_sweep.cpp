@@ -582,123 +582,46 @@ ld polygon_cross_check(const Polygon& A, const Polygon& B) {
 #endif
 	return ret;
 }
-void sweep(const Polygon& A, const Polygon& B, const ld& t, const Pos& v, const Pos& q) {
-	bool prl = 0;
-	ld ret = 0;
-	Pos vec = q.unit();
-	Vld V;
-	Polygon inx;
-	for (int j = 0; j < M; j++) {
-		prl = 0;
-		Pos J0 = B[j], J1 = B[(j + 1) % M];
-		ld tq = q / (J0 - J1);
-		if (zero(tq)) prl = 1;
-		ld h = std::abs(tq / q.mag());
-		for (int i = 0; i < N; i++) {
-			inx.clear();
-			Pos I0 = A[i], I1 = A[(i + 1) % N];
-			if (prl && collinear(I0, I1, J0, J1)) {
-				if (sign(dot(I0, I1, J0, J1)) > 0) continue;
-				Pos J0_ = J0, J1_ = J1;
-				if (q * (J0_ - J1_) < 0) std::swap(J0_, J1_);
-				if (q * (I0 - I1) > 0) std::swap(I0, I1);
-				Pos J2 = J1_ + q;
-				Pos v_ = J0_ - J1_;
-				if (on_seg_strong(J1_, J2, I0)) inx.push_back(I0);
-				if (on_seg_strong(J1_, J2, I1 - vec)) inx.push_back(I1 - v_);
-				for (const Pos& p : inx) V.push_back(std::abs((p - J1_).mag()));
-			}
-			else if (!prl) {
-				Pos J2 = J0 + q;
-				Pos J3 = J1 + q;
-				Pos Jpre = B[(j - 1 + M) % M], Jnxt = B[(j + 2) % M];
-				Pos Ipre = A[(i - 1 + N) % N], Inxt = A[(i + 2) % N];
-				auto inner = [&](const Pos& p) -> bool {
-					bool f1 = ccw(J0, J1, p) * ccw(J2, J3, p) <= 0;
-					bool f2 = ccw(J0, J2, p) * ccw(J1, J3, p) <= 0;
-					return f1 && f2;
-					};
-				auto D = [&](const Pos& p) -> ld {
-					return std::abs(cross(J0, J1, p) / h);
-					};
-				if (inner(I0)) {
-					ld d = D(I0);
-					Pos J0_ = J0 + vec * d, J1_ = J1 + vec * d;
-					if (on_seg_strong(J0, J2, I0)) {
-						Pos Jpre_ = Jpre + vec * d;
-						if (!inner_check(Jpre_, J0_, J1_, Ipre, I0, I1)) V.push_back(d);
-					}
-					else if (on_seg_strong(J1, J3, I0)) {
-						Pos Jnxt_ = Jnxt + vec * d;
-						if (!inner_check(J0_, J1_, Jnxt_, Ipre, I0, I1)) V.push_back(d);
-					}
-					else if (ccw(J0_, J1_, I1) <= 0 && ccw(J0_, J1_, Ipre) <= 0) V.push_back(d);
-				}
-				if (inner(I1)) {
-					ld d = D(I1);
-					Pos J0_ = J0 + vec * d, J1_ = J1 + vec * d;
-					if (on_seg_strong(J0, J2, I1)) {
-						Pos Jpre_ = Jpre + vec * d;
-						if (!inner_check(Jpre_, J0_, J1_, I0, I1, Inxt)) V.push_back(d);
-					}
-					else if (on_seg_strong(J1, J3, I1)) {
-						Pos Jnxt_ = Jnxt + vec * d;
-						if (!inner_check(J0_, J1_, Jnxt_, I0, I1, Inxt)) V.push_back(d);
-					}
-					else if (ccw(J0_, J1_, I0) <= 0 && ccw(J0_, J1_, Inxt) <= 0) V.push_back(d);
-				}
-				if (!collinear(J0, J2, I0, I1) && intersect(J0, J2, I0, I1, STRONG)) {
-					Pos p = intersection(J0, J2, I0, I1);
-					ld d = D(p);
-					Pos J0_ = J0 + vec * d, J1_ = J1 + vec * d;
-					Pos Jpre_ = Jpre + vec * d;
-					if (ccw(I0, I1, Jpre_) <= 0 && ccw(I0, I1, J1_) <= 0) V.push_back(d);
-				}
-				if (!collinear(J1, J3, I0, I1) && intersect(J1, J3, I0, I1, STRONG)) {
-					Pos p = intersection(J1, J3, I0, I1);
-					ld d = D(p);
-					Pos J0_ = J0 + vec * d, J1_ = J1 + vec * d;
-					Pos Jnxt_ = Jnxt + vec * d;
-					if (ccw(I0, I1, Jnxt_) <= 0 && ccw(I0, I1, J0_) <= 0) V.push_back(d);
-				}
-			}
-		}
-	}
-	std::sort(V.begin(), V.end());
-	V.erase(unique(V.begin(), V.end()), V.end());
-	int sz = V.size();
-#ifdef DEBUG
-	std::cout << "FUCK::\n";
-	std::cout << "sz:: " << sz << "\n";
-#endif
-	for (const ld& d : V) events.push_back(Event(t, v + vec * d));
-	return;
+bool inner_check(const Polygon& A, const Polygon& B) {
+
+	return 1;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-
-	std::cin >> N; Polygon A(N);
-	for (Pos& p : A) std::cin >> p;
-	norm(A);
+	std::cin >> N;
+	Polygon A(N); for (Pos& p : A) std::cin >> p; norm(A);
 	T = 0; for (Pos& p : A) p.i = T, T++, p.d = 0;
-
-	std::cin >> M; Polygon B(M);
-	for (Pos& p : B) std::cin >> p;
-	norm(B);
+	std::cin >> M;
+	Polygon B(M); for (Pos& p : B) std::cin >> p; norm(B);
 	T = 0; for (Pos& p : B) p.i = T, T++, p.d = 0;
-
+	Vld R;
 	for (int i = 0; i < N; i++) {
-		const Pos& a0 = A[i], & a1 = A[(i + 1) % M];
+		ld x;
+		const Pos& a0 = A[i], & a1 = A[(i + 1) % N];
 		Seg sa = Seg(O, a0);
 		Seg a01 = Seg(a0, a1);
 		for (int j = 0; j < M; j++) {
 			const Pos& b0 = B[j], & b1 = B[(j + 1) % M];
+			Seg sb = Seg(O, b0);
+			Seg b01 = Seg(b0, b1);
+			x = intersection(sa, b01, WEAK);
+			if (x > 0) R.push_back(x);
+			x = intersection(sb, a01, WEAK);
+			if (x > 0) R.push_back(x);
 		}
 	}
-	
+	std::sort(R.begin(), R.end());
+	R.erase(unique(R.begin(), R.end(), eq), R.end());
+	ld ret = 0;
+	for (const ld& x : R) {
+		Polygon C = A;
+		for (Pos& p : C) p *= x;
+		if (inner_check(C, B)) ret = std::max(ret, x);
+	}
+	std::cout << ret << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj32567 Hedge Topiary
