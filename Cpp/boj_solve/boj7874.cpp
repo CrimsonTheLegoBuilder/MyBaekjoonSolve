@@ -175,7 +175,7 @@ ld two_union(const Sphere& a, const Sphere& b) {
 	ld hb = d - b.r + p.x;
 	return a.vol(ha) + b.vol(hb);
 }
-ld integral(const ll& r, const Polygon& hp) {
+ld volume(const ll& r, const Polygon& hp) {
 	auto inside = [&](const Pos& p, const ld& t) -> bool {
 		if (p.LO < p.HI) {
 			if (p.LO < t && t < p.HI) return 1;
@@ -191,6 +191,19 @@ ld integral(const ll& r, const Polygon& hp) {
 	auto the = [&](const ld& dd, const ld& rr) -> ld {
 		ld w = dd / rr;
 		return norm(acosl(fit(w, -1, 1))) * 2;
+		};
+	auto area = [&](const ld& rr, const ld& t) -> ld {
+		ld fan = rr * t;
+		ld z = PI - t * .5;
+		ld tri = rr * sin(z) * rr * cos(z);
+		tri = std::abs(tri);
+		if (t > PI) return fan + tri;
+		return fan - tri;
+		};
+	auto cone_vol = [&](const ld& rr, const ld& t, const ld& h) -> ld {
+		ld rat = area(rr, t) / 3 / (rr * rr * PI);
+		ld vol = rr * rr * rat * PI * h;
+		return vol;
 		};
 	int sz = hp.size();
 	Circle c = Circle(Pos(), r);
@@ -221,14 +234,32 @@ ld integral(const ll& r, const Polygon& hp) {
 	if (f2) return Sphere(0, 0, 0, r).vol(r + r - hu);
 	Pos us = c.p(u.LO), ue = c.p(u.HI);
 	Pos vs = c.p(v.LO), ve = c.p(v.HI);
+	Seg U = Seg(us, ue);
+	Seg V = Seg(vs, ve);
 	Pos m = intersection(us, ue, vs, ve);
 	ld dm = m.mag();
 	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) dm *= -1;
 	ld a_ = the(dm, r);
 	ld suf = 0;
+	ld x;
+	x = 0.5 - intersection(U, V);
+	if (inside(v, u.HI)) x *= -1;
+	ld ang_u = the(x, 0.5);
+	suf += Sphere(0, 0, 0, r).surf(hu) * ((PI * 2 - ang_u) / (PI * 2));
+	x = 0.5 - intersection(V, U);
+	if (inside(u, v.HI)) x *= -1;
+	ld ang_v = the(x, 0.5);
+	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
 	suf += r * r * (a_ + tu + tu - PI);
 	suf += r * r * (a_ + tv + tv - PI);
-
+	//if (ang_u < PI) suf += r * r * (a_ + tu + tu - PI);
+	//if (ang_v < PI) suf += r * r * (a_ + tv + tv - PI);
+	suf = Sphere(0, 0, 0, r).surf() - suf;
+	ld ratio = suf / Sphere(0, 0, 0, r).surf();
+	ld total = Sphere(0, 0, 0, r).vol() * ratio;
+	total += cone_vol(ru, ang_u, du);
+	total += cone_vol(rv, ang_v, dv);
+	return total;
 }
 void query() {
 	for (int i = 0; i < 3; i++)
@@ -291,7 +322,7 @@ void query() {
 			else hi = std::max(hi, p.HI);
 		}
 		if (rnd < TOL) { std::cout << two_union(S[(i + 1) % 3], S[(i + 2) % 3]) << "\n"; return; }
-		ret += integral(C[i].r, hp);
+		ret += volume(C[i].r, hp);
 	}
 	std::cout << ret << "\n";
 	return;
