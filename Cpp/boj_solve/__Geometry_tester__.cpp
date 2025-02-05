@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <vector>
 
-void merge_sort(std::vector<int> arr1, std::vector<int> arr2, int len);
+void merge_sort(std::vector<int>& arr1, std::vector<int>& arr2, int len);
 
-void merge_sortRecursion(std::vector<int> arr1, std::vector<int> arr2, int l, int r);
+void merge_sortRecursion(std::vector<int>& arr1, std::vector<int>& arr2, int l, int r);
 
-void merge(std::vector<int> arr1, std::vector<int> arr2, int l, int m, int r);
+void merge(std::vector<int>& arr1, std::vector<int>& arr2, int l, int m, int r);
 
 int main(void)
 {
@@ -31,12 +31,12 @@ int main(void)
     return 0;
 }
 
-void merge_sort(std::vector<int> arr1, std::vector<int> arr2, int len)
+void merge_sort(std::vector<int>& arr1, std::vector<int>& arr2, int len)
 {
     merge_sortRecursion(arr1, arr2, 0, len - 1);
 }
 
-void merge_sortRecursion(std::vector<int> arr1, std::vector<int> arr2, int l, int r)
+void merge_sortRecursion(std::vector<int>& arr1, std::vector<int>& arr2, int l, int r)
 {
     if (l < r)
     {
@@ -49,7 +49,7 @@ void merge_sortRecursion(std::vector<int> arr1, std::vector<int> arr2, int l, in
     }
 }
 
-void merge(std::vector<int> arr1, std::vector<int> arr2, int l, int m, int r)
+void merge(std::vector<int>& arr1, std::vector<int>& arr2, int l, int m, int r)
 {
     int left_length = m - l + 1;
     int right_length = r - m;
