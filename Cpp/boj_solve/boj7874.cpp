@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS 
+  #define _CRT_SECURE_NO_WARNINGS 
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -217,10 +217,14 @@ ld volume(const ll& r, const Polygon& hp) {
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
 	ld tu = norm(u.HI - u.LO) * .5;
+	ld mu = norm(u.HI + u.LO);
+	if (u.HI < u.LO) mu = norm(mu + PI);
 	ld du = r * cosl(tu);
 	ld ru = r * sinl(tu);
 	ld hu = r - du;
 	ld tv = norm(v.HI - v.LO) * .5;
+	ld mv = norm(v.HI + v.LO);
+	if (v.HI < v.LO) mv = norm(mv + PI);
 	ld dv = r * cosl(tv);
 	ld rv = r * sinl(tv);
 	ld hv = r - dv;
@@ -238,6 +242,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	Seg V = Seg(vs, ve);
 	Pos m = intersection(us, ue, vs, ve);
 	ld dm = m.mag();
+	ld tm = norm(m.rad());
 	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) dm *= -1;
 	ld a_ = the(dm, r);
 	ld suf = 0;
@@ -250,8 +255,15 @@ ld volume(const ll& r, const Polygon& hp) {
 	if (inside(u, v.HI)) x *= -1;
 	ld ang_v = the(x, 0.5);
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-	suf += r * r * (a_ + tu + tu - PI);
-	suf += r * r * (a_ + tv + tv - PI);
+	if ((inside(v, u.LO) && inside(Pos(mu, u.HI), tm)) || 
+		(inside(v, u.HI) && inside(Pos(u.LO, mu), tm)))
+		suf += r * r * (a_ + tu + tu - PI);
+	else suf -= r * r * (a_ + tu + tu - PI);
+	if ((inside(u, v.LO) && inside(Pos(mv, v.HI), tm)) ||
+		(inside(u, v.HI) && inside(Pos(v.LO, mv), tm)))
+		suf += r * r * (a_ + tv + tv - PI);
+	else suf -= r * r * (a_ + tv + tv - PI);
+	//suf += r * r * (a_ + tv + tv - PI);
 	//if (ang_u < PI) suf += r * r * (a_ + tu + tu - PI);
 	//if (ang_v < PI) suf += r * r * (a_ + tv + tv - PI);
 	suf = Sphere(0, 0, 0, r).surf() - suf;
