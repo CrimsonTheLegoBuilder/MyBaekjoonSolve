@@ -29,6 +29,8 @@ inline ld norm(ld th) {
 #define INSIDE 0
 #define MEET 1
 #define OUTSIDE 2
+#define STRONG 0
+#define WEAK 1
 #define LO x
 #define HI y
 
@@ -60,32 +62,32 @@ ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-Polygon graham_scan(Polygon C) {
-	Polygon H;
-	if (C.size() < 3) {
-		std::sort(C.begin(), C.end());
-		return C;
-	}
-	std::swap(C[0], *min_element(C.begin(), C.end()));
-	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
-		int ret = ccw(C[0], p, q);
-		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
-		return ret > 0;
-		}
-	);
-	C.erase(unique(C.begin(), C.end()), C.end());
-	int sz = C.size();
-	for (int i = 0; i < sz; i++) {
-		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
-			H.pop_back();
-		H.push_back(C[i]);
-	}
-	return H;
-}
+Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
 bool inner_check(const Polygon& H, const Pos& p) {
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) if (ccw(H[i], H[(i + 1) % sz], p) < 0) return 0;
 	return 1;
+}
+struct Seg {
+	Pos s, e;
+	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
+	Pos p(const ld& rt) const { return s + (e - s) * rt; }
+	ld green(const ld& lo = 0, const ld& hi = 1) const {
+		ld d = hi - lo;
+		ld ratio = (lo + hi) * .5;
+		Pos m = p(ratio);
+		return m.y * d * (s.x - e.x);
+	}
+};
+ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
+	const Pos& p1 = s1.s, p2 = s1.e, q1 = s2.s, q2 = s2.e;
+	ld det = (q2 - q1) / (p2 - p1);
+	if (zero(det)) return -1;
+	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
+	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
+	if (f == WEAK) return fit(a1, 0, 1);
+	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
+	return -1;
 }
 struct Circle {
 	Pos c;
@@ -129,6 +131,8 @@ struct Sphere {
 	ll operator * (const Sphere& q) const { return x * q.x + y * q.y + z * q.z; }
 	ld vol() const { return (4. / 3) * PI * r * r * r; }
 	ld vol(const ld& h) const { return PI * h * h * (3 * r - h) / 3; }
+	ld surf() const { return PI * 4 * r * r; }
+	ld surf(const ld& h) const { return PI * 2 * r * h; }
 } S[3];
 bool F[3];
 ll Euc(const Sphere& p, const Sphere& q) { return sq(p.x - q.x) + sq(p.y - q.y) + sq(p.z - q.z); }
@@ -172,49 +176,59 @@ ld two_union(const Sphere& a, const Sphere& b) {
 	return a.vol(ha) + b.vol(hb);
 }
 ld integral(const ll& r, const Polygon& hp) {
+	auto inside = [&](const Pos& p, const ld& t) -> bool {
+		if (p.LO < p.HI) {
+			if (p.LO < t && t < p.HI) return 1;
+		}
+		else {//(p.LO > p.HI)
+			if (p.LO < t || t < p.HI) return 1;
+		}
+		return 0;
+		};
+	auto outer_check = [&](const Pos& p, const Pos& q) -> bool {
+		return !inside(p, q.LO) && !inside(p, q.HI);
+		};
+	auto the = [&](const ld& dd, const ld& rr) -> ld {
+		ld w = dd / rr;
+		return norm(acosl(fit(w, -1, 1))) * 2;
+		};
 	int sz = hp.size();
 	Circle c = Circle(Pos(), r);
 	assert(sz);
 	if (sz == 1) {
 		ld t = norm(hp[0].HI - hp[0].LO) * .5;
-		ld d = r * cos(t);
+		ld d = r * cosl(t);
 		ld h = r - d;
 		return Sphere(0, 0, 0, r).vol(h);
 	}
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
-	bool f1 = 0, f2 = 0;
-	if (u.LO > u.HI) {
-		if (u.HI <= v.LO && v.LO <= u.LO && u.HI <= v.HI && v.HI <= u.LO) {
-			f1 = 1;
-		}
-	}
-	else {//(u.LO < u.HI)
-		if ((u.LO <= v.LO || v.LO <= u.HI) && (u.LO <= v.HI || v.HI <= u.HI)) {
-			f1 = 1;
-		}
-	}
-	if (v.LO > v.HI) {
-		if (v.HI <= u.LO && u.LO <= v.LO && v.HI <= u.HI && u.HI <= v.LO) {
-			f2 = 1;
-		}
-	}
-	else {//(v.LO < v.HI)
-		if ((v.LO <= u.LO || u.LO <= v.HI) && (v.LO <= u.HI || u.HI <= v.HI)) {
-			f2 = 1;
-		}
-	}
+	ld tu = norm(u.HI - u.LO) * .5;
+	ld du = r * cosl(tu);
+	ld ru = r * sinl(tu);
+	ld hu = r - du;
+	ld tv = norm(v.HI - v.LO) * .5;
+	ld dv = r * cosl(tv);
+	ld rv = r * sinl(tv);
+	ld hv = r - dv;
+	bool f1 = outer_check(u, v), f2 = outer_check(v, u);
 	if (f1 && f2) {
-		ld tu = norm(u.HI - u.LO) * .5;
-		ld du = r * cos(tu);
-		ld hu = r - du;
-		ld volu = Sphere(0, 0, 0, r).vol(r + r - hu);
-		ld tv = norm(v.HI - v.LO) * .5;
-		ld dv = r * cos(tv);
-		ld hv = r - dv;
-		ld volv = Sphere(0, 0, 0, r).vol(r + r - hv);
+		ld volu = Sphere(0, 0, 0, r).vol(hu);
+		ld volv = Sphere(0, 0, 0, r).vol(hv);
 		return Sphere(0, 0, 0, r).vol() - volu - volv;
 	}
+	if (f1) return Sphere(0, 0, 0, r).vol(r + r - hv);
+	if (f2) return Sphere(0, 0, 0, r).vol(r + r - hu);
+	Pos us = c.p(u.LO), ue = c.p(u.HI);
+	Pos vs = c.p(v.LO), ve = c.p(v.HI);
+	Pos m = intersection(us, ue, vs, ve);
+	ld dm = m.mag();
+	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) dm *= -1;
+	ld a_ = the(dm, r);
+	ld suf = 0;
+	suf += r * r * (a_ + tu + tu - PI);
+	suf += r * r * (a_ + tv + tv - PI);
+
 }
 void query() {
 	for (int i = 0; i < 3; i++)
@@ -279,7 +293,7 @@ void query() {
 		if (rnd < TOL) { std::cout << two_union(S[(i + 1) % 3], S[(i + 2) % 3]) << "\n"; return; }
 		ret += integral(C[i].r, hp);
 	}
-
+	std::cout << ret << "\n";
 	return;
 }
 void solve() {
