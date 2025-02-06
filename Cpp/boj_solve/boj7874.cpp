@@ -269,12 +269,12 @@ ld volume(const ll& r, const Polygon& hp) {
 	if (inside(u, v.HI)) x *= -1;
 	ld ang_v = the(x, 0.5);
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-	if ((inside(v, u.LO) && inside(Pos(mu, u.HI), tm)) ||
-		(inside(v, u.HI) && inside(Pos(u.LO, mu), tm)))
+	if ((inside(v, u.LO) && inside(Pos(u.LO, mu), tm)) ||
+		(inside(v, u.HI) && inside(Pos(mu, u.LO), tm)))
 		suf += area(a_, tu, tu, r);
 	else suf -= area(a_, tu, tu, r);
-	if ((inside(u, v.LO) && inside(Pos(mv, v.HI), tm)) ||
-		(inside(u, v.HI) && inside(Pos(v.LO, mv), tm)))
+	if ((inside(u, v.LO) && inside(Pos(v.LO, mv), tm)) ||
+		(inside(u, v.HI) && inside(Pos(mv, v.HI), tm)))
 		suf += area(a_, tv, tv, r);
 	else suf -= area(a_, tv, tv, r);
 	//if ((inside(v, u.LO) && inside(Pos(mu, u.HI), tm)) || 
