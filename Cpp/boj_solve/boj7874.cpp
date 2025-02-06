@@ -288,6 +288,10 @@ ld volume(const ll& r, const Polygon& hp) {
 	//std::cout << "sz:: " << sz << "\n";
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
+	//std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
+	//std::cout << "u.t:: " << norm(u.HI - u.LO) << "\n";
+	//std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
+	//std::cout << "v.t:: " << norm(v.HI - v.LO) << "\n";
 	ld tu = norm(u.HI - u.LO) * .5;
 	ld mu = norm(u.HI + u.LO) * .5;
 	//if (u.HI < u.LO) mu = norm(mu + PI);
@@ -312,47 +316,58 @@ ld volume(const ll& r, const Polygon& hp) {
 	if (f2) return Sphere(0, 0, 0, r).vol(r + r - hu);
 	Pos us = c.p(u.LO), ue = c.p(u.HI);
 	Pos vs = c.p(v.LO), ve = c.p(v.HI);
+	//if (inside(v, u.LO)) std::swap(us, ue);
+	//if (inside(u, v.LO)) std::swap(vs, ve);
 	Seg U = Seg(us, ue);
 	Seg V = Seg(vs, ve);
 	Pos m = intersection(us, ue, vs, ve);
 	ld dm = m.mag();
 	ld tm = norm(m.rad());
-	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) dm *= -1;
+	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) {
+		//dm *= -1;
+		tm = norm(tm + PI);
+	}
+	std::cout << "dm:: " << dm << "\n";
+	//std::cout << "hu:: " << hu << "\n";
+	//std::cout << "hv:: " << hv << "\n";
 	ld a_ = the(dm, r);// , A;
+	std::cout << "a_:: " << a_ << "\n";
 	ld suf = 0;
 	ld x;
 	x = intersection(U, V);
+	std::cout << "x:: " << x << "\n";
 	assert(-TOL < x && x < 1 + TOL);
-	//if (inside(v, u.LO && x < .5 || inside(v, u.HI && x > .5))) x = std::abs(x - .5);
-	//else x = -std::abs(x - .5);
-	if (inside(v, u.LO)) x = .5 - x;
-	else x = x - .5;
+	//if (inside(v, u.LO)) x = .5 - x;
+	//else x = x - .5;
+	x = .5 - x;
+	if (inside(v, u.HI)) x *= -1;
+	std::cout << "x:: " << x << "\n";
 	ld ang_u = the(x, 0.5);
-	//A = spherical_triangle_angles(ang_u, tu, tu);
-	//std::cout << "A:: " << A << "\n";
+	std::cout << "ang_u:: " << ang_u * 180 / PI << "\n";
 	suf += Sphere(0, 0, 0, r).surf(hu) * ((PI * 2 - ang_u) / (PI * 2));
 	x = intersection(V, U);
+	std::cout << "x:: " << x << "\n";
 	assert(-TOL < x && x < 1 + TOL);
-	//if (inside(u, v.LO) && x < .5 || inside(u, v.HI && x > .5)) x = std::abs(x - .5);
-	//else x = -std::abs(x - .5);
-	if (inside(u, v.LO)) x = .5 - x;
-	else x = x - .5;
+	//if (inside(u, v.LO)) x = .5 - x;
+	//else x = x - .5;
+	x = .5 - x;
+	if (inside(u, v.HI)) x *= -1;
+	std::cout << "x:: " << x << "\n";
 	ld ang_v = the(x, 0.5);
-	//A = spherical_triangle_angles(ang_v, tv, tv);
-	//std::cout << "A:: " << A << "\n";
+	std::cout << "ang_v:: " << ang_v * 180 / PI << "\n";
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-	//if ((inside(v, u.LO) && inside(Pos(u.LO, mu), tm)) ||
-	//	(inside(v, u.HI) && inside(Pos(mu, u.LO), tm)))
-	//	suf += area(a_, tu, tu, r);
-	//else suf -= area(a_, tu, tu, r);
-	//if ((inside(u, v.LO) && inside(Pos(v.LO, mv), tm)) ||
-	//	(inside(u, v.HI) && inside(Pos(mv, v.HI), tm)))
-	//	suf += area(a_, tv, tv, r);
-	//else suf -= area(a_, tv, tv, r);
 	if (ang_u < PI) suf += area(a_, tu, tu, r);
 	else suf -= area(a_, tu, tu, r);
 	if (ang_v < PI) suf += area(a_, tv, tv, r);
 	else suf -= area(a_, tv, tv, r);
+	//if (inside(v, u.LO) && inside(Pos(mu, u.HI), tm) || 
+	//	inside(v, u.HI) && inside(Pos(u.LO, mu), tm))
+	//	suf -= area(a_, tu, tu, r);
+	//else suf += area(a_, tu, tu, r);
+	//if (inside(u, v.LO) && inside(Pos(mv, v.HI), tm) ||
+	//	inside(u, v.HI) && inside(Pos(v.LO, mu), tm))
+	//	suf -= area(a_, tv, tv, r);
+	//else suf += area(a_, tv, tv, r);
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
@@ -429,9 +444,9 @@ void query(const int& q) {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	std::cout << "C[0] = " << C[0] << "\n";
-	std::cout << "C[1] = " << C[1] << "\n";
-	std::cout << "C[2] = " << C[2] << "\n";
+	//std::cout << "C[0] = " << C[0] << "\n";
+	//std::cout << "C[1] = " << C[1] << "\n";
+	//std::cout << "C[2] = " << C[2] << "\n";
 	//arc_init();
 	//ld c_union = union_except_x(-1);
 	////std::cout << "circle union:: " << c_union << "\n";
@@ -507,7 +522,7 @@ void solve() {
 		if (err < -1e-6 || 1e-6 < err) {
 			cnt++;
 			std::cout << "WHAT THE FUCK:: " << cnt << "\n";
-			std::cout << "tc:: " << q << " ::\n";
+			std::cout << "tc:: " << q + 1 << " ::\n";
 			std::cout << 1 << "\n";
 			std::cout << SP[q * 3 + 0].x << " " << SP[q * 3 + 0].y << " " << SP[q * 3 + 0].z << " " << SP[q * 3 + 0].r << "\n";
 			std::cout << SP[q * 3 + 1].x << " " << SP[q * 3 + 1].y << " " << SP[q * 3 + 1].z << " " << SP[q * 3 + 1].r << "\n";
@@ -552,5 +567,42 @@ int main() { solve(); return 0; }//boj7874
 8 8 1 5
 4473.948436313
 
-
+1
+3 7 5 9
+1 7 0 9
+8 8 1 5
+dm:: 7.580781415
+a_:: 1.138486702
+x:: 0.912591015
+x:: 0.412591015
+ang_u:: 68.786098731
+x:: 0.443755634
+x:: 0.056244366
+ang_v:: 167.082399925
+dm:: 7.580781415
+a_:: 1.138486702
+x:: 0.087408985
+x:: 0.412591015
+ang_u:: 68.786098731
+x:: 0.383710409
+x:: -0.116289591
+ang_v:: 206.897933418
+dm:: -1.211712371
+a_:: 3.631151799
+x:: 0.556244366
+x:: 0.056244366
+ang_u:: 167.082399925
+x:: 0.616289591
+x:: -0.116289591
+ang_v:: 206.897933418
+4473.948436313
+4607.828127280
+WHAT THE FUCK:: 1
+tc:: 1 ::
+1
+3 7 5 9
+1 7 0 9
+8 8 1 5
+4473.948436313
+4607.828127280 | err:: 0.029924281 | state:: 3
 */
