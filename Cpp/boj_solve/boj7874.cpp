@@ -35,6 +35,7 @@ inline ld norm(ld th) {
 #define HI y
 
 int T, N, M;
+bool F[3];
 ld Q[LEN];
 int sts[LEN];
 struct Pos {
@@ -109,6 +110,16 @@ struct Circle {
 	friend std::istream& operator >> (std::istream& is, Circle& p) { is >> p.c.x >> p.c.y >> p.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& p) { os << p.c.x << " " << p.c.y << " " << p.r; return os; }
 } C[3];
+struct Arc {
+	ld lo, hi;
+	int i;
+	Arc(ld l_ = 0, ld h_ = 0, int i_ = -1) : lo(l_), hi(h_), i(i_) {}
+	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
+	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
+	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
+};
+typedef std::vector<Arc> Arcs;
+Arcs AR[3];
 Vld intersections(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
 	Pos vec = cb - ca;
@@ -127,6 +138,41 @@ Vld intersections(const Circle& a, const Circle& b) {
 	ret.push_back(norm(rd + h));
 	return ret;
 }
+void arc_init() {
+	for (int i = 0; i < 3; i++) AR[i].clear();
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (j == i) continue;
+			Vld inxs = intersections(C[i], C[j]);
+			int sz = inxs.size();
+			if (sz < 2) continue;
+			ld lo = inxs[0], hi = inxs[1];
+			if (lo < hi) AR[i].push_back(Arc(lo, hi));
+			else {
+				AR[i].push_back(Arc(lo, 2 * PI, j));
+				AR[i].push_back(Arc(0, hi, j));
+			}
+		}
+		std::sort(AR[i].begin(), AR[i].end());
+		AR[i].push_back(Arc(2 * PI, 2 * PI, -2));
+	}
+	return;
+}
+ld union_except_x(const int& x) {
+	ld ret = 0;
+	for (int i = 0; i < 3; i++) {
+		if (i == x) continue;
+		if (!F[i]) {
+			ld hi = 0;
+			for (const Arc& a : AR[i]) {
+				if (a.i == x) continue;
+				if (hi < a.lo) ret += C[i].green(hi, a.lo), hi = a.hi;
+				else hi = std::max(hi, a.hi);
+			}
+		}
+	}
+	return ret;
+}
 struct Sphere {
 	ll x, y, z, r;
 	Sphere(ll x_ = 0, ll y_ = 0, ll z_ = 0, ll r_ = 0) : x(x_), y(y_), z(z_), r(r_) {}
@@ -137,8 +183,7 @@ struct Sphere {
 	ld vol(const ld& h) const { return PI * h * h * (3 * r - h) / 3; }
 	ld surf() const { return PI * 4 * r * r; }
 	ld surf(const ld& h) const { return PI * 2 * r * h; }
-} S[3];
-bool F[3];
+} S[3], SP[LEN * 3];
 ll Euc(const Sphere& p, const Sphere& q) { return sq(p.x - q.x) + sq(p.y - q.y) + sq(p.z - q.z); }
 ld mag(const Sphere& p, const Sphere& q) { return sqrtl(Euc(p, q)); }
 ld rad(const Sphere& a, const Sphere& b, const Sphere& c) {
@@ -311,14 +356,19 @@ ld volume(const ll& r, const Polygon& hp) {
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
+	//std::cout << "before cone:: " << total << "\n";
 	total += cone_vol(ru, ang_u, du);
+	//std::cout << "cone1 :: " << total << "\n";
 	total += cone_vol(rv, ang_v, dv);
+	//std::cout << "cone2 :: " << total << "\n";
 	//std::cout << "FUCK::\n";
 	return total;
 }
 void query(const int& q) {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++) {
 		std::cin >> S[i].x >> S[i].y >> S[i].z >> S[i].r, F[i] = 0;
+		SP[q * 3 + i] = S[i];
+	}
 	std::sort(S, S + 3);
 	assert(S[0].r >= S[1].r && S[1].r >= S[2].r);
 	int f01 = meet(S[0], S[1]);
@@ -379,10 +429,23 @@ void query(const int& q) {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	//std::cout << "C[0] = " << C[0] << "\n";
-	//std::cout << "C[1] = " << C[1] << "\n";
-	//std::cout << "C[2] = " << C[2] << "\n";
-	memset(F, 0, sizeof F);
+	std::cout << "C[0] = " << C[0] << "\n";
+	std::cout << "C[1] = " << C[1] << "\n";
+	std::cout << "C[2] = " << C[2] << "\n";
+	//arc_init();
+	//ld c_union = union_except_x(-1);
+	////std::cout << "circle union:: " << c_union << "\n";
+	//for (int i = 2; i >= 0; i--) {
+	//	ld tmp = union_except_x(i);
+	//	//std::cout << "tmp:: " << tmp << "\n";
+	//	ld diff = (c_union - tmp) / c_union;
+	//	//std::cout << "diff:: " << diff << "\n";
+	//	if (diff < 0.01) {
+	//		Q[q] = two_union(S[(i + 1) % 3], S[(i + 2) % 3]);
+	//		sts[q] = 2;
+	//		return;
+	//	}
+	//}
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -417,6 +480,8 @@ void query(const int& q) {
 			return;
 		}
 		ret += volume(C[i].r, hp);
+		//std::cout << "S[" << i << "]:: " << S[i].x << " " << S[i].y << " " << S[i].z << " " << S[i].r << "\n";
+		//std::cout << "vol:: " << volume(C[i].r, hp) << "\n";
 	}
 	//std::cout << ret << "\n";
 	Q[q] = ret;
@@ -428,8 +493,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	freopen("../../../input_data/e/e000.in", "r", stdin);
-	freopen("../../../input_data/e/ret.txt", "w", stdout);
+	//freopen("../../../input_data/e/e000.in", "r", stdin);
+	//freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
@@ -438,14 +503,15 @@ void solve() {
 	for (int q = 0; q < T; q++) {
 		ld ans; std::cin >> ans;
 		ld err = (Q[q] - ans) / ans;
+		std::cout << Q[q] << "\n";
 		if (err < -1e-6 || 1e-6 < err) {
 			cnt++;
 			std::cout << "WHAT THE FUCK:: " << cnt << "\n";
 			std::cout << "tc:: " << q << " ::\n";
 			std::cout << 1 << "\n";
-			std::cout << S[0].x << " " << S[0].y << " " << S[0].z << " " << S[0].r << "\n";
-			std::cout << S[1].x << " " << S[1].y << " " << S[1].z << " " << S[1].r << "\n";
-			std::cout << S[2].x << " " << S[2].y << " " << S[2].z << " " << S[2].r << "\n";
+			std::cout << SP[q * 3 + 0].x << " " << SP[q * 3 + 0].y << " " << SP[q * 3 + 0].z << " " << SP[q * 3 + 0].r << "\n";
+			std::cout << SP[q * 3 + 1].x << " " << SP[q * 3 + 1].y << " " << SP[q * 3 + 1].z << " " << SP[q * 3 + 1].r << "\n";
+			std::cout << SP[q * 3 + 2].x << " " << SP[q * 3 + 2].y << " " << SP[q * 3 + 2].z << " " << SP[q * 3 + 2].r << "\n";
 			std::cout << ans << "\n";
 			std::cout << Q[q] << " | err:: ";
 			std::cout << ((Q[q] - ans) / ans) << " | state:: ";
@@ -459,114 +525,32 @@ int main() { solve(); return 0; }//boj7874
 /*
 
 5
-9 5 4 8
-1 2 3 4
-4 1 1 4
-0 6 6 7
-8 4 9 2
-3 7 8 7
-2 9 1 9
-5 9 8 4
-0 7 6 5
-6 1 5 4
-2 0 9 5
-3 7 2 8
-4 6 0 2
-1 7 7 8
-7 3 3 8
-2400.1355473998
-2004.5519240472
-3210.8792959287
-2678.9927528154
-3655.8576746709
-
-
-1
-0 0 0 500000000
-600000000 0 0 500000000
-300000000 0 0 400000000
-938289005872000000000000000.
+3 7 5 9
+1 7 0 9
+8 8 1 5
+8 4 0 6
+4 4 3 10
+8 4 1 6
+5 1 2 7
+5 6 1 10
+4 1 3 6
+4 9 8 10
+5 0 4 4
+5 2 5 4
+1 4 5 4
+1 2 1 7
+1 8 0 10
+4473.948436313
+4225.908317979
+4376.564524088
+4338.065543957
+4514.865527247
 
 1
-0 0 0 5
-6 0 0 5
-3 0 0 4
-938.289005872
+3 7 5 9
+1 7 0 9
+8 8 1 5
+4473.948436313
 
-
-10
-9 5 4 8
-1 2 3 4
-4 1 1 4
-0 6 6 7
-8 4 9 2
-3 7 8 7
-2 9 1 9
-5 9 8 4
-0 7 6 5
-6 1 5 4
-2 0 9 5
-3 7 2 8
-4 6 0 2
-1 7 7 8
-7 3 3 8
-9 9 6 1
-3 4 8 9
-9 9 2 5
-5 3 3 6
-7 4 3 4
-0 8 8 9
-9 0 7 9
-1 5 8 9
-1 2 4 7
-5 8 6 3
-6 5 3 3
-2 4 6 10
-5 8 6 3
-7 2 2 8
-4 1 9 10
-2400.1355473998
-2004.5519240472
-3210.8792959287
-2678.9927528154
-3655.8576746709
-3428.4650874812
-3586.2822479245
-5497.2149900214
-4188.7902047864
-5164.3099716534
-
-2
-2 9 1 9
-5 9 8 4
-0 7 6 5
-9 0 7 9
-1 5 8 9
-1 2 4 7
-3210.8792959287
-5497.2149900214
-
-
-5
-3 9 3 9
-6 7 9 10
-7 6 9 10
-5 7 6 4
-5 8 2 7
-4 4 1 6
-1 6 3 7
-5 5 3 4
-8 2 5 3
-9 6 3 6
-2 8 8 5
-5 8 1 8
-0 0 4 6
-4 9 5 6
-4 8 2 7
-5992.2520762360
-1774.2569859099
-1548.8267144506
-2684.5358779955
-2397.0438767502
 
 */
