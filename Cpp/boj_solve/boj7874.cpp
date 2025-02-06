@@ -229,6 +229,15 @@ ld area(const ld& a, const ld& b, const ld& c, const ll& r) {
 	spherical_triangle_angles(a, b, c, A_, B_, C_);
 	return r * r * (A_ + B_ + C_ - PI);
 }
+ld get_theta(const ld& a, const ld& A, const ld& b, const ld& d) {
+	ld t = asin(fit((sin(A) / sin(a) * sin(b)), -1, 1));
+	return t;
+}
+ld tri_area(const ld& a, const ld& A_, const ld& b, const ld& c, const ll& r, const ld& d) {
+	ld B_ = get_theta(a, A_, b, d);
+	ld C_ = get_theta(a, A_, c, d);
+	return r * r * (A_ + B_ + C_ - PI);
+}
 ld two_union(const Sphere& a, const Sphere& b) {
 	int f = meet(a, b);
 	if (f == OUTSIDE) return a.vol() + b.vol();
@@ -375,10 +384,14 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld ang_v = the(x, 0.5);
 	//std::cout << "ang_v:: " << ang_v * 180 / PI << "\n";
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-	if (ang_u < PI) suf += area(a_, tu, tu, r);
-	else suf -= area(a_, tu, tu, r);
-	if (ang_v < PI) suf += area(a_, tv, tv, r);
-	else suf -= area(a_, tv, tv, r);
+	//if (ang_u < PI) suf += area(a_, tu, tu, r);
+	//else suf -= area(a_, tu, tu, r);
+	//if (ang_v < PI) suf += area(a_, tv, tv, r);
+	//else suf -= area(a_, tv, tv, r);
+	if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
+	else suf -= tri_area(a_, ang_u, tu, tu, r, du);
+	if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
+	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
 	//if (du >= 0) {
 	//	if (ang_u < PI) suf += area(a_, tu, tu, r);
 	//	else suf -= area(a_, tu, tu, r);
@@ -395,14 +408,6 @@ ld volume(const ll& r, const Polygon& hp) {
 	//	if (ang_v < PI) suf -= area(a_, tv, tv, r);
 	//	else suf += area(a_, tv, tv, r);
 	//}
-	//if (inside(v, u.LO) && inside(Pos(mu, u.HI), tm) || 
-	//	inside(v, u.HI) && inside(Pos(u.LO, mu), tm))
-	//	suf -= area(a_, tu, tu, r);
-	//else suf += area(a_, tu, tu, r);
-	//if (inside(u, v.LO) && inside(Pos(mv, v.HI), tm) ||
-	//	inside(u, v.HI) && inside(Pos(v.LO, mu), tm))
-	//	suf -= area(a_, tv, tv, r);
-	//else suf += area(a_, tv, tv, r);
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
