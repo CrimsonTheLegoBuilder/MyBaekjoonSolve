@@ -384,29 +384,29 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld ang_v = the(x, 0.5);
 	//std::cout << "ang_v:: " << ang_v * 180 / PI << "\n";
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-	//if (ang_u < PI) suf += area(a_, tu, tu, r);
-	//else suf -= area(a_, tu, tu, r);
-	//if (ang_v < PI) suf += area(a_, tv, tv, r);
-	//else suf -= area(a_, tv, tv, r);
-	if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
-	else suf -= tri_area(a_, ang_u, tu, tu, r, du);
-	if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
-	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
+	if (ang_u < PI) suf += area(a_, tu, tu, r);
+	else suf -= area(a_, tu, tu, r);
+	if (ang_v < PI) suf += area(a_, tv, tv, r);
+	else suf -= area(a_, tv, tv, r);
+	//if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
+	//else suf -= tri_area(a_, ang_u, tu, tu, r, du);
+	//if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
+	//else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
 	//if (du >= 0) {
-	//	if (ang_u < PI) suf += area(a_, tu, tu, r);
-	//	else suf -= area(a_, tu, tu, r);
+	//	if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
+	//	else suf -= tri_area(a_, ang_u, tu, tu, r, du);
 	//}
 	//else {
-	//	if (ang_u < PI) suf -= area(a_, tu, tu, r);
-	//	else suf += area(a_, tu, tu, r);
+	//	if (ang_u < PI) suf -= tri_area(a_, ang_u, tu, tu, r, du);
+	//	else suf += tri_area(a_, ang_u, tu, tu, r, du);
 	//}
 	//if (dv >= 0) {
-	//	if (ang_v < PI) suf += area(a_, tv, tv, r);
-	//	else suf -= area(a_, tv, tv, r);
+	//	if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
+	//	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
 	//}
 	//else {
-	//	if (ang_v < PI) suf -= area(a_, tv, tv, r);
-	//	else suf += area(a_, tv, tv, r);
+	//	if (ang_v < PI) suf -= tri_area(a_, ang_v, tv, tv, r, dv);
+	//	else suf += tri_area(a_, ang_v, tv, tv, r, dv);
 	//}
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
