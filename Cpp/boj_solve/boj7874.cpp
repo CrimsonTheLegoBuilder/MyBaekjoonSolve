@@ -213,7 +213,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		ld w = dd / rr;
 		return norm(acosl(fit(w, -1, 1))) * 2;
 		};
-	auto area = [&](const ld& rr, const ld& t) -> ld {
+	auto area_ = [&](const ld& rr, const ld& t) -> ld {
 		ld fan = rr * t;
 		ld z = PI - t * .5;
 		ld tri = rr * sin(z) * rr * cos(z);
@@ -222,7 +222,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		return fan - tri;
 		};
 	auto cone_vol = [&](const ld& rr, const ld& t, const ld& h) -> ld {
-		ld rat = area(rr, t) / (rr * rr * PI);
+		ld rat = area_(rr, t) / (rr * rr * PI);
 		ld vol = rr * rr / 3 * rat * PI * h;
 		return vol;
 		};
@@ -269,14 +269,22 @@ ld volume(const ll& r, const Polygon& hp) {
 	if (inside(u, v.HI)) x *= -1;
 	ld ang_v = the(x, 0.5);
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-	if ((inside(v, u.LO) && inside(Pos(mu, u.HI), tm)) || 
+	if ((inside(v, u.LO) && inside(Pos(mu, u.HI), tm)) ||
 		(inside(v, u.HI) && inside(Pos(u.LO, mu), tm)))
-		suf += r * r * (a_ + tu + tu - PI);
-	else suf -= r * r * (a_ + tu + tu - PI);
+		suf += area(a_, tu, tu, r);
+	else suf -= area(a_, tu, tu, r);
 	if ((inside(u, v.LO) && inside(Pos(mv, v.HI), tm)) ||
 		(inside(u, v.HI) && inside(Pos(v.LO, mv), tm)))
-		suf += r * r * (a_ + tv + tv - PI);
-	else suf -= r * r * (a_ + tv + tv - PI);
+		suf += area(a_, tv, tv, r);
+	else suf -= area(a_, tv, tv, r);
+	//if ((inside(v, u.LO) && inside(Pos(mu, u.HI), tm)) || 
+	//	(inside(v, u.HI) && inside(Pos(u.LO, mu), tm)))
+	//	suf += r * r * (a_ + tu + tu - PI);
+	//else suf -= r * r * (a_ + tu + tu - PI);
+	//if ((inside(u, v.LO) && inside(Pos(mv, v.HI), tm)) ||
+	//	(inside(u, v.HI) && inside(Pos(v.LO, mv), tm)))
+	//	suf += r * r * (a_ + tv + tv - PI);
+	//else suf -= r * r * (a_ + tv + tv - PI);
 	//suf += r * r * (a_ + tv + tv - PI);
 	//if (ang_u < PI) suf += r * r * (a_ + tu + tu - PI);
 	//if (ang_v < PI) suf += r * r * (a_ + tv + tv - PI);
