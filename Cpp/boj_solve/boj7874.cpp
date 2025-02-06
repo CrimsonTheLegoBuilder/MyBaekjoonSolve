@@ -273,6 +273,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
 	total += cone_vol(ru, ang_u, du);
 	total += cone_vol(rv, ang_v, dv);
+	std::cout << "FUCK::\n";
 	return total;
 }
 void query() {
@@ -313,9 +314,9 @@ void query() {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	//std::cout << "C[0]::" << C[0] << "\n";
-	//std::cout << "C[1]::" << C[1] << "\n";
-	//std::cout << "C[2]::" << C[2] << "\n";
+	std::cout << "C[0]::" << C[0] << "\n";
+	std::cout << "C[1]::" << C[1] << "\n";
+	std::cout << "C[2]::" << C[2] << "\n";
 	memset(F, 0, sizeof F);
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
@@ -345,8 +346,8 @@ void query() {
 		if (rnd < TOL) { std::cout << two_union(S[(i + 1) % 3], S[(i + 2) % 3]) << " ::TWO 3\n"; return; }
 		ret += volume(C[i].r, hp);
 	}
-	std::cout << ret << "\n";
-	//std::cout << ret << " ::THREE\n";
+	//std::cout << ret << "\n";
+	std::cout << ret << " ::THREE\n";
 	return;
 }
 void solve() {
@@ -358,3 +359,30 @@ void solve() {
 	while (T--) query();
 }
 int main() { solve(); return 0; }//boj7874
+
+/*
+
+5
+9 5 4 8
+1 2 3 4
+4 1 1 4
+0 6 6 7
+8 4 9 2
+3 7 8 7
+2 9 1 9
+5 9 8 4
+0 7 6 5
+6 1 5 4
+2 0 9 5
+3 7 2 8
+4 6 0 2
+1 7 7 8
+7 3 3 8
+
+2400.1355473998
+2004.5519240472
+3210.8792959287
+2678.9927528154
+3655.8576746709
+
+*/
