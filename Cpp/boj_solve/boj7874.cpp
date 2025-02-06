@@ -173,7 +173,7 @@ ld two_union(const Sphere& a, const Sphere& b) {
 	Pos p = aa.p(inxs[0]);
 	ld ha = a.r - p.x;
 	ld hb = d - b.r + p.x;
-	return a.vol(ha) + b.vol(hb);
+	return a.vol(a.r + a.r - ha) + b.vol(b.r + b.r - hb);
 }
 ld volume(const ll& r, const Polygon& hp) {
 	int sz = hp.size();
