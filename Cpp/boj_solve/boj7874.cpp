@@ -162,10 +162,14 @@ ld cos_2nd(const ld& a, const ld& b, const ld& c) {
 	return std::abs(acosl(std::min(std::max(t, -(ld)1.0), (ld)1.0)));
 }
 void spherical_triangle_angles(const ld& a, const ld& b, const ld& c, ld& A_, ld& B_, ld& C_) {
+	std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
 	A_ = acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
 	B_ = acos((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)));
 	C_ = acos((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)));
 	return;
+}
+ld spherical_triangle_angles(const ld& a, const ld& b, const ld& c) {
+	return acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
 }
 ld area(const ld& a, const ld& b, const ld& c, const ll& r) {
 	ld A_, B_, C_;
@@ -258,17 +262,21 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld dm = m.mag();
 	ld tm = norm(m.rad());
 	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) dm *= -1;
-	ld a_ = the(dm, r);
+	ld a_ = the(dm, r), A;
 	ld suf = 0;
 	ld x;
 	x = 0.5 - intersection(U, V);
 	if (inside(v, u.HI)) x *= -1;
 	ld ang_u = the(x, 0.5);
-	suf += Sphere(0, 0, 0, r).surf(hu) * ((PI * 2 - ang_u) / (PI * 2));
+	A = spherical_triangle_angles(ang_u, tu, tu);
+	std::cout << "A:: " << A << "\n";
+	suf += Sphere(0, 0, 0, r).surf(hu) * ((PI * 2 - A) / (PI * 2));
 	x = 0.5 - intersection(V, U);
 	if (inside(u, v.HI)) x *= -1;
 	ld ang_v = the(x, 0.5);
-	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
+	A = spherical_triangle_angles(ang_v, tv, tv);
+	std::cout << "A:: " << A << "\n";
+	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - A) / (PI * 2));
 	if ((inside(v, u.LO) && inside(Pos(u.LO, mu), tm)) ||
 		(inside(v, u.HI) && inside(Pos(mu, u.LO), tm)))
 		suf += area(a_, tu, tu, r);
