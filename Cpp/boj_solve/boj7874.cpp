@@ -306,6 +306,25 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld dv = r * cosl(tv);
 	ld rv = r * sinl(tv);
 	ld hv = r - dv;
+	if (eq(tu * 2, PI) && eq(tv * 2, PI)) {
+		Polygon P;
+		for (const Pos& p : hp) {
+			if (p.LO < p.HI) P.push_back(p);
+			else {
+				P.push_back(Pos(0, p.LO));
+				P.push_back(Pos(p.HI, 2 * PI));
+			}
+		}
+		std::sort(P.begin(), P.end());
+		P.push_back(Pos(2 * PI, 2 * PI));
+		ld hi = 0, tt = 0;
+		for (const Pos& p : P) {
+			if (hi < p.LO) tt += (p.LO - hi), hi = p.HI;
+			else hi = std::max(hi, p.HI);
+		}
+		ld vol = Sphere(0, 0, 0, r).vol();
+		return vol * (tt / (2 * PI));
+	}
 	bool f1 = outer_check(u, v), f2 = outer_check(v, u);
 	if (f1 && f2) {
 		ld volu = Sphere(0, 0, 0, r).vol(hu);
@@ -324,42 +343,58 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld dm = m.mag();
 	ld tm = norm(m.rad());
 	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) {
-		//dm *= -1;
-		tm = norm(tm + PI);
+		dm *= -1;
+		//tm = norm(tm + PI);
 	}
-	std::cout << "dm:: " << dm << "\n";
+	//std::cout << "dm:: " << dm << "\n";
 	//std::cout << "hu:: " << hu << "\n";
 	//std::cout << "hv:: " << hv << "\n";
 	ld a_ = the(dm, r);// , A;
-	std::cout << "a_:: " << a_ << "\n";
+	//std::cout << "a_:: " << a_ << "\n";
 	ld suf = 0;
 	ld x;
 	x = intersection(U, V);
-	std::cout << "x:: " << x << "\n";
+	//std::cout << "x:: " << x << "\n";
 	assert(-TOL < x && x < 1 + TOL);
 	//if (inside(v, u.LO)) x = .5 - x;
 	//else x = x - .5;
 	x = .5 - x;
 	if (inside(v, u.HI)) x *= -1;
-	std::cout << "x:: " << x << "\n";
+	//std::cout << "x:: " << x << "\n";
 	ld ang_u = the(x, 0.5);
-	std::cout << "ang_u:: " << ang_u * 180 / PI << "\n";
+	//std::cout << "ang_u:: " << ang_u * 180 / PI << "\n";
 	suf += Sphere(0, 0, 0, r).surf(hu) * ((PI * 2 - ang_u) / (PI * 2));
 	x = intersection(V, U);
-	std::cout << "x:: " << x << "\n";
+	//std::cout << "x:: " << x << "\n";
 	assert(-TOL < x && x < 1 + TOL);
 	//if (inside(u, v.LO)) x = .5 - x;
 	//else x = x - .5;
 	x = .5 - x;
 	if (inside(u, v.HI)) x *= -1;
-	std::cout << "x:: " << x << "\n";
+	//std::cout << "x:: " << x << "\n";
 	ld ang_v = the(x, 0.5);
-	std::cout << "ang_v:: " << ang_v * 180 / PI << "\n";
+	//std::cout << "ang_v:: " << ang_v * 180 / PI << "\n";
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
 	if (ang_u < PI) suf += area(a_, tu, tu, r);
 	else suf -= area(a_, tu, tu, r);
 	if (ang_v < PI) suf += area(a_, tv, tv, r);
 	else suf -= area(a_, tv, tv, r);
+	//if (du >= 0) {
+	//	if (ang_u < PI) suf += area(a_, tu, tu, r);
+	//	else suf -= area(a_, tu, tu, r);
+	//}
+	//else {
+	//	if (ang_u < PI) suf -= area(a_, tu, tu, r);
+	//	else suf += area(a_, tu, tu, r);
+	//}
+	//if (dv >= 0) {
+	//	if (ang_v < PI) suf += area(a_, tv, tv, r);
+	//	else suf -= area(a_, tv, tv, r);
+	//}
+	//else {
+	//	if (ang_v < PI) suf -= area(a_, tv, tv, r);
+	//	else suf += area(a_, tv, tv, r);
+	//}
 	//if (inside(v, u.LO) && inside(Pos(mu, u.HI), tm) || 
 	//	inside(v, u.HI) && inside(Pos(u.LO, mu), tm))
 	//	suf -= area(a_, tu, tu, r);
@@ -508,8 +543,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	//freopen("../../../input_data/e/e000.in", "r", stdin);
-	//freopen("../../../input_data/e/ret.txt", "w", stdout);
+	freopen("../../../input_data/e/e000.in", "r", stdin);
+	freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
@@ -518,7 +553,7 @@ void solve() {
 	for (int q = 0; q < T; q++) {
 		ld ans; std::cin >> ans;
 		ld err = (Q[q] - ans) / ans;
-		std::cout << Q[q] << "\n";
+		//std::cout << Q[q] << "\n";
 		if (err < -1e-6 || 1e-6 < err) {
 			cnt++;
 			std::cout << "WHAT THE FUCK:: " << cnt << "\n";
