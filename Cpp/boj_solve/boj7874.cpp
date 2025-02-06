@@ -104,6 +104,8 @@ struct Circle {
 		ld tz = (cos(lo) - cos(hi)) * m.y * r;
 		return fan + tz - (s / e) * r * r * (ld).5;
 	}
+	friend std::istream& operator >> (std::istream& is, Circle& p) { is >> p.c.x >> p.c.y >> p.r; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Circle& p) { os << p.c.x << " " << p.c.y << " " << p.r; return os; }
 } C[3];
 Vld intersections(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
@@ -143,7 +145,7 @@ ld rad(const Sphere& a, const Sphere& b, const Sphere& c) {
 	ll det = (b - a) * (c - a);
 	ld proj = det / dab;
 	ld ret = fit(proj / dac, -1, 1);
-	return ret;
+	return acos(ret);
 }
 int meet(const Sphere& p, const Sphere& q) {
 	ll dist = Euc(p, q);
@@ -283,8 +285,8 @@ void query() {
 	if (f01 == INSIDE) F[1] = 1;
 	if (f02 == INSIDE || f12 == INSIDE) F[2] == 1;
 	if (F[1] && F[2]) { std::cout << S[0].vol() << "\n"; return; }
-	if (F[1]) { std::cout << two_union(S[0], S[2]) << "\n"; return; }
-	if (F[2]) { std::cout << two_union(S[0], S[1]) << "\n"; return; }
+	if (F[1]) { std::cout << two_union(S[0], S[2]) << " ::TWO 1\n"; return; }
+	if (F[2]) { std::cout << two_union(S[0], S[1]) << " ::TWO 2\n"; return; }
 	if (f01 == OUTSIDE && f02 == OUTSIDE) {
 		ld ret = S[0].vol() + two_union(S[1], S[2]);
 		std::cout << ret << "\n";
@@ -302,13 +304,18 @@ void query() {
 	}
 	ld dab = mag(S[0], S[1]);
 	ld dac = mag(S[0], S[2]);
+	std::cout << "dab:: " << dab << " dac:: " << dac << "\n";
 	Pos ca = Pos(0, 0);
 	Pos cb = Pos(dab, 0);
 	ld t = rad(S[0], S[1], S[2]);
+	std::cout << "t:: " << t << "\n";
 	Pos cc = Pos(dac, 0).rot(t);
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
+	std::cout << "C[0]::" << C[0] << "\n";
+	std::cout << "C[1]::" << C[1] << "\n";
+	std::cout << "C[2]::" << C[2] << "\n";
 	memset(F, 0, sizeof F);
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
@@ -328,15 +335,18 @@ void query() {
 			}
 		}
 		std::sort(arc.begin(), arc.end());
+		arc.push_back(Pos(2 * PI, 2 * PI));
 		ld hi = 0, rnd = 0;
 		for (const Pos& p : arc) {
 			if (hi < p.LO) rnd += (p.LO - hi), hi = p.HI;
 			else hi = std::max(hi, p.HI);
 		}
-		if (rnd < TOL) { std::cout << two_union(S[(i + 1) % 3], S[(i + 2) % 3]) << "\n"; return; }
+		std::cout << "rnd:: " << rnd << "\n";
+		if (rnd < TOL) { std::cout << two_union(S[(i + 1) % 3], S[(i + 2) % 3]) << " ::TWO 3\n"; return; }
 		ret += volume(C[i].r, hp);
 	}
-	std::cout << ret << "\n";
+	//std::cout << ret << "\n";
+	std::cout << ret << " ::THREE\n";
 	return;
 }
 void solve() {
