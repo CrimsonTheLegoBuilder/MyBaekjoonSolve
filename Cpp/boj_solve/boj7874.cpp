@@ -182,7 +182,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		ld t = norm(hp[0].HI - hp[0].LO) * .5;
 		ld d = r * cosl(t);
 		ld h = r - d;
-		return Sphere(0, 0, 0, r).vol(h);
+		return Sphere(0, 0, 0, r).vol(r + r - h);
 	}
 	auto inside = [&](const Pos& p, const ld& t) -> bool {
 		if (p.LO < p.HI) {
