@@ -161,10 +161,16 @@ ld cos_2nd(const ld& a, const ld& b, const ld& c) {
 	ld t = num / den;
 	return std::abs(acosl(std::min(std::max(t, -(ld)1.0), (ld)1.0)));
 }
-void sphericalTriangleAngles(double a, double b, double c, double& A, double& B, double& C) {
-	A = acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
-	B = acos((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)));
-	C = acos((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)));
+void spherical_triangle_angles(const ld& a, const ld& b, const ld& c, ld& A_, ld& B_, ld& C_) {
+	A_ = acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
+	B_ = acos((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)));
+	C_ = acos((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)));
+	return;
+}
+ld area(const ld& a, const ld& b, const ld& c, const ll& r) {
+	ld A_, B_, C_;
+	spherical_triangle_angles(a, b, c, A_, B_, C_);
+	return r * r * (A_ + B_ + C_ - PI);
 }
 ld two_union(const Sphere& a, const Sphere& b) {
 	int f = meet(a, b);
