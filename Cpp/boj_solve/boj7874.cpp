@@ -188,10 +188,10 @@ ld volume(const ll& r, const Polygon& hp) {
 	}
 	auto inside = [&](const Pos& p, const ld& t) -> bool {
 		if (p.LO < p.HI) {
-			if (p.LO <= t && t <= p.HI) return 1;
+			if (p.LO < t && t < p.HI) return 1;
 		}
 		else {//(p.LO > p.HI)
-			if (p.LO <= t || t <= p.HI) return 1;
+			if (p.LO < t || t < p.HI) return 1;
 		}
 		return 0;
 		};
