@@ -1,4 +1,4 @@
-  #define _CRT_SECURE_NO_WARNINGS 
+#define _CRT_SECURE_NO_WARNINGS 
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -13,7 +13,7 @@ typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
-const int LEN = 1005;
+const int LEN = 10005;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
@@ -35,6 +35,8 @@ inline ld norm(ld th) {
 #define HI y
 
 int T, N, M;
+ld Q[LEN];
+int sts[LEN];
 struct Pos {
 	ld x, y;
 	Pos(ld X_ = 0, ld y_ = 0) : x(X_), y(y_) {}
@@ -164,15 +166,17 @@ ld cos_2nd(const ld& a, const ld& b, const ld& c) {
 void spherical_triangle_angles(const ld& a, const ld& b, const ld& c, ld& A_, ld& B_, ld& C_) {
 	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
 	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
+	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
 	A_ = acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
 	B_ = acos((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)));
 	C_ = acos((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)));
+	//std::cout << "A:: " << A_ << " B:: " << B_ << " C:: " << C_ << "\n";
 	return;
 }
 ld spherical_triangle_angles(const ld& a, const ld& b, const ld& c) {
-	std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
-	std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
-	std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
+	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
+	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
+	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
 	return acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
 }
 ld area(const ld& a, const ld& b, const ld& c, const ll& r) {
@@ -207,10 +211,10 @@ ld volume(const ll& r, const Polygon& hp) {
 	}
 	auto inside = [&](const Pos& p, const ld& t) -> bool {
 		if (p.LO < p.HI) {
-			if (p.LO < t && t < p.HI) return 1;
+			if (p.LO <= t && t <= p.HI) return 1;
 		}
 		else {//(p.LO > p.HI)
-			if (p.LO < t || t < p.HI) return 1;
+			if (p.LO <= t || t <= p.HI) return 1;
 		}
 		return 0;
 		};
@@ -222,11 +226,12 @@ ld volume(const ll& r, const Polygon& hp) {
 		return norm(acosl(fit(w, -1, 1))) * 2;
 		};
 	auto area_ = [&](const ld& rr, const ld& t) -> ld {
-		ld fan = rr * t;
-		ld z = PI - t * .5;
+		ld fan = std::abs(rr * rr * (2 * PI - t) * .5);
+		ld z = t * .5;
 		ld tri = rr * sin(z) * rr * cos(z);
+		//ld tri = rr * rr * sin(t) * 5;
 		tri = std::abs(tri);
-		if (t > PI) return fan + tri;
+		if (t < PI) return fan + tri;
 		return fan - tri;
 		};
 	auto cone_vol = [&](const ld& rr, const ld& t, const ld& h) -> ld {
@@ -235,18 +240,20 @@ ld volume(const ll& r, const Polygon& hp) {
 		return vol;
 		};
 	Circle c = Circle(Pos(), r);
-	std::cout << "sz:: " << sz << "\n";
+	//std::cout << "sz:: " << sz << "\n";
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
 	ld tu = norm(u.HI - u.LO) * .5;
-	ld mu = norm(u.HI + u.LO);
-	if (u.HI < u.LO) mu = norm(mu + PI);
+	ld mu = norm(u.HI + u.LO) * .5;
+	//if (u.HI < u.LO) mu = norm(mu + PI);
+	if (!inside(u, mu)) mu = norm(mu + PI);
 	ld du = r * cosl(tu);
 	ld ru = r * sinl(tu);
 	ld hu = r - du;
 	ld tv = norm(v.HI - v.LO) * .5;
-	ld mv = norm(v.HI + v.LO);
-	if (v.HI < v.LO) mv = norm(mv + PI);
+	ld mv = norm(v.HI + v.LO) * .5;
+	//if (v.HI < v.LO) mv = norm(mv + PI);
+	if (!inside(v, mv)) mv = norm(mv + PI);
 	ld dv = r * cosl(tv);
 	ld rv = r * sinl(tv);
 	ld hv = r - dv;
@@ -266,76 +273,99 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld dm = m.mag();
 	ld tm = norm(m.rad());
 	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) dm *= -1;
-	ld a_ = the(dm, r), A;
+	ld a_ = the(dm, r);// , A;
 	ld suf = 0;
 	ld x;
-	x = 0.5 - intersection(U, V);
-	if (inside(v, u.HI)) x *= -1;
+	x = intersection(U, V);
+	assert(-TOL < x && x < 1 + TOL);
+	//if (inside(v, u.LO && x < .5 || inside(v, u.HI && x > .5))) x = std::abs(x - .5);
+	//else x = -std::abs(x - .5);
+	if (inside(v, u.LO)) x = .5 - x;
+	else x = x - .5;
 	ld ang_u = the(x, 0.5);
-	A = spherical_triangle_angles(ang_u, tu, tu);
-	std::cout << "A:: " << A << "\n";
-	suf += Sphere(0, 0, 0, r).surf(hu) * ((PI * 2 - A) / (PI * 2));
-	x = 0.5 - intersection(V, U);
-	if (inside(u, v.HI)) x *= -1;
+	//A = spherical_triangle_angles(ang_u, tu, tu);
+	//std::cout << "A:: " << A << "\n";
+	suf += Sphere(0, 0, 0, r).surf(hu) * ((PI * 2 - ang_u) / (PI * 2));
+	x = intersection(V, U);
+	assert(-TOL < x && x < 1 + TOL);
+	//if (inside(u, v.LO) && x < .5 || inside(u, v.HI && x > .5)) x = std::abs(x - .5);
+	//else x = -std::abs(x - .5);
+	if (inside(u, v.LO)) x = .5 - x;
+	else x = x - .5;
 	ld ang_v = the(x, 0.5);
-	A = spherical_triangle_angles(ang_v, tv, tv);
-	std::cout << "A:: " << A << "\n";
-	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - A) / (PI * 2));
-	if ((inside(v, u.LO) && inside(Pos(u.LO, mu), tm)) ||
-		(inside(v, u.HI) && inside(Pos(mu, u.LO), tm)))
-		suf += area(a_, tu, tu, r);
+	//A = spherical_triangle_angles(ang_v, tv, tv);
+	//std::cout << "A:: " << A << "\n";
+	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
+	//if ((inside(v, u.LO) && inside(Pos(u.LO, mu), tm)) ||
+	//	(inside(v, u.HI) && inside(Pos(mu, u.LO), tm)))
+	//	suf += area(a_, tu, tu, r);
+	//else suf -= area(a_, tu, tu, r);
+	//if ((inside(u, v.LO) && inside(Pos(v.LO, mv), tm)) ||
+	//	(inside(u, v.HI) && inside(Pos(mv, v.HI), tm)))
+	//	suf += area(a_, tv, tv, r);
+	//else suf -= area(a_, tv, tv, r);
+	if (ang_u < PI) suf += area(a_, tu, tu, r);
 	else suf -= area(a_, tu, tu, r);
-	if ((inside(u, v.LO) && inside(Pos(v.LO, mv), tm)) ||
-		(inside(u, v.HI) && inside(Pos(mv, v.HI), tm)))
-		suf += area(a_, tv, tv, r);
+	if (ang_v < PI) suf += area(a_, tv, tv, r);
 	else suf -= area(a_, tv, tv, r);
-	//if ((inside(v, u.LO) && inside(Pos(mu, u.HI), tm)) || 
-	//	(inside(v, u.HI) && inside(Pos(u.LO, mu), tm)))
-	//	suf += r * r * (a_ + tu + tu - PI);
-	//else suf -= r * r * (a_ + tu + tu - PI);
-	//if ((inside(u, v.LO) && inside(Pos(mv, v.HI), tm)) ||
-	//	(inside(u, v.HI) && inside(Pos(v.LO, mv), tm)))
-	//	suf += r * r * (a_ + tv + tv - PI);
-	//else suf -= r * r * (a_ + tv + tv - PI);
-	//suf += r * r * (a_ + tv + tv - PI);
-	//if (ang_u < PI) suf += r * r * (a_ + tu + tu - PI);
-	//if (ang_v < PI) suf += r * r * (a_ + tv + tv - PI);
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
 	total += cone_vol(ru, ang_u, du);
 	total += cone_vol(rv, ang_v, dv);
-	std::cout << "FUCK::\n";
+	//std::cout << "FUCK::\n";
 	return total;
 }
-void query() {
+void query(const int& q) {
 	for (int i = 0; i < 3; i++)
 		std::cin >> S[i].x >> S[i].y >> S[i].z >> S[i].r, F[i] = 0;
 	std::sort(S, S + 3);
+	assert(S[0].r >= S[1].r && S[1].r >= S[2].r);
 	int f01 = meet(S[0], S[1]);
 	int f02 = meet(S[0], S[2]);
 	int f12 = meet(S[1], S[2]);
-	std::cout << "f01:: " << f01 << " ";
-	std::cout << "f02:: " << f02 << " ";
-	std::cout << "f12:: " << f12 << "\n";
+	//std::cout << "f01:: " << f01 << " ";
+	//std::cout << "f02:: " << f02 << " ";
+	//std::cout << "f12:: " << f12 << "\n";
 	if (f01 == INSIDE) F[1] = 1;
 	if (f02 == INSIDE || f12 == INSIDE) F[2] = 1;
-	if (F[1] && F[2]) { std::cout << S[0].vol() << "\n"; return; }
-	if (F[1]) { std::cout << two_union(S[0], S[2]) << "\n"; return; }
-	if (F[2]) { std::cout << two_union(S[0], S[1]) << "\n"; return; }
+	//if (F[1] && F[2]) { std::cout << S[0].vol() << "\n"; return; }
+	//if (F[1]) { std::cout << two_union(S[0], S[2]) << "\n"; return; }
+	//if (F[2]) { std::cout << two_union(S[0], S[1]) << "\n"; return; }
+	//if (f01 == OUTSIDE && f02 == OUTSIDE) {
+	//	ld ret = S[0].vol() + two_union(S[1], S[2]);
+	//	std::cout << ret << "\n";
+	//	return;
+	//}
+	//if (f01 == OUTSIDE && f12 == OUTSIDE) {
+	//	ld ret = S[1].vol() + two_union(S[0], S[2]);
+	//	std::cout << ret << "\n";
+	//	return;
+	//}
+	//if (f02 == OUTSIDE && f12 == OUTSIDE) {
+	//	ld ret = S[2].vol() + two_union(S[0], S[1]);
+	//	std::cout << ret << "\n";
+	//	return;
+	//}
+	if (F[1] && F[2]) { Q[q] = S[0].vol(); sts[q] = 1; return; }
+	if (F[1]) { Q[q] = two_union(S[0], S[2]); sts[q] = 2; return; }
+	if (F[2]) { Q[q] = two_union(S[0], S[1]); sts[q] = 2; return; }
 	if (f01 == OUTSIDE && f02 == OUTSIDE) {
 		ld ret = S[0].vol() + two_union(S[1], S[2]);
-		std::cout << ret << "\n";
+		Q[q] = ret;
+		sts[q] = 2;
 		return;
 	}
 	if (f01 == OUTSIDE && f12 == OUTSIDE) {
 		ld ret = S[1].vol() + two_union(S[0], S[2]);
-		std::cout << ret << "\n";
+		Q[q] = ret;
+		sts[q] = 2;
 		return;
 	}
 	if (f02 == OUTSIDE && f12 == OUTSIDE) {
 		ld ret = S[2].vol() + two_union(S[0], S[1]);
-		std::cout << ret << "\n";
+		Q[q] = ret;
+		sts[q] = 2;
 		return;
 	}
 	ld dab = mag(S[0], S[1]);
@@ -349,9 +379,9 @@ void query() {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	std::cout << "C[0]::" << C[0] << "\n";
-	std::cout << "C[1]::" << C[1] << "\n";
-	std::cout << "C[2]::" << C[2] << "\n";
+	//std::cout << "C[0] = " << C[0] << "\n";
+	//std::cout << "C[1] = " << C[1] << "\n";
+	//std::cout << "C[2] = " << C[2] << "\n";
 	memset(F, 0, sizeof F);
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
@@ -361,8 +391,8 @@ void query() {
 			Vld inxs = intersections(C[i], C[j]);
 			int sz = inxs.size();
 			if (sz == 0) continue;
-			std::cout << "sz:: " << sz << "\n";
-			std::cout << "meet:: " << meet(S[i], S[j]) << "\n";
+			//std::cout << "sz:: " << sz << "\n";
+			//std::cout << "meet:: " << meet(S[i], S[j]) << "\n";
 			assert(sz == 2);
 			ld lo = inxs[0], hi = inxs[1];
 			hp.push_back(Pos(lo, hi));
@@ -380,11 +410,17 @@ void query() {
 			else hi = std::max(hi, p.HI);
 		}
 		//std::cout << "rnd:: " << rnd << "\n";
-		if (rnd < TOL) { std::cout << two_union(S[(i + 1) % 3], S[(i + 2) % 3]) << " ::TWO 3\n"; return; }
+		//if (rnd < TOL) { std::cout << two_union(S[(i + 1) % 3], S[(i + 2) % 3]) << " ::TWO 3\n"; return; }
+		if (rnd < TOL) {
+			Q[q] = two_union(S[(i + 1) % 3], S[(i + 2) % 3]);
+			sts[q] = 2;
+			return;
+		}
 		ret += volume(C[i].r, hp);
 	}
 	//std::cout << ret << "\n";
-	std::cout << ret << " ::THREE\n";
+	Q[q] = ret;
+	sts[q] = 3;
 	return;
 }
 void solve() {
@@ -392,8 +428,31 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
+	freopen("../../../input_data/e/e000.in", "r", stdin);
+	freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
-	while (T--) query();
+	//while (T--) query();
+	for (int q = 0; q < T; q++) query(q);
+	//for (int q = 0; q < T; q++) std::cout << Q[q] << "\n";
+	int cnt = 0;
+	for (int q = 0; q < T; q++) {
+		ld ans; std::cin >> ans;
+		ld err = (Q[q] - ans) / ans;
+		if (err < -1e-6 || 1e-6 < err) {
+			cnt++;
+			std::cout << "WHAT THE FUCK:: " << cnt << "\n";
+			std::cout << "tc:: " << q << " ::\n";
+			std::cout << 1 << "\n";
+			std::cout << S[0].x << " " << S[0].y << " " << S[0].z << " " << S[0].r << "\n";
+			std::cout << S[1].x << " " << S[1].y << " " << S[1].z << " " << S[1].r << "\n";
+			std::cout << S[2].x << " " << S[2].y << " " << S[2].z << " " << S[2].r << "\n";
+			std::cout << ans << "\n";
+			std::cout << Q[q] << " | err:: ";
+			std::cout << ((Q[q] - ans) / ans) << " | state:: ";
+			std::cout << sts[q] << "\n";
+		}
+	}
+	return;
 }
 int main() { solve(); return 0; }//boj7874
 
@@ -415,11 +474,99 @@ int main() { solve(); return 0; }//boj7874
 4 6 0 2
 1 7 7 8
 7 3 3 8
-
 2400.1355473998
 2004.5519240472
 3210.8792959287
 2678.9927528154
 3655.8576746709
+
+
+1
+0 0 0 500000000
+600000000 0 0 500000000
+300000000 0 0 400000000
+938289005872000000000000000.
+
+1
+0 0 0 5
+6 0 0 5
+3 0 0 4
+938.289005872
+
+
+10
+9 5 4 8
+1 2 3 4
+4 1 1 4
+0 6 6 7
+8 4 9 2
+3 7 8 7
+2 9 1 9
+5 9 8 4
+0 7 6 5
+6 1 5 4
+2 0 9 5
+3 7 2 8
+4 6 0 2
+1 7 7 8
+7 3 3 8
+9 9 6 1
+3 4 8 9
+9 9 2 5
+5 3 3 6
+7 4 3 4
+0 8 8 9
+9 0 7 9
+1 5 8 9
+1 2 4 7
+5 8 6 3
+6 5 3 3
+2 4 6 10
+5 8 6 3
+7 2 2 8
+4 1 9 10
+2400.1355473998
+2004.5519240472
+3210.8792959287
+2678.9927528154
+3655.8576746709
+3428.4650874812
+3586.2822479245
+5497.2149900214
+4188.7902047864
+5164.3099716534
+
+2
+2 9 1 9
+5 9 8 4
+0 7 6 5
+9 0 7 9
+1 5 8 9
+1 2 4 7
+3210.8792959287
+5497.2149900214
+
+
+5
+3 9 3 9
+6 7 9 10
+7 6 9 10
+5 7 6 4
+5 8 2 7
+4 4 1 6
+1 6 3 7
+5 5 3 4
+8 2 5 3
+9 6 3 6
+2 8 8 5
+5 8 1 8
+0 0 4 6
+4 9 5 6
+4 8 2 7
+5992.2520762360
+1774.2569859099
+1548.8267144506
+2684.5358779955
+2397.0438767502
 
 */
