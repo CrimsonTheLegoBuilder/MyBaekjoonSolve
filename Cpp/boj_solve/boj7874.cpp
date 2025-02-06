@@ -216,6 +216,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		return vol;
 		};
 	Circle c = Circle(Pos(), r);
+	std::cout << "sz:: " << sz << "\n";
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
 	ld tu = norm(u.HI - u.LO) * .5;
@@ -283,8 +284,11 @@ void query() {
 	int f01 = meet(S[0], S[1]);
 	int f02 = meet(S[0], S[2]);
 	int f12 = meet(S[1], S[2]);
+	std::cout << "f01:: " << f01 << " ";
+	std::cout << "f02:: " << f02 << " ";
+	std::cout << "f12:: " << f12 << "\n";
 	if (f01 == INSIDE) F[1] = 1;
-	if (f02 == INSIDE || f12 == INSIDE) F[2] == 1;
+	if (f02 == INSIDE || f12 == INSIDE) F[2] = 1;
 	if (F[1] && F[2]) { std::cout << S[0].vol() << "\n"; return; }
 	if (F[1]) { std::cout << two_union(S[0], S[2]) << "\n"; return; }
 	if (F[2]) { std::cout << two_union(S[0], S[1]) << "\n"; return; }
@@ -326,6 +330,8 @@ void query() {
 			Vld inxs = intersections(C[i], C[j]);
 			int sz = inxs.size();
 			if (sz == 0) continue;
+			std::cout << "sz:: " << sz << "\n";
+			std::cout << "meet:: " << meet(S[i], S[j]) << "\n";
 			assert(sz == 2);
 			ld lo = inxs[0], hi = inxs[1];
 			hp.push_back(Pos(lo, hi));
