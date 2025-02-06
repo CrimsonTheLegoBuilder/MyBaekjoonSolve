@@ -211,8 +211,8 @@ ld volume(const ll& r, const Polygon& hp) {
 		return fan - tri;
 		};
 	auto cone_vol = [&](const ld& rr, const ld& t, const ld& h) -> ld {
-		ld rat = area(rr, t) / 3 / (rr * rr * PI);
-		ld vol = rr * rr * rat * PI * h;
+		ld rat = area(rr, t) / (rr * rr * PI);
+		ld vol = rr * rr / 3 * rat * PI * h;
 		return vol;
 		};
 	Circle c = Circle(Pos(), r);
