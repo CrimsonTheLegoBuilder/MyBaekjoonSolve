@@ -208,20 +208,16 @@ ld cos_2nd(const ld& a, const ld& b, const ld& c) {
 	ld t = num / den;
 	return std::abs(acosl(std::min(std::max(t, -(ld)1.0), (ld)1.0)));
 }
-ld spherical_triangle_angles(const ld& a, const ld& b, const ld& c) {
-	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
-	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
-	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
-	return acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
-}
+//ld spherical_triangle_angles(const ld& a, const ld& b, const ld& c) {
+//	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
+//	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
+//	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
+//	return acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
+//}
 void spherical_triangle_angles(const ld& a, const ld& b, const ld& c, ld& A_, ld& B_, ld& C_) {
-	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
-	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
-	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
 	A_ = acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
 	B_ = acos((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)));
 	C_ = acos((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)));
-	//std::cout << "A:: " << A_ << " B:: " << B_ << " C:: " << C_ << "\n";
 	return;
 }
 ld area(const ld& a, const ld& b, const ld& c, const ll& r, const ld& t) {
@@ -233,15 +229,6 @@ ld area(const ld& a, const ld& b, const ld& c, const ll& r, const ld& t) {
 	spherical_triangle_angles(a, b, c, A_, B_, C_);
 	return r * r * (A_ + B_ + C_ - PI);
 }
-//ld get_theta(const ld& a, const ld& A, const ld& b, const ld& d) {
-//	ld t = asin(fit((sin(A) / sin(a) * sin(b)), -1, 1));
-//	return t;
-//}
-//ld tri_area(const ld& a, const ld& A_, const ld& b, const ld& c, const ll& r, const ld& d) {
-//	ld B_ = get_theta(a, A_, b, d);
-//	ld C_ = get_theta(a, A_, c, d);
-//	return r * r * (A_ + B_ + C_ - PI);
-//}
 ld two_union(const Sphere& a, const Sphere& b) {
 	int f = meet(a, b);
 	if (f == OUTSIDE) return a.vol() + b.vol();
@@ -297,13 +284,8 @@ ld volume(const ll& r, const Polygon& hp) {
 		return vol;
 		};
 	Circle c = Circle(Pos(), r);
-	//std::cout << "sz:: " << sz << "\n";
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
-	//std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
-	//std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
-	//std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
-	//std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
 	ld tu = norm(u.HI - u.LO) * .5;
 	ld mu = norm(u.HI + u.LO) * .5;
 	if (!inside(u, mu)) mu = norm(mu + PI);
@@ -350,51 +332,26 @@ ld volume(const ll& r, const Polygon& hp) {
 	Pos m = intersection(us, ue, vs, ve);
 	ld dm = m.mag();
 	ld tm = norm(m.rad());
-	//std::cout << "m - O " << m - O << "\n";
-	//std::cout << "tm:: " << tm * 180 / PI << "\n";
 	if (du < 0 && dv < 0) {
 		dm *= -1;
 		tm = norm(tm + PI);
 	}
-	//std::cout << "tm:: " << tm * 180 / PI << "\n";
-	//ld ttu = std::abs(norm(tm - u.LO) - tu);
 	ld ttu = std::min(norm(tm - mu), norm(mu - tm));
-	//ld ttv = std::abs(norm(tm - v.LO) - tv);
 	ld ttv = std::min(norm(tm - mv), norm(mv - tm));
-	//std::cout << "ttu:: " << ttu * 180 / PI << "\n";
-	//std::cout << "ttv:: " << ttv * 180 / PI << "\n";
-	//std::cout << "dm:: " << dm << "\n";
-	//std::cout << "hu:: " << hu << "\n";
-	//std::cout << "hv:: " << hv << "\n";
-	//std::cout << "du:: " << du << "\n";
-	//std::cout << "dv:: " << dv << "\n";
-	ld a_ = the(dm, r);// , A;
-	//std::cout << "a_:: " << a_ << "\n";
+	ld a_ = the(dm, r);
 	ld suf = 0;
 	ld x;
 	x = intersection(U, V);
-	//std::cout << "x:: " << x << "\n";
 	assert(-TOL < x && x < 1 + TOL);
-	//if (inside(v, u.LO)) x = .5 - x;
-	//else x = x - .5;
 	x = .5 - x;
 	if (inside(v, u.HI)) x *= -1;
-	//std::cout << "x:: " << x << "\n";
 	ld ang_u = the(x, 0.5);
-	//std::cout << "ang_u:: " << ang_u * 180 / PI << "\n";
-	//if (eq(du, 0)) suf += Sphere(0, 0, 0, r).surf() * .5;
 	suf += Sphere(0, 0, 0, r).surf(hu) * ((PI * 2 - ang_u) / (PI * 2));
 	x = intersection(V, U);
-	//std::cout << "x:: " << x << "\n";
 	assert(-TOL < x && x < 1 + TOL);
-	//if (inside(u, v.LO)) x = .5 - x;
-	//else x = x - .5;
 	x = .5 - x;
 	if (inside(u, v.HI)) x *= -1;
-	//std::cout << "x:: " << x << "\n";
 	ld ang_v = the(x, 0.5);
-	//std::cout << "ang_v:: " << ang_v * 180 / PI << "\n";
-	//if (eq(dv, 0)) suf += Sphere(0, 0, 0, r).surf() * .5;
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
 	int su = 0;
 	if ((inside(Pos(u.LO, mu), tm) && inside(v, u.HI)) ||
@@ -413,7 +370,6 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
 	total += cone_vol(ru, ang_u, du);
 	total += cone_vol(rv, ang_v, dv);
-	//std::cout << "FUCK::\n";
 	return total;
 }
 void query(const int& q) {
@@ -426,9 +382,6 @@ void query(const int& q) {
 	int f01 = meet(S[0], S[1]);
 	int f02 = meet(S[0], S[2]);
 	int f12 = meet(S[1], S[2]);
-	//std::cout << "f01:: " << f01 << " ";
-	//std::cout << "f02:: " << f02 << " ";
-	//std::cout << "f12:: " << f12 << "\n";
 	if (f01 == INSIDE) F[1] = 1;
 	if (f02 == INSIDE || f12 == INSIDE) F[2] = 1;
 	if (F[1] && F[2]) { Q[q] = S[0].vol(); sts[q] = 1; return; }
@@ -454,18 +407,16 @@ void query(const int& q) {
 	}
 	ld dab = mag(S[0], S[1]);
 	ld dac = mag(S[0], S[2]);
-	//std::cout << "dab:: " << dab << " dac:: " << dac << "\n";
 	Pos ca = Pos(0, 0);
 	Pos cb = Pos(dab, 0);
 	ld t = rad(S[0], S[1], S[2]);
-	//std::cout << "t:: " << t << "\n";
 	Pos cc = Pos(dac, 0).rot(t);
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	std::cout << "C[0] = " << C[0] << "\n";
-	std::cout << "C[1] = " << C[1] << "\n";
-	std::cout << "C[2] = " << C[2] << "\n";
+	//std::cout << "C[0] = " << C[0] << "\n";
+	//std::cout << "C[1] = " << C[1] << "\n";
+	//std::cout << "C[2] = " << C[2] << "\n";
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -474,8 +425,6 @@ void query(const int& q) {
 			Vld inxs = intersections(C[i], C[j]);
 			int sz = inxs.size();
 			if (sz == 0) continue;
-			//std::cout << "sz:: " << sz << "\n";
-			//std::cout << "meet:: " << meet(S[i], S[j]) << "\n";
 			assert(sz == 2);
 			ld lo = inxs[0], hi = inxs[1];
 			hp.push_back(Pos(lo, hi));
@@ -492,19 +441,15 @@ void query(const int& q) {
 			if (hi < p.LO) rnd += (p.LO - hi), hi = p.HI;
 			else hi = std::max(hi, p.HI);
 		}
-		//std::cout << "rnd:: " << rnd << "\n";
-		//if (rnd < TOL) { std::cout << two_union(S[(i + 1) % 3], S[(i + 2) % 3]) << " ::TWO 3\n"; return; }
 		if (rnd < TOL) {
 			Q[q] = two_union(S[(i + 1) % 3], S[(i + 2) % 3]);
 			sts[q] = 2;
 			return;
 		}
-		ld vv = volume(C[i].r, hp);
-		std::cout << "vol:: " << vv << "\n";
-		ret += vv;
-		//std::cout << "S[" << i << "]:: " << S[i].x << " " << S[i].y << " " << S[i].z << " " << S[i].r << "\n";
+		ld vol = volume(C[i].r, hp);
+		//std::cout << "vol:: " << vv << "\n";
+		ret += vol;
 	}
-	//std::cout << ret << "\n";
 	Q[q] = ret;
 	sts[q] = 3;
 	return;
@@ -514,12 +459,10 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	//freopen("../../../input_data/e/e000.in", "r", stdin);
-	//freopen("../../../input_data/e/ret.txt", "w", stdout);
+	freopen("../../../input_data/e/e000.in", "r", stdin);
+	freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
-	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
-	//for (int q = 0; q < T; q++) std::cout << Q[q] << "\n";
 	int cnt = 0;
 	for (int q = 0; q < T; q++) {
 		ld ans; std::cin >> ans;
@@ -542,213 +485,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj7874
-
-/*
-
-5
-3 7 5 9
-1 7 0 9
-8 8 1 5
-8 4 0 6
-4 4 3 10
-8 4 1 6
-5 1 2 7
-5 6 1 10
-4 1 3 6
-4 9 8 10
-5 0 4 4
-5 2 5 4
-1 4 5 4
-1 2 1 7
-1 8 0 10
-4473.948436313
-4225.908317979
-4376.564524088
-4338.065543957
-4514.865527247
-
-1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-4473.948436313
-
-vol:: 2160.257019560
-vol:: 2175.561354868
-vol:: 138.130055122
-
-vol:: 2160.257019560
-vol:: 2175.561354868
-vol:: 38.892128636
-
-vol:: 2160.257019560
-vol:: 2175.561354868
-vol:: -132.017525647
-
-1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-dm:: 7.580781415
-a_:: 1.138486702
-x:: 0.912591015
-x:: 0.412591015
-ang_u:: 68.786098731
-x:: 0.443755634
-x:: 0.056244366
-ang_v:: 167.082399925
-dm:: 7.580781415
-a_:: 1.138486702
-x:: 0.087408985
-x:: 0.412591015
-ang_u:: 68.786098731
-x:: 0.383710409
-x:: -0.116289591
-ang_v:: 206.897933418
-dm:: -1.211712371
-a_:: 3.631151799
-x:: 0.556244366
-x:: 0.056244366
-ang_u:: 167.082399925
-x:: 0.616289591
-x:: -0.116289591
-ang_v:: 206.897933418
-4473.948436313
-4607.828127280
-WHAT THE FUCK:: 1
-tc:: 1 ::
-1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-4473.948436313
-4607.828127280 | err:: 0.029924281 | state:: 3
-
-
-
-1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-du:: 2.692582404
-dv:: 7.560864148
-a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
-sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
-acos(0.361850763)::
-A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
-a:: 1.138486702 b:: 0.573336119 c:: 0.573336119
-sin(a):: 0.908000511 sin(b):: 0.542437723 sin(c):: 0.542437723
-acos(-0.974692570)::
-A:: 2.916138001 B:: 0.133948245 C:: 0.133948245
-du:: 2.692582404
-dv:: 7.491498450
-a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
-sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
-acos(0.361850763)::
-A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
-a:: 1.138486702 b:: 0.587392225 c:: 0.587392225
-sin(a):: 0.908000511 sin(b):: 0.554192227 sin(c):: 0.554192227
-acos(-0.891813848)::
-A:: 2.672135153 B:: 0.279755810 C:: 0.279755810
-du:: -1.080123450
-dv:: -0.350070021
-a:: 2.652033508 b:: 1.788537505 c:: 1.788537505
-sin(a):: 0.470236862 sin(b):: 0.976387901 sin(c):: 0.976387901
-acos(-0.974692570)::
-A:: 2.916138001 B:: 2.658892421 C:: 2.658892421
-a:: 2.652033508 b:: 1.640867659 c:: 1.640867659
-sin(a):: 0.470236862 sin(b):: 0.997546009 sin(c):: 0.997546009
-acos(-0.891813848)::
-A:: 2.672135153 B:: 1.855614235 C:: 1.855614235
-4473.948436313
-
-1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-du:: 2.692582404
-dv:: 7.560864148
-a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
-sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
-acos(0.361850763)::
-A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
-a:: 1.138486702 b:: 0.573336119 c:: 0.573336119
-sin(a):: 0.908000511 sin(b):: 0.542437723 sin(c):: 0.542437723
-acos(-0.974692570)::
-A:: 2.916138001 B:: 0.133948245 C:: 0.133948245
-du:: 2.692582404
-dv:: 7.491498450
-a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
-sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
-acos(0.361850763)::
-A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
-a:: 1.138486702 b:: 0.587392225 c:: 0.587392225
-sin(a):: 0.908000511 sin(b):: 0.554192227 sin(c):: 0.554192227
-acos(-0.891813848)::
-A:: 2.672135153 B:: 0.279755810 C:: 0.279755810
-du:: -1.080123450
-dv:: -0.350070021
-a:: 3.631151799 b:: 1.788537505 c:: 1.788537505
-sin(a):: -0.470236862 sin(b):: 0.976387901 sin(c):: 0.976387901
-acos(-0.974692570)::
-A:: 2.916138001 B:: 0.482700233 C:: 0.482700233
-a:: 3.631151799 b:: 1.640867659 c:: 1.640867659
-sin(a):: -0.470236862 sin(b):: 0.997546009 sin(c):: 0.997546009
-acos(-0.891813848)::
-A:: 2.672135153 B:: 1.285978419 C:: 1.285978419
-4473.948436313
-WHAT THE FUCK:: 1
-tc:: 1 ::
-1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-4473.948436313
-4607.828127280 | err:: 0.029924281 | state:: 3
-
-
-
-
-*/
-
-//if (ang_u < PI && du > 0) suf -= area(a_, tu, tu, r);
-//else suf += area(a_, tu, tu, r);
-//if (ang_v < PI && dv > 0) suf -= area(a_, tv, tv, r);
-//else suf += area(a_, tv, tv, r);
-
-//if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
-//else suf -= tri_area(a_, ang_u, tu, tu, r, du);
-//if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
-//else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//if (du >= 0) {
-//	if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
-//	else suf -= tri_area(a_, ang_u, tu, tu, r, du);
-//}
-//else {
-//	if (ang_u < PI) suf -= tri_area(a_, ang_u, tu, tu, r, du);
-//	else suf += tri_area(a_, ang_u, tu, tu, r, du);
-//}
-//if (dv >= 0) {
-//	if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
-//	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//}
-//else {
-//	if (ang_v < PI) suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//	else suf += tri_area(a_, ang_v, tv, tv, r, dv);
-//}
-//if (du >= 0) {
-//	if (ang_u < PI) suf -= area(a_, tu, tu, r);
-//	else suf += area(a_, tu, tu, r);
-//}
-//else {
-//	if (ang_u < PI) suf += area(a_, tu, tu, r);
-//	else suf -= area(a_, tu, tu, r);
-//}
-//if (dv >= 0) {
-//	if (ang_v < PI) suf -= area(a_, tv, tv, r);
-//	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//}
-//else {
-//	if (ang_v < PI) suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//	else suf += tri_area(a_, ang_v, tv, tv, r, dv);
-//}
