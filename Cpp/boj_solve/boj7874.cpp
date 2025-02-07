@@ -208,6 +208,12 @@ ld cos_2nd(const ld& a, const ld& b, const ld& c) {
 	ld t = num / den;
 	return std::abs(acosl(std::min(std::max(t, -(ld)1.0), (ld)1.0)));
 }
+ld spherical_triangle_angles(const ld& a, const ld& b, const ld& c) {
+	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
+	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
+	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
+	return acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
+}
 void spherical_triangle_angles(const ld& a, const ld& b, const ld& c, ld& A_, ld& B_, ld& C_) {
 	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
 	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
@@ -218,26 +224,24 @@ void spherical_triangle_angles(const ld& a, const ld& b, const ld& c, ld& A_, ld
 	//std::cout << "A:: " << A_ << " B:: " << B_ << " C:: " << C_ << "\n";
 	return;
 }
-ld spherical_triangle_angles(const ld& a, const ld& b, const ld& c) {
-	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
-	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
-	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
-	return acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
-}
-ld area(const ld& a, const ld& b, const ld& c, const ll& r) {
+ld area(const ld& a, const ld& b, const ld& c, const ll& r, const ld& t) {
 	ld A_, B_, C_;
+	if (a >= PI) {
+		spherical_triangle_angles(a * .5, t, c, A_, B_, C_);
+		return r * r * (A_ + B_ + C_ - PI) * 2;
+	}
 	spherical_triangle_angles(a, b, c, A_, B_, C_);
 	return r * r * (A_ + B_ + C_ - PI);
 }
-ld get_theta(const ld& a, const ld& A, const ld& b, const ld& d) {
-	ld t = asin(fit((sin(A) / sin(a) * sin(b)), -1, 1));
-	return t;
-}
-ld tri_area(const ld& a, const ld& A_, const ld& b, const ld& c, const ll& r, const ld& d) {
-	ld B_ = get_theta(a, A_, b, d);
-	ld C_ = get_theta(a, A_, c, d);
-	return r * r * (A_ + B_ + C_ - PI);
-}
+//ld get_theta(const ld& a, const ld& A, const ld& b, const ld& d) {
+//	ld t = asin(fit((sin(A) / sin(a) * sin(b)), -1, 1));
+//	return t;
+//}
+//ld tri_area(const ld& a, const ld& A_, const ld& b, const ld& c, const ll& r, const ld& d) {
+//	ld B_ = get_theta(a, A_, b, d);
+//	ld C_ = get_theta(a, A_, c, d);
+//	return r * r * (A_ + B_ + C_ - PI);
+//}
 ld two_union(const Sphere& a, const Sphere& b) {
 	int f = meet(a, b);
 	if (f == OUTSIDE) return a.vol() + b.vol();
@@ -265,10 +269,10 @@ ld volume(const ll& r, const Polygon& hp) {
 	}
 	auto inside = [&](const Pos& p, const ld& t) -> bool {
 		if (p.LO < p.HI) {
-			if (p.LO <= t && t <= p.HI) return 1;
+			if (p.LO < t && t < p.HI) return 1;
 		}
 		else {//(p.LO > p.HI)
-			if (p.LO <= t || t <= p.HI) return 1;
+			if (p.LO < t || t < p.HI) return 1;
 		}
 		return 0;
 		};
@@ -283,7 +287,6 @@ ld volume(const ll& r, const Polygon& hp) {
 		ld fan = std::abs(rr * rr * (2 * PI - t) * .5);
 		ld z = t * .5;
 		ld tri = rr * sin(z) * rr * cos(z);
-		//ld tri = rr * rr * sin(t) * 5;
 		tri = std::abs(tri);
 		if (t < PI) return fan + tri;
 		return fan - tri;
@@ -298,19 +301,17 @@ ld volume(const ll& r, const Polygon& hp) {
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
 	//std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
-	//std::cout << "u.t:: " << norm(u.HI - u.LO) << "\n";
+	//std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
 	//std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
-	//std::cout << "v.t:: " << norm(v.HI - v.LO) << "\n";
+	//std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
 	ld tu = norm(u.HI - u.LO) * .5;
 	ld mu = norm(u.HI + u.LO) * .5;
-	//if (u.HI < u.LO) mu = norm(mu + PI);
 	if (!inside(u, mu)) mu = norm(mu + PI);
 	ld du = r * cosl(tu);
 	ld ru = r * sinl(tu);
 	ld hu = r - du;
 	ld tv = norm(v.HI - v.LO) * .5;
 	ld mv = norm(v.HI + v.LO) * .5;
-	//if (v.HI < v.LO) mv = norm(mv + PI);
 	if (!inside(v, mv)) mv = norm(mv + PI);
 	ld dv = r * cosl(tv);
 	ld rv = r * sinl(tv);
@@ -344,20 +345,29 @@ ld volume(const ll& r, const Polygon& hp) {
 	if (f2) return Sphere(0, 0, 0, r).vol(r + r - hu);
 	Pos us = c.p(u.LO), ue = c.p(u.HI);
 	Pos vs = c.p(v.LO), ve = c.p(v.HI);
-	//if (inside(v, u.LO)) std::swap(us, ue);
-	//if (inside(u, v.LO)) std::swap(vs, ve);
 	Seg U = Seg(us, ue);
 	Seg V = Seg(vs, ve);
 	Pos m = intersection(us, ue, vs, ve);
 	ld dm = m.mag();
 	ld tm = norm(m.rad());
-	if (norm(u.HI - u.LO) > PI && norm(v.HI - v.LO) > PI) {
+	//std::cout << "m - O " << m - O << "\n";
+	//std::cout << "tm:: " << tm * 180 / PI << "\n";
+	if (du < 0 && dv < 0) {
 		dm *= -1;
-		//tm = norm(tm + PI);
+		tm = norm(tm + PI);
 	}
+	//std::cout << "tm:: " << tm * 180 / PI << "\n";
+	//ld ttu = std::abs(norm(tm - u.LO) - tu);
+	ld ttu = std::min(norm(tm - mu), norm(mu - tm));
+	//ld ttv = std::abs(norm(tm - v.LO) - tv);
+	ld ttv = std::min(norm(tm - mv), norm(mv - tm));
+	//std::cout << "ttu:: " << ttu * 180 / PI << "\n";
+	//std::cout << "ttv:: " << ttv * 180 / PI << "\n";
 	//std::cout << "dm:: " << dm << "\n";
 	//std::cout << "hu:: " << hu << "\n";
 	//std::cout << "hv:: " << hv << "\n";
+	//std::cout << "du:: " << du << "\n";
+	//std::cout << "dv:: " << dv << "\n";
 	ld a_ = the(dm, r);// , A;
 	//std::cout << "a_:: " << a_ << "\n";
 	ld suf = 0;
@@ -384,41 +394,29 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld ang_v = the(x, 0.5);
 	//std::cout << "ang_v:: " << ang_v * 180 / PI << "\n";
 	suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-	if (ang_u < PI && du > 0) suf -= area(a_, tu, tu, r);
-	else suf += area(a_, tu, tu, r);
-	if (ang_v < PI && dv > 0) suf -= area(a_, tv, tv, r);
-	else suf += area(a_, tv, tv, r);
-	//if (ang_u < PI) suf += area(a_, tu, tu, r);
-	//else suf -= area(a_, tu, tu, r);
-	//if (ang_v < PI) suf += area(a_, tv, tv, r);
-	//else suf -= area(a_, tv, tv, r);
-	//if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
-	//else suf -= tri_area(a_, ang_u, tu, tu, r, du);
-	//if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
-	//else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-	//if (du >= 0) {
-	//	if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
-	//	else suf -= tri_area(a_, ang_u, tu, tu, r, du);
-	//}
-	//else {
-	//	if (ang_u < PI) suf -= tri_area(a_, ang_u, tu, tu, r, du);
-	//	else suf += tri_area(a_, ang_u, tu, tu, r, du);
-	//}
-	//if (dv >= 0) {
-	//	if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
-	//	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-	//}
-	//else {
-	//	if (ang_v < PI) suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-	//	else suf += tri_area(a_, ang_v, tv, tv, r, dv);
-	//}
+	if ((du < 0 && dv < 0)) {
+		suf += area(a_, tu, tu, r, ttu);
+		suf += area(a_, tv, tv, r, ttv);
+	}
+	else {
+		if (ang_u < PI) suf += area(a_, tu, tu, r, ttu);
+		else suf -= area(a_, tu, tu, r, ttu);
+		if (ang_v < PI) suf += area(a_, tv, tv, r, ttv);
+		else suf -= area(a_, tv, tv, r, ttv);
+	}
+	//if (ang_u < PI) suf += area(a_, tu, tu, r, ttu);
+	//else suf -= area(a_, tu, tu, r, ttu);
+	//if (ang_v < PI) suf += area(a_, tv, tv, r, ttv);
+	//else suf -= area(a_, tv, tv, r, ttv);
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
 	//std::cout << "before cone:: " << total << "\n";
 	total += cone_vol(ru, ang_u, du);
+	//total += std::abs(cone_vol(ru, ang_u, du)) * sign(du);
 	//std::cout << "cone1 :: " << total << "\n";
 	total += cone_vol(rv, ang_v, dv);
+	//total += std::abs(cone_vol(rv, ang_v, dv)) * sign(dv);
 	//std::cout << "cone2 :: " << total << "\n";
 	//std::cout << "FUCK::\n";
 	return total;
@@ -438,24 +436,6 @@ void query(const int& q) {
 	//std::cout << "f12:: " << f12 << "\n";
 	if (f01 == INSIDE) F[1] = 1;
 	if (f02 == INSIDE || f12 == INSIDE) F[2] = 1;
-	//if (F[1] && F[2]) { std::cout << S[0].vol() << "\n"; return; }
-	//if (F[1]) { std::cout << two_union(S[0], S[2]) << "\n"; return; }
-	//if (F[2]) { std::cout << two_union(S[0], S[1]) << "\n"; return; }
-	//if (f01 == OUTSIDE && f02 == OUTSIDE) {
-	//	ld ret = S[0].vol() + two_union(S[1], S[2]);
-	//	std::cout << ret << "\n";
-	//	return;
-	//}
-	//if (f01 == OUTSIDE && f12 == OUTSIDE) {
-	//	ld ret = S[1].vol() + two_union(S[0], S[2]);
-	//	std::cout << ret << "\n";
-	//	return;
-	//}
-	//if (f02 == OUTSIDE && f12 == OUTSIDE) {
-	//	ld ret = S[2].vol() + two_union(S[0], S[1]);
-	//	std::cout << ret << "\n";
-	//	return;
-	//}
 	if (F[1] && F[2]) { Q[q] = S[0].vol(); sts[q] = 1; return; }
 	if (F[1]) { Q[q] = two_union(S[0], S[2]); sts[q] = 2; return; }
 	if (F[2]) { Q[q] = two_union(S[0], S[1]); sts[q] = 2; return; }
@@ -491,20 +471,6 @@ void query(const int& q) {
 	//std::cout << "C[0] = " << C[0] << "\n";
 	//std::cout << "C[1] = " << C[1] << "\n";
 	//std::cout << "C[2] = " << C[2] << "\n";
-	//arc_init();
-	//ld c_union = union_except_x(-1);
-	////std::cout << "circle union:: " << c_union << "\n";
-	//for (int i = 2; i >= 0; i--) {
-	//	ld tmp = union_except_x(i);
-	//	//std::cout << "tmp:: " << tmp << "\n";
-	//	ld diff = (c_union - tmp) / c_union;
-	//	//std::cout << "diff:: " << diff << "\n";
-	//	if (diff < 0.01) {
-	//		Q[q] = two_union(S[(i + 1) % 3], S[(i + 2) % 3]);
-	//		sts[q] = 2;
-	//		return;
-	//	}
-	//}
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -552,8 +518,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	//freopen("../../../input_data/e/e000.in", "r", stdin);
-	//freopen("../../../input_data/e/ret.txt", "w", stdout);
+	freopen("../../../input_data/e/e000.in", "r", stdin);
+	freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
@@ -649,4 +615,132 @@ tc:: 1 ::
 8 8 1 5
 4473.948436313
 4607.828127280 | err:: 0.029924281 | state:: 3
+
+
+
+1
+3 7 5 9
+1 7 0 9
+8 8 1 5
+du:: 2.692582404
+dv:: 7.560864148
+a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
+sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
+acos(0.361850763)::
+A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
+a:: 1.138486702 b:: 0.573336119 c:: 0.573336119
+sin(a):: 0.908000511 sin(b):: 0.542437723 sin(c):: 0.542437723
+acos(-0.974692570)::
+A:: 2.916138001 B:: 0.133948245 C:: 0.133948245
+du:: 2.692582404
+dv:: 7.491498450
+a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
+sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
+acos(0.361850763)::
+A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
+a:: 1.138486702 b:: 0.587392225 c:: 0.587392225
+sin(a):: 0.908000511 sin(b):: 0.554192227 sin(c):: 0.554192227
+acos(-0.891813848)::
+A:: 2.672135153 B:: 0.279755810 C:: 0.279755810
+du:: -1.080123450
+dv:: -0.350070021
+a:: 2.652033508 b:: 1.788537505 c:: 1.788537505
+sin(a):: 0.470236862 sin(b):: 0.976387901 sin(c):: 0.976387901
+acos(-0.974692570)::
+A:: 2.916138001 B:: 2.658892421 C:: 2.658892421
+a:: 2.652033508 b:: 1.640867659 c:: 1.640867659
+sin(a):: 0.470236862 sin(b):: 0.997546009 sin(c):: 0.997546009
+acos(-0.891813848)::
+A:: 2.672135153 B:: 1.855614235 C:: 1.855614235
+4473.948436313
+
+1
+3 7 5 9
+1 7 0 9
+8 8 1 5
+du:: 2.692582404
+dv:: 7.560864148
+a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
+sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
+acos(0.361850763)::
+A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
+a:: 1.138486702 b:: 0.573336119 c:: 0.573336119
+sin(a):: 0.908000511 sin(b):: 0.542437723 sin(c):: 0.542437723
+acos(-0.974692570)::
+A:: 2.916138001 B:: 0.133948245 C:: 0.133948245
+du:: 2.692582404
+dv:: 7.491498450
+a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
+sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
+acos(0.361850763)::
+A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
+a:: 1.138486702 b:: 0.587392225 c:: 0.587392225
+sin(a):: 0.908000511 sin(b):: 0.554192227 sin(c):: 0.554192227
+acos(-0.891813848)::
+A:: 2.672135153 B:: 0.279755810 C:: 0.279755810
+du:: -1.080123450
+dv:: -0.350070021
+a:: 3.631151799 b:: 1.788537505 c:: 1.788537505
+sin(a):: -0.470236862 sin(b):: 0.976387901 sin(c):: 0.976387901
+acos(-0.974692570)::
+A:: 2.916138001 B:: 0.482700233 C:: 0.482700233
+a:: 3.631151799 b:: 1.640867659 c:: 1.640867659
+sin(a):: -0.470236862 sin(b):: 0.997546009 sin(c):: 0.997546009
+acos(-0.891813848)::
+A:: 2.672135153 B:: 1.285978419 C:: 1.285978419
+4473.948436313
+WHAT THE FUCK:: 1
+tc:: 1 ::
+1
+3 7 5 9
+1 7 0 9
+8 8 1 5
+4473.948436313
+4607.828127280 | err:: 0.029924281 | state:: 3
+
+
+
+
 */
+
+//if (ang_u < PI && du > 0) suf -= area(a_, tu, tu, r);
+//else suf += area(a_, tu, tu, r);
+//if (ang_v < PI && dv > 0) suf -= area(a_, tv, tv, r);
+//else suf += area(a_, tv, tv, r);
+
+//if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
+//else suf -= tri_area(a_, ang_u, tu, tu, r, du);
+//if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
+//else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
+//if (du >= 0) {
+//	if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
+//	else suf -= tri_area(a_, ang_u, tu, tu, r, du);
+//}
+//else {
+//	if (ang_u < PI) suf -= tri_area(a_, ang_u, tu, tu, r, du);
+//	else suf += tri_area(a_, ang_u, tu, tu, r, du);
+//}
+//if (dv >= 0) {
+//	if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
+//	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
+//}
+//else {
+//	if (ang_v < PI) suf -= tri_area(a_, ang_v, tv, tv, r, dv);
+//	else suf += tri_area(a_, ang_v, tv, tv, r, dv);
+//}
+//if (du >= 0) {
+//	if (ang_u < PI) suf -= area(a_, tu, tu, r);
+//	else suf += area(a_, tu, tu, r);
+//}
+//else {
+//	if (ang_u < PI) suf += area(a_, tu, tu, r);
+//	else suf -= area(a_, tu, tu, r);
+//}
+//if (dv >= 0) {
+//	if (ang_v < PI) suf -= area(a_, tv, tv, r);
+//	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
+//}
+//else {
+//	if (ang_v < PI) suf -= tri_area(a_, ang_v, tv, tv, r, dv);
+//	else suf += tri_area(a_, ang_v, tv, tv, r, dv);
+//}
