@@ -387,7 +387,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		ld ang_v = the(x, 0.5);
 		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
 		ld ttv = 0;
-		if (inside(u_, v_.LO)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
+		if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
 		else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
 		ld tri = area(a_, tv, tv, r, ttv);
 		suf += tri;
