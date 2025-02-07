@@ -343,6 +343,58 @@ ld volume(const ll& r, const Polygon& hp) {
 	}
 	if (f1) return Sphere(0, 0, 0, r).vol(r + r - hv);
 	if (f2) return Sphere(0, 0, 0, r).vol(r + r - hu);
+	if (eq(tu * 2, PI) || eq(tv * 2, PI)) {
+		bool f = 1;
+		Pos u_ = eq(tu * 2, PI) ? u : v;
+		Pos v_ = eq(tu * 2, PI) ? v : u;
+		ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
+		Pos us = c.p(u_.LO), ue = c.p(u_.HI);
+		Pos vs = c.p(v_.LO), ve = c.p(v_.HI);
+		Seg U = Seg(us, ue);
+		Seg V = Seg(vs, ve);
+		mv = norm(v_.HI + v_.LO) * .5;
+		if (!inside(v_, mv)) mv = norm(mv + PI);
+		if (eq(u_.LO, mv) || eq(u_.HI, mv)) {
+			std::cout << "FUCK::\n";
+			tv = norm(v_.HI - v_.LO) * .5;
+			dv = r * cosl(tv);
+			rv = r * sinl(tv);
+			hv = r - dv;
+			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
+		}
+		if (inside(u_, mv)) {
+			f = 0;
+			std::swap(v_.LO, v_.HI);
+			mv = norm(v_.HI + v_.LO) * .5;
+			if (!inside(v_, mv)) mv = norm(mv + PI);
+		}
+		assert(!inside(u_, mv));
+		tv = norm(v_.HI - v_.LO) * .5;
+		dv = r * cosl(tv);
+		rv = r * sinl(tv);
+		hv = r - dv;
+		x = intersection(U, V);
+		assert(-TOL < x && x < 1 + TOL);
+		x = .5 - x;
+		if (inside(v_, u_.HI)) x *= -1;
+		assert(x != 0);
+		ld a_ = the(x, r);
+		x = intersection(V, U);
+		assert(-TOL < x && x < 1 + TOL);
+		x = .5 - x;
+		if (inside(u_, v_.HI)) x *= -1;
+		ld ang_v = the(x, 0.5);
+		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
+		ld ttv = 0;
+		if (inside(u_, v_.LO)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
+		else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		ld tri = area(a_, tv, tv, r, ttv);
+		suf += tri;
+		ld ratio = suf / Sphere(0, 0, 0, r).surf();
+		ld total = Sphere(0, 0, 0, r).vol() * ratio;
+		total += cone_vol(rv, ang_v, dv);
+		return f ? total : Sphere(0, 0, 0, r).vol() * .5 - total;
+	}
 	Pos us = c.p(u.LO), ue = c.p(u.HI);
 	Pos vs = c.p(v.LO), ve = c.p(v.HI);
 	Seg U = Seg(us, ue);
@@ -352,7 +404,8 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld tm = norm(m.rad());
 	//std::cout << "m - O " << m - O << "\n";
 	//std::cout << "tm:: " << tm * 180 / PI << "\n";
-	if (du < 0 && dv < 0) {
+	//if (du <= 0 && dv <= 0) {
+	if (du < TOL && dv < TOL) {
 		dm *= -1;
 		tm = norm(tm + PI);
 	}
@@ -368,7 +421,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	//std::cout << "hv:: " << hv << "\n";
 	//std::cout << "du:: " << du << "\n";
 	//std::cout << "dv:: " << dv << "\n";
-	ld a_ = the(dm, r);// , A;
+	ld a_ = the(dm, r);
 	//std::cout << "a_:: " << a_ << "\n";
 	ld suf = 0;
 	ld x;
@@ -406,8 +459,19 @@ ld volume(const ll& r, const Polygon& hp) {
 		(inside(Pos(mv, v.HI), tm) && inside(u, v.LO))) sv = -1;
 	else sv = 1;
 	if (eq(tm, mv)) sv = 0;
-	suf += area(a_, tu, tu, r, ttu) * su;
-	suf += area(a_, tv, tv, r, ttv) * sv;
+	x = intersection(U, V);
+	if (du < 0 && dv > 0 && (
+		(inside(v, u.LO) && x > .5) ||
+		(inside(v, u.HI) && x < .5)
+		)) suf += (Sphere(0, 0, 0, r).surf() - area(a_, tu, tu, r, ttu)) * su;
+	else suf += area(a_, tu, tu, r, ttu) * su;
+	x = intersection(V, U);
+	if (dv < 0 && du > 0 && (
+		(inside(u, v.LO) && x > .5) ||
+		(inside(u, v.HI) && x < .5)
+		)) suf += (Sphere(0, 0, 0, r).surf() - area(a_, tv, tv, r, ttv)) * sv;
+	else suf += area(a_, tv, tv, r, ttv) * sv;
+	//suf += area(a_, tv, tv, r, ttv) * sv;
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
@@ -463,9 +527,9 @@ void query(const int& q) {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	std::cout << "C[0] = " << C[0] << "\n";
-	std::cout << "C[1] = " << C[1] << "\n";
-	std::cout << "C[2] = " << C[2] << "\n";
+	//std::cout << "C[0] = " << C[0] << "\n";
+	//std::cout << "C[1] = " << C[1] << "\n";
+	//std::cout << "C[2] = " << C[2] << "\n";
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -499,9 +563,9 @@ void query(const int& q) {
 			sts[q] = 2;
 			return;
 		}
-		ld vv = volume(C[i].r, hp);
-		std::cout << "vol:: " << vv << "\n";
-		ret += vv;
+		ld vol = volume(C[i].r, hp);
+		//std::cout << "vol:: " << vol << "\n";
+		ret += vol;
 		//std::cout << "S[" << i << "]:: " << S[i].x << " " << S[i].y << " " << S[i].z << " " << S[i].r << "\n";
 	}
 	//std::cout << ret << "\n";
@@ -533,8 +597,8 @@ void solve() {
 			std::cout << SP[q * 3 + 0].x << " " << SP[q * 3 + 0].y << " " << SP[q * 3 + 0].z << " " << SP[q * 3 + 0].r << "\n";
 			std::cout << SP[q * 3 + 1].x << " " << SP[q * 3 + 1].y << " " << SP[q * 3 + 1].z << " " << SP[q * 3 + 1].r << "\n";
 			std::cout << SP[q * 3 + 2].x << " " << SP[q * 3 + 2].y << " " << SP[q * 3 + 2].z << " " << SP[q * 3 + 2].r << "\n";
-			std::cout << ans << "\n";
-			std::cout << Q[q] << " | err:: ";
+			std::cout << "" << ans << "\n";
+			std::cout << "" << Q[q] << " | err:: ";
 			std::cout << ((Q[q] - ans) / ans) << " | state:: ";
 			std::cout << sts[q] << "\n";
 		}
@@ -545,210 +609,112 @@ int main() { solve(); return 0; }//boj7874
 
 /*
 
-5
-3 7 5 9
-1 7 0 9
-8 8 1 5
-8 4 0 6
-4 4 3 10
-8 4 1 6
-5 1 2 7
-5 6 1 10
-4 1 3 6
-4 9 8 10
-5 0 4 4
-5 2 5 4
-1 4 5 4
-1 2 1 7
-1 8 0 10
-4473.948436313
-4225.908317979
-4376.564524088
-4338.065543957
-4514.865527247
-
-1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-4473.948436313
-
-vol:: 2160.257019560
-vol:: 2175.561354868
-vol:: 138.130055122
-
-vol:: 2160.257019560
-vol:: 2175.561354868
-vol:: 38.892128636
-
-vol:: 2160.257019560
-vol:: 2175.561354868
-vol:: -132.017525647
-
-1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-dm:: 7.580781415
-a_:: 1.138486702
-x:: 0.912591015
-x:: 0.412591015
-ang_u:: 68.786098731
-x:: 0.443755634
-x:: 0.056244366
-ang_v:: 167.082399925
-dm:: 7.580781415
-a_:: 1.138486702
-x:: 0.087408985
-x:: 0.412591015
-ang_u:: 68.786098731
-x:: 0.383710409
-x:: -0.116289591
-ang_v:: 206.897933418
-dm:: -1.211712371
-a_:: 3.631151799
-x:: 0.556244366
-x:: 0.056244366
-ang_u:: 167.082399925
-x:: 0.616289591
-x:: -0.116289591
-ang_v:: 206.897933418
-4473.948436313
-4607.828127280
 WHAT THE FUCK:: 1
-tc:: 1 ::
+tc:: 1176 ::
 1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-4473.948436313
-4607.828127280 | err:: 0.029924281 | state:: 3
-
-
-
+5 1 4 4
+2 4 6 8
+8 1 4 5
+2393.646578056
+qry:: 2297.729407575 | err:: -0.040071568 | state:: 3
+WHAT THE FUCK:: 2
+tc:: 1295 ::
 1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-du:: 2.692582404
-dv:: 7.560864148
-a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
-sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
-acos(0.361850763)::
-A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
-a:: 1.138486702 b:: 0.573336119 c:: 0.573336119
-sin(a):: 0.908000511 sin(b):: 0.542437723 sin(c):: 0.542437723
-acos(-0.974692570)::
-A:: 2.916138001 B:: 0.133948245 C:: 0.133948245
-du:: 2.692582404
-dv:: 7.491498450
-a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
-sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
-acos(0.361850763)::
-A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
-a:: 1.138486702 b:: 0.587392225 c:: 0.587392225
-sin(a):: 0.908000511 sin(b):: 0.554192227 sin(c):: 0.554192227
-acos(-0.891813848)::
-A:: 2.672135153 B:: 0.279755810 C:: 0.279755810
-du:: -1.080123450
-dv:: -0.350070021
-a:: 2.652033508 b:: 1.788537505 c:: 1.788537505
-sin(a):: 0.470236862 sin(b):: 0.976387901 sin(c):: 0.976387901
-acos(-0.974692570)::
-A:: 2.916138001 B:: 2.658892421 C:: 2.658892421
-a:: 2.652033508 b:: 1.640867659 c:: 1.640867659
-sin(a):: 0.470236862 sin(b):: 0.997546009 sin(c):: 0.997546009
-acos(-0.891813848)::
-A:: 2.672135153 B:: 1.855614235 C:: 1.855614235
-4473.948436313
-
+6 2 8 6
+6 6 6 4
+5 7 3 6
+1619.919989260
+qry:: 1448.644500696 | err:: -0.105730832 | state:: 3
+WHAT THE FUCK:: 3
+tc:: 1845 ::
 1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-du:: 2.692582404
-dv:: 7.560864148
-a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
-sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
-acos(0.361850763)::
-A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
-a:: 1.138486702 b:: 0.573336119 c:: 0.573336119
-sin(a):: 0.908000511 sin(b):: 0.542437723 sin(c):: 0.542437723
-acos(-0.974692570)::
-A:: 2.916138001 B:: 0.133948245 C:: 0.133948245
-du:: 2.692582404
-dv:: 7.491498450
-a:: 1.138486702 b:: 1.266967528 c:: 1.266967528
-sin(a):: 0.908000511 sin(b):: 0.954198002 sin(c):: 0.954198002
-acos(0.361850763)::
-A:: 1.200543902 B:: 1.368792880 C:: 1.368792880
-a:: 1.138486702 b:: 0.587392225 c:: 0.587392225
-sin(a):: 0.908000511 sin(b):: 0.554192227 sin(c):: 0.554192227
-acos(-0.891813848)::
-A:: 2.672135153 B:: 0.279755810 C:: 0.279755810
-du:: -1.080123450
-dv:: -0.350070021
-a:: 3.631151799 b:: 1.788537505 c:: 1.788537505
-sin(a):: -0.470236862 sin(b):: 0.976387901 sin(c):: 0.976387901
-acos(-0.974692570)::
-A:: 2.916138001 B:: 0.482700233 C:: 0.482700233
-a:: 3.631151799 b:: 1.640867659 c:: 1.640867659
-sin(a):: -0.470236862 sin(b):: 0.997546009 sin(c):: 0.997546009
-acos(-0.891813848)::
-A:: 2.672135153 B:: 1.285978419 C:: 1.285978419
-4473.948436313
+7 0 0 7
+5 5 2 4
+7 9 4 7
+2708.071106011
+qry:: 2530.377491056 | err:: -0.065616303 | state:: 3
+
+===
+
 WHAT THE FUCK:: 1
-tc:: 1 ::
+tc:: 1040 ::
 1
-3 7 5 9
-1 7 0 9
-8 8 1 5
-4473.948436313
-4607.828127280 | err:: 0.029924281 | state:: 3
-
-
-
+0 5 3 10
+1 2 8 10
+1 8 6 9
+6495.663204638
+2673.587213219 | err:: -0.588404274 | state:: 3
+WHAT THE FUCK:: 2
+tc:: 1088 ::
+1
+3 0 7 8
+0 7 3 4
+4 6 7 7
+2936.823069518
+2551.679620287 | err:: -0.131142885 | state:: 3
+WHAT THE FUCK:: 3
+tc:: 1097 ::
+1
+5 3 9 6
+3 5 4 6
+5 0 3 9
+3528.088552436
+2060.721603001 | err:: -0.415909898 | state:: 3
+WHAT THE FUCK:: 4
+tc:: 1295 ::
+1
+6 2 8 6
+6 6 6 4
+5 7 3 6
+1619.919989260
+1963.945749568 | err:: 0.212372069 | state:: 3
+WHAT THE FUCK:: 5
+tc:: 1313 ::
+1
+8 6 7 4
+2 8 2 9
+4 6 9 5
+3339.454073934
+2924.706022371 | err:: -0.124196363 | state:: 3
+WHAT THE FUCK:: 6
+tc:: 1394 ::
+1
+5 4 9 8
+5 8 8 9
+6 8 4 9
+4566.371994545
+1885.423644677 | err:: -0.587106866 | state:: 3
+WHAT THE FUCK:: 7
+tc:: 1405 ::
+1
+4 5 4 9
+0 4 8 10
+6 7 7 8
+5622.480587850
+3241.979341592 | err:: -0.423389856 | state:: 3
+WHAT THE FUCK:: 8
+tc:: 1642 ::
+1
+0 3 6 6
+2 1 4 7
+1 8 3 10
+4706.541063698
+2127.285535949 | err:: -0.548015091 | state:: 3
+WHAT THE FUCK:: 9
+tc:: 1752 ::
+1
+3 7 4 9
+1 2 8 6
+2 3 3 6
+3418.846912320
+2078.025598841 | err:: -0.392185245 | state:: 3
+WHAT THE FUCK:: 10
+tc:: 1845 ::
+1
+7 0 0 7
+5 5 2 4
+7 9 4 7
+2708.071106011
+3023.520522718 | err:: 0.116484909 | state:: 3
 
 */
-
-//if (ang_u < PI && du > 0) suf -= area(a_, tu, tu, r);
-//else suf += area(a_, tu, tu, r);
-//if (ang_v < PI && dv > 0) suf -= area(a_, tv, tv, r);
-//else suf += area(a_, tv, tv, r);
-
-//if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
-//else suf -= tri_area(a_, ang_u, tu, tu, r, du);
-//if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
-//else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//if (du >= 0) {
-//	if (ang_u < PI) suf += tri_area(a_, ang_u, tu, tu, r, du);
-//	else suf -= tri_area(a_, ang_u, tu, tu, r, du);
-//}
-//else {
-//	if (ang_u < PI) suf -= tri_area(a_, ang_u, tu, tu, r, du);
-//	else suf += tri_area(a_, ang_u, tu, tu, r, du);
-//}
-//if (dv >= 0) {
-//	if (ang_v < PI) suf += tri_area(a_, ang_v, tv, tv, r, dv);
-//	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//}
-//else {
-//	if (ang_v < PI) suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//	else suf += tri_area(a_, ang_v, tv, tv, r, dv);
-//}
-//if (du >= 0) {
-//	if (ang_u < PI) suf -= area(a_, tu, tu, r);
-//	else suf += area(a_, tu, tu, r);
-//}
-//else {
-//	if (ang_u < PI) suf += area(a_, tu, tu, r);
-//	else suf -= area(a_, tu, tu, r);
-//}
-//if (dv >= 0) {
-//	if (ang_v < PI) suf -= area(a_, tv, tv, r);
-//	else suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//}
-//else {
-//	if (ang_v < PI) suf -= tri_area(a_, ang_v, tv, tv, r, dv);
-//	else suf += tri_area(a_, ang_v, tv, tv, r, dv);
-//}

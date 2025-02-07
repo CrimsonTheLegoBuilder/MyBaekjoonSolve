@@ -447,7 +447,7 @@ void query(const int& q) {
 			return;
 		}
 		ld vol = volume(C[i].r, hp);
-		//std::cout << "vol:: " << vv << "\n";
+		//std::cout << "vol:: " << vol / 1e1 << "\n";
 		ret += vol;
 	}
 	Q[q] = ret;
@@ -459,8 +459,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	freopen("../../../input_data/e/e000.in", "r", stdin);
-	freopen("../../../input_data/e/ret.txt", "w", stdout);
+	//freopen("../../../input_data/e/e000.in", "r", stdin);
+	//freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	for (int q = 0; q < T; q++) query(q);
 	int cnt = 0;
