@@ -351,7 +351,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		mv = norm(v_.HI + v_.LO) * .5;
 		if (!inside(v_, mv)) mv = norm(mv + PI);
 		if (eq(u_.LO, mv) || eq(u_.HI, mv)) {
-			//std::cout << "FUCK::\n";
+			std::cout << "FUCK1::\n";
 			tv = norm(v_.HI - v_.LO) * .5;
 			dv = r * cosl(tv);
 			rv = r * sinl(tv);
@@ -359,7 +359,7 @@ ld volume(const ll& r, const Polygon& hp) {
 			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
 		}
 		if (inside(u_, mv)) {
-			std::cout << "FUCK::\n";
+			std::cout << "FUCK2::\n";
 			f = 0;
 			std::swap(v_.LO, v_.HI);
 			mv = norm(v_.HI + v_.LO) * .5;
