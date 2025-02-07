@@ -348,14 +348,10 @@ ld volume(const ll& r, const Polygon& hp) {
 		Pos u_ = eq(tu * 2, PI) ? u : v;
 		Pos v_ = eq(tu * 2, PI) ? v : u;
 		ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
-		Pos us = c.p(u_.LO), ue = c.p(u_.HI);
-		Pos vs = c.p(v_.LO), ve = c.p(v_.HI);
-		Seg U = Seg(us, ue);
-		Seg V = Seg(vs, ve);
 		mv = norm(v_.HI + v_.LO) * .5;
 		if (!inside(v_, mv)) mv = norm(mv + PI);
 		if (eq(u_.LO, mv) || eq(u_.HI, mv)) {
-			std::cout << "FUCK::\n";
+			//std::cout << "FUCK::\n";
 			tv = norm(v_.HI - v_.LO) * .5;
 			dv = r * cosl(tv);
 			rv = r * sinl(tv);
@@ -363,11 +359,16 @@ ld volume(const ll& r, const Polygon& hp) {
 			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
 		}
 		if (inside(u_, mv)) {
+			std::cout << "FUCK::\n";
 			f = 0;
 			std::swap(v_.LO, v_.HI);
 			mv = norm(v_.HI + v_.LO) * .5;
 			if (!inside(v_, mv)) mv = norm(mv + PI);
 		}
+		Pos us = c.p(u_.LO), ue = c.p(u_.HI);
+		Pos vs = c.p(v_.LO), ve = c.p(v_.HI);
+		Seg U = Seg(us, ue);
+		Seg V = Seg(vs, ve);
 		assert(!inside(u_, mv));
 		tv = norm(v_.HI - v_.LO) * .5;
 		dv = r * cosl(tv);
@@ -578,8 +579,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	//freopen("../../../input_data/e/e000.in", "r", stdin);
-	//freopen("../../../input_data/e/ret.txt", "w", stdout);
+	freopen("../../../input_data/e/e000.in", "r", stdin);
+	freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
@@ -608,6 +609,59 @@ void solve() {
 int main() { solve(); return 0; }//boj7874
 
 /*
+
+10
+
+0 5 3 10
+1 2 8 10
+1 8 6 9
+
+3 0 7 8
+0 7 3 4
+4 6 7 7
+
+5 3 9 6
+3 5 4 6
+5 0 3 9
+
+6 2 8 6
+6 6 6 4
+5 7 3 6
+
+8 6 7 4
+2 8 2 9
+4 6 9 5
+
+5 4 9 8
+5 8 8 9
+6 8 4 9
+
+4 5 4 9
+0 4 8 10
+6 7 7 8
+
+0 3 6 6
+2 1 4 7
+1 8 3 10
+
+3 7 4 9
+1 2 8 6
+2 3 3 6
+
+7 0 0 7
+5 5 2 4
+7 9 4 7
+6495.663204638
+2936.823069518
+3528.088552436
+1619.919989260
+3339.454073934
+4566.371994545
+5622.480587850
+4706.541063698
+3418.846912320
+2708.071106011
+
 
 WHAT THE FUCK:: 1
 tc:: 1176 ::
