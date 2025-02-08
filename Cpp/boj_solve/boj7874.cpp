@@ -218,9 +218,9 @@ void spherical_triangle_angles(const ld& a, const ld& b, const ld& c, ld& A_, ld
 	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
 	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
 	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
-	A_ = acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
-	B_ = acos((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)));
-	C_ = acos((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)));
+	A_ = acos(fit((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)), -1, 1));
+	B_ = acos(fit((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)), -1, 1));
+	C_ = acos(fit((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)), -1, 1));
 	//std::cout << "A:: " << A_ << " B:: " << B_ << " C:: " << C_ << "\n";
 	return;
 }
@@ -281,6 +281,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		};
 	auto the = [&](const ld& dd, const ld& rr) -> ld {
 		ld w = dd / rr;
+		assert(std::abs(dd) <= std::abs(rr));
 		return norm(acosl(fit(w, -1, 1))) * 2;
 		};
 	auto area_ = [&](const ld& rr, const ld& t) -> ld {
@@ -300,10 +301,10 @@ ld volume(const ll& r, const Polygon& hp) {
 	//std::cout << "sz:: " << sz << "\n";
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
-	//std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
-	//std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
-	//std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
-	//std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
+	std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
+	std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
+	std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
+	std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
 	ld tu = norm(u.HI - u.LO) * .5;
 	ld mu = norm(u.HI + u.LO) * .5;
 	if (!inside(u, mu)) mu = norm(mu + PI);
@@ -344,14 +345,17 @@ ld volume(const ll& r, const Polygon& hp) {
 	if (f1) return Sphere(0, 0, 0, r).vol(r + r - hv);
 	if (f2) return Sphere(0, 0, 0, r).vol(r + r - hu);
 	if (eq(tu * 2, PI) || eq(tv * 2, PI)) {
+		//std::cout << "FUCK::\n";
 		bool f = 1;
 		Pos u_ = eq(tu * 2, PI) ? u : v;
 		Pos v_ = eq(tu * 2, PI) ? v : u;
-		ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
+		assert(u_ != v_);
+		//ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
+		ld suf = 0, x;
 		mv = norm(v_.HI + v_.LO) * .5;
 		if (!inside(v_, mv)) mv = norm(mv + PI);
 		if (eq(u_.LO, mv) || eq(u_.HI, mv)) {
-			std::cout << "FUCK1::\n";
+			//std::cout << "FUCK1::\n";
 			tv = norm(v_.HI - v_.LO) * .5;
 			dv = r * cosl(tv);
 			rv = r * sinl(tv);
@@ -359,18 +363,19 @@ ld volume(const ll& r, const Polygon& hp) {
 			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
 		}
 		if (inside(u_, mv)) {
-			std::cout << "FUCK2::\n";
+			//std::cout << "FUCK2::\n";
 			f = 0;
 			std::swap(v_.LO, v_.HI);
-			mv = norm(v_.HI + v_.LO) * .5;
-			if (!inside(v_, mv)) mv = norm(mv + PI);
 		}
+		mv = norm(v_.HI + v_.LO) * .5;
+		if (!inside(v_, mv)) mv = norm(mv + PI);
 		Pos us = c.p(u_.LO), ue = c.p(u_.HI);
 		Pos vs = c.p(v_.LO), ve = c.p(v_.HI);
 		Seg U = Seg(us, ue);
 		Seg V = Seg(vs, ve);
 		assert(!inside(u_, mv));
 		tv = norm(v_.HI - v_.LO) * .5;
+		std::cout << "tv||PI:: " << tv * 2 * 180 / PI << "\n";
 		dv = r * cosl(tv);
 		rv = r * sinl(tv);
 		hv = r - dv;
@@ -378,6 +383,8 @@ ld volume(const ll& r, const Polygon& hp) {
 		assert(-TOL < x && x < 1 + TOL);
 		x = .5 - x;
 		if (inside(v_, u_.HI)) x *= -1;
+		//if (dv < 0) x *= -1;
+		//x *= -1;
 		assert(x != 0);
 		ld a_ = the(x, r);
 		x = intersection(V, U);
@@ -386,15 +393,22 @@ ld volume(const ll& r, const Polygon& hp) {
 		if (inside(u_, v_.HI)) x *= -1;
 		ld ang_v = the(x, 0.5);
 		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-		ld ttv = 0;
-		if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
-		else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		//ld ttv = 0;
+		//if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
+		//else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		ld ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		ttv = std::min({ ttv, norm(u_.LO - mv), norm(mv - u_.LO) });
 		ld tri = area(a_, tv, tv, r, ttv);
 		suf += tri;
-		ld ratio = suf / Sphere(0, 0, 0, r).surf();
-		ld total = Sphere(0, 0, 0, r).vol() * ratio;
+		//suf = Sphere(0, 0, 0, r).surf() - suf;
+		//ld ratio = suf / Sphere(0, 0, 0, r).surf();
+		//ld total = Sphere(0, 0, 0, r).vol() * ratio;
+		suf = (Sphere(0, 0, 0, r).surf() * .5) - suf;
+		ld ratio = suf / (Sphere(0, 0, 0, r).surf() * .5);
+		ld total = Sphere(0, 0, 0, r).vol() * .5 * ratio;
 		total += cone_vol(rv, ang_v, dv);
-		return f ? total : Sphere(0, 0, 0, r).vol() * .5 - total;
+		return f ? total : (Sphere(0, 0, 0, r).vol() * .5 - total);
+		//return total;
 	}
 	Pos us = c.p(u.LO), ue = c.p(u.HI);
 	Pos vs = c.p(v.LO), ve = c.p(v.HI);
@@ -472,7 +486,6 @@ ld volume(const ll& r, const Polygon& hp) {
 		(inside(u, v.HI) && x < .5)
 		)) suf += (Sphere(0, 0, 0, r).surf() - area(a_, tv, tv, r, ttv)) * sv;
 	else suf += area(a_, tv, tv, r, ttv) * sv;
-	//suf += area(a_, tv, tv, r, ttv) * sv;
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
@@ -565,7 +578,7 @@ void query(const int& q) {
 			return;
 		}
 		ld vol = volume(C[i].r, hp);
-		//std::cout << "vol:: " << vol << "\n";
+		std::cout << "vol:: " << vol << "\n";
 		ret += vol;
 		//std::cout << "S[" << i << "]:: " << S[i].x << " " << S[i].y << " " << S[i].z << " " << S[i].r << "\n";
 	}
@@ -578,9 +591,9 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
-	freopen("../../../input_data/e/e000.in", "r", stdin);
-	freopen("../../../input_data/e/ret.txt", "w", stdout);
+	std::cout.precision(15);
+	//freopen("../../../input_data/e/e000.in", "r", stdin);
+	//freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
@@ -588,9 +601,10 @@ void solve() {
 	int cnt = 0;
 	for (int q = 0; q < T; q++) {
 		ld ans; std::cin >> ans;
-		ld err = (Q[q] - ans) / ans;
-		//std::cout << Q[q] << "\n";
-		if (err < -1e-6 || 1e-6 < err) {
+		ld err = (Q[q] - ans) / Q[q];
+		//std::cout << std::abs(Q[q]) << "\n";
+		bool f = std::isnan(Q[q]);
+		if (f || err <= -1e-6 || 1e-6 <= err) {
 			cnt++;
 			std::cout << "WHAT THE FUCK:: " << cnt << "\n";
 			std::cout << "tc:: " << q + 1 << " ::\n";
@@ -664,111 +678,181 @@ int main() { solve(); return 0; }//boj7874
 
 
 WHAT THE FUCK:: 1
-tc:: 1176 ::
+tc:: 1016 ::
 1
-5 1 4 4
-2 4 6 8
-8 1 4 5
-2393.646578056
-qry:: 2297.729407575 | err:: -0.040071568 | state:: 3
+6 8 3 2
+4 8 4 2
+2 0 7 10
+4206.885955961700347
+4203.771553956073149 | err:: -0.000740310538063 | state:: 3
 WHAT THE FUCK:: 2
-tc:: 1295 ::
-1
-6 2 8 6
-6 6 6 4
-5 7 3 6
-1619.919989260
-qry:: 1448.644500696 | err:: -0.105730832 | state:: 3
-WHAT THE FUCK:: 3
-tc:: 1845 ::
-1
-7 0 0 7
-5 5 2 4
-7 9 4 7
-2708.071106011
-qry:: 2530.377491056 | err:: -0.065616303 | state:: 3
-
-===
-
-WHAT THE FUCK:: 1
 tc:: 1040 ::
 1
 0 5 3 10
 1 2 8 10
 1 8 6 9
-6495.663204638
-2673.587213219 | err:: -0.588404274 | state:: 3
-WHAT THE FUCK:: 2
+6495.663204638300158
+6451.960261148306017 | err:: -0.006728018696965 | state:: 3
+WHAT THE FUCK:: 3
 tc:: 1088 ::
 1
 3 0 7 8
 0 7 3 4
 4 6 7 7
-2936.823069518
-2551.679620287 | err:: -0.131142885 | state:: 3
-WHAT THE FUCK:: 3
+2936.823069518000011
+2920.902707154424661 | err:: -0.005420947052894 | state:: 3
+WHAT THE FUCK:: 4
 tc:: 1097 ::
 1
 5 3 9 6
 3 5 4 6
 5 0 3 9
-3528.088552436
-2060.721603001 | err:: -0.415909898 | state:: 3
-WHAT THE FUCK:: 4
+3528.088552436000100
+3447.326403559420669 | err:: -0.022891190988054 | state:: 3
+WHAT THE FUCK:: 5
+tc:: 1164 ::
+1
+7 7 1 7
+3 6 3 9
+8 3 5 4
+3353.812564650500008
+3341.285795882780803 | err:: -0.003735083140827 | state:: 3
+WHAT THE FUCK:: 6
+tc:: 1176 ::
+1
+5 1 4 4
+2 4 6 8
+8 1 4 5
+2393.646578056299859
+2463.061632972864572 | err:: 0.028999709294148 | state:: 3
+WHAT THE FUCK:: 7
 tc:: 1295 ::
 1
 6 2 8 6
 6 6 6 4
 5 7 3 6
-1619.919989260
-1963.945749568 | err:: 0.212372069 | state:: 3
-WHAT THE FUCK:: 5
+1619.919989260100010
+1632.227082465124795 | err:: 0.007597346342177 | state:: 3
+WHAT THE FUCK:: 8
+tc:: 1312 ::
+1
+3 0 2 9
+1 5 6 6
+4 1 3 9
+3709.538298286299778
+3611.688557913360455 | err:: -0.026377875763715 | state:: 3
+WHAT THE FUCK:: 9
 tc:: 1313 ::
 1
 8 6 7 4
 2 8 2 9
 4 6 9 5
-3339.454073934
-2924.706022371 | err:: -0.124196363 | state:: 3
-WHAT THE FUCK:: 6
+3339.454073933799918
+3330.706324155044058 | err:: -0.002619514922225 | state:: 3
+WHAT THE FUCK:: 10
+tc:: 1392 ::
+1
+1 9 9 6
+9 2 9 9
+0 8 6 5
+3906.080642653800169
+3847.740004168937503 | err:: -0.014935851003124 | state:: 3
+WHAT THE FUCK:: 11
 tc:: 1394 ::
 1
 5 4 9 8
 5 8 8 9
 6 8 4 9
-4566.371994545
-1885.423644677 | err:: -0.587106866 | state:: 3
-WHAT THE FUCK:: 7
+4566.371994545100279
+4481.080125371411668 | err:: -0.018678256890936 | state:: 3
+WHAT THE FUCK:: 12
 tc:: 1405 ::
 1
 4 5 4 9
 0 4 8 10
 6 7 7 8
-5622.480587850
-3241.979341592 | err:: -0.423389856 | state:: 3
-WHAT THE FUCK:: 8
+5622.480587849699987
+5609.292779231411259 | err:: -0.002345549871135 | state:: 3
+WHAT THE FUCK:: 13
+tc:: 1440 ::
+1
+6 4 9 2
+0 6 9 7
+4 9 5 7
+2360.846498980400156
+2358.527468468942516 | err:: -0.000982287714368 | state:: 3
+WHAT THE FUCK:: 14
+tc:: 1550 ::
+1
+3 3 9 8
+4 4 4 8
+7 6 2 9
+4561.000097865899988
+4728.270916267221764 | err:: 0.036674153653184 | state:: 3
+WHAT THE FUCK:: 15
+tc:: 1562 ::
+1
+9 6 4 8
+3 5 6 9
+9 5 9 6
+4181.454725219599823
+4118.344581040793855 | err:: -0.015092867991173 | state:: 3
+WHAT THE FUCK:: 16
 tc:: 1642 ::
 1
 0 3 6 6
 2 1 4 7
 1 8 3 10
-4706.541063698
-2127.285535949 | err:: -0.548015091 | state:: 3
-WHAT THE FUCK:: 9
+4706.541063697900427
+4551.078591725339720 | err:: -0.033031151724493 | state:: 3
+WHAT THE FUCK:: 17
+tc:: 1653 ::
+1
+7 8 4 5
+5 6 8 7
+9 3 8 9
+3493.548477125400041
+3443.921533595303117 | err:: -0.014205311263043 | state:: 3
+WHAT THE FUCK:: 18
+tc:: 1674 ::
+1
+4 6 7 9
+6 8 4 8
+7 5 2 6
+3667.225829590800004
+3685.612849759834262 | err:: 0.005013877253119 | state:: 3
+WHAT THE FUCK:: 19
 tc:: 1752 ::
 1
 3 7 4 9
 1 2 8 6
 2 3 3 6
-3418.846912320
-2078.025598841 | err:: -0.392185245 | state:: 3
-WHAT THE FUCK:: 10
+3418.846912320499996
+3330.954515530726439 | err:: -0.025708199005061 | state:: 3
+WHAT THE FUCK:: 20
+tc:: 1793 ::
+1
+2 1 7 5
+2 3 4 8
+6 3 3 9
+3586.203059618199859
+3600.377858674823983 | err:: 0.003952592427416 | state:: 3
+WHAT THE FUCK:: 21
+tc:: 1815 ::
+1
+0 1 0 8
+9 4 5 9
+8 1 2 10
+5982.687673596199602
+5032.547338065868644 | err:: -0.158814965341355 | state:: 3
+WHAT THE FUCK:: 22
 tc:: 1845 ::
 1
 7 0 0 7
 5 5 2 4
 7 9 4 7
-2708.071106011
-3023.520522718 | err:: 0.116484909 | state:: 3
+2708.071106011199845
+2715.408181974607487 | err:: 0.002709336526327 | state:: 3
+
 
 */
