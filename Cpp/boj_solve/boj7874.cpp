@@ -434,14 +434,14 @@ ld volume(const ll& r, const Polygon& hp) {
 	total += cone_vol(ru, ang_u, du);
 	total += cone_vol(rv, ang_v, dv);
 	//std::cout << "FUCK::\n";
-	return total;
+	//return total;
 	if (total < 0) {
 		bool f = 1;
 		Pos u_ = eq(tu * 2, PI) ? u : v;
 		Pos v_ = eq(tu * 2, PI) ? v : u;
 		assert(u_ != v_);
-		//ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
-		ld suf = 0, x;
+		ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
+		//ld suf = 0, x;
 		mv = norm(v_.HI + v_.LO) * .5;
 		if (!inside(v_, mv)) mv = norm(mv + PI);
 		if (eq(u_.LO, mv) || eq(u_.HI, mv)) {
@@ -473,7 +473,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		assert(-TOL < x && x < 1 + TOL);
 		x = .5 - x;
 		if (inside(v_, u_.HI)) x *= -1;
-		if (dv > 0) x *= -1;
+		//if (dv > 0) x *= -1;
 		//x *= -1;
 		assert(x != 0);
 		ld a_ = the(x, r);
@@ -481,6 +481,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		assert(-TOL < x && x < 1 + TOL);
 		x = .5 - x;
 		if (inside(u_, v_.HI)) x *= -1;
+		//x *= -1;
 		ld ang_v = the(x, 0.5);
 		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
 		//suf += Sphere(0, 0, 0, r).surf(hv) * (ang_v / (PI * 2));
@@ -489,15 +490,15 @@ ld volume(const ll& r, const Polygon& hp) {
 		//else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
 		ld ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
 		ttv = std::min({ ttv, norm(u_.LO - mv), norm(mv - u_.LO) });
-		//ld tri = area(a_, tv, tv, r, ttv);
-		ld tri = std::abs(area(a_, tv, tv, r, ttv));
+		ld tri = area(a_, tv, tv, r, ttv);
+		//ld tri = std::abs(area(a_, tv, tv, r, ttv));
 		suf += tri;
-		//suf = Sphere(0, 0, 0, r).surf() - suf;
-		//ld ratio = suf / Sphere(0, 0, 0, r).surf();
-		//ld total = Sphere(0, 0, 0, r).vol() * ratio;
-		suf = (Sphere(0, 0, 0, r).surf() * .5) - suf;
-		ld ratio = suf / (Sphere(0, 0, 0, r).surf() * .5);
-		ld total = Sphere(0, 0, 0, r).vol() * .5 * ratio;
+		suf = Sphere(0, 0, 0, r).surf() - suf;
+		ld ratio = suf / Sphere(0, 0, 0, r).surf();
+		ld total = Sphere(0, 0, 0, r).vol() * ratio;
+		//suf = (Sphere(0, 0, 0, r).surf() * .5) - suf;
+		//ld ratio = suf / (Sphere(0, 0, 0, r).surf() * .5);
+		//ld total = Sphere(0, 0, 0, r).vol() * .5 * ratio;
 		total += cone_vol(rv, ang_v, dv);
 		std::cout << "total:: " << total << "\n";
 		std::cout << "total rvs:: " << Sphere(0, 0, 0, r).vol() * .5 - total << "\n";
