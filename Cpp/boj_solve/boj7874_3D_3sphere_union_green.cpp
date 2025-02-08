@@ -36,7 +36,7 @@ Vld Q;
 Vint sts;
 struct Pos {
 	ld x, y;
-	Pos(ld X_ = 0, ld y_ = 0) : x(X_), y(y_) {}
+	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
