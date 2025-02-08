@@ -11,7 +11,7 @@ typedef long double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-17;
+const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 10005;
 inline int sign(const ld& x) { return x <= -TOL ? -1 : x >= TOL; }
@@ -301,10 +301,10 @@ ld volume(const ll& r, const Polygon& hp) {
 	//std::cout << "sz:: " << sz << "\n";
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
-	//std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
-	//std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
-	//std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
-	//std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
+	std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
+	std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
+	std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
+	std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
 	ld tu = norm(u.HI - u.LO) * .5;
 	ld mu = norm(u.HI + u.LO) * .5;
 	if (!inside(u, mu)) mu = norm(mu + PI);
@@ -344,74 +344,6 @@ ld volume(const ll& r, const Polygon& hp) {
 	}
 	if (f1) return Sphere(0, 0, 0, r).vol(r + r - hv);
 	if (f2) return Sphere(0, 0, 0, r).vol(r + r - hu);
-	if (eq(tu * 2, PI) || eq(tv * 2, PI) || eq(du, 0) || eq(dv, 0)) {
-		//std::cout << "FUCK::\n";
-		bool f = 1;
-		Pos u_ = eq(tu * 2, PI) ? u : v;
-		Pos v_ = eq(tu * 2, PI) ? v : u;
-		assert(u_ != v_);
-		//ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
-		ld suf = 0, x;
-		mv = norm(v_.HI + v_.LO) * .5;
-		if (!inside(v_, mv)) mv = norm(mv + PI);
-		if (eq(u_.LO, mv) || eq(u_.HI, mv)) {
-			//std::cout << "FUCK1::\n";
-			tv = norm(v_.HI - v_.LO) * .5;
-			dv = r * cosl(tv);
-			rv = r * sinl(tv);
-			hv = r - dv;
-			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
-		}
-		if (inside(u_, mv)) {
-			//std::cout << "FUCK2::\n";
-			f = 0;
-			std::swap(v_.LO, v_.HI);
-		}
-		mv = norm(v_.HI + v_.LO) * .5;
-		if (!inside(v_, mv)) mv = norm(mv + PI);
-		Pos us = c.p(u_.LO), ue = c.p(u_.HI);
-		Pos vs = c.p(v_.LO), ve = c.p(v_.HI);
-		Seg U = Seg(us, ue);
-		Seg V = Seg(vs, ve);
-		assert(!inside(u_, mv));
-		tv = norm(v_.HI - v_.LO) * .5;
-		//std::cout << "tv||PI:: " << tv * 2 * 180 / PI << "\n";
-		dv = r * cosl(tv);
-		rv = r * sinl(tv);
-		hv = r - dv;
-		x = intersection(U, V);
-		assert(-TOL < x && x < 1 + TOL);
-		x = .5 - x;
-		if (inside(v_, u_.HI)) x *= -1;
-		if (dv > 0) x *= -1;
-		//x *= -1;
-		assert(x != 0);
-		ld a_ = the(x, r);
-		x = intersection(V, U);
-		assert(-TOL < x && x < 1 + TOL);
-		x = .5 - x;
-		if (inside(u_, v_.HI)) x *= -1;
-		ld ang_v = the(x, 0.5);
-		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
-		//suf += Sphere(0, 0, 0, r).surf(hv) * (ang_v / (PI * 2));
-		//ld ttv = 0;
-		//if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
-		//else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
-		ld ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
-		ttv = std::min({ ttv, norm(u_.LO - mv), norm(mv - u_.LO) });
-		//ld tri = area(a_, tv, tv, r, ttv);
-		ld tri = std::abs(area(a_, tv, tv, r, ttv));
-		suf += tri;
-		//suf = Sphere(0, 0, 0, r).surf() - suf;
-		//ld ratio = suf / Sphere(0, 0, 0, r).surf();
-		//ld total = Sphere(0, 0, 0, r).vol() * ratio;
-		suf = (Sphere(0, 0, 0, r).surf() * .5) - suf;
-		ld ratio = suf / (Sphere(0, 0, 0, r).surf() * .5);
-		ld total = Sphere(0, 0, 0, r).vol() * .5 * ratio;
-		total += cone_vol(rv, ang_v, dv);
-		return f ? total : (Sphere(0, 0, 0, r).vol() * .5 - total);
-		//return total;
-	}
 	Pos us = c.p(u.LO), ue = c.p(u.HI);
 	Pos vs = c.p(v.LO), ve = c.p(v.HI);
 	Seg U = Seg(us, ue);
@@ -421,7 +353,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld tm = norm(m.rad());
 	//std::cout << "m - O " << m - O << "\n";
 	//std::cout << "tm:: " << tm * 180 / PI << "\n";
-	//if (du <= 0 && dv <= 0) {
+	//if (du < 0 && dv < 0) {
 	if (du < TOL && dv < TOL) {
 		dm *= -1;
 		tm = norm(tm + PI);
@@ -449,6 +381,8 @@ ld volume(const ll& r, const Polygon& hp) {
 	//else x = x - .5;
 	x = .5 - x;
 	if (inside(v, u.HI)) x *= -1;
+	//if (zero(dv) && du > 0) x = std::abs(x);
+	//if (zero(dv) && du < 0) x = -std::abs(x);
 	//std::cout << "x:: " << x << "\n";
 	ld ang_u = the(x, 0.5);
 	//std::cout << "ang_u:: " << ang_u * 180 / PI << "\n";
@@ -461,6 +395,8 @@ ld volume(const ll& r, const Polygon& hp) {
 	//else x = x - .5;
 	x = .5 - x;
 	if (inside(u, v.HI)) x *= -1;
+	//if (zero(du) && dv > 0) x = std::abs(x);
+	//if (zero(du) && dv < 0) x = -std::abs(x);
 	//std::cout << "x:: " << x << "\n";
 	ld ang_v = the(x, 0.5);
 	//std::cout << "ang_v:: " << ang_v * 180 / PI << "\n";
@@ -494,6 +430,76 @@ ld volume(const ll& r, const Polygon& hp) {
 	total += cone_vol(ru, ang_u, du);
 	total += cone_vol(rv, ang_v, dv);
 	//std::cout << "FUCK::\n";
+	return total;
+	if (total < 0) {
+		bool f = 1;
+		Pos u_ = eq(tu * 2, PI) ? u : v;
+		Pos v_ = eq(tu * 2, PI) ? v : u;
+		assert(u_ != v_);
+		//ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
+		ld suf = 0, x;
+		mv = norm(v_.HI + v_.LO) * .5;
+		if (!inside(v_, mv)) mv = norm(mv + PI);
+		if (eq(u_.LO, mv) || eq(u_.HI, mv)) {
+			//std::cout << "FUCK1::\n";
+			tv = norm(v_.HI - v_.LO) * .5;
+			dv = r * cosl(tv);
+			rv = r * sinl(tv);
+			hv = r - dv;
+			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
+		}
+		if (inside(u_, mv)) {
+			//std::cout << "FUCK2::\n";
+			f = 0;
+			std::swap(v_.LO, v_.HI);
+		}
+		mv = norm(v_.HI + v_.LO) * .5;
+		if (!inside(v_, mv)) mv = norm(mv + PI);
+		Pos us = c.p(u_.LO), ue = c.p(u_.HI);
+		Pos vs = c.p(v_.LO), ve = c.p(v_.HI);
+		Seg U = Seg(us, ue);
+		Seg V = Seg(vs, ve);
+		assert(!inside(u_, mv));
+		tv = norm(v_.HI - v_.LO) * .5;
+		std::cout << "tv||PI:: " << tv * 2 * 180 / PI << "\n";
+		dv = r * cosl(tv);
+		rv = r * sinl(tv);
+		hv = r - dv;
+		x = intersection(U, V);
+		assert(-TOL < x && x < 1 + TOL);
+		x = .5 - x;
+		if (inside(v_, u_.HI)) x *= -1;
+		if (dv > 0) x *= -1;
+		//x *= -1;
+		assert(x != 0);
+		ld a_ = the(x, r);
+		x = intersection(V, U);
+		assert(-TOL < x && x < 1 + TOL);
+		x = .5 - x;
+		if (inside(u_, v_.HI)) x *= -1;
+		ld ang_v = the(x, 0.5);
+		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
+		//suf += Sphere(0, 0, 0, r).surf(hv) * (ang_v / (PI * 2));
+		//ld ttv = 0;
+		//if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
+		//else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		ld ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		ttv = std::min({ ttv, norm(u_.LO - mv), norm(mv - u_.LO) });
+		//ld tri = area(a_, tv, tv, r, ttv);
+		ld tri = std::abs(area(a_, tv, tv, r, ttv));
+		suf += tri;
+		//suf = Sphere(0, 0, 0, r).surf() - suf;
+		//ld ratio = suf / Sphere(0, 0, 0, r).surf();
+		//ld total = Sphere(0, 0, 0, r).vol() * ratio;
+		suf = (Sphere(0, 0, 0, r).surf() * .5) - suf;
+		ld ratio = suf / (Sphere(0, 0, 0, r).surf() * .5);
+		ld total = Sphere(0, 0, 0, r).vol() * .5 * ratio;
+		total += cone_vol(rv, ang_v, dv);
+		std::cout << "total:: " << total << "\n";
+		std::cout << "total rvs:: " << Sphere(0, 0, 0, r).vol() * .5 - total << "\n";
+		return f ? total : (Sphere(0, 0, 0, r).vol() * .5 - total);
+		//return total;
+	}
 	return total;
 }
 void query(const int& q) {
@@ -555,9 +561,9 @@ void query(const int& q) {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	//std::cout << "C[0] = " << C[0] << "\n";
-	//std::cout << "C[1] = " << C[1] << "\n";
-	//std::cout << "C[2] = " << C[2] << "\n";
+	std::cout << "C[0] = " << C[0] << "\n";
+	std::cout << "C[1] = " << C[1] << "\n";
+	std::cout << "C[2] = " << C[2] << "\n";
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -592,7 +598,7 @@ void query(const int& q) {
 			return;
 		}
 		ld vol = volume(C[i].r, hp);
-		//std::cout << "vol:: " << vol << "\n";
+		std::cout << "vol:: " << vol << "\n";
 		ret += vol;
 		//std::cout << "S[" << i << "]:: " << S[i].x << " " << S[i].y << " " << S[i].z << " " << S[i].r << "\n";
 	}
@@ -638,235 +644,62 @@ int main() { solve(); return 0; }//boj7874 CERC 2009 E Everybody may get lost in
 
 /*
 
-10
-
-0 5 3 10
-1 2 8 10
-1 8 6 9
-
-3 0 7 8
-0 7 3 4
-4 6 7 7
-
-5 3 9 6
-3 5 4 6
-5 0 3 9
-
-6 2 8 6
-6 6 6 4
-5 7 3 6
-
-8 6 7 4
-2 8 2 9
-4 6 9 5
-
-5 4 9 8
-5 8 8 9
-6 8 4 9
-
-4 5 4 9
-0 4 8 10
-6 7 7 8
-
-0 3 6 6
-2 1 4 7
-1 8 3 10
-
-3 7 4 9
-1 2 8 6
-2 3 3 6
-
-7 0 0 7
-5 5 2 4
-7 9 4 7
-6495.663204638
-2936.823069518
-3528.088552436
-1619.919989260
-3339.454073934
-4566.371994545
-5622.480587850
-4706.541063698
-3418.846912320
-2708.071106011
-
-
 WHAT THE FUCK:: 1
-tc:: 1016 ::
-1
-6 8 3 2
-4 8 4 2
-2 0 7 10
-4206.885955961700347
-4203.771553956073149 | err:: -0.000740310538063 | state:: 3
-WHAT THE FUCK:: 2
-tc:: 1040 ::
-1
-0 5 3 10
-1 2 8 10
-1 8 6 9
-6495.663204638300158
-6451.960261148306017 | err:: -0.006728018696965 | state:: 3
-WHAT THE FUCK:: 3
-tc:: 1088 ::
-1
-3 0 7 8
-0 7 3 4
-4 6 7 7
-2936.823069518000011
-2920.902707154424661 | err:: -0.005420947052894 | state:: 3
-WHAT THE FUCK:: 4
-tc:: 1097 ::
-1
-5 3 9 6
-3 5 4 6
-5 0 3 9
-3528.088552436000100
-3447.326403559420669 | err:: -0.022891190988054 | state:: 3
-WHAT THE FUCK:: 5
-tc:: 1164 ::
-1
-7 7 1 7
-3 6 3 9
-8 3 5 4
-3353.812564650500008
-3341.285795882780803 | err:: -0.003735083140827 | state:: 3
-WHAT THE FUCK:: 6
 tc:: 1176 ::
 1
 5 1 4 4
 2 4 6 8
 8 1 4 5
 2393.646578056299859
-2463.061632972864572 | err:: 0.028999709294148 | state:: 3
-WHAT THE FUCK:: 7
+2297.729407575465757 | err:: -0.040071567523858 | state:: 3
+WHAT THE FUCK:: 2
 tc:: 1295 ::
 1
 6 2 8 6
 6 6 6 4
 5 7 3 6
 1619.919989260100010
-1632.227082465124795 | err:: 0.007597346342177 | state:: 3
-WHAT THE FUCK:: 8
-tc:: 1312 ::
-1
-3 0 2 9
-1 5 6 6
-4 1 3 9
-3709.538298286299778
-3611.688557913360455 | err:: -0.026377875763715 | state:: 3
-WHAT THE FUCK:: 9
-tc:: 1313 ::
-1
-8 6 7 4
-2 8 2 9
-4 6 9 5
-3339.454073933799918
-3330.706324155044058 | err:: -0.002619514922225 | state:: 3
-WHAT THE FUCK:: 10
-tc:: 1392 ::
-1
-1 9 9 6
-9 2 9 9
-0 8 6 5
-3906.080642653800169
-3847.740004168937503 | err:: -0.014935851003124 | state:: 3
-WHAT THE FUCK:: 11
-tc:: 1394 ::
-1
-5 4 9 8
-5 8 8 9
-6 8 4 9
-4566.371994545100279
-4481.080125371411668 | err:: -0.018678256890936 | state:: 3
-WHAT THE FUCK:: 12
-tc:: 1405 ::
-1
-4 5 4 9
-0 4 8 10
-6 7 7 8
-5622.480587849699987
-5609.292779231411259 | err:: -0.002345549871135 | state:: 3
-WHAT THE FUCK:: 13
-tc:: 1440 ::
-1
-6 4 9 2
-0 6 9 7
-4 9 5 7
-2360.846498980400156
-2358.527468468942516 | err:: -0.000982287714368 | state:: 3
-WHAT THE FUCK:: 14
-tc:: 1550 ::
-1
-3 3 9 8
-4 4 4 8
-7 6 2 9
-4561.000097865899988
-4728.270916267221764 | err:: 0.036674153653184 | state:: 3
-WHAT THE FUCK:: 15
-tc:: 1562 ::
-1
-9 6 4 8
-3 5 6 9
-9 5 9 6
-4181.454725219599823
-4118.344581040793855 | err:: -0.015092867991173 | state:: 3
-WHAT THE FUCK:: 16
-tc:: 1642 ::
-1
-0 3 6 6
-2 1 4 7
-1 8 3 10
-4706.541063697900427
-4551.078591725339720 | err:: -0.033031151724493 | state:: 3
-WHAT THE FUCK:: 17
-tc:: 1653 ::
-1
-7 8 4 5
-5 6 8 7
-9 3 8 9
-3493.548477125400041
-3443.921533595303117 | err:: -0.014205311263043 | state:: 3
-WHAT THE FUCK:: 18
-tc:: 1674 ::
-1
-4 6 7 9
-6 8 4 8
-7 5 2 6
-3667.225829590800004
-3685.612849759834262 | err:: 0.005013877253119 | state:: 3
-WHAT THE FUCK:: 19
-tc:: 1752 ::
-1
-3 7 4 9
-1 2 8 6
-2 3 3 6
-3418.846912320499996
-3330.954515530726439 | err:: -0.025708199005061 | state:: 3
-WHAT THE FUCK:: 20
-tc:: 1793 ::
-1
-2 1 7 5
-2 3 4 8
-6 3 3 9
-3586.203059618199859
-3600.377858674823983 | err:: 0.003952592427416 | state:: 3
-WHAT THE FUCK:: 21
-tc:: 1815 ::
-1
-0 1 0 8
-9 4 5 9
-8 1 2 10
-5982.687673596199602
-5032.547338065868644 | err:: -0.158814965341355 | state:: 3
-WHAT THE FUCK:: 22
+1448.644500695591205 | err:: -0.105730832201619 | state:: 3
+WHAT THE FUCK:: 3
 tc:: 1845 ::
 1
 7 0 0 7
 5 5 2 4
 7 9 4 7
 2708.071106011199845
-2715.408181974607487 | err:: 0.002709336526327 | state:: 3
+2530.377491055583505 | err:: -0.065616303265148 | state:: 3
 
+
+1
+5 1 4 4
+2 4 6 8
+8 1 4 5
+C[0] = 0.000000000000000 0.000000000000000 8
+C[1] = 7.000000000000000 0.000000000000000 5
+C[2] = 4.428571428571429 1.545236260913138 4
+u:: 321.786789298261851 38.213210701738198
+u.t:: 76.426421403476368
+v:: 358.103249630420123 40.366993798221820
+v.t:: 42.263744167801697
+vol:: 2076.020134662319833
+u:: 98.213210701738191 261.786789298261795
+u.t:: 163.573578596523589
+v:: 95.867178511970039 202.127383220282013
+v.t:: 106.260204708311960
+vol:: 317.457942908929681
+u:: 65.374827032906921 333.095416395735015
+u.t:: 267.720589362828093
+v:: 238.997280866126033 58.997280866126040
+v.t:: 180.000000000000000
+vol:: -95.748669995783828
+2393.646578056299859
+WHAT THE FUCK:: 1
+tc:: 1 ::
+1
+5 1 4 4
+2 4 6 8
+8 1 4 5
+2393.646578056299859
+2297.729407575465757 | err:: -0.040071567523858 | state:: 3
 
 */
