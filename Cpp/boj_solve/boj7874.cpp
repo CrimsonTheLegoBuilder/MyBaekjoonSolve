@@ -406,12 +406,16 @@ ld volume(const ll& r, const Polygon& hp) {
 	if ((inside(Pos(u.LO, mu), tm) && inside(v, u.HI)) ||
 		(inside(Pos(mu, u.HI), tm) && inside(v, u.LO))) su = -1;
 	else su = 1;
-	if (eq(tm, mu)) su = 0;
+	//if (eq(tm, u.LO) || eq(tm, u.HI)) su = 0;
+	//if (eq(tm, mu)) su = 0;
+	//if (eq(du, 0)) su = 0;
 	int sv = 0;
 	if ((inside(Pos(v.LO, mv), tm) && inside(u, v.HI)) ||
 		(inside(Pos(mv, v.HI), tm) && inside(u, v.LO))) sv = -1;
 	else sv = 1;
-	if (eq(tm, mv)) sv = 0;
+	//if (eq(tm, v.LO) || eq(tm, v.HI)) sv = 0;
+	//if (eq(tm, mv)) sv = 0;
+	//if (eq(dv, 0)) sv = 0;
 	x = intersection(U, V);
 	if (du < 0 && dv > 0 && (
 		(inside(v, u.LO) && x > .5) ||
@@ -612,8 +616,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	//freopen("../../../input_data/e/e000.in", "r", stdin);
-	//freopen("../../../input_data/e/ret.txt", "w", stdout);
+	freopen("../../../input_data/e/e000.in", "r", stdin);
+	freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
