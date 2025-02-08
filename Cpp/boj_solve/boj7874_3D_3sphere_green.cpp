@@ -20,11 +20,7 @@ inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
 inline ll sq(const ll& x) { return x * x; }
 inline ld sq(const ld& x) { return x * x; }
 inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
-inline ld norm(ld th) {
-	while (th < 0) th += 2 * PI;
-	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
-	return th;
-}
+inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
 
 #define INSIDE 0
 #define MEET 1
@@ -282,10 +278,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	Pos m = intersection(us, ue, vs, ve);
 	ld dm = m.mag();
 	ld tm = norm(m.rad());
-	if (du < TOL && dv < TOL) {
-		dm *= -1;
-		tm = norm(tm + PI);
-	}
+	if (du < TOL && dv < TOL) { dm *= -1; tm = norm(tm + PI); }
 	ld ttu = std::min(norm(tm - mu), norm(mu - tm));
 	ld ttv = std::min(norm(tm - mv), norm(mv - tm));
 	ld a_ = the(dm, r);
@@ -328,7 +321,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
 	total += cone_vol(ru, ang_u, du);
 	total += cone_vol(rv, ang_v, dv);
-	if (total < 0) {
+	if (total < 0 || zero(dm) || zero(dv)) {
 		bool f = 1;
 		Pos u_ = eq(tu * 2, PI) ? u : v;
 		Pos v_ = eq(tu * 2, PI) ? v : u;
@@ -465,8 +458,6 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	//std::cout << Sphere(0, 0, 0, 1).vol() << "\n";
-	//std::cout << Sphere(0, 0, 0, 1).vol(2) << "\n";
 #ifdef READ_FILE
 	freopen("../../../input_data/e/e000.in", "r", stdin);
 	freopen("../../../input_data/e/ret.txt", "w", stdout);
@@ -500,65 +491,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj7874 CERC 2009 E Everybody may get lost in space
-
-/*
-
-WHAT THE FUCK:: 1
-tc:: 1176 ::
-1
-5 1 4 4
-2 4 6 8
-8 1 4 5
-2393.646578056299859
-2297.729407575465757 | err:: -0.040071567523858 | state:: 3
-WHAT THE FUCK:: 2
-tc:: 1295 ::
-1
-6 2 8 6
-6 6 6 4
-5 7 3 6
-1619.919989260100010
-1448.644500695591205 | err:: -0.105730832201619 | state:: 3
-WHAT THE FUCK:: 3
-tc:: 1845 ::
-1
-7 0 0 7
-5 5 2 4
-7 9 4 7
-2708.071106011199845
-2530.377491055583505 | err:: -0.065616303265148 | state:: 3
-
-
-1
-5 1 4 4
-2 4 6 8
-8 1 4 5
-C[0] = 0.000000000000000 0.000000000000000 8
-C[1] = 7.000000000000000 0.000000000000000 5
-C[2] = 4.428571428571429 1.545236260913138 4
-u:: 321.786789298261851 38.213210701738198
-u.t:: 76.426421403476368
-v:: 358.103249630420123 40.366993798221820
-v.t:: 42.263744167801697
-vol:: 2076.020134662319833
-u:: 98.213210701738191 261.786789298261795
-u.t:: 163.573578596523589
-v:: 95.867178511970039 202.127383220282013
-v.t:: 106.260204708311960
-vol:: 317.457942908929681
-u:: 65.374827032906921 333.095416395735015
-u.t:: 267.720589362828093
-v:: 238.997280866126033 58.997280866126040
-v.t:: 180.000000000000000
-vol:: -95.748669995783828
-2393.646578056299859
-WHAT THE FUCK:: 1
-tc:: 1 ::
-1
-5 1 4 4
-2 4 6 8
-8 1 4 5
-2393.646578056299859
-2297.729407575465757 | err:: -0.040071567523858 | state:: 3
-
-*/

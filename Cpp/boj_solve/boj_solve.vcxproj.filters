@@ -1602,10 +1602,7 @@
     <ClCompile Include="boj32567_fast.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj7874_3D_3sphere.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="boj7874_3D_green.cpp">
+    <ClCompile Include="boj7874_3D_3sphere_green.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
