@@ -453,7 +453,7 @@ ld volume(const ll& r, const Polygon& hp) {
 			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
 		}
 		if (inside(u_, mv)) {
-			//std::cout << "FUCK2::\n";
+			std::cout << "FUCK2::\n";
 			f = 0;
 			std::swap(v_.LO, v_.HI);
 		}
@@ -617,8 +617,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	freopen("../../../input_data/e/e000.in", "r", stdin);
-	freopen("../../../input_data/e/ret.txt", "w", stdout);
+	//freopen("../../../input_data/e/e000.in", "r", stdin);
+	//freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
