@@ -11,7 +11,7 @@ typedef long double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-18;
+const ld TOL = 1e-15;
 const ld PI = acos(-1);
 const int LEN = 10005;
 inline int sign(const ld& x) { return x <= -TOL ? -1 : x >= TOL; }
@@ -497,10 +497,22 @@ ld volume(const ll& r, const Polygon& hp) {
 	return total;
 }
 void query(const int& q) {
+	//ll rat = 0;
 	for (int i = 0; i < 3; i++) {
 		std::cin >> S[i].x >> S[i].y >> S[i].z >> S[i].r, F[i] = 0;
+		//rat = std::max({ rat, std::abs(S[i].x), std::abs(S[i].y), std::abs(S[i].z), std::abs(S[i].r) });
 		SP[q * 3 + i] = S[i];
 	}
+	//if (rat < 100) {
+	//	for (int i = 0; i < 3; i++) {
+	//		S[i].x *= 10;
+	//		S[i].y *= 10;
+	//		S[i].z *= 10;
+	//		S[i].r *= 10;
+	//	}
+	//	rat = 1000000;
+	//}
+	//else rat = 1;
 	std::sort(S, S + 3);
 	assert(S[0].r >= S[1].r && S[1].r >= S[2].r);
 	int f01 = meet(S[0], S[1]);
