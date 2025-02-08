@@ -14,7 +14,7 @@ const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 10005;
-inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline int sign(const ld& x) { return x <= -TOL ? -1 : x >= TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
 inline ll sq(const ll& x) { return x * x; }
@@ -36,8 +36,8 @@ inline ld norm(ld th) {
 
 int T, N, M;
 bool F[3];
-ld Q[LEN];
-int sts[LEN];
+Vld Q;
+Vint sts;
 struct Pos {
 	ld x, y;
 	Pos(ld X_ = 0, ld y_ = 0) : x(X_), y(y_) {}
@@ -110,16 +110,6 @@ struct Circle {
 	friend std::istream& operator >> (std::istream& is, Circle& p) { is >> p.c.x >> p.c.y >> p.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& p) { os << p.c.x << " " << p.c.y << " " << p.r; return os; }
 } C[3];
-struct Arc {
-	ld lo, hi;
-	int i;
-	Arc(ld l_ = 0, ld h_ = 0, int i_ = -1) : lo(l_), hi(h_), i(i_) {}
-	bool operator < (const Arc& a) const { return zero(lo - a.lo) ? hi < a.hi : lo < a.lo; }
-	inline friend std::istream& operator >> (std::istream& is, Arc& a) { is >> a.lo >> a.hi; return is; }
-	inline friend std::ostream& operator << (std::ostream& os, const Arc& a) { os << a.lo << " " << a.hi; return os; }
-};
-typedef std::vector<Arc> Arcs;
-Arcs AR[3];
 Vld intersections(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
 	Pos vec = cb - ca;
@@ -136,41 +126,6 @@ Vld intersections(const Circle& a, const Circle& b) {
 	ret.push_back(norm(rd - h));
 	if (zero(h)) return ret;
 	ret.push_back(norm(rd + h));
-	return ret;
-}
-void arc_init() {
-	for (int i = 0; i < 3; i++) AR[i].clear();
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			if (j == i) continue;
-			Vld inxs = intersections(C[i], C[j]);
-			int sz = inxs.size();
-			if (sz < 2) continue;
-			ld lo = inxs[0], hi = inxs[1];
-			if (lo < hi) AR[i].push_back(Arc(lo, hi));
-			else {
-				AR[i].push_back(Arc(lo, 2 * PI, j));
-				AR[i].push_back(Arc(0, hi, j));
-			}
-		}
-		std::sort(AR[i].begin(), AR[i].end());
-		AR[i].push_back(Arc(2 * PI, 2 * PI, -2));
-	}
-	return;
-}
-ld union_except_x(const int& x) {
-	ld ret = 0;
-	for (int i = 0; i < 3; i++) {
-		if (i == x) continue;
-		if (!F[i]) {
-			ld hi = 0;
-			for (const Arc& a : AR[i]) {
-				if (a.i == x) continue;
-				if (hi < a.lo) ret += C[i].green(hi, a.lo), hi = a.hi;
-				else hi = std::max(hi, a.hi);
-			}
-		}
-	}
 	return ret;
 }
 struct Sphere {
@@ -208,16 +163,13 @@ ld cos_2nd(const ld& a, const ld& b, const ld& c) {
 	ld t = num / den;
 	return std::abs(acosl(std::min(std::max(t, -(ld)1.0), (ld)1.0)));
 }
-//ld spherical_triangle_angles(const ld& a, const ld& b, const ld& c) {
-//	//std::cout << "a:: " << a << " b:: " << b << " c:: " << c << "\n";
-//	//std::cout << "sin(a):: " << sin(a) << " sin(b):: " << sin(b) << " sin(c):: " << sin(c) << "\n";
-//	//std::cout << "acos(" << (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)) << ")::\n";
-//	return acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
-//}
+ld spherical_triangle_angles(const ld& a, const ld& b, const ld& c) {
+	return acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
+}
 void spherical_triangle_angles(const ld& a, const ld& b, const ld& c, ld& A_, ld& B_, ld& C_) {
-	A_ = acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)));
-	B_ = acos((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)));
-	C_ = acos((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)));
+	A_ = acos(fit((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)), -1, 1));
+	B_ = acos(fit((cos(b) - cos(a) * cos(c)) / (sin(a) * sin(c)), -1, 1));
+	C_ = acos(fit((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)), -1, 1));
 	return;
 }
 ld area(const ld& a, const ld& b, const ld& c, const ll& r, const ld& t) {
@@ -255,12 +207,8 @@ ld volume(const ll& r, const Polygon& hp) {
 		return Sphere(0, 0, 0, r).vol(r + r - h);
 	}
 	auto inside = [&](const Pos& p, const ld& t) -> bool {
-		if (p.LO < p.HI) {
-			if (p.LO < t && t < p.HI) return 1;
-		}
-		else {//(p.LO > p.HI)
-			if (p.LO < t || t < p.HI) return 1;
-		}
+		if (p.LO < p.HI) { if (p.LO < t && t < p.HI) return 1; }
+		else { if (p.LO < t || t < p.HI) return 1; }//(p.LO > p.HI)
 		return 0;
 		};
 	auto outer_check = [&](const Pos& p, const Pos& q) -> bool {
@@ -268,6 +216,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		};
 	auto the = [&](const ld& dd, const ld& rr) -> ld {
 		ld w = dd / rr;
+		assert(std::abs(dd) <= std::abs(rr));
 		return norm(acosl(fit(w, -1, 1))) * 2;
 		};
 	auto area_ = [&](const ld& rr, const ld& t) -> ld {
@@ -332,7 +281,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	Pos m = intersection(us, ue, vs, ve);
 	ld dm = m.mag();
 	ld tm = norm(m.rad());
-	if (du < 0 && dv < 0) {
+	if (du < TOL && dv < TOL) {
 		dm *= -1;
 		tm = norm(tm + PI);
 	}
@@ -357,19 +306,77 @@ ld volume(const ll& r, const Polygon& hp) {
 	if ((inside(Pos(u.LO, mu), tm) && inside(v, u.HI)) ||
 		(inside(Pos(mu, u.HI), tm) && inside(v, u.LO))) su = -1;
 	else su = 1;
-	if (eq(tm, mu)) su = 0;
 	int sv = 0;
 	if ((inside(Pos(v.LO, mv), tm) && inside(u, v.HI)) ||
 		(inside(Pos(mv, v.HI), tm) && inside(u, v.LO))) sv = -1;
 	else sv = 1;
-	if (eq(tm, mv)) sv = 0;
-	suf += area(a_, tu, tu, r, ttu) * su;
-	suf += area(a_, tv, tv, r, ttv) * sv;
+	x = intersection(U, V);
+	if (du < 0 && dv > 0 && (
+		(inside(v, u.LO) && x > .5) ||
+		(inside(v, u.HI) && x < .5)
+		)) suf += (Sphere(0, 0, 0, r).surf() - area(a_, tu, tu, r, ttu)) * su;
+	else suf += area(a_, tu, tu, r, ttu) * su;
+	x = intersection(V, U);
+	if (dv < 0 && du > 0 && (
+		(inside(u, v.LO) && x > .5) ||
+		(inside(u, v.HI) && x < .5)
+		)) suf += (Sphere(0, 0, 0, r).surf() - area(a_, tv, tv, r, ttv)) * sv;
+	else suf += area(a_, tv, tv, r, ttv) * sv;
 	suf = Sphere(0, 0, 0, r).surf() - suf;
 	ld ratio = suf / Sphere(0, 0, 0, r).surf();
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
 	total += cone_vol(ru, ang_u, du);
 	total += cone_vol(rv, ang_v, dv);
+	if (total < 0) {
+		bool f = 1;
+		Pos u_ = eq(tu * 2, PI) ? u : v;
+		Pos v_ = eq(tu * 2, PI) ? v : u;
+		assert(u_ != v_);
+		ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
+		mv = norm(v_.HI + v_.LO) * .5;
+		if (!inside(v_, mv)) mv = norm(mv + PI);
+		if (eq(u_.LO, mv) || eq(u_.HI, mv)) {
+			tv = norm(v_.HI - v_.LO) * .5;
+			dv = r * cosl(tv);
+			rv = r * sinl(tv);
+			hv = r - dv;
+			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
+		}
+		if (inside(u_, mv)) { f = 0; std::swap(v_.LO, v_.HI); }
+		mv = norm(v_.HI + v_.LO) * .5;
+		if (!inside(v_, mv)) mv = norm(mv + PI);
+		Pos us = c.p(u_.LO), ue = c.p(u_.HI);
+		Pos vs = c.p(v_.LO), ve = c.p(v_.HI);
+		Seg U = Seg(us, ue);
+		Seg V = Seg(vs, ve);
+		assert(!inside(u_, mv));
+		tv = norm(v_.HI - v_.LO) * .5;
+		dv = r * cosl(tv);
+		rv = r * sinl(tv);
+		hv = r - dv;
+		x = intersection(U, V);
+		assert(-TOL < x && x < 1 + TOL);
+		x = .5 - x;
+		if (inside(v_, u_.HI)) x *= -1;
+		assert(x != 0);
+		ld a_ = the(x, .5);
+		x = intersection(V, U);
+		assert(-TOL < x && x < 1 + TOL);
+		x = .5 - x;
+		if (inside(u_, v_.HI)) x *= -1;
+		ld ang_v = the(x, 0.5);
+		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
+		ld ttv = 0;
+		if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
+		else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		ld tri = area(a_, tv, tv, r, ttv);
+		suf += tri;
+		suf = Sphere(0, 0, 0, r).surf() - suf;
+		ld ratio = suf / Sphere(0, 0, 0, r).surf();
+		ld total = Sphere(0, 0, 0, r).vol() * ratio;
+		total += cone_vol(rv, ang_v, dv);
+		return f ? total : (Sphere(0, 0, 0, r).vol() * .5 - total);
+	}
 	return total;
 }
 void query(const int& q) {
@@ -414,9 +421,6 @@ void query(const int& q) {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	//std::cout << "C[0] = " << C[0] << "\n";
-	//std::cout << "C[1] = " << C[1] << "\n";
-	//std::cout << "C[2] = " << C[2] << "\n";
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -447,9 +451,8 @@ void query(const int& q) {
 			return;
 		}
 		ld vol = volume(C[i].r, hp);
-		//std::cout << "vol:: " << vol / 1e1 << "\n";
 		ret += vol;
-	}
+}
 	Q[q] = ret;
 	sts[q] = 3;
 	return;
@@ -458,30 +461,10 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
-	//freopen("../../../input_data/e/e000.in", "r", stdin);
-	//freopen("../../../input_data/e/ret.txt", "w", stdout);
-	std::cin >> T;
+	std::cout.precision(15);
+	std::cin >> T; Q.resize(T); sts.resize(T);
 	for (int q = 0; q < T; q++) query(q);
-	int cnt = 0;
-	for (int q = 0; q < T; q++) {
-		ld ans; std::cin >> ans;
-		ld err = (Q[q] - ans) / ans;
-		//std::cout << Q[q] << "\n";
-		if (err < -1e-6 || 1e-6 < err) {
-			cnt++;
-			std::cout << "WHAT THE FUCK:: " << cnt << "\n";
-			std::cout << "tc:: " << q + 1 << " ::\n";
-			std::cout << 1 << "\n";
-			std::cout << SP[q * 3 + 0].x << " " << SP[q * 3 + 0].y << " " << SP[q * 3 + 0].z << " " << SP[q * 3 + 0].r << "\n";
-			std::cout << SP[q * 3 + 1].x << " " << SP[q * 3 + 1].y << " " << SP[q * 3 + 1].z << " " << SP[q * 3 + 1].r << "\n";
-			std::cout << SP[q * 3 + 2].x << " " << SP[q * 3 + 2].y << " " << SP[q * 3 + 2].z << " " << SP[q * 3 + 2].r << "\n";
-			std::cout << ans << "\n";
-			std::cout << Q[q] << " | err:: ";
-			std::cout << ((Q[q] - ans) / ans) << " | state:: ";
-			std::cout << sts[q] << "\n";
-		}
-	}
+	for (int q = 0; q < T; q++) std::cout << Q[q] << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj7874
+int main() { solve(); return 0; }//boj7874 CERC 2009 E Everybody may get lost in space

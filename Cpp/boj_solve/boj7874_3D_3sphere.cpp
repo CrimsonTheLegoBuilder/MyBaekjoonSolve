@@ -36,8 +36,8 @@ inline ld norm(ld th) {
 
 int T, N, M;
 bool F[3];
-ld Q[LEN];
-int sts[LEN];
+Vld Q;
+Vint sts;
 struct Pos {
 	ld x, y;
 	Pos(ld X_ = 0, ld y_ = 0) : x(X_), y(y_) {}
@@ -301,10 +301,10 @@ ld volume(const ll& r, const Polygon& hp) {
 	//std::cout << "sz:: " << sz << "\n";
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
-	std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
-	std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
-	std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
-	std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
+	//std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
+	//std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
+	//std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
+	//std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
 	ld tu = norm(u.HI - u.LO) * .5;
 	ld mu = norm(u.HI + u.LO) * .5;
 	if (!inside(u, mu)) mu = norm(mu + PI);
@@ -441,6 +441,8 @@ ld volume(const ll& r, const Polygon& hp) {
 		Pos v_ = eq(tu * 2, PI) ? v : u;
 		assert(u_ != v_);
 		ld suf = Sphere(0, 0, 0, r).surf() * .5, x;
+		//std::cout << "hf:: " << Sphere(0, 0, 0, r).surf() * .5 << "\n";
+		//std::cout << "hf:: " << Sphere(0, 0, 0, r).surf(r) << "\n";
 		//ld suf = 0, x;
 		mv = norm(v_.HI + v_.LO) * .5;
 		if (!inside(v_, mv)) mv = norm(mv + PI);
@@ -453,7 +455,7 @@ ld volume(const ll& r, const Polygon& hp) {
 			return Sphere(0, 0, 0, r).vol(r + r - hv) * .5;
 		}
 		if (inside(u_, mv)) {
-			std::cout << "FUCK2::\n";
+			//std::cout << "FUCK2::\n";
 			f = 0;
 			std::swap(v_.LO, v_.HI);
 		}
@@ -465,7 +467,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		Seg V = Seg(vs, ve);
 		assert(!inside(u_, mv));
 		tv = norm(v_.HI - v_.LO) * .5;
-		std::cout << "tv||PI:: " << tv * 2 * 180 / PI << "\n";
+		//std::cout << "tv||PI:: " << tv * 2 * 180 / PI << "\n";
 		dv = r * cosl(tv);
 		rv = r * sinl(tv);
 		hv = r - dv;
@@ -476,7 +478,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		//if (dv > 0) x *= -1;
 		//x *= -1;
 		assert(x != 0);
-		ld a_ = the(x, r);
+		ld a_ = the(x, .5);
 		x = intersection(V, U);
 		assert(-TOL < x && x < 1 + TOL);
 		x = .5 - x;
@@ -485,11 +487,11 @@ ld volume(const ll& r, const Polygon& hp) {
 		ld ang_v = the(x, 0.5);
 		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
 		//suf += Sphere(0, 0, 0, r).surf(hv) * (ang_v / (PI * 2));
-		//ld ttv = 0;
-		//if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
-		//else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
-		ld ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
-		ttv = std::min({ ttv, norm(u_.LO - mv), norm(mv - u_.LO) });
+		ld ttv = 0;
+		if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
+		else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		//ld ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
+		//ttv = std::min({ ttv, norm(u_.LO - mv), norm(mv - u_.LO) });
 		ld tri = area(a_, tv, tv, r, ttv);
 		//ld tri = std::abs(area(a_, tv, tv, r, ttv));
 		suf += tri;
@@ -500,8 +502,10 @@ ld volume(const ll& r, const Polygon& hp) {
 		//ld ratio = suf / (Sphere(0, 0, 0, r).surf() * .5);
 		//ld total = Sphere(0, 0, 0, r).vol() * .5 * ratio;
 		total += cone_vol(rv, ang_v, dv);
-		std::cout << "total:: " << total << "\n";
-		std::cout << "total rvs:: " << Sphere(0, 0, 0, r).vol() * .5 - total << "\n";
+		//std::cout << "total:: " << total << "\n";
+		//std::cout << "total rvs:: " << Sphere(0, 0, 0, r).vol() * .5 - total << "\n";
+		//std::cout << "hf:: " << Sphere(0, 0, 0, r).vol() * .5 << "\n";
+		//std::cout << "hf:: " << Sphere(0, 0, 0, r).vol(r) << "\n";
 		return f ? total : (Sphere(0, 0, 0, r).vol() * .5 - total);
 		//return total;
 	}
@@ -566,9 +570,9 @@ void query(const int& q) {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	std::cout << "C[0] = " << C[0] << "\n";
-	std::cout << "C[1] = " << C[1] << "\n";
-	std::cout << "C[2] = " << C[2] << "\n";
+	//std::cout << "C[0] = " << C[0] << "\n";
+	//std::cout << "C[1] = " << C[1] << "\n";
+	//std::cout << "C[2] = " << C[2] << "\n";
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -603,7 +607,7 @@ void query(const int& q) {
 			return;
 		}
 		ld vol = volume(C[i].r, hp);
-		std::cout << "vol:: " << vol << "\n";
+		//std::cout << "vol:: " << vol << "\n";
 		ret += vol;
 		//std::cout << "S[" << i << "]:: " << S[i].x << " " << S[i].y << " " << S[i].z << " " << S[i].r << "\n";
 	}
@@ -619,30 +623,30 @@ void solve() {
 	std::cout.precision(15);
 	//freopen("../../../input_data/e/e000.in", "r", stdin);
 	//freopen("../../../input_data/e/ret.txt", "w", stdout);
-	std::cin >> T;
+	std::cin >> T; Q.resize(T); sts.resize(T);
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
 	//for (int q = 0; q < T; q++) std::cout << Q[q] << "\n";
 	int cnt = 0;
-	for (int q = 0; q < T; q++) {
-		ld ans; std::cin >> ans;
-		ld err = (Q[q] - ans) / Q[q];
-		//std::cout << std::abs(Q[q]) << "\n";
-		bool f = std::isnan(Q[q]);
-		if (f || err <= -1e-6 || 1e-6 <= err) {
-			cnt++;
-			std::cout << "WHAT THE FUCK:: " << cnt << "\n";
-			std::cout << "tc:: " << q + 1 << " ::\n";
-			std::cout << 1 << "\n";
-			std::cout << SP[q * 3 + 0].x << " " << SP[q * 3 + 0].y << " " << SP[q * 3 + 0].z << " " << SP[q * 3 + 0].r << "\n";
-			std::cout << SP[q * 3 + 1].x << " " << SP[q * 3 + 1].y << " " << SP[q * 3 + 1].z << " " << SP[q * 3 + 1].r << "\n";
-			std::cout << SP[q * 3 + 2].x << " " << SP[q * 3 + 2].y << " " << SP[q * 3 + 2].z << " " << SP[q * 3 + 2].r << "\n";
-			std::cout << "" << ans << "\n";
-			std::cout << "" << Q[q] << " | err:: ";
-			std::cout << ((Q[q] - ans) / ans) << " | state:: ";
-			std::cout << sts[q] << "\n";
-		}
-	}
+	//for (int q = 0; q < T; q++) {
+	//	ld ans; std::cin >> ans;
+	//	ld err = (Q[q] - ans) / Q[q];
+	//	std::cout << std::abs(Q[q]) << "\n";
+	//	bool f = std::isnan(Q[q]);
+	//	if (f || err <= -1e-6 || 1e-6 <= err) {
+	//		cnt++;
+	//		std::cout << "WHAT THE FUCK:: " << cnt << "\n";
+	//		std::cout << "tc:: " << q + 1 << " ::\n";
+	//		std::cout << 1 << "\n";
+	//		std::cout << SP[q * 3 + 0].x << " " << SP[q * 3 + 0].y << " " << SP[q * 3 + 0].z << " " << SP[q * 3 + 0].r << "\n";
+	//		std::cout << SP[q * 3 + 1].x << " " << SP[q * 3 + 1].y << " " << SP[q * 3 + 1].z << " " << SP[q * 3 + 1].r << "\n";
+	//		std::cout << SP[q * 3 + 2].x << " " << SP[q * 3 + 2].y << " " << SP[q * 3 + 2].z << " " << SP[q * 3 + 2].r << "\n";
+	//		std::cout << "" << ans << "\n";
+	//		std::cout << "" << Q[q] << " | err:: ";
+	//		std::cout << ((Q[q] - ans) / ans) << " | state:: ";
+	//		std::cout << sts[q] << "\n";
+	//	}
+	//}
 	return;
 }
 int main() { solve(); return 0; }//boj7874 CERC 2009 E Everybody may get lost in space
