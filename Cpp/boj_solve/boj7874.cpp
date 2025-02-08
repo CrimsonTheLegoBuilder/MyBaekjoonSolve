@@ -612,8 +612,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	freopen("../../../input_data/e/e000.in", "r", stdin);
-	freopen("../../../input_data/e/ret.txt", "w", stdout);
+	//freopen("../../../input_data/e/e000.in", "r", stdin);
+	//freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
