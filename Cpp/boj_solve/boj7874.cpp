@@ -11,10 +11,10 @@ typedef long double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-18;
 const ld PI = acos(-1);
 const int LEN = 10005;
-inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline int sign(const ld& x) { return x <= -TOL ? -1 : x >= TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
 inline ll sq(const ll& x) { return x * x; }
@@ -344,7 +344,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	}
 	if (f1) return Sphere(0, 0, 0, r).vol(r + r - hv);
 	if (f2) return Sphere(0, 0, 0, r).vol(r + r - hu);
-	if (eq(tu * 2, PI) || eq(tv * 2, PI)) {
+	if (eq(tu * 2, PI) || eq(tv * 2, PI) || eq(du, 0) || eq(dv, 0)) {
 		//std::cout << "FUCK::\n";
 		bool f = 1;
 		Pos u_ = eq(tu * 2, PI) ? u : v;
@@ -375,7 +375,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		Seg V = Seg(vs, ve);
 		assert(!inside(u_, mv));
 		tv = norm(v_.HI - v_.LO) * .5;
-		std::cout << "tv||PI:: " << tv * 2 * 180 / PI << "\n";
+		//std::cout << "tv||PI:: " << tv * 2 * 180 / PI << "\n";
 		dv = r * cosl(tv);
 		rv = r * sinl(tv);
 		hv = r - dv;
@@ -383,7 +383,7 @@ ld volume(const ll& r, const Polygon& hp) {
 		assert(-TOL < x && x < 1 + TOL);
 		x = .5 - x;
 		if (inside(v_, u_.HI)) x *= -1;
-		//if (dv < 0) x *= -1;
+		if (dv > 0) x *= -1;
 		//x *= -1;
 		assert(x != 0);
 		ld a_ = the(x, r);
@@ -393,12 +393,14 @@ ld volume(const ll& r, const Polygon& hp) {
 		if (inside(u_, v_.HI)) x *= -1;
 		ld ang_v = the(x, 0.5);
 		suf += Sphere(0, 0, 0, r).surf(hv) * ((PI * 2 - ang_v) / (PI * 2));
+		//suf += Sphere(0, 0, 0, r).surf(hv) * (ang_v / (PI * 2));
 		//ld ttv = 0;
 		//if (inside(u_, v_.HI)) ttv = std::min(norm(u_.LO - mv), norm(mv - u_.LO));
 		//else ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
 		ld ttv = std::min(norm(u_.HI - mv), norm(mv - u_.HI));
 		ttv = std::min({ ttv, norm(u_.LO - mv), norm(mv - u_.LO) });
-		ld tri = area(a_, tv, tv, r, ttv);
+		//ld tri = area(a_, tv, tv, r, ttv);
+		ld tri = std::abs(area(a_, tv, tv, r, ttv));
 		suf += tri;
 		//suf = Sphere(0, 0, 0, r).surf() - suf;
 		//ld ratio = suf / Sphere(0, 0, 0, r).surf();
@@ -541,9 +543,9 @@ void query(const int& q) {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	//std::cout << "C[0] = " << C[0] << "\n";
-	//std::cout << "C[1] = " << C[1] << "\n";
-	//std::cout << "C[2] = " << C[2] << "\n";
+	std::cout << "C[0] = " << C[0] << "\n";
+	std::cout << "C[1] = " << C[1] << "\n";
+	std::cout << "C[2] = " << C[2] << "\n";
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -578,7 +580,7 @@ void query(const int& q) {
 			return;
 		}
 		ld vol = volume(C[i].r, hp);
-		std::cout << "vol:: " << vol << "\n";
+		//std::cout << "vol:: " << vol << "\n";
 		ret += vol;
 		//std::cout << "S[" << i << "]:: " << S[i].x << " " << S[i].y << " " << S[i].z << " " << S[i].r << "\n";
 	}
@@ -620,7 +622,7 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj7874
+int main() { solve(); return 0; }//boj7874 CERC 2009 E Everybody may get lost in space
 
 /*
 
