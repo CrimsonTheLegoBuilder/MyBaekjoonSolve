@@ -11,7 +11,7 @@ typedef long double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
-const ld TOL = 1e-15;
+const ld TOL = 1e-17;
 const ld PI = acos(-1);
 const int LEN = 10005;
 inline int sign(const ld& x) { return x <= -TOL ? -1 : x >= TOL; }
@@ -301,10 +301,10 @@ ld volume(const ll& r, const Polygon& hp) {
 	//std::cout << "sz:: " << sz << "\n";
 	assert(sz == 2);
 	Pos u = hp[0], v = hp[1];
-	std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
-	std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
-	std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
-	std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
+	//std::cout << "u:: " << u.x * 180 / PI << " " << u.y * 180 / PI << "\n";
+	//std::cout << "u.t:: " << norm(u.HI - u.LO) * 180 / PI << "\n";
+	//std::cout << "v:: " << v.x * 180 / PI << " " << v.y * 180 / PI << "\n";
+	//std::cout << "v.t:: " << norm(v.HI - v.LO) * 180 / PI << "\n";
 	ld tu = norm(u.HI - u.LO) * .5;
 	ld mu = norm(u.HI + u.LO) * .5;
 	if (!inside(u, mu)) mu = norm(mu + PI);
@@ -555,9 +555,9 @@ void query(const int& q) {
 	C[0] = Circle(ca, S[0].r);
 	C[1] = Circle(cb, S[1].r);
 	C[2] = Circle(cc, S[2].r);
-	std::cout << "C[0] = " << C[0] << "\n";
-	std::cout << "C[1] = " << C[1] << "\n";
-	std::cout << "C[2] = " << C[2] << "\n";
+	//std::cout << "C[0] = " << C[0] << "\n";
+	//std::cout << "C[1] = " << C[1] << "\n";
+	//std::cout << "C[2] = " << C[2] << "\n";
 	ld ret = 0;
 	for (int i = 0; i < 3; i++) {
 		Polygon arc, hp;
@@ -606,8 +606,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	//freopen("../../../input_data/e/e000.in", "r", stdin);
-	//freopen("../../../input_data/e/ret.txt", "w", stdout);
+	freopen("../../../input_data/e/e000.in", "r", stdin);
+	freopen("../../../input_data/e/ret.txt", "w", stdout);
 	std::cin >> T;
 	//while (T--) query();
 	for (int q = 0; q < T; q++) query(q);
