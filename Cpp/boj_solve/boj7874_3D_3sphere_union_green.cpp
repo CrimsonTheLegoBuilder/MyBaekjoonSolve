@@ -321,7 +321,7 @@ ld volume(const ll& r, const Polygon& hp) {
 	ld total = Sphere(0, 0, 0, r).vol() * ratio;
 	total += cone_vol(ru, ang_u, du);
 	total += cone_vol(rv, ang_v, dv);
-	if (total < 0 || zero(dm) || zero(dv)) {
+	if (total < 0 || zero(du) || zero(dv)) {
 		bool f = 1;
 		Pos u_ = eq(tu * 2, PI) ? u : v;
 		Pos v_ = eq(tu * 2, PI) ? v : u;
