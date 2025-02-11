@@ -158,6 +158,13 @@ bool query() {
 			Pos v2 = v.rot(-t);
 			if (v2 < O) v2 *= -1;
 			V.push_back(v2);
+			t = asinl(1 / l);
+			v1 = v.rot(t);
+			if (v1 < O) v1 *= -1;
+			V.push_back(v1);
+			v2 = v.rot(-t);
+			if (v2 < O) v2 *= -1;
+			V.push_back(v2);
 		}
 	}
 	std::sort(V.begin(), V.end());
@@ -191,17 +198,16 @@ bool query() {
 		if (min > x) { min = x; mint = std::min(norm(v.rad()), norm(v.rad() + PI)); }
 		if (max < x) { max = x; maxt = std::min(norm(v.rad()), norm(v.rad() + PI)); }
 		//if (min > x) { min = x; mint = std::min(norm(-v.rad()), norm(-v.rad() + PI)); }
-		//std::sort(W.begin(), W.end());
-		//W.erase(unique(W.begin(), W.end()), W.end());
-		//x = 0;
-		//sz = W.size();
-		//for (int i = 0; i < sz; i++) {
-		//	if (i < sz - 1 && W[i].HI > W[i + 1].LO) x += (W[i + 1].LO - W[i].LO);
-		//	else x += W[i].HI - W[i].LO;
-		//}
-		//if (min > x) { min = x; mint = std::min(norm(h.rad()), norm(h.rad() + PI)); }
-		//if (max < x) { max = x; maxt = std::min(norm(h.rad()), norm(h.rad() + PI)); }
-		//
+		std::sort(W.begin(), W.end());
+		W.erase(unique(W.begin(), W.end()), W.end());
+		x = 0;
+		sz = W.size();
+		for (int i = 0; i < sz; i++) {
+			if (i < sz - 1 && W[i].HI > W[i + 1].LO) x += (W[i + 1].LO - W[i].LO);
+			else x += W[i].HI - W[i].LO;
+		}
+		if (min > x) { min = x; mint = std::min(norm(h.rad()), norm(h.rad() + PI)); }
+		if (max < x) { max = x; maxt = std::min(norm(h.rad()), norm(h.rad() + PI)); }
 	}
 	std::cout << mint << "\n" << maxt << "\n";
 	return 1;
