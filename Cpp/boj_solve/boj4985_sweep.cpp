@@ -33,7 +33,8 @@ inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >=
 int T, N, M;
 struct Pos {
 	ld x, y;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) {}
+	int i;
+	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) { i = 0; }
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -134,6 +135,17 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 //	ret.push_back(norm(rd + h));
 //	return ret;
 //}
+Pos get_vec(const Polygon& P, const Polygon& V) {
+	Pos ret = Pos(0, 0);
+	int sz = V.size();
+	for (int i = 0; i < sz; i++) {
+		if (i < sz - 1 && V[i].HI > V[i + 1].LO) {
+			Pos v = P[V[i + 1].i] - P[V[i].i];
+			ret += v;
+		}
+	}
+	return ret;
+}
 bool query() {
 	ld min = INF, max = -1;
 	ld mint = 0, maxt = 0;
@@ -217,8 +229,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(15);
-	std::cout << 2.819842099193151 * 180 / PI << "\n";
 	while (query());
 	return;
 }
-int main() { solve(); return 0; }//boj7874 CERC 2009 E Everybody may get lost in space
+int main() { solve(); return 0; }//boj4985 Secrets in Shadows
