@@ -12,7 +12,7 @@ typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 const ld INF = 1e17;
 const ld TOL = 1e-20;
-const ld PI = acos(-1);
+const ld PI = acosl(-1);
 const int LEN = 10005;
 inline int sign(const ld& x) { return x <= -TOL ? -1 : x >= TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -22,15 +22,13 @@ inline ld sq(const ld& x) { return x * x; }
 inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
 
-#define INSIDE 0
-#define MEET 1
-#define OUTSIDE 2
 #define STRONG 0
 #define WEAK 1
 #define LO x
 #define HI y
 
-int T, N, M;
+int N, M;
+Vld ANS;
 struct Pos {
 	ld x, y;
 	int i;
@@ -54,11 +52,11 @@ struct Pos {
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
 	ld xy() const { return x * y; }
-	Pos rot(ld the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
+	Pos rot(const ld& the) const { return { x * cosl(the) - y * sinl(the), x * sinl(the) + y * cosl(the) }; }
 	ld Euc() const { return x * x + y * y; }
-	ld mag() const { return sqrt(Euc()); }
+	ld mag() const { return sqrtl(Euc()); }
 	Pos unit() const { return *this / mag(); }
-	ld rad() const { return atan2(y, x); }
+	ld rad() const { return atan2l(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
@@ -99,6 +97,120 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
+Pos get_vec(const Polygon& P, const Polygon& V) {
+	Pos ab = Pos(0, 0);//a * sin(t) + b * cos(t) + c = 0
+	int sz = V.size();
+	for (int i = 0; i < sz; i++) {
+		if (i < sz - 1 && V[i].HI > V[i + 1].LO) {
+			Pos v = P[V[i + 1].i] - P[V[i].i];
+			ab += v;
+		}
+	}
+	return ab;
+}
+bool query() {
+	ld min = INF, max = -1;
+	ld mint = 0, maxt = 0;
+	std::cin >> N;
+	if (!N) return 0;
+	Polygon P(N); for (Pos& p : P) std::cin >> p, p.y *= -1;
+	Polygon V;
+	Vld T = { 0, PI };
+	for (int i = 0; i < N; i++) {
+		for (int j = i + 1; j < N; j++) {
+			Pos v = (P[j] - P[i]);
+			ld l = v.mag();
+			//v = v.unit();
+			if (v < O) v *= -1;
+			T.push_back(norm(v.rad()));
+			ld t = asinl(2 / l);
+			Pos v1 = v.rot(t);
+			if (v1 < O) v1 *= -1;
+			T.push_back(norm(v1.rad()));
+			Pos v2 = v.rot(-t);
+			if (v2 < O) v2 *= -1;
+			T.push_back(norm(v2.rad()));
+		}
+	}
+	std::sort(T.begin(), T.end());
+	T.erase(unique(T.begin(), T.end()), T.end());
+	int sz = T.size();
+	for (int i = 0; i < sz - 1; i++) {
+		ld s = T[i], e = T[i + 1];
+		ld m = (s + e) * .5;
+		Pos v = Pos(1, 0).rot(m);
+		Pos h = ~v;
+		Seg I = Seg(O, h);
+		Polygon V;
+		ld x;
+		for (int k = 0; k < N; k++) {
+			Pos p = P[k];
+			Pos q = p + v;
+			Seg K = Seg(p, q);
+			x = intersection(I, K, WEAK);
+			Pos r = Pos(x - 1, x + 1);
+			r.i = k;
+			V.push_back(r);
+		}
+		std::sort(V.begin(), V.end());
+		Pos ab = get_vec(P, V);
+		T.push_back(norm(ab.rad()));
+		T.push_back(norm((~ab).rad()));
+	}
+	std::sort(T.begin(), T.end());
+	T.erase(unique(T.begin(), T.end()), T.end());
+	for (const ld& t : T) {
+		Pos v = Pos(1, 0).rot(t);
+		Pos h = ~v;
+		Seg I = Seg(O, h);
+		Polygon V;
+		ld x;
+		for (const Pos& p : P) {
+			Pos q = p + v;
+			Seg K = Seg(p, q);
+			x = intersection(I, K, WEAK);
+			Pos r = Pos(x - 1, x + 1);
+			V.push_back(r);
+		}
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end()), V.end());
+		x = 0;
+		int sz = V.size();
+		for (int i = 0; i < sz; i++) {
+			if (i < sz - 1 && V[i].HI > V[i + 1].LO) x += (V[i + 1].LO - V[i].LO);
+			else x += V[i].HI - V[i].LO;
+		}
+		if (min > x) { min = x; mint = std::min(norm(v.rad()), norm(v.rad() + PI)); }
+		if (max < x) { max = x; maxt = std::min(norm(v.rad()), norm(v.rad() + PI)); }
+	}
+	std::cout << mint << "\n" << maxt << "\n";
+	//ANS.push_back(mint);
+	//ANS.push_back(maxt);
+	return 1;
+}
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(11);
+	while (query());
+	//for (const ld& ans : ANS) std::cout << ans << "\n";
+	//for (const ld& ans : ANS) {
+	//	ld x;
+	//	std::cin >> x;
+	//	std::cout << ans << "\n";
+	//	ld err = (ans - x) / ans;
+	//	if (zero(x)) std::cout << "answer is zero and my result is " << ans << "\n";
+	//	else std::cout << err << "\n";
+	//	if (std::abs(err) > 1e-10) std::cout << "FUCK::\n";
+	//	else std::cout << "GOOD\n";
+	//}
+	return;
+}
+int main() { solve(); return 0; }//boj4985 Secrets in Shadows
+
+
+
 //struct Circle {
 //	Pos c;
 //	ll r;
@@ -135,101 +247,3 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 //	ret.push_back(norm(rd + h));
 //	return ret;
 //}
-Pos get_vec(const Polygon& P, const Polygon& V) {
-	Pos ret = Pos(0, 0);
-	int sz = V.size();
-	for (int i = 0; i < sz; i++) {
-		if (i < sz - 1 && V[i].HI > V[i + 1].LO) {
-			Pos v = P[V[i + 1].i] - P[V[i].i];
-			ret += v;
-		}
-	}
-	return ret;
-}
-bool query() {
-	ld min = INF, max = -1;
-	ld mint = 0, maxt = 0;
-	std::cin >> N;
-	if (!N) return 0;
-	Polygon P(N); for (Pos& p : P) std::cin >> p, p.y *= -1;
-	Polygon V;
-	for (int i = 0; i < N; i++) {
-		for (int j = i + 1; j < N; j++) {
-			Pos v = (P[j] - P[i]);
-			ld l = v.mag();
-			v = v.unit();
-			if (v < O) v *= -1;
-			V.push_back(v);
-			Pos v0 = ~v;
-			if (v0 < O) v0 *= -1;
-			V.push_back(v0);
-			ld t = asinl(2 / l);
-			Pos v1 = v.rot(t);
-			if (v1 < O) v1 *= -1;
-			V.push_back(v1);
-			Pos v2 = v.rot(-t);
-			if (v2 < O) v2 *= -1;
-			V.push_back(v2);
-			t = asinl(1 / l);
-			v1 = v.rot(t);
-			if (v1 < O) v1 *= -1;
-			V.push_back(v1);
-			v2 = v.rot(-t);
-			if (v2 < O) v2 *= -1;
-			V.push_back(v2);
-		}
-	}
-	std::sort(V.begin(), V.end());
-	V.erase(unique(V.begin(), V.end()), V.end());
-	for (const Pos& v : V) {
-		Pos h = ~v;
-		Pos s = O, e1 = h, e2 = v;
-		Polygon R, W;
-		Seg I = Seg(s, e1);
-		Seg J = Seg(s, e2);
-		ld x;
-		for (const Pos& p : P) {
-			Pos q = p + v, u = p + h;
-			Seg K = Seg(p, q);
-			Seg L = Seg(p, u);
-			x = intersection(I, K, WEAK);
-			Pos r = Pos(x - 1, x + 1);
-			R.push_back(r);
-			x = intersection(J, L, WEAK);
-			Pos w = Pos(x - 1, x + 1);
-			W.push_back(w);
-		}
-		std::sort(R.begin(), R.end());
-		R.erase(unique(R.begin(), R.end()), R.end());
-		x = 0;
-		int sz = R.size();
-		for (int i = 0; i < sz; i++) {
-			if (i < sz - 1 && R[i].HI > R[i + 1].LO) x += (R[i + 1].LO - R[i].LO);
-			else x += R[i].HI - R[i].LO;
-		}
-		if (min > x) { min = x; mint = std::min(norm(v.rad()), norm(v.rad() + PI)); }
-		if (max < x) { max = x; maxt = std::min(norm(v.rad()), norm(v.rad() + PI)); }
-		//if (min > x) { min = x; mint = std::min(norm(-v.rad()), norm(-v.rad() + PI)); }
-		std::sort(W.begin(), W.end());
-		W.erase(unique(W.begin(), W.end()), W.end());
-		x = 0;
-		sz = W.size();
-		for (int i = 0; i < sz; i++) {
-			if (i < sz - 1 && W[i].HI > W[i + 1].LO) x += (W[i + 1].LO - W[i].LO);
-			else x += W[i].HI - W[i].LO;
-		}
-		if (min > x) { min = x; mint = std::min(norm(h.rad()), norm(h.rad() + PI)); }
-		if (max < x) { max = x; maxt = std::min(norm(h.rad()), norm(h.rad() + PI)); }
-	}
-	std::cout << mint << "\n" << maxt << "\n";
-	return 1;
-}
-void solve() {
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-	std::cout << std::fixed;
-	std::cout.precision(15);
-	while (query());
-	return;
-}
-int main() { solve(); return 0; }//boj4985 Secrets in Shadows
