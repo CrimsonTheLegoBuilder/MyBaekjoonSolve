@@ -114,7 +114,6 @@ bool query() {
 	std::cin >> N;
 	if (!N) return 0;
 	Polygon P(N); for (Pos& p : P) std::cin >> p, p.y *= -1;
-	Polygon V;
 	Vld T = { 0, PI };
 	for (int i = 0; i < N; i++) {
 		for (int j = i + 1; j < N; j++) {
