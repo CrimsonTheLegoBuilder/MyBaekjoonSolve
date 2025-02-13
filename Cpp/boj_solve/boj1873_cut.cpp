@@ -216,5 +216,3 @@ int main() { solve(); return 0; }//boj1873
 1 10
 
 */
-
-*/

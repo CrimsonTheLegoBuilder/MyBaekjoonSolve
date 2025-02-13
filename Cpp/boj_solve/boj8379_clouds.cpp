@@ -57,6 +57,7 @@ bool cmp(const Pos& p, const Pos& q) {
 	int tq = sign(p / q);
 	return !tq ? p.Euc() < q.Euc() : tq > 0;
 }
+bool same_dir(const Pos& p, const Pos& q) { return !(p / q) && (p * q) >= 0; }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -119,21 +120,38 @@ int count(const Pos& s, const Pos& v, const Polygon& P) {
 			if (!on_seg_strong(v, p1, s)) cnt += ccw(p0, p1, p2) < 0;
 			continue;
 		}
-		f = front(s, v, p1, p2);
+		//f = front(s, v, p1, p2);
+		//int tq0 = ccw(s, v, p0);
+		//int tq1 = ccw(s, v, p1);
+		//int tq2 = ccw(s, v, p2);
+		//int tq3 = ccw(s, v, p3);
+		//if (!~f) continue;
+		//if (!tq1 && !tq0) continue;
+		//if (f == 2) { cnt++; continue; }
+		//else if (!tq1 && !tq2) {
+		//	if (tq0 * tq3 < 0) cnt++;
+		//	else cnt += ccw(p0, p1, p2) > 0;
+		//}
+		//else if (!tq1) {
+		//	if (tq0 * tq2 < 0) cnt++;
+		//	else cnt += ccw(p0, p1, p2) > 0;
+		//}
 		int tq0 = ccw(s, v, p0);
 		int tq1 = ccw(s, v, p1);
 		int tq2 = ccw(s, v, p2);
 		int tq3 = ccw(s, v, p3);
-		if (!~f) continue;
+		if (tq1 * tq2 > 0) continue;
+		if (tq1 * tq2 < 0) { cnt++; continue; }
 		if (!tq1 && !tq0) continue;
-		if (f == 2) { cnt++; continue; }
 		else if (!tq1 && !tq2) {
 			if (tq0 * tq3 < 0) cnt++;
-			else cnt += ccw(p0, p1, p2) > 0;
+			//else cnt += ccw(p0, p1, p2) > 0;
+			else cnt += 2;
 		}
 		else if (!tq1) {
 			if (tq0 * tq2 < 0) cnt++;
-			else cnt += ccw(p0, p1, p2) > 0;
+			//else cnt += ccw(p0, p1, p2) > 0;
+			else cnt += 2;
 		}
 	}
 	return cnt;
@@ -178,17 +196,26 @@ void solve() {
 				for (int l = 0; l < M; l++) {
 					if (k == i && l == j) continue;
 					Pos v = P[k][l] - p;
+					if (v < O) v *= -1;
 					v.ni = k; v.i = l;
 					V.push_back(v);
 				}
 			}
-			int hi, lo, sum = 2;
+			int hi = 0, lo = 0, sum = 2;
 			std::sort(V.begin(), V.end(), cmp);
 			int szv = V.size();
 			for (int k = 0; k < N; k++) sum += count(p, p + V[0], P[k]);
+			hi = count(p, P[V[0].ni], V[0].i);
+			if (hi > 0) sum -= hi;
+			int x = 1;
+			while (x < szv && same_dir(V[0], V[x])) {
+				hi = count(p, P[V[x].ni], V[x].i);
+				if (hi > 0) sum -= hi;
+				x++;
+			}
 			for (int k = 0, l = 0; k < szv; k = l) {
 				hi = 0, lo = 0;
-				while (l < szv && V[k] / V[l] == 0) {
+				while (l < szv && same_dir(V[k], V[l])) {
 					int c = count(p, P[V[l].ni], V[l].i);
 					if (c > 0) hi += c;
 					if (c < 0) lo += c;
