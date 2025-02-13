@@ -6,24 +6,51 @@
 #include <cassert>
 #include <vector>
 typedef long long ll;
+typedef long double ld;
 const int LEN = 1e5 + 1;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
 int N;
 struct Pos {
-	int x, y;
-	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
+	int x, y, i;
+	Pos(int x_ = 0, int y_ = 0, int i_ = -1) : x(x_), y(y_), i(i_) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	Pos operator * (const int& n) const { return { x * n, y * n }; }
+	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
+	Pos& operator *= (const int& n) { x *= n; y *= n; return *this; }
+	Pos& operator /= (const int& n) { x /= n; y /= n; return *this; }
+	Pos operator - () const { return { -x, -y }; }
+	Pos operator ~ () const { return { -y, x }; }
+	Pos operator ! () const { return { y, x }; }
+	ll xy() const { return (ll)x * y; }
+	ll Euc() const { return (ll)x * x + (ll)y * y; }
+	int Man() const { return std::abs(x) + std::abs(y); }
+	ld mag() const { return hypot(x, y); }
+	ld rad() const { return atan2(y, x); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+	int quad() const { return y > 0 || y == 0 && x >= 0; }
+	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
+bool cmp(const Pos& p, const Pos& q) {
+	bool f1 = O < p;
+	bool f2 = O < q;
+	if (f1 != f2) return f1;
+	int tq = sign(p / q);
+	return !tq ? p.Euc() < q.Euc() : tq > 0;
+}
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -54,17 +81,21 @@ int count(Pos s, Pos e, const Pos& q) {
 	if (s.y >= q.y || q.y > e.y) return 0;
 	return ccw(s, e, q) > 0;
 }
-void solve() {
-	std::cin.tie(0)->sync_with_stdio(0);
-	std::cout.tie(0);
-	Pos s, e;
-	std::cin >> s >> e >> N;
-	Polygon P(N);
-	if (s == e) { std::cout << "1\n"; return; }
+bool tri_inner_check(const Pos& p0, Pos p1, Pos p2, const Pos& q) {
+	if (ccw(p0, p1, p2) < 0) std::swap(p1, p2);
+	return ccw(p0, p1, q) >= 0 && ccw(p1, p2, q) >= 0 && ccw(p2, p0, q) >= 0;
+}
+int front(const Pos& s, const Pos& v, Pos p, Pos q) {
+	int sp = ccw(s, v, p), sq = ccw(s, v, q);
+	if (sp * sq == 1) return -1;
+	if (!sp && !sq) return dot(v, s, p) <= 0 && dot(v, s, q) <= 0;
+	if (!sp) return dot(v, s, p) <= 0;
+	if (!sq) return dot(v, s, q) <= 0;
+	return tri_inner_check(s, p, q, v) ? 2 : -1;
+}
+int count(const Pos& s, const Pos& v, const Polygon& P) {
 	int si = 0, ei = 0, cnt = 0;
 	int s_in = 0, e_in = 0;
-	for (Pos& p : P) std::cin >> p;
-	if (e < s) std::swap(s, e);
 	for (int i = 0; i < N; i++) {
 		const Pos& p0 = P[i], & p1 = P[(i + 1) % N], & p2 = P[(i + 2) % N], & p3 = P[(i + 3) % N];
 		int f;
@@ -73,87 +104,17 @@ void solve() {
 			if (f == 2) s_in = 2;
 			else si += f;
 		}
-		if (!e_in) {
-			f = count(p1, p2, e);
-			if (f == 2) e_in = 2;
-			else ei += f;
-		}
-		if (!intersect(s, e, p1, p2)) continue;
-		if (intersect(s, e, p1, p2, 1)) cnt++;
-		else if (collinear(s, e, p1, p2)) {
-			int ccw0 = ccw(p1, p2, p0), ccw3 = ccw(p1, p2, p3);
-			assert(ccw0); assert(ccw3);
-			if (on_seg_strong(p1, p2, s) && on_seg_strong(p1, p2, e)) { std::cout << "1\n"; return; }
-			else if (on_seg_weak(s, e, p1) && on_seg_weak(s, e, p2)) {
-				cnt += ccw3 < 0;
-				cnt += ccw0 < 0;
-			}
-			else if (on_seg_strong(p1, p2, s)) {
-				if (dot(p1, p2, e) > 0 && ccw3 < 0) cnt++;
-				else if (dot(p2, p1, e) > 0 && ccw0 < 0) cnt++;
-			}
-			else if (on_seg_strong(p1, p2, e)) {
-				if (dot(p1, p2, s) > 0 && ccw3 < 0) cnt++;
-				else if (dot(p2, p1, s) > 0 && ccw0 < 0) cnt++;
-			}
-		}
-		else if (collinear(s, e, p1, p0)) continue;
-		else if (p1 == s) cnt += inside(p0, p1, p2, e);
-		else if (p1 == e) cnt += inside(p0, p1, p2, s);
-		else if (on_seg_weak(s, e, p1)) cnt += ccw(s, e, p0) != ccw(s, e, p2);
-		else if (on_seg_weak(p1, p2, s)) cnt += ccw(p1, p2, e) > 0;
-		else if (on_seg_weak(p1, p2, e)) cnt += ccw(p1, p2, s) > 0;
+		f = front(s, v, p1, p2);
+		if (!~f) continue;
+		if (f == 2) { cnt++; continue; }
+
 	}
-	//std::cout << cnt << " cnt\n";
-	//std::cout << s_in << " s\n";
-	//std::cout << e_in << " e\n";
-	if (s_in != 2) s_in = si & 1;
-	if (e_in != 2) e_in = ei & 1;
-	if (s_in & 1) cnt--;
-	if (e_in & 1) cnt--;
-	//std::cout << cnt << "\n";
-	cnt = std::max(cnt, 0);
-	//std::cout << cnt << "\n";
-	std::cout << (cnt >> 1) + 1 << "\n";
+
+	return cnt;
+}
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	return;
 }
 int main() { solve(); return 0; }//boj8379
-
-/*
-
-1 1 1 4
-12
-0 0
-2 0
-2 5
-0 5
-0 4
-1 4
-1 3
-0 3
-0 2
-1 2
-1 1
-0 1
-
-1 1 1 4
-12
-0 0
-3 0
-3 5
-0 5
-0 4
-2 4
-2 3
-0 3
-0 2
-2 2
-2 1
-0 1
-
-1 1 1 2
-3
-0 0
-2 0
-1 10
-
-*/
