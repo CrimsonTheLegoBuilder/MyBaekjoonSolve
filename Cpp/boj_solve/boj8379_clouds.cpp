@@ -7,13 +7,18 @@
 #include <vector>
 typedef long long ll;
 typedef long double ld;
-const int LEN = 1e5 + 1;
+const int LEN = 2005;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
-int N;
+#define STRONG 0
+#define WEAK 1
+#define LO x
+#define HI y
+
+int N, M;
 struct Pos {
-	int x, y, i;
-	Pos(int x_ = 0, int y_ = 0, int i_ = -1) : x(x_), y(y_), i(i_) {}
+	int x, y, ni, i;
+	Pos(int x_ = 0, int y_ = 0, int ni_ = 0, int i_ = -1) : x(x_), y(y_), ni(ni_), i(i_) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -44,6 +49,7 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
+Polygon P[LEN];
 bool cmp(const Pos& p, const Pos& q) {
 	bool f1 = O < p;
 	bool f2 = O < q;
@@ -70,7 +76,7 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool 
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int& f = 1) {
+bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int& f = STRONG) {
 	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
 	return ccw(p0, p1, q) >= f && ccw(p1, p2, q) >= f;
 }
@@ -91,7 +97,7 @@ int front(const Pos& s, const Pos& v, Pos p, Pos q) {
 	if (!sp && !sq) return dot(v, s, p) <= 0 && dot(v, s, q) <= 0;
 	if (!sp) return dot(v, s, p) <= 0;
 	if (!sq) return dot(v, s, q) <= 0;
-	return tri_inner_check(s, p, q, v) ? 2 : -1;
+	return tri_inner_check(v, p, q, s) ? -1 : 2;
 }
 int count(const Pos& s, const Pos& v, const Polygon& P) {
 	int si = 0, ei = 0, cnt = 0;
@@ -99,22 +105,102 @@ int count(const Pos& s, const Pos& v, const Polygon& P) {
 	for (int i = 0; i < N; i++) {
 		const Pos& p0 = P[i], & p1 = P[(i + 1) % N], & p2 = P[(i + 2) % N], & p3 = P[(i + 3) % N];
 		int f;
-		if (!s_in) {
-			f = count(p1, p2, s);
-			if (f == 2) s_in = 2;
-			else si += f;
+		//if (!s_in) {
+		//	f = count(p1, p2, s);
+		//	if (f == 2) s_in = 2;
+		//	else si += f;
+		//}
+		if (p1 == s) continue;
+		if (p0 == s) {
+			if (!on_seg_strong(v, p1, s)) cnt += ccw(p0, p1, p2) > 0;
+			continue;
+		}
+		if (p2 == s) {
+			if (!on_seg_strong(v, p1, s)) cnt += ccw(p0, p1, p2) < 0;
+			continue;
 		}
 		f = front(s, v, p1, p2);
+		int tq0 = ccw(s, v, p0);
+		int tq1 = ccw(s, v, p1);
+		int tq2 = ccw(s, v, p2);
+		int tq3 = ccw(s, v, p3);
 		if (!~f) continue;
+		if (!tq1 && !tq0) continue;
 		if (f == 2) { cnt++; continue; }
-
+		else if (!tq1 && !tq2) {
+			if (tq0 * tq3 < 0) cnt++;
+			else cnt += ccw(p0, p1, p2) > 0;
+		}
+		else if (!tq1) {
+			if (tq0 * tq2 < 0) cnt++;
+			else cnt += ccw(p0, p1, p2) > 0;
+		}
 	}
-
 	return cnt;
+}
+int count(const Pos& o, const Polygon& P, const int& i) {
+	int sz = P.size();
+	const Pos& p0 = P[(i - 1 + sz) % sz], & p1 = P[i], & p2 = P[(i + 1) % sz], & p3 = P[(i + 2) % sz];
+	if (p0 == o) return ccw(p0, p1, p2) > 0 ? 1 : -1;
+	if (p2 == o) return ccw(p0, p1, p2) < 0 ? -1 : 1;
+	int tq0 = ccw(o, p1, p0);
+	int tq2 = ccw(o, p1, p2);
+	int tq3 = ccw(o, p1, p3);
+	if (!tq0) return 0;
+	if (tq0 * tq2 < 0) return 0;
+	if (tq0 > 0 && tq2 > 0) return 2;
+	if (tq0 < 0 && tq2 < 0) return -2;
+	assert(tq2 == 0);
+	if (tq0 * tq3 < 0) return 0;
+	if (tq0 > 0 && tq3 > 0) return 2;
+	if (tq0 < 0 && tq3 < 0) return -2;
+	return 0;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	std::cin >> N;
+	for (int i = 0; i < N; i++) {
+		int ni;
+		std::cin >> ni; P[i].resize(ni);
+		ni = 0;
+		for (Pos& p : P[i]) std::cin >> p, p.ni = i, p.i = ni++;
+	}
+	int ret = 0;
+	for (int i = 0; i < N; i++) {
+		const Polygon& H = P[i];
+		int sz = H.size();
+		for (int j = 0; j < sz; j++) {
+			const Pos& p = H[j];
+			Polygon V;
+			for (int k = 0; k < N; k++) {
+				M = P[k].size();
+				for (int l = 0; l < M; l++) {
+					if (k == i && l == j) continue;
+					Pos v = P[k][l] - p;
+					v.ni = k; v.i = l;
+					V.push_back(v);
+				}
+			}
+			int hi, lo, sum = 2;
+			std::sort(V.begin(), V.end(), cmp);
+			int szv = V.size();
+			for (int k = 0; k < N; k++) sum += count(p, p + V[0], P[k]);
+			for (int k = 0, l = 0; k < szv; k = l) {
+				hi = 0, lo = 0;
+				while (l < szv && V[k] / V[l] == 0) {
+					int c = count(p, P[V[l].ni], V[l].i);
+					if (c > 0) hi += c;
+					if (c < 0) lo += c;
+					l++;
+				}
+				sum += hi;
+				ret = std::max(ret, sum);
+				sum += lo;
+			}
+		}
+	}
+	std::cout << (ret >> 1) << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj8379
+int main() { solve(); return 0; }//boj8379 Clouds
