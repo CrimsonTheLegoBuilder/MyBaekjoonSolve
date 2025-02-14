@@ -53,11 +53,12 @@ Polygon P[LEN];
 bool cmp(const Pos& p, const Pos& q) {
 	bool f1 = O < p;
 	bool f2 = O < q;
-	if (f1 != f2) return f1;
+	//if (f1 != f2) return f1;
 	int tq = sign(p / q);
-	return !tq ? p.Euc() < q.Euc() : tq > 0;
+	return tq > 0;
+	//return !tq ? p.Euc() < q.Euc() : tq > 0;
 }
-bool same_dir(const Pos& p, const Pos& q) { return !(p / q) && (p * q) >= 0; }
+bool same_dir(const Pos& p, const Pos& q) { return !(p / q) && (p * q >= 0); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
@@ -80,6 +81,12 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2, bool 
 bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int& f = STRONG) {
 	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
 	return ccw(p0, p1, q) >= f && ccw(p1, p2, q) >= f;
+}
+ll area(const Polygon& H) {
+	ll a = 0;
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) a += H[i] / H[(i + 1) % sz];
+	return sz;
 }
 int count(Pos s, Pos e, const Pos& q) {
 	if (on_seg_strong(s, e, q)) return 2;
@@ -187,10 +194,12 @@ void solve() {
 	int ret = 0;
 	for (int i = 0; i < N; i++) {
 		const Polygon& H = P[i];
+		ll a = area(H);
+		assert(a > 0);
 		int sz = H.size();
 		for (int j = 0; j < sz; j++) {
 			const Pos& p = H[j];
-			std::cout << "p:: " << p << "\n";
+			//std::cout << "p:: " << p << "\n";
 			Polygon V;
 			for (int k = 0; k < N; k++) {
 				M = P[k].size();
@@ -219,11 +228,15 @@ void solve() {
 				hi = count(p, P[V[k].ni], V[k].i);
 				if (hi > 0) sum -= hi;
 			}
+			//for (int k = 0, l = 0; k < szv; k++) {
+			//	ret = k;
+			//}
 			for (int k = 0, l = 0; k < szv; k = l) {
 				hi = 0, lo = 0;
+				l = k;
 				//회전할 때마다 기준점이 있는 도형의 내외부에 대해서는 예외처리를 해주면 되지 않을까?
 				//기준점 +1, -1 점에서는 들어가거나 나갈 때 +-1 판정, 나머지는 +-2 판정으로 도형의 교차 판정.
-				while (l < szv && same_dir(V[k], V[l])) {
+				while (l < szv && !(V[k] / V[l])) {
 					int c = count(p, P[V[l].ni], V[l].i);
 					//점의 위상을 180도 돌린 점들에 대해서는 방향성을 반대로 적용하는 로직이 빠짐
 					//이건 알아서 돌아가게 될 것 같아 보임.
@@ -231,11 +244,11 @@ void solve() {
 					if (c < 0) lo += c;
 					l++;
 				}
-				std::cout << "v:: " << V[k] << "\n";
+				//std::cout << "v:: " << V[k] << "\n";
 				sum += hi;
-				ret = std::max(ret, sum);
-				std::cout << "sum:: " << sum << "\n";
 				sum += lo;
+				ret = std::max(ret, sum);
+				//std::cout << "sum:: " << sum << "\n";
 			}
 		}
 	}
