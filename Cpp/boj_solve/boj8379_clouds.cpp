@@ -29,6 +29,7 @@ struct Pos {
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	//bool operator < (const Pos& p) const { return *this / p > 0; }
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
@@ -212,44 +213,44 @@ void solve() {
 				}
 			}
 			int hi = 0, lo = 0, sum = 1;
-			std::sort(V.begin(), V.end(), cmp);
+			std::sort(V.begin(), V.end());
 			int szv = V.size();
 			for (int k = 0; k < N; k++) sum += count(p, p + V[0], P[k]);
-			//hi = count(p, P[V[0].ni], V[0].i);
-			//if (hi > 0) sum -= hi;
-			//int x = 1;
-			//while (x < szv && same_dir(V[0], V[x])) {
-			//	hi = count(p, P[V[x].ni], V[x].i);
+			////hi = count(p, P[V[0].ni], V[0].i);
+			////if (hi > 0) sum -= hi;
+			////int x = 1;
+			////while (x < szv && same_dir(V[0], V[x])) {
+			////	hi = count(p, P[V[x].ni], V[x].i);
+			////	if (hi > 0) sum -= hi;
+			////	x++;
+			////}
+			//for (int k = 0; k < szv - 1; k++) {
+			//	if (V[k] / V[k + 1]) break;
+			//	hi = count(p, P[V[k].ni], V[k].i);
 			//	if (hi > 0) sum -= hi;
-			//	x++;
 			//}
-			for (int k = 0; k < szv - 1; k++) {
-				if (V[k] / V[k + 1]) break;
-				hi = count(p, P[V[k].ni], V[k].i);
-				if (hi > 0) sum -= hi;
-			}
-			//for (int k = 0, l = 0; k < szv; k++) {
-			//	ret = k;
+			////for (int k = 0, l = 0; k < szv; k++) {
+			////	ret = k;
+			////}
+			//for (int k = 0, l = 0; k < szv; k = l) {
+			//	hi = 0, lo = 0;
+			//	l = k;
+			//	//회전할 때마다 기준점이 있는 도형의 내외부에 대해서는 예외처리를 해주면 되지 않을까?
+			//	//기준점 +1, -1 점에서는 들어가거나 나갈 때 +-1 판정, 나머지는 +-2 판정으로 도형의 교차 판정.
+			//	while (l < szv && !(V[k] / V[l])) {
+			//		int c = count(p, P[V[l].ni], V[l].i);
+			//		//점의 위상을 180도 돌린 점들에 대해서는 방향성을 반대로 적용하는 로직이 빠짐
+			//		//이건 알아서 돌아가게 될 것 같아 보임.
+			//		if (c > 0) hi += c;
+			//		if (c < 0) lo += c;
+			//		l++;
+			//	}
+			//	//std::cout << "v:: " << V[k] << "\n";
+			//	sum += hi;
+			//	sum += lo;
+			//	ret = std::max(ret, sum);
+			//	//std::cout << "sum:: " << sum << "\n";
 			//}
-			for (int k = 0, l = 0; k < szv; k = l) {
-				hi = 0, lo = 0;
-				l = k;
-				//회전할 때마다 기준점이 있는 도형의 내외부에 대해서는 예외처리를 해주면 되지 않을까?
-				//기준점 +1, -1 점에서는 들어가거나 나갈 때 +-1 판정, 나머지는 +-2 판정으로 도형의 교차 판정.
-				while (l < szv && !(V[k] / V[l])) {
-					int c = count(p, P[V[l].ni], V[l].i);
-					//점의 위상을 180도 돌린 점들에 대해서는 방향성을 반대로 적용하는 로직이 빠짐
-					//이건 알아서 돌아가게 될 것 같아 보임.
-					if (c > 0) hi += c;
-					if (c < 0) lo += c;
-					l++;
-				}
-				//std::cout << "v:: " << V[k] << "\n";
-				sum += hi;
-				sum += lo;
-				ret = std::max(ret, sum);
-				//std::cout << "sum:: " << sum << "\n";
-			}
 		}
 	}
 	std::cout << (ret >> 1) << "\n";
