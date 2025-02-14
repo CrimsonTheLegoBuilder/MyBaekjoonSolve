@@ -220,6 +220,7 @@ void solve() {
 			}
 			for (int k = 0, l = 0; k < szv; k = l) {
 				hi = 0, lo = 0;
+				//회전할 때마다 기준점이 있는 도형의 내외부에 대해서는 예외처리를 해주면 되지 않을까?
 				while (l < szv && same_dir(V[k], V[l])) {
 					int c = count(p, P[V[l].ni], V[l].i);
 					if (c > 0) hi += c;
