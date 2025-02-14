@@ -160,7 +160,7 @@ int count(const Pos& o, const Polygon& P, const int& i) {
 	int sz = P.size();
 	const Pos& p0 = P[(i - 1 + sz) % sz], & p1 = P[i], & p2 = P[(i + 1) % sz], & p3 = P[(i + 2) % sz];
 	if (p0 == o) return ccw(p0, p1, p2) > 0 ? 1 : -1;
-	if (p2 == o) return ccw(p0, p1, p2) < 0 ? -1 : 1;
+	if (p2 == o) return ccw(p0, p1, p2) < 0 ? 1 : -1;
 	int tq0 = ccw(o, p1, p0);
 	int tq2 = ccw(o, p1, p2);
 	int tq3 = ccw(o, p1, p3);
@@ -190,6 +190,7 @@ void solve() {
 		int sz = H.size();
 		for (int j = 0; j < sz; j++) {
 			const Pos& p = H[j];
+			std::cout << "p:: " << p << "\n";
 			Polygon V;
 			for (int k = 0; k < N; k++) {
 				M = P[k].size();
@@ -201,7 +202,7 @@ void solve() {
 					V.push_back(v);
 				}
 			}
-			int hi = 0, lo = 0, sum = 2;
+			int hi = 0, lo = 0, sum = 1;
 			std::sort(V.begin(), V.end(), cmp);
 			int szv = V.size();
 			for (int k = 0; k < N; k++) sum += count(p, p + V[0], P[k]);
@@ -230,8 +231,10 @@ void solve() {
 					if (c < 0) lo += c;
 					l++;
 				}
+				std::cout << "v:: " << V[k] << "\n";
 				sum += hi;
 				ret = std::max(ret, sum);
+				std::cout << "sum:: " << sum << "\n";
 				sum += lo;
 			}
 		}
