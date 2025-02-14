@@ -7,6 +7,7 @@
 #include <vector>
 typedef long long ll;
 typedef long double ld;
+typedef std::vector<bool> Vbool;
 const int LEN = 2005;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
@@ -21,7 +22,7 @@ struct Pos {
 	Pos(int x_ = 0, int y_ = 0, int ni_ = 0, int i_ = -1) : x(x_), y(y_), ni(ni_), i(i_) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
-	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -29,7 +30,7 @@ struct Pos {
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	//bool operator < (const Pos& p) const { return *this / p > 0; }
+	bool operator < (const Pos& p) const { return *this / p > 0; }
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
@@ -89,6 +90,18 @@ ll area(const Polygon& H) {
 	for (int i = 0; i < sz; i++) a += H[i] / H[(i + 1) % sz];
 	return sz;
 }
+int inner_check(const std::vector<Pos>& H, const Pos& p) {//concave
+	int cnt = 0, sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (cur.y == nxt.y) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y <= p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return (cnt & 1) * 2;
+}
 int count(Pos s, Pos e, const Pos& q) {
 	if (on_seg_strong(s, e, q)) return 2;
 	if (s.y == e.y) return 0;
@@ -114,35 +127,14 @@ int count(const Pos& s, const Pos& v, const Polygon& P) {
 	for (int i = 0; i < N; i++) {
 		const Pos& p0 = P[i], & p1 = P[(i + 1) % N], & p2 = P[(i + 2) % N], & p3 = P[(i + 3) % N];
 		int f;
-		//if (!s_in) {
-		//	f = count(p1, p2, s);
-		//	if (f == 2) s_in = 2;
-		//	else si += f;
+		//if (p1 == s) continue;
+		//if (p0 == s) {
+		//	if (!on_seg_strong(v, p1, s)) cnt += ccw(p0, p1, p2) > 0;
+		//	continue;
 		//}
-		if (p1 == s) continue;
-		if (p0 == s) {
-			if (!on_seg_strong(v, p1, s)) cnt += ccw(p0, p1, p2) > 0;
-			continue;
-		}
-		if (p2 == s) {
-			if (!on_seg_strong(v, p1, s)) cnt += ccw(p0, p1, p2) < 0;
-			continue;
-		}
-		//f = front(s, v, p1, p2);
-		//int tq0 = ccw(s, v, p0);
-		//int tq1 = ccw(s, v, p1);
-		//int tq2 = ccw(s, v, p2);
-		//int tq3 = ccw(s, v, p3);
-		//if (!~f) continue;
-		//if (!tq1 && !tq0) continue;
-		//if (f == 2) { cnt++; continue; }
-		//else if (!tq1 && !tq2) {
-		//	if (tq0 * tq3 < 0) cnt++;
-		//	else cnt += ccw(p0, p1, p2) > 0;
-		//}
-		//else if (!tq1) {
-		//	if (tq0 * tq2 < 0) cnt++;
-		//	else cnt += ccw(p0, p1, p2) > 0;
+		//if (p2 == s) {
+		//	if (!on_seg_strong(v, p1, s)) cnt += ccw(p0, p1, p2) < 0;
+		//	continue;
 		//}
 		int tq0 = ccw(s, v, p0);
 		int tq1 = ccw(s, v, p1);
@@ -189,10 +181,41 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		int ni;
 		std::cin >> ni; P[i].resize(ni);
-		ni = 0;
-		for (Pos& p : P[i]) std::cin >> p, p.ni = i, p.i = ni++;
+		//ni = 0;
+		for (Pos& p : P[i]) std::cin >> p;// , p.ni = i, p.i = ni++;
+		Vbool F(ni, 0);
+		for (int j = 0; j < ni; j++) {
+			if (!ccw(P[i][(j - 1 + ni) % ni], P[i][j], P[i][(j + 1) % ni])) F[j] = 1;
+		}
+		Polygon C;
+		for (int j = 0; j < ni; j++) if (!F[j]) C.push_back(P[i][j]);
+		P[i] = C;
 	}
 	int ret = 0;
+	//for (int i = 0; i < N; i++) {
+	//	for (int j = 0; j < N; j++) {
+	//		if (j == i) continue;
+	//		int sz = P[j].size();
+	//		for (int k = 0; k < sz; k++) {
+	//			int f = inner_check(P[i], P[j][k]);
+	//			assert(f == 0);
+	//		}
+	//	}
+	//	int n = P[i].size();
+	//	for (int j = 0; j < n; j++) {
+	//		Pos p1 = P[i][j], p2 = P[i][(j + 1) % n];
+	//		for (int k = 0; k < N; k++) {
+	//			if (k == i) continue;
+	//			int sz = P[k].size();
+	//			for (int l = 0; l < sz; l++) {
+	//				Pos p3 = P[k][l], p4 = P[k][(l + 1) % sz];
+	//				bool f = intersect(p1, p2, p3, p4);
+	//				assert(!f);
+	//			}
+	//		}
+	//	}
+	//}
+	//return;
 	for (int i = 0; i < N; i++) {
 		const Polygon& H = P[i];
 		ll a = area(H);
@@ -215,42 +238,28 @@ void solve() {
 			int hi = 0, lo = 0, sum = 1;
 			std::sort(V.begin(), V.end());
 			int szv = V.size();
+			assert(szv);
 			for (int k = 0; k < N; k++) sum += count(p, p + V[0], P[k]);
-			////hi = count(p, P[V[0].ni], V[0].i);
-			////if (hi > 0) sum -= hi;
-			////int x = 1;
-			////while (x < szv && same_dir(V[0], V[x])) {
-			////	hi = count(p, P[V[x].ni], V[x].i);
-			////	if (hi > 0) sum -= hi;
-			////	x++;
-			////}
-			//for (int k = 0; k < szv - 1; k++) {
-			//	if (V[k] / V[k + 1]) break;
-			//	hi = count(p, P[V[k].ni], V[k].i);
-			//	if (hi > 0) sum -= hi;
-			//}
-			////for (int k = 0, l = 0; k < szv; k++) {
-			////	ret = k;
-			////}
-			//for (int k = 0, l = 0; k < szv; k = l) {
-			//	hi = 0, lo = 0;
-			//	l = k;
-			//	//회전할 때마다 기준점이 있는 도형의 내외부에 대해서는 예외처리를 해주면 되지 않을까?
-			//	//기준점 +1, -1 점에서는 들어가거나 나갈 때 +-1 판정, 나머지는 +-2 판정으로 도형의 교차 판정.
-			//	while (l < szv && !(V[k] / V[l])) {
-			//		int c = count(p, P[V[l].ni], V[l].i);
-			//		//점의 위상을 180도 돌린 점들에 대해서는 방향성을 반대로 적용하는 로직이 빠짐
-			//		//이건 알아서 돌아가게 될 것 같아 보임.
-			//		if (c > 0) hi += c;
-			//		if (c < 0) lo += c;
-			//		l++;
-			//	}
-			//	//std::cout << "v:: " << V[k] << "\n";
-			//	sum += hi;
-			//	sum += lo;
-			//	ret = std::max(ret, sum);
-			//	//std::cout << "sum:: " << sum << "\n";
-			//}
+			for (int k = 0; k < szv - 1; k++) {
+				if (V[k] / V[k + 1]) break;
+				hi = count(p, P[V[k].ni], V[k].i);
+				if (hi > 0) sum -= hi;
+				if (hi < 0) sum -= hi;
+			}
+			for (int k = 0, l = 0; k < szv; k = l) {
+				hi = 0, lo = 0;
+				while (l < szv && !(V[k] / V[l])) {
+					int c = count(p, P[V[l].ni], V[l].i);
+					if (c > 0) hi += c;
+					if (c < 0) lo += c;
+					l++;
+				}
+				//std::cout << "v:: " << V[k] << "\n";
+				sum += hi;
+				ret = std::max(ret, sum);
+				sum += lo;
+				//std::cout << "sum:: " << sum << "\n";
+			}
 		}
 	}
 	std::cout << (ret >> 1) << "\n";
