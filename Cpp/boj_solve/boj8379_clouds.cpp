@@ -205,13 +205,18 @@ void solve() {
 			std::sort(V.begin(), V.end(), cmp);
 			int szv = V.size();
 			for (int k = 0; k < N; k++) sum += count(p, p + V[0], P[k]);
-			hi = count(p, P[V[0].ni], V[0].i);
-			if (hi > 0) sum -= hi;
-			int x = 1;
-			while (x < szv && same_dir(V[0], V[x])) {
-				hi = count(p, P[V[x].ni], V[x].i);
+			//hi = count(p, P[V[0].ni], V[0].i);
+			//if (hi > 0) sum -= hi;
+			//int x = 1;
+			//while (x < szv && same_dir(V[0], V[x])) {
+			//	hi = count(p, P[V[x].ni], V[x].i);
+			//	if (hi > 0) sum -= hi;
+			//	x++;
+			//}
+			for (int k = 0; k < szv - 1; k++) {
+				if (V[k] / V[k + 1]) break;
+				hi = count(p, P[V[k].ni], V[k].i);
 				if (hi > 0) sum -= hi;
-				x++;
 			}
 			for (int k = 0, l = 0; k < szv; k = l) {
 				hi = 0, lo = 0;
