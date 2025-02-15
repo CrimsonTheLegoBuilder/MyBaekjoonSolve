@@ -10,13 +10,14 @@ typedef long double ld;
 typedef std::vector<bool> Vbool;
 const int LEN = 2005;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
+ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 
 #define STRONG 0
 #define WEAK 1
 #define LO x
 #define HI y
 
-int N, M;
+int N, M, T;
 struct Pos {
 	int x, y, ni, i;
 	Pos(int x_ = 0, int y_ = 0, int ni_ = 0, int i_ = -1) : x(x_), y(y_), ni(ni_), i(i_) {}
@@ -59,6 +60,10 @@ bool cmp(const Pos& p, const Pos& q) {
 	int tq = sign(p / q);
 	return tq > 0;
 	//return !tq ? p.Euc() < q.Euc() : tq > 0;
+}
+Pos norm(Pos p) {
+	ll g = gcd(std::abs(p.x), std::abs(p.y));
+	return p / (int)g;
 }
 bool same_dir(const Pos& p, const Pos& q) { return !(p / q) && (p * q >= 0); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
@@ -182,7 +187,7 @@ void solve() {
 		int ni;
 		std::cin >> ni; P[i].resize(ni);
 		//ni = 0;
-		for (Pos& p : P[i]) std::cin >> p;// , p.ni = i, p.i = ni++;
+		for (Pos& p : P[i]) std::cin >> p, T++;// , p.ni = i, p.i = ni++;
 		Vbool F(ni, 0);
 		for (int j = 0; j < ni; j++) {
 			if (!ccw(P[i][(j - 1 + ni) % ni], P[i][j], P[i][(j + 1) % ni])) F[j] = 1;
@@ -191,7 +196,8 @@ void solve() {
 		for (int j = 0; j < ni; j++) if (!F[j]) C.push_back(P[i][j]);
 		P[i] = C;
 	}
-	int ret = 0;
+	assert(T < 2005);
+	ll ret = 0;
 	//for (int i = 0; i < N; i++) {
 	//	for (int j = 0; j < N; j++) {
 	//		if (j == i) continue;
@@ -230,35 +236,35 @@ void solve() {
 				for (int l = 0; l < M; l++) {
 					if (k == i && l == j) continue;
 					Pos v = P[k][l] - p;
+					v = norm(v);
 					if (v < O) v *= -1;
 					v.ni = k; v.i = l;
 					V.push_back(v);
 				}
 			}
-			int hi = 0, lo = 0, sum = 1;
+			ll hi = 0, lo = 0, sm = 1;
 			std::sort(V.begin(), V.end());
 			int szv = V.size();
 			assert(szv);
-			for (int k = 0; k < N; k++) sum += count(p, p + V[0], P[k]);
+			for (int k = 0; k < N; k++) sm += count(p, p + V[0], P[k]);
 			for (int k = 0; k < szv - 1; k++) {
 				if (V[k] / V[k + 1]) break;
 				hi = count(p, P[V[k].ni], V[k].i);
-				if (hi > 0) sum -= hi;
-				if (hi < 0) sum -= hi;
+				if (hi > 0) sm -= hi;
+				if (hi < 0) sm -= hi;
 			}
-			for (int k = 0, l = 0; k < szv; k = l) {
-				hi = 0, lo = 0;
-				while (l < szv && !(V[k] / V[l])) {
-					int c = count(p, P[V[l].ni], V[l].i);
-					if (c > 0) hi += c;
-					if (c < 0) lo += c;
-					l++;
+			for (int k = 0; k < szv; k++) {
+				ll c = count(p, P[V[k].ni], V[k].i);
+				if (c > 0) hi += c;
+				if (c < 0) lo += c;
+				if (k == szv - 1 || (k < szv - 1 && V[k] != V[k + 1])) {
+					sm += hi;
+					ret = std::max(ret, sm);
+					//ret = sm;
+					//assert(sm < 17000);
+					sm += lo;
+					lo = 0; hi = 0;
 				}
-				//std::cout << "v:: " << V[k] << "\n";
-				sum += hi;
-				ret = std::max(ret, sum);
-				sum += lo;
-				//std::cout << "sum:: " << sum << "\n";
 			}
 		}
 	}
