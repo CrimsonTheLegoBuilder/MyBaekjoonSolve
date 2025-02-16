@@ -126,11 +126,12 @@ int front(const Pos& s, const Pos& v, Pos p, Pos q) {
 	if (!sq) return dot(v, s, q) <= 0;
 	return tri_inner_check(v, p, q, s) ? -1 : 2;
 }
-int count_(const Pos& s, const Pos& v, const Polygon& P) {
+int count_(const Pos& s, const Pos& v, const Polygon& H) {
 	int si = 0, ei = 0, cnt = 0;
 	int s_in = 0, e_in = 0;
-	for (int i = 0; i < N; i++) {
-		const Pos& p0 = P[i], & p1 = P[(i + 1) % N], & p2 = P[(i + 2) % N], & p3 = P[(i + 3) % N];
+	int sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		const Pos& p0 = H[i], & p1 = H[(i + 1) % sz], & p2 = H[(i + 2) % sz], & p3 = H[(i + 3) % sz];
 		int f;
 		//if (p1 == s) continue;
 		//if (p0 == s) {
@@ -161,9 +162,9 @@ int count_(const Pos& s, const Pos& v, const Polygon& P) {
 	}
 	return cnt;
 }
-int count(const Pos& o, const Polygon& P, const int& i) {
-	int sz = P.size();
-	const Pos& p0 = P[(i - 1 + sz) % sz], & p1 = P[i], & p2 = P[(i + 1) % sz], & p3 = P[(i + 2) % sz];
+int count(const Pos& o, const Polygon& H, const int& i) {
+	int sz = H.size();
+	const Pos& p0 = H[(i - 1 + sz) % sz], & p1 = H[i], & p2 = H[(i + 1) % sz], & p3 = H[(i + 2) % sz];
 	if (p0 == o) return ccw(p0, p1, p2) > 0 ? 1 : -1;
 	if (p2 == o) return ccw(p0, p1, p2) < 0 ? 1 : -1;
 	int tq0 = ccw(o, p1, p0);
@@ -252,16 +253,15 @@ void solve() {
 				if (hi > 0) sm -= hi;
 				if (hi < 0) sm -= hi;
 			}
+			hi = lo = 0;
 			for (int k = 0; k < szv; k++) {
 				ll c = count(p, P[V[k].ni], V[k].i);
 				if (c > 0) hi += c;
 				if (c < 0) lo += c;
 				if (k == szv - 1 || (k < szv - 1 && V[k] != V[k + 1])) {
-					ll tsm = sm + hi;
-					ret = std::max(ret, tsm);
-					//ret = sm;
-					sm = sm + hi + lo;
-					assert(sm < 1e9);
+					sm += hi;
+					ret = std::max(ret, sm);
+					sm += lo;
 					lo = 0; hi = 0;
 				}
 			}
