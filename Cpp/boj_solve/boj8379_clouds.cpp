@@ -264,21 +264,23 @@ void solve() {
 			ret = std::max(ret, sm - hi);
 			ret = std::max(ret, sm + lo);
 			sm -= hi;
+			//sm -= lo;
 			hi = lo = 0;
 			//std::cout << "sm:: 1:: " << sm << "\n";
 			for (int k = 0; k < szv; k++) {
 				ll c = count(p, P[V[k].ni], V[k].i);
-				//std::cout << "p:: " << P[V[k].ni][V[k].i] << "\n";
+				//std::cout << "p[ni][i]:: " << P[V[k].ni][V[k].i] << "\n";
 				//std::cout << "v:: " << V[k] << "\n";
 				//std::cout << "ni:: " << V[k].ni << " i:: " << V[k].i << " c:: " << c << "\n";
 				if (c > 0) hi += c;
 				if (c < 0) lo += c;
-				if (k == szv - 1 || (k < szv - 1 && V[k] != V[k + 1])) {
+				if (k == szv - 1 || (k < szv - 1 && V[k] / V[k + 1])) {
 					//std::cout << "v:: " << V[k] << "\n";
-					sm += hi;
 					//std::cout << "sm+:: " << sm << "\n";
-					ret = std::max(ret, sm);
+					ret = std::max(ret, sm - hi);
+					ret = std::max(ret, sm + lo);
 					sm += lo;
+					sm += hi;
 					//std::cout << "sm-:: " << sm << "\n";
 					lo = 0; hi = 0;
 				}
