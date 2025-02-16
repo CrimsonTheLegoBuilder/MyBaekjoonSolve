@@ -20,7 +20,8 @@ ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 int N, M, T;
 struct Pos {
 	int x, y, ni, i;
-	Pos(int x_ = 0, int y_ = 0, int ni_ = 0, int i_ = -1) : x(x_), y(y_), ni(ni_), i(i_) {}
+	bool f;
+	Pos(int x_ = 0, int y_ = 0, int ni_ = 0, int i_ = -1) : x(x_), y(y_), ni(ni_), i(i_) { f = 0; }
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -244,25 +245,34 @@ void solve() {
 					if (k == i && l == j) continue;
 					Pos v = P[k][l] - p;
 					v = norm(v);
-					if (v < O) v *= -1;
+					if (v < O) v *= -1, v.f = 1;
 					v.ni = k; v.i = l;
 					V.push_back(v);
 				}
 			}
-			ll hi = 0, lo = 0, sm = 0;
+			ll hi = 0, lo = 0, hif = 0, hir = 0, lof = 0, lor = 0, sm = 0;
 			std::sort(V.begin(), V.end(), cmp);
 			int szv = V.size();
 			assert(szv);
 			for (int k = 0; k < N; k++) sm += count_(p, p + V[0], P[k]);
 			//std::cout << "sm:: 0:: " << sm << "\n";
 			for (int k = 0; k < szv - 1; k++) {
+				bool f0 = V[k].f;
 				ll c = count(p, P[V[k].ni], V[k].i);
-				if (c > 0) hi += c;
-				if (c < 0) lo += c;
+				if (c > 0) {
+					hi += c;
+					if (f0) hir += c;
+					else hif += c;
+				}
+				if (c < 0) {
+					lo += c;
+					if (f0) lor += c;
+					else lof += c;
+				}
 				if (V[k] / V[k + 1]) break;
 			}
-			ret = std::max(ret, sm - hi);
-			ret = std::max(ret, sm + lo);
+			ret = std::max(ret, sm - hir - hif);
+			ret = std::max(ret, sm + lor + lor);
 			sm -= hi;
 			//sm -= lo;
 			hi = lo = 0;
