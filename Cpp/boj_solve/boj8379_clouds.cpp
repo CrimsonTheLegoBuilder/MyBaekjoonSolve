@@ -186,8 +186,7 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		int ni;
 		std::cin >> ni; P[i].resize(ni);
-		//ni = 0;
-		for (Pos& p : P[i]) std::cin >> p, T++;// , p.ni = i, p.i = ni++;
+		for (Pos& p : P[i]) std::cin >> p, T++;
 		Vbool F(ni, 0);
 		for (int j = 0; j < ni; j++) {
 			if (!ccw(P[i][(j - 1 + ni) % ni], P[i][j], P[i][(j + 1) % ni])) F[j] = 1;
