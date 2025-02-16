@@ -126,7 +126,7 @@ int front(const Pos& s, const Pos& v, Pos p, Pos q) {
 	if (!sq) return dot(v, s, q) <= 0;
 	return tri_inner_check(v, p, q, s) ? -1 : 2;
 }
-int count(const Pos& s, const Pos& v, const Polygon& P) {
+int count_(const Pos& s, const Pos& v, const Polygon& P) {
 	int si = 0, ei = 0, cnt = 0;
 	int s_in = 0, e_in = 0;
 	for (int i = 0; i < N; i++) {
@@ -246,7 +246,7 @@ void solve() {
 			std::sort(V.begin(), V.end());
 			int szv = V.size();
 			assert(szv);
-			for (int k = 0; k < N; k++) sm += count(p, p + V[0], P[k]);
+			for (int k = 0; k < N; k++) sm += count_(p, p + V[0], P[k]);
 			for (int k = 0; k < szv - 1; k++) {
 				if (V[k] / V[k + 1]) break;
 				hi = count(p, P[V[k].ni], V[k].i);
@@ -261,7 +261,7 @@ void solve() {
 					sm += hi;
 					ret = std::max(ret, sm);
 					//ret = sm;
-					//assert(sm < 17000);
+					assert(sm < 1e9);
 					sm += lo;
 					lo = 0; hi = 0;
 				}
