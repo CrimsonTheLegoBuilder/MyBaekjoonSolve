@@ -23,7 +23,7 @@ struct Pos {
 	Pos(int x_ = 0, int y_ = 0, int ni_ = 0, int i_ = -1) : x(x_), y(y_), ni(ni_), i(i_) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
-	//bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
 	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
@@ -31,7 +31,7 @@ struct Pos {
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	bool operator < (const Pos& p) const { return *this / p > 0; }
+	//bool operator < (const Pos& p) const { return *this / p > 0; }
 	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
@@ -53,14 +53,7 @@ struct Pos {
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 Polygon P[LEN];
-bool cmp(const Pos& p, const Pos& q) {
-	bool f1 = O < p;
-	bool f2 = O < q;
-	//if (f1 != f2) return f1;
-	int tq = sign(p / q);
-	return tq > 0;
-	//return !tq ? p.Euc() < q.Euc() : tq > 0;
-}
+bool cmp(const Pos& p, const Pos& q) { return p / q > 0; }
 Pos norm(Pos p) {
 	ll g = gcd(std::abs(p.x), std::abs(p.y));
 	return p / (int)g;
@@ -229,7 +222,7 @@ void solve() {
 		int sz = H.size();
 		for (int j = 0; j < sz; j++) {
 			const Pos& p = H[j];
-			//std::cout << "p:: " << p << "\n";
+			//std::cout << "\np:: " << p << "\n";
 			Polygon V;
 			for (int k = 0; k < N; k++) {
 				M = P[k].size();
@@ -242,26 +235,34 @@ void solve() {
 					V.push_back(v);
 				}
 			}
-			ll hi = 0, lo = 0, sm = 1;
-			std::sort(V.begin(), V.end());
+			ll hi = 0, lo = 0, sm = 0;
+			std::sort(V.begin(), V.end(), cmp);
 			int szv = V.size();
 			assert(szv);
 			for (int k = 0; k < N; k++) sm += count_(p, p + V[0], P[k]);
+			//std::cout << "sm:: 0:: " << sm << "\n";
 			for (int k = 0; k < szv - 1; k++) {
-				if (V[k] / V[k + 1]) break;
 				hi = count(p, P[V[k].ni], V[k].i);
 				if (hi > 0) sm -= hi;
-				if (hi < 0) sm -= hi;
+				if (V[k] / V[k + 1]) break;
+				//if (hi < 0) sm -= hi;
 			}
 			hi = lo = 0;
+			//std::cout << "sm:: 1:: " << sm << "\n";
 			for (int k = 0; k < szv; k++) {
 				ll c = count(p, P[V[k].ni], V[k].i);
+				//std::cout << "p:: " << P[V[k].ni][V[k].i] << "\n";
+				//std::cout << "v:: " << V[k] << "\n";
+				//std::cout << "ni:: " << V[k].ni << " i:: " << V[k].i << " c:: " << c << "\n";
 				if (c > 0) hi += c;
 				if (c < 0) lo += c;
 				if (k == szv - 1 || (k < szv - 1 && V[k] != V[k + 1])) {
+					//std::cout << "v:: " << V[k] << "\n";
 					sm += hi;
 					ret = std::max(ret, sm);
+					//std::cout << "sm+:: " << sm << "\n";
 					sm += lo;
+					//std::cout << "sm-:: " << sm << "\n";
 					lo = 0; hi = 0;
 				}
 			}
