@@ -120,12 +120,13 @@ int front(const Pos& s, const Pos& v, Pos p, Pos q) {
 	return tri_inner_check(v, p, q, s) ? -1 : 2;
 }
 int count_(const Pos& s, const Pos& v, const Polygon& H) {
-	int si = 0, ei = 0, cnt = 0;
-	int s_in = 0, e_in = 0;
+	//int si = 0, ei = 0;
+	int cnt = 0;
+	//int s_in = 0, e_in = 0;
 	int sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		const Pos& p0 = H[i], & p1 = H[(i + 1) % sz], & p2 = H[(i + 2) % sz], & p3 = H[(i + 3) % sz];
-		int f;
+		//int f;
 		//if (p1 == s) continue;
 		//if (p0 == s) {
 		//	if (!on_seg_strong(v, p1, s)) cnt += ccw(p0, p1, p2) > 0;
@@ -140,16 +141,16 @@ int count_(const Pos& s, const Pos& v, const Polygon& H) {
 		int tq2 = ccw(s, v, p2);
 		int tq3 = ccw(s, v, p3);
 		if (tq1 * tq2 > 0) continue;
-		if (tq1 * tq2 < 0) { cnt++; continue; }
+		if (tq1* tq2 < 0) { cnt++; continue; }
 		if (!tq1 && !tq0) continue;
 		else if (!tq1 && !tq2) {
 			if (tq0 * tq3 < 0) cnt++;
-			//else cnt += ccw(p0, p1, p2) > 0;
+			//else cnt += (ccw(p0, p1, p2) > 0) * 2;
 			else cnt += 2;
 		}
 		else if (!tq1) {
 			if (tq0 * tq2 < 0) cnt++;
-			//else cnt += ccw(p0, p1, p2) > 0;
+			//else cnt += (ccw(p0, p1, p2) > 0) * 2;
 			else cnt += 2;
 		}
 	}
@@ -176,6 +177,19 @@ int count(const Pos& o, const Polygon& H, const int& i) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
+	//freopen("../../../input_data/clouds/t2000.txt", "r", stdin);
+	//freopen("../../../input_data/clouds/t2000.txt", "w", stdout);
+	//std::cout << "1\n2000\n";
+	//Pos a1 = Pos(-1e9, 0), a2 = Pos(0, -1e9), a3 = Pos(1e9, 0);
+	//std::cout << a1 << "\n" << a2 << "\n" << a3 << "\n";
+	//int x = 998, y = -1;
+	//Pos a0 = Pos(x, y);
+	//for (int i = 0; i < 1997; i++) {
+	//	std::cout << a0 << "\n";
+	//	if (i & 1) a0 += Pos(-1, -1);
+	//	else a0 += Pos(-1, 1);
+	//}
+	//return;
 	std::cin >> N;
 	for (int i = 0; i < N; i++) {
 		int ni;
@@ -242,11 +256,14 @@ void solve() {
 			for (int k = 0; k < N; k++) sm += count_(p, p + V[0], P[k]);
 			//std::cout << "sm:: 0:: " << sm << "\n";
 			for (int k = 0; k < szv - 1; k++) {
-				hi = count(p, P[V[k].ni], V[k].i);
-				if (hi > 0) sm -= hi;
+				ll c = count(p, P[V[k].ni], V[k].i);
+				if (c > 0) hi += c;
+				if (c < 0) lo += c;
 				if (V[k] / V[k + 1]) break;
-				//if (hi < 0) sm -= hi;
 			}
+			ret = std::max(ret, sm - hi);
+			ret = std::max(ret, sm + lo);
+			sm -= hi;
 			hi = lo = 0;
 			//std::cout << "sm:: 1:: " << sm << "\n";
 			for (int k = 0; k < szv; k++) {
@@ -259,8 +276,8 @@ void solve() {
 				if (k == szv - 1 || (k < szv - 1 && V[k] != V[k + 1])) {
 					//std::cout << "v:: " << V[k] << "\n";
 					sm += hi;
-					ret = std::max(ret, sm);
 					//std::cout << "sm+:: " << sm << "\n";
+					ret = std::max(ret, sm);
 					sm += lo;
 					//std::cout << "sm-:: " << sm << "\n";
 					lo = 0; hi = 0;
@@ -268,7 +285,21 @@ void solve() {
 			}
 		}
 	}
-	std::cout << (ret >> 1) << "\n";
+	std::cout << std::min((ret >> 1), 1000ll) << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj8379 Clouds
+
+/*
+
+5
+4 0 0 1 0 1 1 0 1
+4 -1 2 0 2 0 3 -1 3
+4 0 4 1 4 1 5 0 5
+4 -1 6 0 6 0 7 -1 7
+4 0 8 1 8 1 9 0 9
+
+
+
+
+*/
