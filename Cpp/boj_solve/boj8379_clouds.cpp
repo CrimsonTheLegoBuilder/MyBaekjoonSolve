@@ -257,11 +257,11 @@ void solve() {
 				if (c > 0) hi += c;
 				if (c < 0) lo += c;
 				if (k == szv - 1 || (k < szv - 1 && V[k] != V[k + 1])) {
-					sm += hi;
-					ret = std::max(ret, sm);
+					ll tsm = sm + hi;
+					ret = std::max(ret, tsm);
 					//ret = sm;
+					sm = sm + hi + lo;
 					assert(sm < 1e9);
-					sm += lo;
 					lo = 0; hi = 0;
 				}
 			}
