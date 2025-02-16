@@ -141,7 +141,7 @@ int count_(const Pos& s, const Pos& v, const Polygon& H) {
 		int tq2 = ccw(s, v, p2);
 		int tq3 = ccw(s, v, p3);
 		if (tq1 * tq2 > 0) continue;
-		if (tq1* tq2 < 0) { cnt++; continue; }
+		if (tq1 * tq2 < 0) { cnt++; continue; }
 		if (!tq1 && !tq0) continue;
 		else if (!tq1 && !tq2) {
 			if (tq0 * tq3 < 0) cnt++;
