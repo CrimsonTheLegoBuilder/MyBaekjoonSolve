@@ -273,8 +273,8 @@ void solve() {
 			}
 			ret = std::max(ret, sm);
 			ret = std::max(ret, sm + lo + hi);
-			ret = std::max(ret, sm + lo - lor + hif);
-			ret = std::max(ret, sm + lo - lof + hir);
+			ret = std::max(ret, sm + lor + hir);
+			ret = std::max(ret, sm + lof + hif);
 			sm -= hi;
 			//sm -= lo;
 			hi = 0; lo = 0; hif = 0; hir = 0; lof = 0; lor = 0;
@@ -300,8 +300,8 @@ void solve() {
 					//std::cout << "sm+:: " << sm << "\n";
 					ret = std::max(ret, sm);
 					ret = std::max(ret, sm + lo + hi);
-					ret = std::max(ret, sm + lo - lof + hif);
-					ret = std::max(ret, sm + lo - lor + hir);
+					ret = std::max(ret, sm + lor + hir);
+					ret = std::max(ret, sm + lof + hif);
 					sm += lo;
 					sm += hi;
 					//std::cout << "sm-:: " << sm << "\n";
