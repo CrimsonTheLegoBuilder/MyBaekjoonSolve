@@ -55,28 +55,28 @@ Pos ternary_search(const Polygon& H, Pos v, const int& d) {
 	return p;
 }
 void query(const Polygon& L, const Polygon& U) {
-	Pos q;
-	std::cin >> q;
-	Pos v = ~q;
-	Pos p1 = ternary_search(L, v, LO);
-	Pos p2 = ternary_search(U, v, HI);
-	ll ret = std::max(q * p1, q * p2);
-	std::cout << ret << "\n";
+	int q;
+	Pos p1, p2;
+	std::cin >> q >> p1;
+	if (q == 1) {
+
+	}
+	else if (q == 2) {
+		std::cin >> p2;
+	}
+	else { assert(0); }
 	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("../../../input_data/cultivating-mars-testcases/input/input01.txt", "r", stdin);
-	//freopen("../../../input_data/cultivating-mars-testcases/output/ret.txt", "w", stdout);
-	std::cin >> T;
-	while (T--) {
-		std::cin >> N >> Q;
-		Polygon C(N); for (Pos& p : C) std::cin >> p;
-		Polygon L = half_monotone_chane(C, LO);
-		Polygon U = half_monotone_chane(C, HI);
-		while (Q--) query(L, U);
-	}
+	//freopen("../../../input_data/.txt", "r", stdin);
+	//freopen("../../../input_data/.txt", "w", stdout);
+	std::cin >> N >> Q;
+	Polygon C(N); for (Pos& p : C) std::cin >> p;
+	Polygon L = half_monotone_chane(C, LO);
+	Polygon U = half_monotone_chane(C, HI);
+	while (Q--) query(L, U);
 	return;
 }
-int main() { solve(); return 0; }//boj18672 Cultivating Mars
+int main() { solve(); return 0; }//boj33441
