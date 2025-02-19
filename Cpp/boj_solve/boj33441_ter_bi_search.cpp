@@ -54,18 +54,19 @@ Pos ternary_search(const Polygon& H, Pos v, const int& d) {
 	for (int i = s; i <= e; i++) if (v / H[i] < tq) tq = v / H[i], p = H[i];
 	return p;
 }
-void query(const Polygon& L, const Polygon& U) {
+int query(const Polygon& L, const Polygon& U) {
 	int q;
 	Pos p1, p2;
 	std::cin >> q >> p1;
 	if (q == 1) {
-
+		return 1;
 	}
 	else if (q == 2) {
 		std::cin >> p2;
+		return 0;
 	}
 	else { assert(0); }
-	return;
+	return -1;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
