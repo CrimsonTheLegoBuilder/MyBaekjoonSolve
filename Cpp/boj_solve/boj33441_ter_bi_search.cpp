@@ -102,6 +102,9 @@ Pos ternary_search(const Polygon& H, Pos v, const int& d) {
 	p.i = x;
 	return p;
 }
+ll bi_search(const Polygon& H, const int& i, const Pos& v) {
+	return 0;
+}
 int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 	int q, sz = P.size();
 	Pos p1, p2, u, v;
@@ -112,6 +115,7 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 			v = p - p1;
 			Pos lx = ternary_search(L, v, 1);
 			Pos ux = ternary_search(U, v, -1);
+
 		}
 		return 1;
 	}
