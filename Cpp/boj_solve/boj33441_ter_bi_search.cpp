@@ -15,7 +15,8 @@ inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 int N, T, Q;
 struct Pos {
 	int x, y;
-	Pos(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
+	int i;
+	Pos(int x_ = 0, int y_ = 0, int i_ = 0) : x(x_), y(y_), i(i_) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -91,8 +92,14 @@ Pos ternary_search(const Polygon& H, Pos v, const int& d) {
 		if (tq1 > tq2) s = m1;
 		else e = m2;
 	}
-	ll tq = INF; Pos p = H[s];
-	for (int i = s; i <= e; i++) if (v / H[i] < tq) tq = v / H[i], p = H[i];
+	ll tq = INF; Pos p = H[s]; int x = 0;
+	for (int i = s; i <= e; i++) {
+		if (v / H[i] < tq) {
+			tq = v / H[i], p = H[i];
+			x = i;
+		}
+	}
+	p.i = x;
 	return p;
 }
 int query(const Polygon& P, const Polygon& L, const Polygon& U) {
@@ -103,7 +110,8 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 		for (int i = 0; i < sz; i++) {
 			const Pos& p = P[i];
 			v = p - p1;
-
+			Pos lx = ternary_search(L, v, 1);
+			Pos ux = ternary_search(U, v, -1);
 		}
 		return 1;
 	}
