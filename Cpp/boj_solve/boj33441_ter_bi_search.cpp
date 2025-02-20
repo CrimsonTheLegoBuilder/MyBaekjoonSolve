@@ -48,7 +48,11 @@ struct Pos {
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
+ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 	std::vector<Pos> H;
 	if (C.size() < 3) {
@@ -102,8 +106,16 @@ Pos ternary_search(const Polygon& H, Pos v, const int& d) {
 	p.i = x;
 	return p;
 }
-ll bi_search(const Polygon& H, const int& i, const Pos& v) {
-	return 0;
+int bi_search(const Polygon& H, int s, int e, Pos p, Pos v) {
+	if (cross(p, v, H[s], H[e]) < 0) std::swap(p, v);
+	while (s < e) {
+		int m = s + e >> 1;
+		int tq = cross(p, v, H[m]);
+		if (tq == 0) return m;
+		if (tq > 0) e = m;
+		else s = m + 1;
+	}
+	return -1;
 }
 int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 	int q, sz = P.size();
