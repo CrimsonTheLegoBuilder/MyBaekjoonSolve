@@ -113,7 +113,7 @@ int bi_search(const Polygon& H, int s, int e, Pos p, Pos v) {
 		int m = s + e >> 1;
 		int tq = cross(p, v, H[m]);
 		if (tq == 0) return m;
-		if (tq > 0) e = m;
+		if (tq > 0) e = m - 1;
 		else s = m + 1;
 	}
 	if (!cross(p, v, H[s]) || !cross(p, v, H[e])) return 0;
