@@ -116,7 +116,8 @@ int bi_search(const Polygon& H, int s, int e, Pos p, Pos v) {
 		if (tq > 0) e = m - 1;
 		else s = m + 1;
 	}
-	if (!cross(p, v, H[s]) || !cross(p, v, H[e])) return 0;
+	if (!cross(p, v, H[s])) return s;
+	if (!cross(p, v, H[e])) return e;
 	return -1;
 }
 int query(const Polygon& P, const Polygon& L, const Polygon& U) {
