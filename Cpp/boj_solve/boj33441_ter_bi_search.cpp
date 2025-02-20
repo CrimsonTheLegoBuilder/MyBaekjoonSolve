@@ -6,6 +6,7 @@
 #include <vector>
 typedef long long ll;
 typedef long double ld;
+typedef std::vector<int> Vint;
 const ll INF = 1e18;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
@@ -115,24 +116,54 @@ int bi_search(const Polygon& H, int s, int e, Pos p, Pos v) {
 		if (tq > 0) e = m;
 		else s = m + 1;
 	}
+	if (!cross(p, v, H[s]) || !cross(p, v, H[e])) return 0;
 	return -1;
 }
 int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 	int q, sz = P.size();
 	Pos p1, p2, u, v;
 	std::cin >> q >> p1;
+	int cnt = 0;
 	if (q == 1) {
 		for (int i = 0; i < sz; i++) {
 			const Pos& p = P[i];
-			v = p - p1;
-			Pos lx = ternary_search(L, v, 1);
-			Pos ux = ternary_search(U, v, -1);
-
+			v = p1 - p;
+			Pos lp = ternary_search(L, v, LO);
+			Pos up = ternary_search(U, v, HI);
+			Polygon I;
+			int l1 = bi_search(L, 0, lp.i, p, p1);
+			if (l1 >= 0) I.push_back(L[l1]);
+			int l2 = bi_search(L, lp.i, L.size() - 1, p, p1);
+			if (l2 >= 0) I.push_back(L[l2]);
+			int u1 = bi_search(U, 0, up.i, p, p1);
+			if (u1 >= 0) I.push_back(U[u1]);
+			int u2 = bi_search(U, up.i, U.size() - 1, p, p1);
+			if (u2 >= 0) I.push_back(U[u2]);
+			std::sort(I.begin(), I.end());
+			I.erase(unique(I.begin(), I.end()), I.end());
+			if (I.size() == 2) cnt++;
 		}
+		std::cout << (cnt >> 1) << "\n";
 		return 1;
 	}
 	else if (q == 2) {
 		std::cin >> p2;
+		v = p2 - p1;
+		Pos lp = ternary_search(L, v, LO);
+		Pos up = ternary_search(U, v, HI);
+		Polygon I;
+		int l1 = bi_search(L, 0, lp.i, p1, p2);
+		if (l1 >= 0) I.push_back(L[l1]);
+		int l2 = bi_search(L, lp.i, L.size() - 1, p1, p2);
+		if (l2 >= 0) I.push_back(L[l2]);
+		int u1 = bi_search(U, 0, up.i, p1, p2);
+		if (u1 >= 0) I.push_back(U[u1]);
+		int u2 = bi_search(U, up.i, U.size() - 1, p1, p2);
+		if (u2 >= 0) I.push_back(U[u2]);
+		std::sort(I.begin(), I.end());
+		I.erase(unique(I.begin(), I.end()), I.end());
+		cnt += I.size();
+		std::cout << cnt << "\n";
 		return 0;
 	}
 	else { assert(0); }
@@ -141,8 +172,6 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
-	//freopen("../../../input_data/.txt", "r", stdin);
-	//freopen("../../../input_data/.txt", "w", stdout);
 	std::cin >> N >> Q;
 	Polygon C(N); for (Pos& p : C) std::cin >> p;
 	Polygon P = graham_scan(C);
