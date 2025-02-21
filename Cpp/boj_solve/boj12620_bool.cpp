@@ -314,28 +314,8 @@ void query(const int& q) {
 			for (const Polygon& T0 : T[c]) A[c] += area(T0);
 		}
 	}
-	for (int k = 1; k <= K; k++) {
-		ld a = area(P[k]);
-		int c = C[k];
-		A[c] += a;
-	}
-	A[YELLOW] -= A[WHITE];
-	A[MAGENTA] -= A[WHITE];
-	A[CYAN] -= A[WHITE];
-	A[RED] -= A[YELLOW] + A[MAGENTA] + A[WHITE];
-	A[GREEN] -= A[YELLOW] + A[CYAN] + A[WHITE];
-	A[BLUE] -= A[MAGENTA] + A[CYAN] + A[WHITE];
-	A[BLACK] = area(P[0]);
-	for (int c = 1; c < (1 << 3); c++) A[BLACK] -= A[c];
-	std::cout << "Case #" << q << ":\n";
-	std::cout << "R: " << A[RED] << "\n";
-	std::cout << "G: " << A[GREEN] << "\n";
-	std::cout << "B: " << A[BLUE] << "\n";
-	std::cout << "Y: " << A[YELLOW] << "\n";
-	std::cout << "M: " << A[MAGENTA] << "\n";
-	std::cout << "C: " << A[CYAN] << "\n";
-	std::cout << "W: " << A[WHITE] << "\n";
-	std::cout << "L: " << A[BLACK] << "\n";
+
+
 	return;
 }
 void solve() {
