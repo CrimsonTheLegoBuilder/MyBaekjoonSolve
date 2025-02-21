@@ -215,7 +215,7 @@ void query(const int& q) {
 		for (int k = 1; k <= K; k++) {
 			fk = inner_check(P[k], L[c]);
 			if (fk) {
-				C[0] ^= c;
+				C[0] -= c;
 				C[k] |= c;
 				I[c] = k;
 				break;
