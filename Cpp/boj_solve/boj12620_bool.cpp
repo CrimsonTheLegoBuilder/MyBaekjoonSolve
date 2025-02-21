@@ -234,9 +234,9 @@ void query(const int& q) {
 		}
 		int sz = P[0].size();
 		for (int i = 0; i < sz; i++) {
-			const Pos& s = P[0][i], & e = P[0][(i + 1) % sz];
-			assert(ccw(L[c], s, e) > 0);
-			Seg w = Seg(s, e);
+			const Pos& u = P[0][i], & v = P[0][(i + 1) % sz];
+			assert(ccw(L[c], u, v) > 0);
+			Seg w = Seg(u, v);
 			Polygon VP = { Pos(0, 0) };
 			for (int k = 1; k <= K; k++) {
 				if (k == i) continue;
@@ -261,9 +261,9 @@ void query(const int& q) {
 			const Polygon& H = P[k];
 			sz = H.size();
 			for (int i = 0; i < sz; i++) {
-				const Pos& s = P[0][i], & e = P[0][(i + 1) % sz];
-				if (ccw(L[c], s, e) <= 0) continue;
-				Seg w = Seg(s, e);
+				const Pos& u = H[i], & v = H[(i + 1) % sz];
+				if (ccw(L[c], u, v) >= 0) continue;
+				Seg w = Seg(v, u);
 				Polygon VP = { Pos(0, 0) };
 				for (int k_ = 1; k_ <= K; k_++) {
 					if (k_ == k) continue;
