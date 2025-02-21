@@ -362,8 +362,8 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout << std::scientific;
-	//std::cout.precision(15);
+	//std::cout << std::scientific;
+	std::cout.precision(15);
 	std::cin >> T;
 	for (int q = 1; q <= T; q++) query(q);
 	return;
