@@ -48,8 +48,8 @@ inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std
 
 int N, M, K, Q;
 ld A[1 << 3];
-int F[1 << 3];
-int I[LEN];
+int I[1 << 3];
+int C[LEN];
 struct Pos {
 	ld x, y;
 	Pos(ld X_ = 0, ld y_ = 0) : x(X_), y(y_) {}
@@ -206,18 +206,18 @@ ld intersection(const Polygon& a, const Polygon& b, const Polygon& c) {
 void query(const int& q) {
 	std::cin >> L[RED] >> L[GREEN] >> L[BLUE];
 	memset(A, 0, sizeof A);
-	memset(F, -1, sizeof F);
-	memset(I, 0, sizeof I);
+	memset(I, -1, sizeof I);
+	memset(C, 0, sizeof C);
 	for (int c = 1; c < (1 << 3); c <<= 1) T[c].clear();
 	for (int c = 1; c < (1 << 3); c <<= 1) {
 		int f0 = inner_check(P[0], L[c]), fk = 0;
-		if (f0) { I[0] |= c; F[c] = 0; }
+		if (f0) { C[0] |= c; I[c] = 0; }
 		for (int k = 1; k <= K; k++) {
 			fk = inner_check(P[k], L[c]);
 			if (fk) {
-				I[0] ^= c;
-				I[k] |= c;
-				F[c] = k;
+				C[0] ^= c;
+				C[k] |= c;
+				I[c] = k;
 				break;
 			}
 		}
@@ -258,7 +258,7 @@ void query(const int& q) {
 			}
 		}
 	}
-	if (!F[RED] && !F[GREEN] && !F[BLUE]) {
+	if (!I[RED] && !I[GREEN] && !I[BLUE]) {
 		for (const Polygon& R : T[RED]) {
 			for (const Polygon& G : T[GREEN]) {
 				for (const Polygon& B : T[BLUE]) {
@@ -271,7 +271,7 @@ void query(const int& q) {
 	for (int i = 0; i < 3; i++) {
 		int c1 = (1 << ((i + 1) % 3));
 		int c2 = (1 << ((i + 2) % 3));
-		if (!F[c1] && !F[c2]) {
+		if (!I[c1] && !I[c2]) {
 			int c = c1 | c2;
 			for (const Polygon& T1 : T[c1]) {
 				for (const Polygon& T2 : T[c2]) {
@@ -282,13 +282,13 @@ void query(const int& q) {
 		}
 	}
 	for (int c = 1; c < (1 << 3); c <<= 1) {
-		if (!F[c]) {
+		if (!I[c]) {
 			for (const Polygon& T0 : T[c]) A[c] += area(T0);
 		}
 	}
 	for (int k = 1; k <= K; k++) {
 		ld a = area(P[k]);
-		int c = I[k];
+		int c = C[k];
 		A[c] += a;
 	}
 	A[YELLOW] -= A[WHITE];
