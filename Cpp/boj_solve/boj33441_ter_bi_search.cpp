@@ -144,7 +144,7 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 			I.erase(unique(I.begin(), I.end()), I.end());
 			if (I.size() == 2) cnt++;
 		}
-		std::cout << (cnt >> 1) << "\n";
+		std::cout << cnt << "\n";
 		return 1;
 	}
 	else if (q == 2) {
