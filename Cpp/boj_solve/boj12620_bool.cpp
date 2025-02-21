@@ -222,25 +222,25 @@ void query(const int& q) {
 			}
 		}
 		if (fk) continue;
-		int sz;
 		for (int k = 1; k <= K; k++) {
 			const Polygon& H = P[k];
-			sz = H.size();
+			M = H.size();
 			Pos pl = H[0], pr = H[0];
-			for (int j = 0; j < sz; j++) {
+			for (int j = 0; j < M; j++) {
 				if (ccw(L[c], pl, H[j]) > 0) pl = H[j];
 				if (ccw(L[c], pr, H[j]) < 0) pr = H[j];
 			}
 			S[c][k] = Seg(pr, pl);
 		}
-		sz = P[0].size();
+		int sz = P[0].size();
 		for (int i = 0; i < sz; i++) {
 			const Pos& s = P[0][i], & e = P[0][(i + 1) % sz];
+			assert(ccw(L[c], s, e) > 0);
 			Seg w = Seg(s, e);
 			Polygon VP = { Pos(0, 0) };
-			for (int j = 0; j < N; j++) {
-				if (i == j) continue;
-				Pos se = get_pos(L[c], w, S[c][j]);
+			for (int k = 1; k <= K; k++) {
+				if (k == i) continue;
+				Pos se = get_pos(L[c], w, S[c][k]);
 				if (!eq(se.x, se.y)) VP.push_back(se);
 			}
 			VP.push_back(Pos(1, 1));
@@ -255,6 +255,34 @@ void query(const int& q) {
 					hi = p.HI;
 				}
 				else hi = std::max(hi, p.HI);
+			}
+		}
+		for (int k = 1; k <= K; k++) {
+			const Polygon& H = P[k];
+			sz = H.size();
+			for (int i = 0; i < sz; i++) {
+				const Pos& s = P[0][i], & e = P[0][(i + 1) % sz];
+				if (ccw(L[c], s, e) <= 0) continue;
+				Seg w = Seg(s, e);
+				Polygon VP = { Pos(0, 0) };
+				for (int k_ = 1; k_ <= K; k_++) {
+					if (k_ == k) continue;
+					Pos se = get_pos(L[c], w, S[c][k_]);
+					if (!eq(se.x, se.y)) VP.push_back(se);
+				}
+				VP.push_back(Pos(1, 1));
+				std::sort(VP.begin(), VP.end());
+				ld hi = 0;
+				for (const Pos& p : VP) {
+					if (hi < p.LO) {
+						Pos s = w.p(hi);
+						Pos e = w.p(p.LO);
+						Polygon tri = { L[c], s, e };
+						T[c].push_back(tri);
+						hi = p.HI;
+					}
+					else hi = std::max(hi, p.HI);
+				}
 			}
 		}
 	}
