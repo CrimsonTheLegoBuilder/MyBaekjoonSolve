@@ -231,7 +231,7 @@ void query(const int& q) {
 				if (ccw(L[c], pl, H[j]) > 0) pl = H[j];
 				if (ccw(L[c], pr, H[j]) < 0) pr = H[j];
 			}
-			S[c][k] = Seg(pl, pr);
+			S[c][k] = Seg(pr, pl);
 		}
 		sz = P[0].size();
 		for (int i = 0; i < sz; i++) {
