@@ -1617,7 +1617,7 @@
     <ClCompile Include="boj33441_ter_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj12620_cccs.cpp">
+    <ClCompile Include="boj12620_bool.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
