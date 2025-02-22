@@ -112,17 +112,19 @@ void norm(Polygon& H) {
 	if (a < 0) std::reverse(H.begin(), H.end());
 	return;
 }
-void prune(Polygon& H) {
+ld prune(Polygon& H) {
 	int sz = H.size();
 	Vbool V(sz, 0);
 	Polygon tmp;
+	ld a = 0;
 	for (int i = 0; i < sz; i++) {
 		const Pos& p0 = H[(i - 1 + sz) % sz], & p1 = H[i], & p2 = H[(i + 1) % sz];
+		a += p0 / p1;
 		if (!ccw(p0, p1, p2)) V[i] = 1;
 	}
 	for (int i = 0; i < sz; i++) if (!V[i]) tmp.push_back(H[i]);
 	H = tmp;
-	return;
+	return a * .5;
 }
 Polygon convex_cut(const Polygon& ps, const Pos& b1, const Pos& b2) {
 	Polygon qs;
@@ -196,11 +198,14 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 }
 ld intersection(const Polygon& a, const Polygon& b) {
 	Polygon ret = sutherland_hodgman(a, b);
+	prune(ret);
 	return area(ret);
 }
 ld intersection(const Polygon& a, const Polygon& b, const Polygon& c) {
-	Polygon d = sutherland_hodgman(a, b); prune(d);
+	Polygon d = sutherland_hodgman(a, b);
+	if (zero(prune(d))) return 0;
 	Polygon ret = sutherland_hodgman(d, c);
+	prune(ret);
 	return area(ret);
 }
 void query(const int& q) {
