@@ -1620,6 +1620,9 @@
     <ClCompile Include="boj12620_bool.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="__Geometry_generator.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
@@ -1789,5 +1792,10 @@
     <None Include="bigbrother\34-random-nonempty.in">
       <Filter>리소스 파일</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="testlib.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
