@@ -52,7 +52,7 @@ int I[1 << 3];
 int C[LEN];
 struct Pos {
 	ld x, y;
-	Pos(ld X_ = 0, ld y_ = 0) : x(X_), y(y_) {}
+	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -314,8 +314,28 @@ void query(const int& q) {
 			for (const Polygon& T0 : T[c]) A[c] += area(T0);
 		}
 	}
-
-
+	for (int k = 1; k <= K; k++) {
+		ld a = area(P[k]);
+		int c = C[k];
+		A[c] += a;
+	}
+	A[YELLOW] -= A[WHITE];
+	A[MAGENTA] -= A[WHITE];
+	A[CYAN] -= A[WHITE];
+	A[RED] -= A[YELLOW] + A[MAGENTA] + A[WHITE];
+	A[GREEN] -= A[YELLOW] + A[CYAN] + A[WHITE];
+	A[BLUE] -= A[MAGENTA] + A[CYAN] + A[WHITE];
+	A[BLACK] = area(P[0]);
+	for (int c = 1; c < (1 << 3); c++) A[BLACK] -= A[c];
+	std::cout << "Case #" << q << ":\n";
+	std::cout << "R: " << A[RED] << "\n";
+	std::cout << "G: " << A[GREEN] << "\n";
+	std::cout << "B: " << A[BLUE] << "\n";
+	std::cout << "Y: " << A[YELLOW] << "\n";
+	std::cout << "M: " << A[MAGENTA] << "\n";
+	std::cout << "C: " << A[CYAN] << "\n";
+	std::cout << "W: " << A[WHITE] << "\n";
+	std::cout << "L: " << A[BLACK] << "\n";
 	return;
 }
 void solve() {
@@ -339,4 +359,4 @@ void solve() {
 	for (int q = 1; q <= Q; q++) query(q);
 	return;
 }
-int main() { solve(); return 0; }//boj12620 
+int main() { solve(); return 0; }//
