@@ -125,6 +125,7 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 	Pos p1, p2, u, v;
 	std::cin >> q >> p1;
 	int cnt = 0;
+	Polygon V;
 	if (q == 1) {
 		for (int i = 0; i < sz; i++) {
 			const Pos& p = P[i];
@@ -133,17 +134,40 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 			Pos up = ternary_search(U, v, HI);
 			Polygon I;
 			int l1 = bi_search(L, 0, lp.i, p, p1);
-			if (l1 >= 0) I.push_back(L[l1]);
+			if (l1 >= 0) {
+				if (l1 > 0 && !ccw(p, p1, L[l1 - 1])) V.push_back(L[l1 - 1]);
+				if (l1 < lp.i && !ccw(p, p1, L[l1 + 1])) V.push_back(L[l1 + 1]);
+				I.push_back(L[l1]);
+			}
 			int l2 = bi_search(L, lp.i, L.size() - 1, p, p1);
-			if (l2 >= 0) I.push_back(L[l2]);
+			if (l2 >= 0) {
+				if (l2 > 0 && !ccw(p, p1, L[l2 - 1])) V.push_back(L[l2 - 1]);
+				if (l2 < lp.i && !ccw(p, p1, L[l2 + 1])) V.push_back(L[l2 + 1]);
+				I.push_back(L[l2]);
+			}
 			int u1 = bi_search(U, 0, up.i, p, p1);
-			if (u1 >= 0) I.push_back(U[u1]);
+			if (u1 >= 0) {
+				if (u1 > 0 && !ccw(p, p1, L[u1 - 1])) V.push_back(U[u1 - 1]);
+				if (u1 < up.i && !ccw(p, p1, L[u1 + 1])) V.push_back(U[u1 + 1]);
+				I.push_back(U[u1]);
+			}
 			int u2 = bi_search(U, up.i, U.size() - 1, p, p1);
-			if (u2 >= 0) I.push_back(U[u2]);
+			if (u2 >= 0) {
+				if (u2 > 0 && !ccw(p, p1, L[u2 - 1])) V.push_back(U[u2 - 1]);
+				if (u2 < up.i && !ccw(p, p1, L[u2 + 1])) V.push_back(U[u2 + 1]);
+				I.push_back(U[u2]);
+			}
 			std::sort(I.begin(), I.end());
 			I.erase(unique(I.begin(), I.end()), I.end());
-			if (I.size() == 2) cnt++;
+			if (I.size() == 2) {
+				V.push_back(I[0]);
+				V.push_back(I[1]);
+				//cnt++;
+			}
 		}
+		std::sort(V.begin(), V.end());
+		V.erase(unique(V.begin(), V.end()), V.end());
+		cnt = V.size(); assert(cnt % 2 == 0);
 		std::cout << (cnt >> 1) << "\n";
 		return 1;
 	}
@@ -154,7 +178,11 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 		Pos up = ternary_search(U, v, HI);
 		Polygon I;
 		int l1 = bi_search(L, 0, lp.i, p1, p2);
-		if (l1 >= 0) I.push_back(L[l1]);
+		if (l1 >= 0) {
+			if (l1 > 0 && !ccw(p1, p2, L[l1 - 1])) V.push_back(L[l1 - 1]);
+			if (l1 < lp.i && !ccw(p1, p2, L[l1 + 1])) V.push_back(L[l1 + 1]);
+			I.push_back(L[l1]);
+		}
 		int l2 = bi_search(L, lp.i, L.size() - 1, p1, p2);
 		if (l2 >= 0) I.push_back(L[l2]);
 		int u1 = bi_search(U, 0, up.i, p1, p2);
