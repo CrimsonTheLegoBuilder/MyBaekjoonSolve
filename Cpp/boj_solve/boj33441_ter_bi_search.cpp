@@ -7,7 +7,7 @@
 typedef long long ll;
 typedef long double ld;
 typedef std::vector<int> Vint;
-const ll INF = 1e18;
+const ll INF = 9e18;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
 #define LO 1
@@ -110,11 +110,11 @@ Pos ternary_search(const Polygon& H, Pos v, const int& d) {
 int bi_search(const Polygon& H, int s, int e, Pos p, Pos v) {
 	if (cross(p, v, H[s], H[e]) < 0) std::swap(p, v);
 	while (s < e) {
-		int m = s + e >> 1;
+		int m = s + e + 1 >> 1;
 		int tq = cross(p, v, H[m]);
 		if (tq == 0) return m;
 		if (tq > 0) e = m - 1;
-		else s = m + 1;
+		else s = m;
 	}
 	if (!cross(p, v, H[s])) return s;
 	if (!cross(p, v, H[e])) return e;
@@ -144,7 +144,7 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 			I.erase(unique(I.begin(), I.end()), I.end());
 			if (I.size() == 2) cnt++;
 		}
-		std::cout << cnt << "\n";
+		std::cout << (cnt >> 1) << "\n";
 		return 1;
 	}
 	else if (q == 2) {
