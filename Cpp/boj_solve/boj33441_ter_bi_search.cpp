@@ -111,7 +111,7 @@ int bi_search(const Polygon& H, int s, int e, Pos p, Pos v) {
 	if (cross(p, v, H[s], H[e]) < 0) std::swap(p, v);
 	while (s < e) {
 		int m = s + e + 1 >> 1;
-		int tq = cross(p, v, H[m]);
+		ll tq = cross(p, v, H[m]);
 		if (tq == 0) return m;
 		if (tq > 0) e = m - 1;
 		else s = m;
