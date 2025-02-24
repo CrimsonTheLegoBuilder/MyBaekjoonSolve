@@ -277,27 +277,31 @@ int query(const Polygon& P, const Polygon& L, const Polygon& U) {
 		Polygon I;
 		int l1 = bi_search(L, 0, lp.i, p1, p2);
 		if (l1 >= 0) {
+			if (l1 > 0 && !ccw(p1, p2, L[l1 - 1]) || l1 < L.size() - 1 && !ccw(p1, p2, L[l1 + 1])) {
+				std::cout << "2\n"; return 0;
+			}
 			V.push_back(L[l1]);
-			if (l1 > 0 && !ccw(p1, p2, L[l1 - 1])) V.push_back(L[l1 - 1]);
-			if (l1 < L.size() - 1 && !ccw(p1, p2, L[l1 + 1])) V.push_back(L[l1 + 1]);
 		}
 		int l2 = bi_search(L, lp.i, L.size() - 1, p1, p2);
 		if (l2 >= 0) {
+			if (l2 > 0 && !ccw(p1, p2, L[l2 - 1]) || l2 < L.size() - 1 && !ccw(p1, p2, L[l2 + 1])) {
+				std::cout << "2\n"; return 0;
+			}
 			V.push_back(L[l2]);
-			if (l2 > 0 && !ccw(p1, p2, L[l2 - 1])) V.push_back(L[l2 - 1]);
-			if (l2 < L.size() - 1 && !ccw(p1, p2, L[l2 + 1])) V.push_back(L[l2 + 1]);
 		}
 		int u1 = bi_search(U, 0, up.i, p1, p2);
 		if (u1 >= 0) {
+			if (u1 > 0 && !ccw(p1, p2, U[u1 - 1]) || u1 < U.size() - 1 && !ccw(p1, p2, U[u1 + 1])) {
+				std::cout << "2\n"; return 0;
+			}
 			V.push_back(U[u1]);
-			if (u1 > 0 && !ccw(p1, p2, U[u1 - 1])) V.push_back(U[u1 - 1]);
-			if (u1 < U.size() - 1 && !ccw(p1, p2, U[u1 + 1])) V.push_back(U[u1 + 1]);
 		}
 		int u2 = bi_search(U, up.i, U.size() - 1, p1, p2);
 		if (u2 >= 0) {
+			if (u2 > 0 && !ccw(p1, p2, U[u2 - 1]) || u2 < U.size() - 1 && !ccw(p1, p2, U[u2 + 1])) {
+				std::cout << "2\n"; return 0;
+			}
 			V.push_back(U[u2]);
-			if (u2 > 0 && !ccw(p1, p2, U[u2 - 1])) V.push_back(U[u2 - 1]);
-			if (u2 < U.size() - 1 && !ccw(p1, p2, U[u2 + 1])) V.push_back(U[u2 + 1]);
 		}
 		std::sort(V.begin(), V.end());
 		V.erase(unique(V.begin(), V.end()), V.end());
