@@ -51,6 +51,7 @@ void solve() {
 		int hide = v0 / v1;
 		if (fvis && bvis) {
 			if (dir < 0) {//move backward
+				p2.d = LEFT;
 				if (!rvs && hide < 0) {
 					rvs = 1;
 					fvis = 0;
