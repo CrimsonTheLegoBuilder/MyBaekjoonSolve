@@ -130,4 +130,12 @@ int main() { solve(); return 0; }//boj33519 Andrew the Diver
 9 7
 9 8
 
+6
+4 8
+1 4
+3 0
+5 0
+4 2
+8 8
+
 */
