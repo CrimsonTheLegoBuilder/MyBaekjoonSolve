@@ -10,11 +10,14 @@ const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 
+#define RIGHT 1
+#define LEFT -1
+
 int N;
 bool V[LEN];
 struct Pos {
-	int x, y, i;
-	Pos(int x_ = 0, int y_ = 0, int i_ = 0) : x(x_), y(y_), i(i_) {}
+	int x, y, d;
+	Pos(int x_ = 0, int y_ = 0, int d_ = 0) : x(x_), y(y_), d(d_) {}
 	ll operator / (const Pos& p) const { return { (ll)x * p.y - (ll)y * p.x }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	ll Euc() const { return (ll)x * x + (ll)y * y; }
@@ -45,12 +48,14 @@ void solve() {
 	std::cout.tie(0);
 	std::cin >> N;
 	H.resize(N);
-	for (int i = 0; i < N; i++) std::cin >> H[i], H[i].i = i + 1;
+	for (Pos& p : H) std::cin >> p;
 #ifndef ASSERT
 	ll A = area(H);
 	assert(A > 0);
 #endif
-	for (int i = 0; i < N; i++) {
+	S.push_back(H[0]);
+	for (int i = 1; i < N - 1; i++) {
+		Pos& pre = H[(i - 1 + N) % N], cur = H[i % N], nxt = H[(i + 1) % N];
 		while (S.size()) {
 
 		}
