@@ -34,9 +34,9 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2,
 bool invisible(Pos p1, Pos p2, const Pos& q, const bool& f = 1) {
 	if (p1.x > p2.x) std::swap(p1, p2);
 	if (f == RIGHT && q.d == RIGHT) {
-		return p1.x < q.x && q.x <= p2.x && ccw(p1, p2, q) < 0;
+		return p1.x < q.x && q.x <= p2.x && ccw(p1, p2, q) <= 0;
 	}
-	return p1.x <= q.x && q.x <= p2.x && ccw(p1, p2, q) < 0;
+	return p1.x <= q.x && q.x <= p2.x && ccw(p1, p2, q) <= 0;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
@@ -65,9 +65,10 @@ void solve() {
 				while (S.size() && invisible(p1, p2, S.back(), LEFT)) S.pop_back();
 			}
 			else if (!dir) {//move vertical
-				if (v1.y < 0) S.push_back(p2);
+				if (v1.y < 0) continue;
 				else if (v1.y > 0) {
 					if (rvs) p2.d = RIGHT;
+					else S.pop_back();
 					S.push_back(p2);
 				}
 			}
