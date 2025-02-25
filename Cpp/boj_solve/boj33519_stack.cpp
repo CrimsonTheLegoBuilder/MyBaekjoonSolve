@@ -55,8 +55,8 @@ void solve() {
 		ll tq = v0 / v1;
 		if (fvis && bvis) {
 			if (dir < 0) {//move backward
-				p2.d = LEFT;
-				if (!rvs && tq < 0) {
+				if (!rvs && tq < 0) {//hide
+					S.back().d = LEFT;
 					rvs = 1;
 					fvis = 0;
 					continue;
@@ -65,18 +65,22 @@ void solve() {
 				while (S.size() && invisible(p1, p2, S.back(), LEFT)) S.pop_back();
 			}
 			else if (!dir) {//move vertical
-
-				p2.d = LEFT;
+				if (v1.y < 0) S.push_back(p2);
+				else if (v1.y > 0) {
+					if (rvs) p2.d = RIGHT;
+					S.push_back(p2);
+				}
 			}
 			else if (dir > 0) {//move forward
-				if (rvs && tq > 0) {
-					p1.d = RIGHT;
+				if (rvs && tq > 0) {//hide
 					S.push_back(p1);
 					rvs = 0;
 					bvis = 0;
 					continue;
 				}
-				if (S.size() && rvs && S.back().x < p1.x) S.push_back(p1);
+				if (S.size() && rvs &&
+					(S.back().x < p1.x) ||
+					(S.back().d == RIGHT && S.back().x <= p1.x)) p1.d = RIGHT, S.push_back(p1);
 				rvs = 0;
 				if (S.size() < 1 || S.back().x < p2.x) S.push_back(p2);
 			}
