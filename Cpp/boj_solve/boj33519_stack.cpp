@@ -67,9 +67,8 @@ void solve() {
 			else if (!dir) {//move vertical
 				if (v1.y < 0) continue;
 				else if (v1.y > 0) {
-					if (rvs) p2.d = RIGHT;
-					else S.pop_back();
-					S.push_back(p2);
+					if (rvs) p1.d = RIGHT, S.push_back(p1), S.push_back(p2);
+					else S.pop_back(), S.push_back(p2);
 				}
 			}
 			else if (dir > 0) {//move forward
@@ -90,7 +89,7 @@ void solve() {
 			if (S.back().x <= p2.x) {
 				rvs = 0;
 				fvis = 1;
-				p2.d = LEFT;
+				//p2.d = LEFT;
 				S.push_back(p2);
 			}
 		}
@@ -105,7 +104,30 @@ void solve() {
 	}
 	int cnt = 0;
 	for (const Pos& p : S) cnt += p.d != 0;
+	for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
 	std::cout << cnt << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj33519 Andrew the Diver
+
+/*
+
+8
+2 8
+1 7
+2 6
+0 5
+10 5
+8 6
+9 7
+8 8
+
+6
+2 8
+2 7
+1 6
+10 6
+9 7
+9 8
+
+*/
