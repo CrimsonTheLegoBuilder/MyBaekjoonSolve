@@ -116,7 +116,7 @@ void solve() {
 	}
 	int cnt = 0;
 	for (const Pos& p : S) cnt += p.d != 0;
-	//for (const Pos& p : S) std::cout << "s:: " << p << "\n";
+	//for (const Pos& p : S) std::cout << "s:: " << p << " " << p.d << "\n";
 	//for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
 	std::cout << cnt << "\n";
 	return;
@@ -316,5 +316,48 @@ int main() { solve(); return 0; }//boj33519 Andrew the Diver
 12 6
 4 8
 12 10
+
+8
+4 10
+3 6
+4 6
+4 8
+5 6
+4 0
+10 0
+10 10
+
+14
+4 10
+3 6
+4 6
+4 8
+5 6
+5 5
+4 0
+10 0
+9 5
+9 6
+10 8
+10 6
+11 6
+10 10
+
+15
+4 10
+4 9
+3 9
+4 7
+3 7
+4 5
+3 5
+4 3
+3 3
+4 1
+4 0
+10 0
+4 2
+10 2
+10 10
 
 */
