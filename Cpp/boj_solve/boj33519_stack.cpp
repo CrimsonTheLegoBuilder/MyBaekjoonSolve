@@ -20,22 +20,19 @@ struct Pos {
 	Pos(int x_ = 0, int y_ = 0, int d_ = 0) : x(x_), y(y_), d(d_) {}
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
+	//ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	ll Euc() const { return (ll)x * x + (ll)y * y; }
+	//ll Euc() const { return (ll)x * x + (ll)y * y; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 } P[LEN]; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
-Polygon S;
-ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+//ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
 bool invisible(Pos p1, Pos p2, const Pos& q, const bool& f = 1) {
 	if (p1.x > p2.x) std::swap(p1, p2);
-	if (f == RIGHT && q.d == RIGHT) {
-		return p1.x < q.x && q.x <= p2.x && ccw(p1, p2, q) <= 0;
-	}
+	if (f == RIGHT && q.d == RIGHT) return p1.x < q.x && q.x <= p2.x && ccw(p1, p2, q) <= 0;
 	return p1.x <= q.x && q.x <= p2.x && ccw(p1, p2, q) <= 0;
 }
 void solve() {
@@ -45,6 +42,7 @@ void solve() {
 	for (int i = 1; i <= N; i++) std::cin >> P[i];
 	P[0] = P[1] + Pos(-1);
 	P[N + 1] = P[N] + Pos(1);
+	Polygon S;
 	S.clear(); S.push_back(P[0]); S.push_back(P[1]);
 	if ((P[2] - P[1]).x < 0) S.back().d = LEFT;
 	bool fvis = 1, bvis = 1, rvs = 0;
