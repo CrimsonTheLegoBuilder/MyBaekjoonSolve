@@ -89,7 +89,6 @@ void solve() {
 			if (S.back().x <= p2.x) {
 				rvs = 0;
 				fvis = 1;
-				//p2.d = LEFT;
 				S.push_back(p2);
 			}
 		}
@@ -137,5 +136,22 @@ int main() { solve(); return 0; }//boj33519 Andrew the Diver
 5 0
 4 2
 8 8
+
+15
+4 10
+4 9
+3 9
+4 8
+4 7
+1 7
+4 2
+4 1
+3 0
+10 0
+9 1
+9 2
+5 3
+9 3
+9 10
 
 */
