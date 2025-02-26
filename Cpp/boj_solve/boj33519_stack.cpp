@@ -18,6 +18,8 @@ bool V[LEN];
 struct Pos {
 	int x, y, d;
 	Pos(int x_ = 0, int y_ = 0, int d_ = 0) : x(x_), y(y_), d(d_) {}
+	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
+	bool operator < (const Pos& p) const { return x == p.x ? y == p.y ? d : y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	//ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
@@ -113,6 +115,8 @@ void solve() {
 		}
 	}
 	int cnt = 0;
+	std::sort(S.begin(), S.end());
+	S.erase(unique(S.begin(), S.end()), S.end());
 	for (const Pos& p : S) cnt += p.d != 0;
 	//for (const Pos& p : S) std::cout << "s:: " << p << " " << p.d << "\n";
 	//for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
