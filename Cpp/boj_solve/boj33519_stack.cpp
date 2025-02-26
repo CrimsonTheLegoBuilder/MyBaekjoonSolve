@@ -67,7 +67,7 @@ void solve() {
 					continue;
 				}
 				rvs = 1;
-				while (S.size() && invisible(p1, p2, S.back(), LEFT)) S.pop_back();
+				while (S.size() && invisible(p1, p2, S.back())) S.pop_back();
 			}
 			else if (!dir) {//move vertical
 				if (v1.y < 0) continue;
