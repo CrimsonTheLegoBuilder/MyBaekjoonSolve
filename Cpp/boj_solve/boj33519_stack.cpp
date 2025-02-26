@@ -116,8 +116,8 @@ void solve() {
 	}
 	int cnt = 0;
 	for (const Pos& p : S) cnt += p.d != 0;
-	for (const Pos& p : S) std::cout << "s:: " << p << "\n";
-	for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
+	//for (const Pos& p : S) std::cout << "s:: " << p << "\n";
+	//for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
 	std::cout << cnt << "\n";
 	return;
 }
