@@ -56,7 +56,7 @@ void solve() {
 		//std::cout << "rvs:: " << rvs << "\n";
 		//std::cout << "fvis:: " << fvis << " bvis:: " << bvis << "\n";
 		//for (Pos& p : S) std::cout << "(" << p << "), ";
-		std::cout << "\n";
+		//std::cout << "\n";
 		ll tq = v0 / v1;
 		if (fvis && bvis) {
 			if (dir < 0) {//move backward
@@ -74,7 +74,11 @@ void solve() {
 				else if (v1.y > 0) {
 					//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
 					//std::cout << "rvs:: " << rvs << "\n";
-					if (rvs) p1.d = RIGHT, S.push_back(p1), S.push_back(p2);
+					if (rvs) {
+						if ((S.back().x < p1.x) ||
+							(S.back().d == RIGHT && S.back().x <= p1.x))
+						p1.d = RIGHT, S.push_back(p1), S.push_back(p2);
+					}
 					else S.pop_back(), S.push_back(p2);
 				}
 			}
@@ -112,7 +116,7 @@ void solve() {
 	}
 	int cnt = 0;
 	for (const Pos& p : S) cnt += p.d != 0;
-	//for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
+	for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
 	std::cout << cnt << "\n";
 	return;
 }
@@ -232,7 +236,7 @@ int main() { solve(); return 0; }//boj33519 Andrew the Diver
 5 9
 6 10
 
-5
+6
 3 10
 5 1
 3 0
@@ -271,6 +275,31 @@ int main() { solve(); return 0; }//boj33519 Andrew the Diver
 20 8
 15 8
 15 10
+
+22
+4 10
+4 9
+3 8
+3 7
+4 6
+4 5
+3 4
+3 3
+4 2
+4 1
+3 0
+4 0
+5 1
+5 2
+4 3
+4 4
+5 5
+5 6
+4 7
+4 8
+5 9
+5 10
+
 
 
 */
