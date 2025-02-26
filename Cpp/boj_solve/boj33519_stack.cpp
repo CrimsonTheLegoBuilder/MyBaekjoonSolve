@@ -52,6 +52,11 @@ void solve() {
 		Pos p0 = P[i - 1], p1 = P[i], p2 = P[i + 1];
 		Pos v0 = p1 - p0, v1 = p2 - p1;
 		int dir = sign(v1.x);
+		//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
+		//std::cout << "rvs:: " << rvs << "\n";
+		//std::cout << "fvis:: " << fvis << " bvis:: " << bvis << "\n";
+		//for (Pos& p : S) std::cout << "(" << p << "), ";
+		std::cout << "\n";
 		ll tq = v0 / v1;
 		if (fvis && bvis) {
 			if (dir < 0) {//move backward
@@ -67,6 +72,8 @@ void solve() {
 			else if (!dir) {//move vertical
 				if (v1.y < 0) continue;
 				else if (v1.y > 0) {
+					//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
+					//std::cout << "rvs:: " << rvs << "\n";
 					if (rvs) p1.d = RIGHT, S.push_back(p1), S.push_back(p2);
 					else S.pop_back(), S.push_back(p2);
 				}
@@ -77,7 +84,9 @@ void solve() {
 					rvs = 0;
 					bvis = 0;
 					continue;
+					//std::cout << "SUCK:: " << p1 << "\n";
 				}
+				//std::cout << "FUCK:: " << p1 << "\n";
 				if (S.size() && rvs &&
 					(S.back().x < p1.x) ||
 					(S.back().d == RIGHT && S.back().x <= p1.x)) p1.d = RIGHT, S.push_back(p1);
@@ -103,7 +112,7 @@ void solve() {
 	}
 	int cnt = 0;
 	for (const Pos& p : S) cnt += p.d != 0;
-	for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
+	//for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
 	std::cout << cnt << "\n";
 	return;
 }
@@ -230,5 +239,38 @@ int main() { solve(); return 0; }//boj33519 Andrew the Diver
 10 0
 4 9
 10 10
+
+11
+4 10
+0 9
+0 4
+4 4
+4 5
+3 5
+4 6
+7 5
+0 0
+10 0
+10 10
+
+17
+4 10
+0 9
+0 4
+4 4
+4 5
+3 5
+4 6
+7 5
+0 0
+20 0
+7 6
+6 7
+15 7
+20 7
+20 8
+15 8
+15 10
+
 
 */
