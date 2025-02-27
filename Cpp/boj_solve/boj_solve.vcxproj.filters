@@ -864,9 +864,6 @@
     <ClCompile Include="boj5719_dijkstra.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj3303_stack.cpp">
-      <Filter>소스 파일\stack</Filter>
-    </ClCompile>
     <ClCompile Include="boj13977_modulo.cpp">
       <Filter>소스 파일\divide_conquer</Filter>
     </ClCompile>
@@ -1627,6 +1624,9 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj33519_stack_los_mem.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj3303_stack.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
