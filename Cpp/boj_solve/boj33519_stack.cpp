@@ -22,14 +22,11 @@ struct Pos {
 	bool operator < (const Pos& p) const { return x == p.x ? y == p.y ? d : y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	//ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	//ll Euc() const { return (ll)x * x + (ll)y * y; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 } P[LEN]; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
-//ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
 bool invisible(Pos p1, Pos p2, const Pos& q, const bool& f = 1) {
@@ -44,8 +41,6 @@ void solve() {
 	for (int i = 1; i <= N; i++) std::cin >> P[i];
 	P[0] = P[1] + Pos(-1);
 	P[N + 1] = P[N] + Pos(1);
-	//assert(P[2].y < P[1].y);
-	//assert(P[N - 1].y < P[N].y);
 	Polygon S;
 	S.clear(); S.push_back(P[0]); S.push_back(P[1]);
 	if ((P[2] - P[1]).x < 0) S.back().d = LEFT;
@@ -54,19 +49,12 @@ void solve() {
 		Pos p0 = P[i - 1], p1 = P[i], p2 = P[i + 1];
 		Pos v0 = p1 - p0, v1 = p2 - p1;
 		int dir = sign(v1.x);
-		//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
-		//std::cout << "rvs:: " << rvs << "\n";
-		//std::cout << "fvis:: " << fvis << " bvis:: " << bvis << "\n";
-		//for (Pos& p : S) std::cout << "(" << p << "), ";
-		//std::cout << "\n";
 		ll tq = v0 / v1;
-		assert(fvis || bvis);
 		if (fvis && bvis) {
 			if (dir < 0) {//move backward
 				if (!rvs && tq < 0) {//hide
 					S.back().d = LEFT;
-					rvs = 1;
-					fvis = 0;
+					rvs = 1; fvis = 0;
 					continue;
 				}
 				rvs = 1;
@@ -75,8 +63,6 @@ void solve() {
 			else if (!dir) {//move vertical
 				if (v1.y < 0) continue;
 				else if (v1.y > 0) {
-					//std::cout << "p1:: " << p1 << " p2:: " << p2 << "\n";
-					//std::cout << "rvs:: " << rvs << "\n";
 					if (rvs) {
 						if ((S.back().x < p1.x) ||
 							(S.back().d == RIGHT && S.back().x <= p1.x))
@@ -91,12 +77,9 @@ void solve() {
 			else if (dir > 0) {//move forward
 				if (rvs && tq > 0) {//hide
 					S.push_back(p1);
-					rvs = 0;
-					bvis = 0;
+					rvs = 0; bvis = 0;
 					continue;
-					//std::cout << "SUCK:: " << p1 << "\n";
 				}
-				//std::cout << "FUCK:: " << p1 << "\n";
 				if (S.size() && rvs &&
 					((S.back().x < p1.x) ||
 					(S.back().d == RIGHT && S.back().x <= p1.x))) p1.d = RIGHT, S.push_back(p1);
@@ -106,27 +89,20 @@ void solve() {
 		}
 		else if (!fvis) {
 			if (S.back().x <= p2.x) {
-				assert(S.back().d == LEFT);
-				rvs = 0;
-				fvis = 1;
+				rvs = 0; fvis = 1;
 				S.push_back(p2);
 			}
 		}
 		else if (!bvis) {
 			if (S.back().x > p2.x) {
 				S.pop_back();
-				rvs = 1;
-				bvis = 1;
+				rvs = 1; bvis = 1;
 				while (S.size() && invisible(p1, p2, S.back())) S.pop_back();
 			}
 		}
 	}
 	int cnt = 0;
-	//std::sort(S.begin(), S.end());
-	//S.erase(unique(S.begin(), S.end()), S.end());
 	for (const Pos& p : S) cnt += p.d != 0;
-	//for (const Pos& p : S) std::cout << "s:: " << p << " " << p.d << "\n";
-	//for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
 	std::cout << cnt << "\n";
 	return;
 }
