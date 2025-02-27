@@ -44,8 +44,8 @@ void solve() {
 	for (int i = 1; i <= N; i++) std::cin >> P[i];
 	P[0] = P[1] + Pos(-1);
 	P[N + 1] = P[N] + Pos(1);
-	assert(P[2].y < P[1].y);
-	assert(P[N - 1].y < P[N].y);
+	//assert(P[2].y < P[1].y);
+	//assert(P[N - 1].y < P[N].y);
 	Polygon S;
 	S.clear(); S.push_back(P[0]); S.push_back(P[1]);
 	if ((P[2] - P[1]).x < 0) S.back().d = LEFT;
@@ -60,6 +60,7 @@ void solve() {
 		//for (Pos& p : S) std::cout << "(" << p << "), ";
 		//std::cout << "\n";
 		ll tq = v0 / v1;
+		assert(fvis || bvis);
 		if (fvis && bvis) {
 			if (dir < 0) {//move backward
 				if (!rvs && tq < 0) {//hide
@@ -81,7 +82,10 @@ void solve() {
 							(S.back().d == RIGHT && S.back().x <= p1.x))
 						p1.d = RIGHT, S.push_back(p1), S.push_back(p2);
 					}
-					else S.pop_back(), S.push_back(p2);
+					else {
+						if (S.back() == p1) S.pop_back();
+						S.push_back(p2);
+					}
 				}
 			}
 			else if (dir > 0) {//move forward
@@ -102,6 +106,7 @@ void solve() {
 		}
 		else if (!fvis) {
 			if (S.back().x <= p2.x) {
+				assert(S.back().d == LEFT);
 				rvs = 0;
 				fvis = 1;
 				S.push_back(p2);
