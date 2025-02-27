@@ -117,8 +117,8 @@ void solve() {
 		}
 	}
 	int cnt = 0;
-	std::sort(S.begin(), S.end());
-	S.erase(unique(S.begin(), S.end()), S.end());
+	//std::sort(S.begin(), S.end());
+	//S.erase(unique(S.begin(), S.end()), S.end());
 	for (const Pos& p : S) cnt += p.d != 0;
 	//for (const Pos& p : S) std::cout << "s:: " << p << " " << p.d << "\n";
 	//for (const Pos& p : S) if (p.d) std::cout << "p:: " << p << "\n";
