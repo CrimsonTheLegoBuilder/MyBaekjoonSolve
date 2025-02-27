@@ -84,7 +84,7 @@ void solve() {
 					}
 					else {
 						if (S.back() == p1) S.pop_back();
-						S.push_back(p2);
+						if (S.back().x < p2.x)S.push_back(p2);
 					}
 				}
 			}
