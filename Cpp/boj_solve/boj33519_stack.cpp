@@ -44,6 +44,8 @@ void solve() {
 	for (int i = 1; i <= N; i++) std::cin >> P[i];
 	P[0] = P[1] + Pos(-1);
 	P[N + 1] = P[N] + Pos(1);
+	assert(P[2].y < P[1].y);
+	assert(P[N - 1].y < P[N].y);
 	Polygon S;
 	S.clear(); S.push_back(P[0]); S.push_back(P[1]);
 	if ((P[2] - P[1]).x < 0) S.back().d = LEFT;
@@ -92,8 +94,8 @@ void solve() {
 				}
 				//std::cout << "FUCK:: " << p1 << "\n";
 				if (S.size() && rvs &&
-					(S.back().x < p1.x) ||
-					(S.back().d == RIGHT && S.back().x <= p1.x)) p1.d = RIGHT, S.push_back(p1);
+					((S.back().x < p1.x) ||
+					(S.back().d == RIGHT && S.back().x <= p1.x))) p1.d = RIGHT, S.push_back(p1);
 				rvs = 0;
 				if (S.size() < 1 || S.back().x < p2.x) S.push_back(p2);
 			}
@@ -126,6 +128,37 @@ void solve() {
 int main() { solve(); return 0; }//boj33519 Andrew the Diver
 
 /*
+
+16
+0 20
+0 0
+10 0
+20 1
+20 10
+10 10
+10 8
+15 8
+15 9
+17 9
+17 7
+10 7
+9 10
+10 11
+20 11
+20 20
+
+11
+4 10
+2 9
+2 0
+5 0
+10 1
+10 3
+6 3
+6 2
+5 3
+10 4
+10 10
 
 8
 2 8
