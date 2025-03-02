@@ -11,15 +11,15 @@
 #include <deque>
 #include <iomanip>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::pair<int, int> pi;
 typedef std::vector<size_t> Vidx;
 typedef std::vector<int> Vint;
 typedef std::vector<ld> Vld;
 typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-13;
 const int LEN = 105;
 const ld PI = acos(-1);
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
@@ -29,7 +29,7 @@ inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
 inline ld sq(const ld& x) { return x * x; }
 inline ll sq(const ll& x) { return x * x; }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
-inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
+inline ld fit(const ld& x, const ld& lo = 0, const ld& hi = 1) { return std::min(hi, std::max(lo, x)); }
 
 #define STRONG 0
 #define WEAK 1
@@ -57,6 +57,10 @@ ld AA[1 << 23];
 #endif
 
 #define POLYGON_CHECK
+//#define NAIVE
+#ifndef NAIVE
+#define FAST
+#endif
 //=======================DEBUG MACRO=======================//
 
 int N, M, K, Q;
@@ -94,12 +98,16 @@ typedef std::vector<Pos> Polygon;
 Polygon P[LEN];
 std::vector<Polygon> T[1 << 3];
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
 bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
+bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return dot(d1, d2, d3) / (d2 - d1).mag(); }
 bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int& f = STRONG) {
 	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
 	return ccw(p0, p1, q) >= f && ccw(p1, p2, q) >= f;
@@ -162,7 +170,20 @@ Polygon sutherland_hodgman(const Polygon& C, const Polygon& clip) {
 struct Seg {
 	Pos s, e;
 	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
-	Pos p(const ld& rt) const { return s + (e - s) * rt; }
+	Pos dir() const { return (s - e).unit(); }
+	//bool operator < (const Seg& l) const {
+	//	Pos v0 = dir();
+	//	Pos v1 = l.dir();
+	//	bool f0 = O < v0;
+	//	bool f1 = O < v1;
+	//	if (f0 != f1) return f0;
+	//	if (collinear(s, e, l.s, l.e)) return s < l.s;
+	//	int tq = v0 / v1;
+	//	return !tq ? ccw(s, e, l.s) > 0 : tq > 0;
+	//}
+	bool operator < (const Seg& l) const { return s == l.s ? e < l.e : s < l.s; }
+	bool operator == (const Seg& l) const { return s == l.s && e == l.e; }
+	Pos p(const ld& rt = .5) const { return s + (e - s) * rt; }
 	ld green(const ld& lo = 0, const ld& hi = 1) const {
 		ld d = hi - lo;
 		ld ratio = (lo + hi) * .5;
@@ -184,9 +205,16 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = STRONG) {
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
-bool inner_check(const Polygon& H, const Pos& q) {
+bool inner_check(const Polygon& H, const Pos& q, const Pos& d = Pos(0, 0)) {
 	int sz = H.size();
-	for (int i = 0; i < sz; i++) if (ccw(H[i], H[(i + 1) % sz], q) < 0) return 0;
+	for (int i = 0; i < sz; i++) {
+		const Pos& p1 = H[i], & p2 = H[(i + 1) % sz];
+		if (ccw(p1, p2, q) < 0) return 0;
+		if (on_seg_strong(p1, p2, q) && !eq(d.x, d.y)) {
+			if (sign((p2 - p1) / d) > 0) return 1;
+			else return 0;
+		}
+	}
 	return 1;
 }
 Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
@@ -221,6 +249,51 @@ Polygon intersection(const Polygon& a, const Polygon& b, const Polygon& c) {
 	if (zero(prune(ret))) return {};
 	return ret;
 }
+Vld intersections(const Seg& l, const Polygon& H) {
+	int sz = H.size();
+	Vld ret;
+	for (int i = 0; i < sz; i++) {
+		const Pos& p0 = H[i], & p1 = H[(i + 1) % sz];
+		Seg k = Seg(p0, p1);
+		if (collinear(l.s, l.e, p0, p1)) {
+			if (dot(l.s, l.e, p0, p1) < 0) return {};
+			for (const Pos& p : { p0, p1 }) {
+				ld ix = projection(l.s, l.e, p);
+				ret.push_back(fit(ix));
+			}
+		}
+		else if (ccw(l.s, l.e, p0) * ccw(l.s, l.e, p1) <= 0) {
+			ld ix = intersection(l, k, WEAK);
+			ret.push_back(fit(ix));
+		}
+	}
+	std::sort(ret.begin(), ret.end());
+	ret.erase(unique(ret.begin(), ret.end()), ret.end());
+	return ret;
+}
+//Vld intersections(const Seg& l, const int& c) {
+//	Vld ret;
+//	for (const Polygon& t : T[c]) {
+//		Vld tmp = intersections(l, t);
+//		ret.insert(ret.end(), tmp.begin(), tmp.end());
+//	}
+//	return ret;
+//}
+//bool inner_check_seg(const int& c, const Seg& l, const ld& x) {
+//	Pos q = l.p(x), d = l.dir();
+//	Pos pet = ~d;//centripetal
+//	for (const Polygon& t : T[c]) {
+//		assert(t.size() == 3);
+//		if (inner_check(t, q, d)) return 1;
+//	}
+//	return 0;
+//}
+struct Event {
+	ld x;
+	int f;
+	bool operator < (const Event& o) const { return eq(x, o.x) ? f < o.f : sign(x - o.x) < 0; }
+};
+typedef std::vector<Event> Ve;
 void query(const int& q) {
 	std::cin >> L[RED] >> L[GREEN] >> L[BLUE];
 	memset(A, 0, sizeof A);
@@ -303,7 +376,8 @@ void query(const int& q) {
 			}
 		}
 	}
-	if (!I[RED] && !I[GREEN] && !I[BLUE]) {
+	if (!I[RED] && !I[GREEN] && !I[BLUE]) {//R & G & B
+#ifdef NAIVE //27N^3 -> N==200:216,000,000
 		for (const Polygon& R : T[RED]) {
 			for (const Polygon& G : T[GREEN]) {
 				for (const Polygon& B : T[BLUE]) {
@@ -315,8 +389,53 @@ void query(const int& q) {
 				}
 			}
 		}
+#endif
+#ifdef FAST //3*3*2N^2log2N -> N==200:6,480,000
+		Segs VS;
+		for (int i = 0; i < 3; i++) {
+			int c0 = 1 << i;
+			int c1 = (1 << ((i + 1) % 3));
+			int c2 = (1 << ((i + 2) % 3));
+			for (const Polygon& T0 : T[c0]) {
+				for (int j = 0; j < 3; j++) {
+					const Pos& p0 = T0[j], & p1 = T0[(j + 1) % 3];
+					Seg l = Seg(p0, p1);
+					Polygon vp;
+					Ve ve = { { 0, 1 }, { 1, -1 } };
+					Vld vx = { 0, 1 };
+					for (const int& c : { c1, c2 }) {
+						for (const Polygon& t : T[c]) {
+							Vld tmp = intersections(l, t);
+							if (tmp.size() > 1) {
+								assert(tmp.size() == 2);
+								ld s = tmp[0];
+								ld e = tmp[1];
+								ve.push_back({ s, 1 });
+								ve.push_back({ e, -1 });
+								vx.push_back(s);
+								vx.push_back(e);
+							}
+						}
+					}
+					std::sort(ve.begin(), ve.end());
+					std::sort(vx.begin(), vx.end());
+					vx.erase(unique(vx.begin(), vx.end()), vx.end());
+					int szr = ve.size(), szx = vx.size(), cnt = 0;
+					for (int x = 0, k = 0; x < szx - 1; x++) {
+						const ld& s = vx[x], e = vx[x + 1];
+						while (k < szr && eq(ve[k].x, s)) { cnt += ve[k].f; k++; }
+						if (cnt > 2) vp.push_back(Pos(s, e));
+					}
+					for (const Pos& se : vp) VS.push_back(Seg(l.p(se.x), l.p(se.y)));
+				}
+			}
+		}
+		std::sort(VS.begin(), VS.end());
+		VS.erase(unique(VS.begin(), VS.end()), VS.end());
+		for (const Seg& se : VS) A[WHITE] += se.green();
+#endif
 	}
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {//R & G, G & B, B & R  3*9*N^2 -> N==200:1,080,000
 		int c1 = (1 << ((i + 1) % 3));
 		int c2 = (1 << ((i + 2) % 3));
 		if (!I[c1] && !I[c2]) {
@@ -332,7 +451,7 @@ void query(const int& q) {
 			}
 		}
 	}
-	for (int c = 1; c < (1 << 3); c <<= 1) {
+	for (int c = 1; c < (1 << 3); c <<= 1) {//R, G, B  3*3*N -> N==200:1,800
 		if (!I[c]) {
 			for (const Polygon& T0 : T[c]) A[c] += area(T0);
 		}
