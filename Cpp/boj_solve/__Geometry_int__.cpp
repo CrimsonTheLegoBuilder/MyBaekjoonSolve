@@ -18,6 +18,7 @@ const ll INF = 1e17;
 const int LEN = 1e5 + 1;
 const ld TOL = 1e-7;
 const ll MOD = 1'000'000'007;
+const ld PI = acos(-1);
 int N, M, T, Q;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -80,6 +81,7 @@ struct Pos {
 	ll Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
 	ld rad() const { return atan2(y, x); }
+	Pos rot(const ld& the) const { return { x * cos(the) - y * sin(the), x * sin(the) + y * cos(the) }; }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	int quad() const { return y > 0 || y == 0 && x >= 0; }
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
