@@ -2,6 +2,10 @@
 #include <iostream>
 #include <algorithm>
 
+struct Pos {
+
+};
+
 int main(int argc, char* argv[]) {
 	registerGen(argc, argv, 1);
 	std::cout << "generating start\n";
