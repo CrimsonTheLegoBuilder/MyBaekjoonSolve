@@ -54,7 +54,7 @@ inline ld fit(const ld& x, const ld& lo = 0, const ld& hi = 1) { return std::min
 
 //#define POLYGON_CHECK
 
-#define NAIVE
+//#define NAIVE
 #ifndef NAIVE
 #define FAST
 #endif
@@ -130,19 +130,27 @@ void norm(Polygon& H) {
 	if (a < 0) std::reverse(H.begin(), H.end());
 	return;
 }
-ld prune(Polygon& H) {
-	int sz = H.size();
-	Vbool V(sz, 0);
-	Polygon tmp;
-	ld a = 0;
-	for (int i = 0; i < sz; i++) {
-		const Pos& p0 = H[(i - 1 + sz) % sz], & p1 = H[i], & p2 = H[(i + 1) % sz];
-		a += p0 / p1;
-		if (!ccw(p0, p1, p2)) V[i] = 1;
+std::vector<Pos> graham_scan(std::vector<Pos>& C) {
+	std::vector<Pos> H;
+	if (C.size() < 3) {
+		std::sort(C.begin(), C.end());
+		return C;
 	}
-	for (int i = 0; i < sz; i++) if (!V[i]) tmp.push_back(H[i]);
-	H = tmp;
-	return a * .5;
+	std::swap(C[0], *min_element(C.begin(), C.end()));
+	std::sort(C.begin() + 1, C.end(), [&](const Pos& p, const Pos& q) -> bool {
+		int ret = ccw(C[0], p, q);
+		if (!ret) return (C[0] - p).Euc() < (C[0] - q).Euc();
+		return ret > 0;
+		}
+	);
+	C.erase(unique(C.begin(), C.end()), C.end());
+	int sz = C.size();
+	for (int i = 0; i < sz; i++) {
+		while (H.size() >= 2 && ccw(H[H.size() - 2], H.back(), C[i]) <= 0)
+			H.pop_back();
+		H.push_back(C[i]);
+	}
+	return H;
 }
 Polygon convex_cut(const Polygon& ps, const Pos& b1, const Pos& b2) {
 	Polygon qs;
@@ -236,14 +244,17 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 }
 Polygon intersection(const Polygon& a, const Polygon& b) {
 	Polygon ret = sutherland_hodgman(a, b);
-	if (zero(prune(ret))) return {};
+	ret = graham_scan(ret);
+	if (zero(area(ret))) return {};
 	return ret;
 }
 Polygon intersection(const Polygon& a, const Polygon& b, const Polygon& c) {
 	Polygon d = sutherland_hodgman(a, b);
-	if (zero(prune(d))) return {};
+	d = graham_scan(d);
+	if (zero(area(d))) return {};
 	Polygon ret = sutherland_hodgman(d, c);
-	if (zero(prune(ret))) return {};
+	ret = graham_scan(ret);
+	if (zero(area(ret))) return {};
 	return ret;
 }
 Vld intersections(const Seg& l, const Polygon& H) {
