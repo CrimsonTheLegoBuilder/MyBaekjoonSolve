@@ -16,6 +16,11 @@ inline ld norm(ld th) {
 	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
 	return th;
 }
+inline int fit(const int& x, const int& lo, const int& hi) { return std::max(lo, std::min(hi, x)); }
+
+#define ANG
+//#define CAR
+//#define RAD
 
 struct Pos {
 	int x, y;
@@ -49,8 +54,11 @@ struct Pos {
 	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : a / b > 0; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << "(" << p.x << ", " << p.y << ")"; return os; }
+	void println() const { std::cout << x << " " << y << "\n";  return; }
+	void print() const { std::cout << x << " " << y;  return; }
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Vpos;
+Pos qry[105][3];
 Vpos P[40];
 bool cmp(const Pos& p, const Pos& q) {
 	bool f0 = O < p;
@@ -140,6 +148,9 @@ bool val(const Pos& p, const int& i = -1) {
 	if (inner_check_bi_search(P[0], p) >= 0) return 0;
 	return 1;
 }
+Pos fit(const Pos& p, const int& x) {
+	return Pos(fit(p.x, -x, x), fit(p.y, -x, x));
+}
 Vpos Polygon_generator(const int& n, const int& i, const int& B, const Pos& cen, const int& tol) {
 	int coo = 900 / B;
 	Vpos C, H;
@@ -200,6 +211,47 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	Pos cen = Pos(Pos(rnd.next(-0, 0), rnd.next(-0, 0)));
+	
+#ifdef ANG
+	for (Pos& p : C) p -= cen;
+	std::sort(C.begin(), C.end(), cmp);
+#elif defined CAR
+	std::sort(C.begin(), C.end());
+#endif
+#ifndef RAD
+	int sz = C.size();
+	int tum = sz / B;
+	for (int i = 0; i < B; i++) {
+		int s = i * tum;
+		int e = (i + 1) * tum - 1;
+		Vpos C_;
+		for (int j = s; j < e; j++) {
+			C_.push_back(C[j]);
+		}
+		Vpos H = graham_scan(C_);
+		if (H.size() > v) {
+			std::cout << "Hull is too big\n";
+			int sz = H.size();
+			int diff = sz - v;
+			Vint I;
+			while (I.size() < diff) {
+				int id(rnd.next(0, sz - 1));
+				if (std::find(I.begin(), I.end(), id) == I.end())
+					I.push_back(id);
+			}
+			Vbool F0(sz, 0);
+			for (const int& id : I) F0[id] = 1;
+			Vpos V;
+			for (int id = 0; id < sz; id++) if (!F0[id]) V.push_back(H[id]);
+			H = V;
+		}
+		P[i + 1] = H;
+		std::cout << "P[" << i + 1 << "].sz:: " << P[i + 1].size() << "\n";
+		std::cout << "i:: " << i + 1 << "\n";
+	}
+#endif
+
+#ifdef RAD
 	ld phi = rnd.next();
 	ld t = 2 * PI / B;
 	Vbool F(C.size(), 0);
@@ -239,8 +291,66 @@ int main(int argc, char* argv[]) {
 		std::cout << "P[" << i << "].sz:: " << P[i].size() << "\n";
 		std::cout << "i:: " << i << "\n";
 	}
+#endif
+
+	int N = 100;
+	C.clear();
+	for (int i = 1; i <= B; i++) {
+		for (Pos& p : P[i]) {
+			int err = rnd.next(10, 200);
+			C.push_back(fit(Pos(p.x + err, p.y), 1000));
+			err = rnd.next(10, 200);
+			C.push_back(fit(Pos(p.x - err, p.y), 1000));
+			err = rnd.next(10, 200);
+			C.push_back(fit(Pos(p.x, p.y + err), 1000));
+			err = rnd.next(10, 200);
+			C.push_back(fit(Pos(p.x, p.y - err), 1000));
+			err = rnd.next(10, 200);
+			C.push_back(fit(Pos(p.x + err, p.y + err), 1000));
+			err = rnd.next(10, 200);
+			C.push_back(fit(Pos(p.x + err, p.y - err), 1000));
+			err = rnd.next(10, 200);
+			C.push_back(fit(Pos(p.x - err, p.y + err), 1000));
+			err = rnd.next(10, 200);
+			C.push_back(fit(Pos(p.x - err, p.y - err), 1000));
+		}
+	}
+	Vpos H = graham_scan(C);
+	std::cout << "H.sz:: " << H.size() << "\n";
+	C.clear();
+	//while (C.size() < N) {
+	//	cnt = (cnt + 1) % 100;
+	//	Pos p(rnd.next(-1000, 1000), rnd.next(-1000, 1000));
+	//	if (std::find(C.begin(), C.end(), p) == C.end() &&
+	//		inner_check_bi_search(H, p) < 0)
+	//		C.push_back(p);
+	//	if (!cnt) {
+	//		std::cout << "Now C gene...\n";
+	//		std::cout << "C.sz:: " << C.size() << "\n";
+	//	}
+	//}
+	//H = graham_scan(C);
+	//if (H.size() > N) {
+	//	std::cout << "Hull is too big\n";
+	//	int sz = H.size();
+	//	int diff = sz - N;
+	//	Vint I;
+	//	while (I.size() < diff) {
+	//		int id(rnd.next(0, sz - 1));
+	//		if (std::find(I.begin(), I.end(), id) == I.end())
+	//			I.push_back(id);
+	//	}
+	//	Vbool F0(sz, 0);
+	//	for (const int& id : I) F0[id] = 1;
+	//	Vpos V;
+	//	for (int id = 0; id < sz; id++) if (!F0[id]) V.push_back(H[id]);
+	//	H = V;
+	//}
+	std::cout << "H.sz:: " << H.size() << "\n";
+	P[0] = H;
+
 	std::cout << "H" << " = [\n";
-	for (int i = 0; i < B; i++) {
+	for (int i = 0; i <= B; i++) {
 		if (!P[i].size()) continue;
 		std::cout << "  [";
 		//for (Pos& p : P[i]) {
@@ -251,60 +361,55 @@ int main(int argc, char* argv[]) {
 		std::cout << "],\n";
 	}
 	std::cout << "]\n";
-	//int N = rnd.next(3, 100);
-	int N = 100;
 
-	//int N = rnd.next(3, 100);
-	//int N = 100;
-	//std::cout << "N:: " << N << "\n";
-	//Vpos C, PR;
-	//int cnt = 0;
-	//Pos s = Pos(rnd.next(1, 1000), 0);
-	//while (C.size() < N * 100) {
-	//	cnt = (cnt + 1) % 100;
-	//	ld t = rnd.next() * 2 * PI;
-	//	//Pos p(rnd.next(-1000, 1000), rnd.next(-1000, 1000));
-	//	Pos p = s.rot(t) + Pos(rnd.next(-200, 200), rnd.next(-200, 200));
-	//	if (val(p) && std::find(C.begin(), C.end(), p) == C.end())
-	//		C.push_back(p);
-	//	if (!cnt) {
-	//		std::cout << "Now C gene...\n";
-	//		std::cout << "C.sz:: " << C.size() << "\n";
-	//	}
-	//}
-	//std::cout << "random C gene\n";
-	//PR = graham_scan(C);
-	//std::cout << "random PR gene\n";
-	//std::cout << "PR.sz:: bfr " << PR.size() << "\n";
-	//if (PR.size() > N) {
-	//	std::cout << "PR is too big\n";
-	//	int sz = PR.size();
-	//	int diff = sz - N;
-	//	Vint I;
-	//	while (I.size() < diff) {
-	//		int i(rnd.next(0, sz - 1));
-	//		if (std::find(I.begin(), I.end(), i) == I.end())
-	//			I.push_back(i);
-	//	}
-	//	Vbool F(sz, 0);
-	//	for (const int& i : I) F[i] = 1;
-	//	Vpos V;
-	//	for (int i = 0; i < sz; i++) if (!F[i]) V.push_back(PR[i]);
-	//	PR = V;
-	//}
-	//std::cout << "H = [\n";
-	//for (Pos& p : PR) {
-	//	std::cout << "    " << p << ",\n";
-	//}
-	//std::cout << "]\n";
-	//std::cout << "PR.sz:: aft " << PR.size() << "\n";
-	//bool ok_pr = convex_valiator(PR);
-	//std::cout << "PR is " << (ok_pr ? "convex\n" : "shit\n");
-	//P[0] = PR;
-	////int B = rnd.next(1, 33);
-	//int B = 15;
-	//for (int b = 1; b <= 15; b++) {
+	std::cout << "Q::\n";
+	int Q = 100;
+	for (int q = 0; q < Q; q++) {
+		for (int i = 0; i < 3; i++) {
+			bool f;
+			while (1) {
+				f = 1;
+				Pos p = Pos(rnd.next(-1000, 1000), rnd.next(-1000, 1000));
+				for (int b = 0; b <= B; b++) {
+					if (inner_check_bi_search(P[b], p) == 0) {
+						f = 0; break;
+					}
+				}
+				for (int j = 0; j < i; j++) {
+					if (qry[q][j] == qry[q][i]) {
+						f = 0; break;
+					}
+				}
+				if (f) {
+					qry[q][i] = p;
+					break;
+				}
+			}
+		}
+		std::cout << "query[" << q + 1 << "] done\n";
+	}
+	for (int q = 0; q < Q; q++) {
+		for (int i = 0; i < 3; i++) {
+			std::cout << qry[q][i] << ", ";
+		}
+		std::cout << "\n";
+	}
 
-	//}
+	std::cout << P[0].size() << "\n";
+	for (const Pos& p : P[0]) p.println();
+	std::cout << B << "\n";
+	for (int i = 1; i <= B; i++) {
+		std::cout << P[i].size() << "\n";
+		for (const Pos& p : P[i]) p.println();
+	}
+	std::cout << Q << "\n";
+	for (int q = 0; q < Q; q++) {
+		qry[q][1].print();
+		std::cout << " ";
+		qry[q][2].print();
+		std::cout << " ";
+		qry[q][3].println();
+	}
+
 	return 0;
 }
