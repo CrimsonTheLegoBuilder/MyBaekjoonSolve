@@ -54,7 +54,7 @@ inline ld fit(const ld& x, const ld& lo = 0, const ld& hi = 1) { return std::min
 
 //#define POLYGON_CHECK
 
-//#define NAIVE
+#define NAIVE
 #ifndef NAIVE
 #define FAST
 #endif
