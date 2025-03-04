@@ -54,7 +54,7 @@ inline ld fit(const ld& x, const ld& lo = 0, const ld& hi = 1) { return std::min
 
 //#define POLYGON_CHECK
 
-//#define NAIVE
+#define NAIVE
 #ifndef NAIVE
 #define FAST
 #endif
@@ -244,8 +244,8 @@ Pos get_pos(const Pos& l, const Seg& p, const Seg& q) {
 }
 Polygon intersection(const Polygon& a, const Polygon& b) {
 	Polygon ret = sutherland_hodgman(a, b);
-	ret = graham_scan(ret);
-	if (zero(area(ret))) return {};
+	//ret = graham_scan(ret);
+	//if (zero(area(ret))) return {};
 	return ret;
 }
 Polygon intersection(const Polygon& a, const Polygon& b, const Polygon& c) {
