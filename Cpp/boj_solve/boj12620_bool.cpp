@@ -54,7 +54,7 @@ inline ld fit(const ld& x, const ld& lo = 0, const ld& hi = 1) { return std::min
 
 //#define POLYGON_CHECK
 
-#define NAIVE
+//#define NAIVE
 #ifndef NAIVE
 #define FAST
 #endif
@@ -253,9 +253,10 @@ Polygon intersection(const Polygon& a, const Polygon& b, const Polygon& c) {
 	d = graham_scan(d);
 	if (zero(area(d))) return {};
 	Polygon ret = sutherland_hodgman(d, c);
-	ret = graham_scan(ret);
-	if (zero(area(ret))) return {};
 	return ret;
+	//ret = graham_scan(ret);
+	//if (zero(area(ret))) return {};
+	//return ret;
 }
 Vld intersections(const Seg& l, const Polygon& H) {
 	int sz = H.size();
