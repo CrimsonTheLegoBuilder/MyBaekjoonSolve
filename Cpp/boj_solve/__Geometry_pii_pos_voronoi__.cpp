@@ -771,11 +771,11 @@ ld intersection(const Seg& s1, const Seg& s2, const bool& f = 0) {
 	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return -1;
 }
-Segs half_plane_intersection(Segs& HP) {
+Segs half_plane_intersection(Segs& HP, const bool& srt = 1) {
 	auto check = [&](Seg& u, Seg& v, Seg& w) -> bool {
 		return w.inner(intersection_(u, v));
 		};
-	std::sort(HP.begin(), HP.end());
+	if (srt) std::sort(HP.begin(), HP.end());
 	std::deque<Seg> dq;
 	int sz = HP.size();
 	for (int i = 0; i < sz; ++i) {
@@ -793,13 +793,15 @@ Segs half_plane_intersection(Segs& HP) {
 	return HPI;
 }
 Segs half_plane_intersection(const Segs& P, const Segs& Q) {
-	Segs HP;
-	int sz;
-	sz = P.size();
-	for (int i = 0; i < sz; i++) HP.push_back(P[i]);
-	sz = Q.size();
-	for (int i = 0; i < sz; i++) HP.push_back(Q[i]);
-	return half_plane_intersection(HP);
+	//Segs HP;
+	//int sz;
+	//sz = P.size();
+	//for (int i = 0; i < sz; i++) HP.push_back(P[i]);
+	//sz = Q.size();
+	//for (int i = 0; i < sz; i++) HP.push_back(Q[i]);
+	Segs HP(P.size() + Q.size());
+	std::merge(P.begin(), P.end(), Q.begin(), Q.end(), HP.begin());
+	return half_plane_intersection(HP, 0);
 }
 Segs cell(std::vector<Pos>& C, const int& idx, const int f = 1) {
 	int sz = C.size();
