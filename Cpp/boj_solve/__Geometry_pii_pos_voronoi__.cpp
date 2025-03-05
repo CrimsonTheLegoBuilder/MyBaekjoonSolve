@@ -101,7 +101,7 @@ std::vector<Pii> graham_scan(std::vector<Pii>& C) {
 	return H;
 }
 struct Pos {
-	ld x, y, i;
+	ld x, y; int i;
 	Pos(ld x_ = 0, ld y_ = 0, int i_ = 0) : x(x_), y(y_), i(i_) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
