@@ -660,11 +660,11 @@ void init(std::vector<Linear>& HP, const ld& mx = 5e9) {
 	return;
 }
 //std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {
-std::vector<Linear> half_plane_intersection(std::vector<Linear>& HP) {
+std::vector<Linear> half_plane_intersection(std::vector<Linear>& HP, const bool& srt = 1) {
 	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
 		return w.include(intersection(u, v));
 		};
-	std::sort(HP.begin(), HP.end());
+	if (srt) std::sort(HP.begin(), HP.end());
 	std::deque<Linear> dq;
 	int sz = HP.size();
 	for (int i = 0; i < sz; ++i) {
@@ -684,14 +684,17 @@ std::vector<Linear> half_plane_intersection(std::vector<Linear>& HP) {
 	//for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
 	//return HPI;
 }
-std::vector<Linear> half_plane_intersection(VHP& P, VHP& Q) {
-	std::vector<Linear> HP;
-	int sz;
-	sz = P.size();
-	for (int i = 0; i < sz; i++) HP.push_back(P[i]);
-	sz = Q.size();
-	for (int i = 0; i < sz; i++) HP.push_back(Q[i]);
-	return half_plane_intersection(HP);
+std::vector<Linear> half_plane_intersection(const VHP& P, const VHP& Q) {
+	//std::vector<Linear> HP;
+	//int sz;
+	//sz = P.size();
+	//for (int i = 0; i < sz; i++) HP.push_back(P[i]);
+	//sz = Q.size();
+	//for (int i = 0; i < sz; i++) HP.push_back(Q[i]);
+	//return half_plane_intersection(HP);
+	std::vector<Linear> HP(P.size() + Q.size());
+	std::merge(P.begin(), P.end(), Q.begin(), Q.end(), HP.begin());
+	return half_plane_intersection(HP, 0);
 }
 std::vector<Linear> get_cell(std::vector<Pos>& C, const int& idx, const int f = 1) {
 	int sz = C.size();
@@ -879,8 +882,8 @@ int main() { solve(); return 0; }//boj33390 Keychain refer to Crysfly from QOJ
 
 더 큰 수를 정의하지 않기 위해 일부러 직선 형태로만 반평면 교집합을 관리하는 꼼수를 배웠음.
 정수형 답을 반환하기 위해 모든 바이섹터가 .5 단위로 표현될 수 있음을 응용.
-양의 반평면 교집합은 seed 바깥에서 존재하는 점
-음의 반평면 교집합은 seed가 바깥에 있는 경우
+양의 반평면 교집합은 seed 와 다른 점들을 같은 거리에 둘 수 있는 원의 중심이 있을 수 있는 구역
+음의 반평면 교집합은 seed와 다른 점을 원의 서로 다른 면에 두는 원의 중심이 있을 수 있는 구역
 잔머리 보소
 
 */
