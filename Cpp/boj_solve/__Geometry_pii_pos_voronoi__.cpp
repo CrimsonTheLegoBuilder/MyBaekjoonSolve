@@ -849,17 +849,6 @@ void solve() {
 	Vpii Cii(N);
 	for (int i = 0; i < N; i++) { std::cin >> Cii[i], Cii[i].i = i; }
 	if (N == 1) { std::cout << "0\nL 1 0 " << Cii[0].x << "\n"; return; }
-	if (N == 2) {
-		Pii s = Cii[0], e = Cii[1];
-		Pii vec = e - s;
-		X_ = -vec.y;
-		Y_ = vec.x;
-		Pos v = ~conv(vec);
-		Pos m = (conv(s) + conv(e)) * .5;
-		Z_ = round(v * m);
-		std::cout << "0\nL " << X_ << " " << Y_ << " " << Z_ << "\n";
-		return;
-	}
 	Vpii P_ = Cii;
 	D = 1e27;
 	LF = 1;//line flag
