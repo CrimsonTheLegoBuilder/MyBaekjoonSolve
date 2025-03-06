@@ -38,6 +38,15 @@ inline ll gcd(ll x, ll y, ll z) {
 	return gcd(w, z);
 }
 
+/*
+
+tested in range -1e5 < x, y < 1e5;
+Delaunator - https://github.com/abellgithub/delaunator-cpp/blob/master/include/delaunator.cpp
+modify : jinhwanlazy
+I'm : stupid
+
+*/
+
 int N;
 ll X_, Y_, Z_;
 ld R_, D;

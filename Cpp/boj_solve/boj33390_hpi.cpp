@@ -13,8 +13,8 @@
 #include <complex>
 #include <numeric>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
@@ -23,15 +23,14 @@ const ld INF = 1e18;
 const ld TOL = 1e-5;
 const ld PI = acos(-1);
 const int LEN = 3005;
+inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
-inline ll sq(ll x) { return (ll)x * x; }
-inline ld sq(ld x) { return x * x; }
-inline ld norm(ld th) {
-	while (th < 0) th += 2 * PI;
-	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
-	return th;
-}
+inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
+inline ld sq(const ld& x) { return x * x; }
+inline ll sq(const ll& x) { return x * x; }
+inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
+inline ld fit(const ld& x, const ld& lo = 0, const ld& hi = 1) { return std::min(hi, std::max(lo, x)); }
 inline ll gcd(ll a, ll b) { while (b) { ll tmp = a % b; a = b; b = tmp; } return a; }
 inline ll gcd(ll x, ll y, ll z) {
 	x = std::abs(x); y = std::abs(y); z = std::abs(z);
@@ -80,7 +79,6 @@ struct Pii {
 	friend std::ostream& operator << (std::ostream& os, const Pii& p) { os << p.x << " " << p.y; return os; }
 };
 const Pii Oii = { 0, 0 };
-const Pii INF_PT = { (int)1e9, (int)1e9 };
 typedef std::vector<Pii> Vpii;
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pii& d1, const Pii& d2, const Pii& d3, const Pii& d4) { return (d2 - d1) / (d4 - d3); }
@@ -111,7 +109,7 @@ std::vector<Pii> graham_scan(std::vector<Pii>& C) {
 	return H;
 }
 struct Pos {
-	ld x, y, i;
+	ld x, y; int i;
 	Pos(ld x_ = 0, ld y_ = 0, int i_ = 0) : x(x_), y(y_), i(i_) {}
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
@@ -137,8 +135,6 @@ struct Pos {
 	Pos unit() const { return *this / mag(); }
 	ld rad() const { return atan2(y, x); }
 	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
-	int quad() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) >= 0); }
-	friend bool cmpq(const Pos& a, const Pos& b) { return (a.quad() != b.quad()) ? a.quad() < b.quad() : sign(a / b) > 0; }
 	bool close(const Pos& p) const { return zero((*this - p).Euc()); }
 	bool close(const Pos& rhs,
 		const ld span = 1.,
@@ -150,6 +146,7 @@ struct Pos {
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
 Pos conv(const Pii& p) { return Pos(p.x, p.y, p.i); }
+Pii conv(const Pos& p) { return Pii(round(p.x), round(p.y)); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
@@ -641,41 +638,54 @@ private:
 		}
 	}
 };
-struct Linear {//ps[0] -> ps[1] ::
-	Pos ps[2];
-	Pos dir_;
-	const Pos& operator [] (const int& i) const { return ps[i]; }
-	const Pos& dir() const { return dir_; }
-	Linear(Pos a = Pos(0, 0), Pos b = Pos(0, 0)) {
-		ps[0] = a;
-		ps[1] = b;
-		//dir_ = (ps[1] - ps[0]).unit();
-		dir_ = (ps[1] - ps[0]);
+struct Seg {
+	Pos s, e, dir;
+	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) { dir = e - s; }
+	//bool operator < (const Seg& l) const { return s == l.s ? e < l.e : s < l.s; }
+	bool inner(const Pos& p) const { return sign(dir / (p - s)) > 0; }
+	friend bool parallel(const Seg& l0, const Seg& l1) { return zero(l0.dir / l1.dir); }
+	friend bool same_dir(const Seg& l0, const Seg& l1) { return parallel(l0, l1) && l0.dir * l1.dir > 0; }
+	friend Pos intersection_(const Seg& s1, const Seg& s2) {
+		const Pos& p1 = s1.s, & p2 = s1.e;
+		const Pos& q1 = s2.s, & q2 = s2.e;
+		ld a1 = cross(q1, q2, p1);
+		ld a2 = -cross(q1, q2, p2);
+		return (p1 * a2 + p2 * a1) / (a1 + a2);
 	}
-	bool include(const Pos& p) const { return sign(dir_ / (p - ps[0])) > 0; }
-	friend bool parallel(const Linear& l0, const Linear& l1) { return zero(l0.dir() / l1.dir()); }
-	friend bool same_dir(const Linear& l0, const Linear& l1) { return parallel(l0, l1) && l0.dir() * l1.dir() > 0; }
-	bool operator < (const Linear& l0) const {
-		if (same_dir(*this, l0)) return l0.include(ps[0]);
-		else return cmpq(this->dir(), l0.dir());
+	bool operator < (const Seg& l) const {
+		if (same_dir(*this, l)) return l.inner(s);
+		bool f0 = O < dir;
+		bool f1 = O < l.dir;
+		if (f0 != f1) return f1;
+		return sign(dir / l.dir) > 0;
+	}
+	//bool operator == (const Seg& l) const { return s == l.s && e == l.e; }
+	Pos p(const ld& rt = .5) const { return s + (e - s) * rt; }
+	ld green(const ld& lo = 0, const ld& hi = 1) const {
+		ld d = hi - lo;
+		ld ratio = (lo + hi) * .5;
+		Pos m = p(ratio);
+		return m.y * d * (s.x - e.x);
 	}
 };
-typedef std::vector<Linear> VHP;
-Pos intersection(const Linear& l1, const Linear& l2) { return intersection(l1[0], l1[1], l2[0], l2[1]); }
-void init(std::vector<Linear>& HP, const ld& mx = 5e9) {
-	HP.push_back(Linear(Pos(-mx, -mx), Pos(mx, -mx)));
-	HP.push_back(Linear(Pos(mx, -mx), Pos(mx, mx)));
-	HP.push_back(Linear(Pos(mx, mx), Pos(-mx, mx)));
-	HP.push_back(Linear(Pos(-mx, mx), Pos(-mx, -mx)));
-	return;
+typedef std::vector<Seg> Segs;
+ld dot(const Seg& p, const Seg& q) { return dot(p.s, p.e, q.s, q.e); }
+ld intersection(const Seg& s1, const Seg& s2, const bool& f = 0) {
+	const Pos& p1 = s1.s, p2 = s1.e, q1 = s2.s, q2 = s2.e;
+	ld det = (q2 - q1) / (p2 - p1);
+	if (zero(det)) return -1;
+	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
+	ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
+	if (f == 1) return fit(a1, 0, 1);
+	if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
+	return -1;
 }
-//std::vector<Pos> half_plane_intersection(std::vector<Linear>& HP) {
-std::vector<Linear> half_plane_intersection(std::vector<Linear>& HP, const bool& srt = 1) {
-	auto check = [&](Linear& u, Linear& v, Linear& w) -> bool {
-		return w.include(intersection(u, v));
+Segs half_plane_intersection(Segs& HP, const bool& srt = 1) {
+	auto check = [&](Seg& u, Seg& v, Seg& w) -> bool {
+		return w.inner(intersection_(u, v));
 		};
 	if (srt) std::sort(HP.begin(), HP.end());
-	std::deque<Linear> dq;
+	std::deque<Seg> dq;
 	int sz = HP.size();
 	for (int i = 0; i < sz; ++i) {
 		if (i && same_dir(HP[i], HP[(i - 1) % sz])) continue;
@@ -687,52 +697,38 @@ std::vector<Linear> half_plane_intersection(std::vector<Linear>& HP, const bool&
 	while (dq.size() > 2 && !check(dq[1], dq[0], dq[dq.size() - 1])) dq.pop_front();
 	sz = dq.size();
 	if (sz < 3) return {};
-	std::vector<Linear> HPI;
+	std::vector<Seg> HPI;
 	for (int i = 0; i < sz; ++i) HPI.push_back(dq[i]);
 	return HPI;
-	//std::vector<Pos> HPI;
-	//for (int i = 0; i < sz; ++i) HPI.push_back(intersection(dq[i], dq[(i + 1) % sz]));
-	//return HPI;
 }
-std::vector<Linear> half_plane_intersection(const VHP& P, const VHP& Q) {
-	//std::vector<Linear> HP;
-	//int sz;
-	//sz = P.size();
-	//for (int i = 0; i < sz; i++) HP.push_back(P[i]);
-	//sz = Q.size();
-	//for (int i = 0; i < sz; i++) HP.push_back(Q[i]);
-	//return half_plane_intersection(HP);
-	std::vector<Linear> HP(P.size() + Q.size());
+Segs half_plane_intersection(const Segs& P, const Segs& Q) {
+	Segs HP(P.size() + Q.size());
 	std::merge(P.begin(), P.end(), Q.begin(), Q.end(), HP.begin());
 	return half_plane_intersection(HP, 0);
 }
-std::vector<Linear> get_cell(std::vector<Pos>& C, const int& idx, const int f = 1) {
+Segs cell(std::vector<Pos>& C, const int& idx, const int f = 1) {
 	int sz = C.size();
-	std::vector<Linear> HP; init(HP);
+	ld mx = 1e9;
+	Segs HP = {
+		Seg(Pos(-mx, -mx), Pos(mx, -mx)),
+		Seg(Pos(mx, -mx), Pos(mx, mx)),
+		Seg(Pos(mx, mx), Pos(-mx, mx)),
+		Seg(Pos(-mx, mx), Pos(-mx, -mx))
+	};
 	for (int i = 0; i < sz; i++) {
 		if (i == idx) continue;
 		Pos v = ~(C[i] - C[idx]);
 		v *= f;
 		Pos m = (C[i] + C[idx]) * .5;
-		HP.push_back(Linear(m, m + v));
+		HP.push_back(Seg(m, m + v));
 	}
 	return half_plane_intersection(HP);
 }
-Pii conv(const Pos& p) {
-	ll x = round(p.x);
-	ll y = round(p.y);
-	return Pii(x, y);
-}
-//Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
-//	ld a1 = cross(q1, q2, p1);
-//	ld a2 = -cross(q1, q2, p2);
-//	return (p1 * a2 + p2 * a1) / (a1 + a2);
-//}
-void update_XYZ(const Linear& u, const Linear& v) {
-	Pii p1 = conv(u[0] * 2);
-	Pii p2 = conv(u[1] * 2);
-	Pii q1 = conv(v[0] * 2);
-	Pii q2 = conv(v[1] * 2);
+void update_XYZ(const Seg& u, const Seg& v) {
+	Pii p1 = conv(u.s * 2);
+	Pii p2 = conv(u.e * 2);
+	Pii q1 = conv(v.s * 2);
+	Pii q2 = conv(v.e * 2);
 	ll a1 = cross(q1, q2, p1);
 	ll a2 = -cross(q1, q2, p2);
 	ll det = (a1 + a2);
@@ -743,8 +739,8 @@ void update_XYZ(const Linear& u, const Linear& v) {
 	return;
 }
 Vint DT[LEN], NG;
-std::vector<Linear> VDP[LEN];
-std::vector<Linear> VDN[LEN];
+Segs VDP[LEN];
+Segs VDN[LEN];
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -754,21 +750,9 @@ void solve() {
 	Vpii Cii(N);
 	for (int i = 0; i < N; i++) { std::cin >> Cii[i], Cii[i].i = i; }
 	if (N == 1) { std::cout << "0\nL 1 0 " << Cii[0].x << "\n"; return; }
-	if (N == 2) {
-		Pii s = Cii[0], e = Cii[1];
-		Pii vec = e - s;
-		X_ = -vec.y;
-		Y_ = vec.x;
-		Pos v = ~conv(vec);
-		Pos m = (conv(s) + conv(e)) * .5;
-		Z_ = round(v * m);
-		std::cout << "0\nL " << X_ << " " << Y_ << " " << Z_ << "\n";
-		return;
-	}
 	Vpii P_ = Cii;
 	D = 1e27;
 	LF = 1;//line flag
-	//line
 	Vpii H = graham_scan(P_);
 	if (H.size() == 2) {
 		Pii s = H[0], e = H[1];
@@ -800,8 +784,6 @@ void solve() {
 			Z_ = round(v * m);
 		}
 	}
-	//circle
-	//std::cout << "circle::\n";
 	Polygon C;
 	for (Pii& p : Cii) C.push_back(conv(p));
 	Delaunator DTR(C);
@@ -818,8 +800,13 @@ void solve() {
 		std::sort(I.begin(), I.end());
 		I.erase(unique(I.begin(), I.end()), I.end());
 		Pii sd = Cii[c];//seed
-		std::vector<Linear> HP;
-		init(HP, 5e9);
+		ld mx = 1e9;
+		Segs HP = {
+			Seg(Pos(-mx, -mx), Pos(mx, -mx)),
+			Seg(Pos(mx, -mx), Pos(mx, mx)),
+			Seg(Pos(mx, mx), Pos(-mx, mx)),
+			Seg(Pos(-mx, mx), Pos(-mx, -mx))
+		};
 		for (const int& i : I) {
 			Pii p = Cii[i];
 			Pii vec = p - sd;
@@ -827,19 +814,16 @@ void solve() {
 			vec /= g;
 			Pos v = ~conv(vec);
 			Pos s = conv(sd), e = conv(p);
-			//Pos v = ~(e - s);
 			Pos m = (s + e) * .5;
-			HP.push_back(Linear(m, m + v));
+			HP.push_back(Seg(m, m + v));
 		}
-		VHP hpi = half_plane_intersection(HP);
-		//std::cout << "hpi_p.sz:: " << hpi.size() << "\n";
+		Segs hpi = half_plane_intersection(HP);
 		if (hpi.size() < 3) continue;
 		VDP[c] = hpi;
 	}
 	for (const Pii& q : H) {
 		int c = q.i;
-		VHP hpi = get_cell(C, q.i, -1);
-		//std::cout << "hpi_n.sz:: " << hpi.size() << "\n";
+		Segs hpi = cell(C, q.i, -1);
 		if (hpi.size() < 3) continue;
 		VDN[c] = hpi;
 		NG.push_back(q.i);
@@ -849,21 +833,17 @@ void solve() {
 		Pii p_ = Cii[pv];
 		Pos sdp = C[pv];//seed
 		for (const int& ng : NG) {
-			if (!VDN[ng].size()) continue;
-			VHP inx = half_plane_intersection(VDP[pv], VDN[ng]);
+			//if (!VDN[ng].size()) continue;
+			Segs inx = half_plane_intersection(VDP[pv], VDN[ng]);
 			int sz = inx.size();
 			if (sz < 3) continue;
 			Pos sdn = C[ng];//seed
 			for (int i = 0; i < sz; i++) {
 				int j = (i + 1) % sz;
-				const Linear& l0 = inx[i];
-				const Linear& l1 = inx[j];
-				//std::cout << "l[0]:: " << l0[0] << " ";
-				//std::cout << "l[1]:: " << l0[1] << "\n";
-				//std::cout << "l[0]:: " << l1[0] << " ";
-				//std::cout << "l[1]:: " << l1[1] << "\n";
-				if (!ccw(l0[0], l0[1], l1[0], l1[1])) continue;
-				Pos ix = intersection(l0, l1);
+				const Seg& l0 = inx[i];
+				const Seg& l1 = inx[j];
+				//if (!ccw(l0.s, l0.e, l1.s, l1.e)) continue;
+				Pos ix = intersection_(l0, l1);
 				ld dn = (sdn - ix).mag();
 				ld dp = (sdp - ix).mag();
 				ld d = dn - dp;
@@ -877,7 +857,6 @@ void solve() {
 			}
 		}
 	}
-	//result
 	if (zero(D)) D = +0;
 	if (zero(R_)) R_ = +0;
 	ll g = gcd(X_, Y_, Z_);
