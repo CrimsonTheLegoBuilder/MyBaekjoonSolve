@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
-#include <unordered_set>
+#include <set>
 typedef long long ll;
 typedef long double ld;
 const int LEN = 205;
@@ -75,10 +75,10 @@ struct Pos {
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 };
-const Pff O = Pff(Z, Z);
 typedef Pos<Fraction> Pff;
+const Pff O = Pff(Z, Z);
 typedef std::vector<Pff> Polygon;
-typedef std::unordered_set<Pff> Spos;
+typedef std::set<Pff> Spos;
 Pff norm(const Pff& p) { return Pff(p.x.normalize(), p.y.normalize()); }
 Fraction cross(const Pff& d1, const Pff& d2, const Pff& d3) { return (d2 - d1) / (d3 - d2); }
 Pff intersection(const Pff& p1, const Pff& p2, const Pff& q1, const Pff& q2) {
@@ -93,7 +93,7 @@ Pff intersection(const Pff& p1, const Pff& p2, const Pff& q1, const Pff& q2) {
 }
 struct Line {
 	Pff s, e;
-	Line(Pff s_ = Z, Pff e_ = Z) : s(s_), e(e_) {}
+	Line(Pff s_ = O, Pff e_ = O) : s(s_), e(e_) {}
 	Pff dir() const { return e - s; }
 	bool operator<(const Line& r) const {
 		bool f0 = O < dir();
@@ -144,7 +144,7 @@ void solve() {
 		const Line& l0 = HP[i], & l1 = HP[(i + 1) % sz];
 		ret.push_back(intersection(l0, l1));
 	}
-	for (const Pff p : ret) {
+	for (const Pff& p : ret) {
 		std::cout << p.x.num << " " << p.x.den << " ";
 		std::cout << p.y.num << " " << p.y.den << "\n";
 	}
