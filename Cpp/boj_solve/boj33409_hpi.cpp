@@ -37,6 +37,7 @@ struct Fraction {
 	Fraction operator*(const Fraction& r) const { return Fraction(num * r.num, den * r.den).normalize(); }
 	Fraction operator/(const Fraction& r) const { return *this * r.inv(); }
 	Fraction& operator*=(const Fraction& r) { return *this = *this * r; }
+	Fraction& operator/=(const Fraction& r) { return *this = *this / r; }
 	bool operator<(const Fraction& o) const { return num * o.den < o.num * den; }
 	bool operator<=(const Fraction& o) const { return num * o.den <= o.num * den; }
 	bool operator>(const Fraction& o) const { return o < *this; }
@@ -87,8 +88,8 @@ Pff intersection(const Pff& p1, const Pff& p2, const Pff& q1, const Pff& q2) {
 	Fraction x = p1.x * a2 + p2.x * a1;
 	Fraction y = p1.y * a2 + p2.y * a1;
 	Fraction den = a1 + a2;
-	x = x / den;
-	y = y / den;
+	x /= den;
+	y /= den;
 	return Pff(x, y);
 }
 struct Line {
