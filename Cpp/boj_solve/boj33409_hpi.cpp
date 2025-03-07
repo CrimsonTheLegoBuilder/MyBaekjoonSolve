@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
+#include <cassert>
 #include <set>
 typedef long long ll;
 typedef long double ld;
@@ -84,13 +85,13 @@ Pff norm(const Pff& p) { return Pff(p.x.normalize(), p.y.normalize()); }
 Fraction cross(const Pff& d1, const Pff& d2, const Pff& d3) { return (d2 - d1) / (d3 - d2); }
 Pff intersection(const Pff& p1, const Pff& p2, const Pff& q1, const Pff& q2) {
 	Fraction a1 = cross(q1, q2, p1);
-	Fraction a2 = cross(q1, q2, p2);
+	Fraction a2 = -cross(q1, q2, p2);
 	Fraction x = p1.x * a2 + p2.x * a1;
 	Fraction y = p1.y * a2 + p2.y * a1;
 	Fraction den = a1 + a2;
 	x /= den;
 	y /= den;
-	return Pff(x, y);
+	return Pff(x.normalize(), y.normalize());
 }
 struct Line {
 	Pff s, e;
@@ -99,7 +100,7 @@ struct Line {
 	bool operator<(const Line& r) const {
 		bool f0 = O < dir();
 		bool f1 = O < r.dir();
-		if (f0 != f1) return f0;
+		if (f0 != f1) return f1;
 		Fraction det = dir() / r.dir();
 		return det == Z ? cross(r.s, r.e, s) > Z : det > Z;
 	}
@@ -112,25 +113,36 @@ void solve() {
 	std::cin >> N;
 	Polygon P(N);
 	for (Pff& p : P) std::cin >> p;
-	K = int(sqrt(N) + 1);
+	K = int(sqrt(N * 2) + 1);
 	Spos S;
 	Vhp HP;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			if (i == j) continue;
-			Pff p1 = P[i], p2 = P[(j)];
+			Pff p1 = P[i], p2 = P[j];
 			Pff v = norm(p2 - p1);
-			Pff v_ = v *= Fraction(-1, 1);
-			if (S.find(v) != S.end() || S.find(v_) != S.end()) continue;
+			Pff v_ = v * Fraction(-1, 1);
+			bool f = 0;
+			for (const Pff& p : S) {
+				if (v / p == Z || v_ / p == Z) {
+					f = 1;
+					break;
+				}
+			}
+			if (f) continue;
+			//for (const Pff& p : S) std::cout << p << " ";
+			//std::cout << "\n";
+			//if (S.find(v) != S.end() || S.find(v_) != S.end()) continue;
 			int z = 0, r = 0, l = 0;
 			for (int k = 0; k < N; k++) {
-				if (k == i || j == k) continue;
+				if (k == i || k == j) continue;
 				Fraction det = cross(p1, p2, P[k]);
 				if (det == Z) z++;
 				else if (det > Z) l++;
 				else r++;
 			}
 			if (z == K - 3) {
+				assert(l != r);
 				if (l < r) std::swap(p1, p2);
 				HP.push_back(Line(p1, p2));
 				v = norm(p2 - p1);
@@ -143,8 +155,13 @@ void solve() {
 	Polygon ret;
 	for (int i = 0; i < sz; i++) {
 		const Line& l0 = HP[i], & l1 = HP[(i + 1) % sz];
+		//std::cout << "l0:: " << l0.s << " " << l0.e << "\n";
+		//std::cout << "l1:: " << l1.s << " " << l1.e << "\n";
 		ret.push_back(intersection(l0, l1));
 	}
+	//assert(K == ret.size());
+	std::cout << K << "\n";
+	//std::cout << ret.size() << "\n";
 	for (const Pff& p : ret) {
 		std::cout << p.x.num << " " << p.x.den << " ";
 		std::cout << p.y.num << " " << p.y.den << "\n";
