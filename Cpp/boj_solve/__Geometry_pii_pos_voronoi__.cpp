@@ -40,7 +40,7 @@ inline ll gcd(ll x, ll y, ll z) {
 
 /*
 
-tested in range -1e5 < x, y < 1e5;
+tested in range -1e6 < x, y < 1e6;
 Delaunator - https://github.com/abellgithub/delaunator-cpp/blob/master/include/delaunator.cpp
 modify : jinhwanlazy
 I'm : stupid
