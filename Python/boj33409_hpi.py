@@ -21,6 +21,16 @@ def intersection_(p1_, p2_, q1_, q2_) -> tuple:
     return Fraction(x, den), Fraction(y, den)
 
 
+def cmp(t1_, t2_) -> int:
+    p1_ = (t1_[0])
+    f1: bool = (0, 0) < p1_
+    f2: bool = (0, 0) < p2_
+    if f1 != f2:
+        return f1
+
+    return 1
+
+
 N: int
 
 if __name__ == "__main__":
@@ -41,6 +51,12 @@ if __name__ == "__main__":
                 continue
             I: tuple = H[i]
             J: tuple = H[j]
+            x: Fraction = J[0] - I[0]
+            y: Fraction = J[1] - I[1]
+            v1: tuple = x, y
+            v2: tuple = -x, -y
+            if v1 in V or v2 in V:
+                continue
             r: int = 0
             z: int = 0
             l: int = 0
@@ -57,3 +73,6 @@ if __name__ == "__main__":
             if z == K - 1:
                 if l < r:
                     I, J = J, I
+                x: Fraction = J[0] - I[0]
+                y: Fraction = J[1] - I[1]
+                L.append((I, J))
