@@ -13,7 +13,7 @@ def cross(d1, d2, d3) -> Fraction:
     return (d2[0] - d1[0]) * (d3[1] - d2[1]) - (d2[1] - d1[1]) * (d3[0] - d2[0])
 
 
-def     intersection(p1_, p2_, q1_, q2_) -> tuple:
+def intersection(p1_, p2_, q1_, q2_) -> tuple:
     a1 = cross(q1_, q2_, p1_)
     a2 = -cross(q1_, q2_, p2_)
     x_: Fraction = p1_[0] * a2 + p2_[0] * a1
