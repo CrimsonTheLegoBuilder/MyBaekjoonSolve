@@ -22,12 +22,13 @@ def intersection_(p1_, p2_, q1_, q2_) -> tuple:
 
 
 def cmp(t1_, t2_) -> int:
-    p1_ = (t1_[0])
+    p1_ = (t1_[0][0] - t1_[1][0], t1_[0][1] - t1_[1][1])
+    p2_ = (t2_[0][0] - t2_[1][0], t2_[0][1] - t2_[1][1])
     f1: bool = (0, 0) < p1_
     f2: bool = (0, 0) < p2_
     if f1 != f2:
         return f1
-
+    det: Fraction = p1_[0] * p2_[0]
     return 1
 
 
