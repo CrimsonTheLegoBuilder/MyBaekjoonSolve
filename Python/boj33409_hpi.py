@@ -27,9 +27,14 @@ def cmp(t1_, t2_) -> int:
     f1: bool = (0, 0) < p1_
     f2: bool = (0, 0) < p2_
     if f1 != f2:
-        return f1
+        return -1 if f1 > f2 else 1
     det: Fraction = p1_[0] * p2_[0]
-    return 1
+    if det == 0:
+        d: Fraction = cross(t1_[0], t1_[1], t2_[0])
+        if d == 0:
+            return 0
+        return -1 if d > 0 else 1
+    return -1 if det > 0 else 1
 
 
 N: int
