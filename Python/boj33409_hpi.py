@@ -34,6 +34,7 @@ if __name__ == "__main__":
         H.append(p)
 
     L: list = []
+    V: set = set()
     for i in range(N):
         for j in range(N):
             if j == i:
@@ -47,4 +48,12 @@ if __name__ == "__main__":
                 if k == i or k == j:
                     continue
                 tq: Fraction = cross(I, J, H[k])
-                
+                if tq == 0:
+                    z += 1
+                if tq > 0:
+                    l += 1
+                if tq < 0:
+                    r += 1
+            if z == K - 1:
+                if l < r:
+                    I, J = J, I
