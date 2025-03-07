@@ -3,8 +3,8 @@
 #include <vector>
 #include <cmath>
 #include <cassert>
-#include <set>
 typedef long long ll;
+//typedef __int128 ll;
 typedef long double ld;
 const int LEN = 205;
 const ll MOD = 1e9 + 7;
@@ -68,8 +68,8 @@ struct Pos {
 	Pos operator - () const { return { -x, -y }; }
 	Pos operator ~ () const { return { -y, x }; }
 	Pos operator ! () const { return { y, x }; }
-	T xy() const { return (ll)x * y; }
-	T Euc() const { return (ll)x * x + (ll)y * y; }
+	//T xy() const { return (ll)x * y; }
+	//T Euc() const { return (ll)x * x + (ll)y * y; }
 	//T Man() const { return std::abs(x) + std::abs(y); }
 	//ld mag() const { return hypot(x, y); }
 	//ld rad() const { return atan2(y, x); }
@@ -80,7 +80,6 @@ struct Pos {
 typedef Pos<Fraction> Pff;
 const Pff O = Pff(Z, Z);
 typedef std::vector<Pff> Polygon;
-typedef std::set<Pff> Spos;
 Pff norm(const Pff& p) { return Pff(p.x.normalize(), p.y.normalize()); }
 Fraction cross(const Pff& d1, const Pff& d2, const Pff& d3) { return (d2 - d1) / (d3 - d2); }
 Pff intersection(const Pff& p1, const Pff& p2, const Pff& q1, const Pff& q2) {
@@ -114,10 +113,10 @@ void solve() {
 	Polygon P(N);
 	for (Pff& p : P) std::cin >> p;
 	K = int(sqrt(N * 2) + 1);
-	Spos S;
+	Polygon S;
 	Vhp HP;
 	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
+		for (int j = i + 1; j < N; j++) {
 			if (i == j) continue;
 			Pff p1 = P[i], p2 = P[j];
 			Pff v = norm(p2 - p1);
@@ -146,7 +145,7 @@ void solve() {
 				if (l < r) std::swap(p1, p2);
 				HP.push_back(Line(p1, p2));
 				v = norm(p2 - p1);
-				S.insert(v);
+				S.push_back(v);
 			}
 		}
 	}
@@ -160,8 +159,8 @@ void solve() {
 		ret.push_back(intersection(l0, l1));
 	}
 	//assert(K == ret.size());
-	std::cout << K << "\n";
-	//std::cout << ret.size() << "\n";
+	//std::cout << K << "\n";
+	std::cout << ret.size() << "\n";
 	for (const Pff& p : ret) {
 		std::cout << p.x.num << " " << p.x.den << " ";
 		std::cout << p.y.num << " " << p.y.den << "\n";
