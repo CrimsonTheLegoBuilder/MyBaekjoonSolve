@@ -45,7 +45,7 @@ def cmp_(t1_: tuple, t2_: tuple) -> int:
 
 
 if __name__ == "__main__":
-    N = int(INPUT())
+    N: int = int(INPUT())
     K: int = int((N * 2)**.5 + 1)
 
     H: list = []
