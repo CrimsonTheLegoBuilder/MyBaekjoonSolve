@@ -25,7 +25,7 @@ def intersection(p1_: tuple, p2_: tuple, q1_: tuple, q2_: tuple) -> tuple:
 def collinear(l1_: tuple, l2_: tuple) -> bool:
     tq1: Fraction = cross(l1_[0], l1_[1], l2_[0])
     tq2: Fraction = cross(l1_[0], l1_[1], l2_[1])
-    return tq1 == Fraction(0, 1) and tq2 == Fraction(0, 1)
+    return tq1 == 0 and tq2 == 0
 
 
 def cmp_(t1_: tuple, t2_: tuple) -> int:
@@ -54,7 +54,6 @@ if __name__ == "__main__":
         H.append(p)
 
     L: list = []
-    V: list = []
     for i in range(N):
         for j in range(i + 1, N):
             p0: tuple = H[i]
@@ -65,10 +64,10 @@ if __name__ == "__main__":
 
     L.sort(key=cmp_to_key(cmp_))
 
-    V: list = []
     sz: int = len(L)
     cnt: int = 1
     M: int = (K - 1) * (K - 2) // 2
+    V: list = []
     for i in range(sz):
         l0: tuple = L[i]
         l1: tuple = L[(i + 1) % sz]
@@ -84,7 +83,7 @@ if __name__ == "__main__":
                     tq: Fraction = cross(p0, p1, H[j])
                     if tq == 0:
                         continue
-                    elif tq > Fraction(0, 1):
+                    elif tq > 0:
                         l += 1
                     else:
                         r += 1
@@ -96,9 +95,9 @@ if __name__ == "__main__":
                 cnt = 1
                 continue
 
-    R: list = []
-
     V.sort(key=cmp_to_key(cmp_))
+
+    R: list = []
     for i in range(len(V)):
         l0: tuple = V[i - 1]
         l1: tuple = V[i]
