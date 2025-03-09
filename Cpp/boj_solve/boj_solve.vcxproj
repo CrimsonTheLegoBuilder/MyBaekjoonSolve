@@ -2113,6 +2113,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="___now_solving.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt" />
