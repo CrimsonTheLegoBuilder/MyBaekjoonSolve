@@ -4,7 +4,7 @@
 #include <cstring>
 typedef long long ll;
 typedef long double ld;
-int T, X, N, Ki, Ai;
+int T, X, N, M, Ki, Ai;
 int A[1005];
 
 int main() {
@@ -12,15 +12,11 @@ int main() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-	memset(A, 0, sizeof A);
-	std::cin >> T >> X >> N;
-	for (int i = 0; i < N; i++) {
-		std::cin >> Ki;
-		for (int k = 0; k < Ki; k++) {
-			std::cin >> Ai;
-			A[Ai]++;
-		}
+	std::cin >> X >> N;
+	for (int i = 1; i < N; i++) {
+		if (i & 1) X = (X / 2) ^ 6;
+		else X = (X * 2) ^ 6;
 	}
-	//std::cout << (A[X] == N ? "YES\n" : "NO\n");
+	std::cout << X << "\n";
 	return 0;
 }
