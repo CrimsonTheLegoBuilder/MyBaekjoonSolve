@@ -14,8 +14,8 @@ def cross(d1: tuple, d2: tuple, d3: tuple) -> Fraction:
 
 
 def intersection(p1_: tuple, p2_: tuple, q1_: tuple, q2_: tuple) -> tuple:
-    a1 = cross(q1_, q2_, p1_)
-    a2 = cross(q1_, q2_, p2_) * Fraction(-1, 1)
+    a1: Fraction = cross(q1_, q2_, p1_)
+    a2: Fraction = cross(q1_, q2_, p2_) * Fraction(-1, 1)
     x_: Fraction = p1_[0] * a2 + p2_[0] * a1
     y_: Fraction = p1_[1] * a2 + p2_[1] * a1
     den: Fraction = a1 + a2
