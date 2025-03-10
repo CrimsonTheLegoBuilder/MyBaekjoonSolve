@@ -12,62 +12,25 @@ const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const ld ERAD = 6370;
 const int LEN = 600 + 25;//nC2(25) + 25
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-ld norm(ld& th) {
-	while (th < 0) th += PI * 2;
-	while (th > PI * 2 - TOL) th -= PI * 2;
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return !sign(x); }
+inline ll sq(int x) { return (ll)x * x; }
+inline ld norm(ld th) {
+	while (th < 0) th += 2 * PI;
+	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
 	return th;
 }
+ld flip(ld lat) {
+	if (zero(lat - PI * .5) || zero(lat + PI * .5)) return 0;
+	if (zero(lat)) return PI * .5;
+	if (lat > 0) return PI * .5 - lat;
+	if (lat < 0) return -(PI * .5) - lat;
+	return INF;
+}
+ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
 int N, T, q;
 ld R, TH;
-ld adj[LEN][LEN], COST[LEN], G[25][25];
-struct Info {
-	int i;
-	ld c;
-	Info(int I = 0, ld C = 0) : i(I), c(C) {}
-	bool operator < (const Info& x) const { return zero(c - x.c) ? i < x.i : c > x.c; }
-};
-std::priority_queue<Info> Q;
-void dijkstra_adj(const int& v, const int& sz, const int& n = N) {
-	for (int i = 0; i < sz; i++) COST[i] = INF;
-	Q.push({ v, 0 });
-	COST[v] = 0;
-	while (Q.size()) {
-		Info p = Q.top(); Q.pop();
-		if (p.c > COST[p.i]) continue;
-		for (int i = 0; i < sz; i++) {
-			ld w = adj[p.i][i];
-			if (w > INF - 1) continue;
-			ld cost = p.c + w;
-			if (COST[i] > cost) {
-				COST[i] = cost;
-				Q.push({ i, cost });
-			}
-		}
-	}
-	for (int g = 0; g < n; g++) G[v][g] = COST[g];
-	return;
-}
-ld dijkstra(const int& v, const int& g, const int& sz, const ld& limit) {
-	for (int i = 0; i < sz; i++) COST[i] = INF;
-	Q.push({ v, 0 });
-	COST[v] = 0;
-	while (Q.size()) {
-		Info p = Q.top(); Q.pop();
-		if (p.c > COST[p.i]) continue;
-		for (int i = 0; i < sz; i++) {
-			ld w = G[p.i][i];
-			if (w > limit) continue;
-			ld cost = p.c + w;
-			if (COST[i] > cost) {
-				COST[i] = cost;
-				Q.push({ i, cost });
-			}
-		}
-	}
-	return COST[g];
-}
 struct Pos3D {
 	ld x, y, z;
 	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
@@ -151,158 +114,14 @@ bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, co
 	Pos3D X = a.unit();//X-axis
 	Pos3D Y = (perp / a).unit();//Y-axis
 	ld ang = angle(X, Y, b);
-	std::vector<Info> tmp = { { 0, 0 }, { 0, ang } };
-	std::vector<Pos3D> inxs;
-	for (int i = 0; i < N; i++) {//sweeping
-		if (acos(a * P[i]) < th + TOL && acos(b * P[i]) < th + TOL) return 1;
-		if (plane_circle_intersection(P[i], perp, th, inxs)) {
-			if (inxs.size() == 1) continue;
-			Pos3D axis = (P[i] / perp).unit();
-			Pos3D mid = (perp / axis).unit();
-			Pos3D hi = inxs[0], lo = inxs[1];
-			if (ccw(O, mid, lo, perp) > 0) std::swap(hi, lo);
-			ld h = angle(X, Y, hi), l = angle(X, Y, lo);
-			if (inner_check(a, b, lo, perp) &&
-				inner_check(a, b, hi, perp)) {
-				if (h < l) {
-					tmp.push_back({ 1, -INF });
-					tmp.push_back({ -1, l });
-					tmp.push_back({ 1, h });
-					tmp.push_back({ -1, INF });
-				}
-				else {
-					tmp.push_back({ 1, l });
-					tmp.push_back({ -1, h });
-				}
-			}
-			else if (inner_check(a, b, lo, perp)) {
-				if (h < 0) h += 2 * PI;
-				tmp.push_back({ 1, l });
-				tmp.push_back({ -1, h });
-			}
-			else if (inner_check(a, b, hi, perp)) {
-				if (l > 0) l -= 2 * PI;
-				tmp.push_back({ 1, l });
-				tmp.push_back({ -1, h });
-			}
-		}
-	}
-	std::sort(tmp.begin(), tmp.end());
-	int toggle = 0;
-	bool f = 0;
-	for (const Info& s : tmp) {
-		toggle -= s.i;
-		if (!s.i) f = !f;
-		if (f && toggle <= 0) return 0;
-	}
 	return 1;
-}
-void query() {
-	int s, t; ld c;
-	std::cin >> s >> t >> c;
-	ld ans = dijkstra(s - 1, t - 1, N, c);
-	if (ans > 1e16) std::cout << "impossible\n";
-	else std::cout << ans << "\n";
-	return;
-}
-void solve(const int& tc) {
-	std::cout << "Case " << tc << ":\n";
-	TH = R / ERAD;
-	pos.resize(N);
-	ld lon, lat;
-	for (int i = 0; i < N; i++)
-		std::cin >> lon >> lat, pos[i] = S2C(lon, lat);//unit
-
-	std::vector<Pos3D> inxs;
-	for (int i = 0; i < N; i++)
-		for (int j = i + 1; j < N; j++)
-			if (circle_intersection(pos[i], pos[j], TH, inxs))
-				for (const Pos3D& inx : inxs) pos.push_back(inx);
-
-	int sz = pos.size();
-	for (int i = 0; i < sz; i++) {
-		adj[i][i] = 0;
-		for (int j = 0; j < i; j++) {
-			if (connectable(pos, pos[i], pos[j], TH))
-				adj[i][j] = adj[j][i] = ERAD * acos(pos[i] * pos[j]);
-			else
-				adj[i][j] = adj[j][i] = INF;
-		}
-	}
-
-	for (int i = 0; i < N; i++) dijkstra_adj(i, sz);
-
-	std::cin >> q;
-	while (q--) query();
-	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(3);
-	T = 0;
-	while (std::cin >> N >> R) solve(++T);
+	std::cout.precision(9);
+
 	return;
 }
 int main() { solve(); return 0; }//boj4212 Shortest Flight Path
-
-
-//struct Seq {
-//	ld d; int i;
-//	Seq(ld D = 0, int I = 0) : d(D), i(I) {}
-//	bool operator < (const Seq& s) const { return zero(d - s.d) ? i < s.i : d < s.d; }
-//};
-//bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, const ld& th) {
-//	if (zero((a - b).mag())) return 1;
-//	if (zero((a + b).mag()) && R > ERAD * PI * .5 - TOL) return 1;
-//	Pos3D perp = (a / b).unit();
-//	Pos3D X = a.unit();//X-axis
-//	Pos3D Y = (perp / a).unit();//Y-axis
-//	ld ang = angle(X, Y, b);
-//	std::vector<Seq> tmp = { { 0, 0 }, { ang, 0 } };
-//	std::vector<Pos3D> inxs;
-//	for (int i = 0; i < N; i++) {
-//		if (acos(a * P[i]) < th + TOL && acos(b * P[i]) < th + TOL) return 1;
-//		if (plane_circle_intersection(P[i], perp, th, inxs)) {
-//			if (inxs.size() == 1) continue;
-//			Pos3D axis = (P[i] / perp).unit();
-//			Pos3D mid = (perp / axis).unit();
-//			Pos3D hi = inxs[0], lo = inxs[1];
-//			if (ccw(O, mid, lo - mid, perp) > 0) std::swap(hi, lo);
-//			ld h = angle(X, Y, hi), l = angle(X, Y, lo);
-//			if (inner_check(a, b, lo, perp) &&
-//				inner_check(a, b, hi, perp)) {
-//				if (h < l) {
-//					tmp.push_back({ -INF, -1 });
-//					tmp.push_back({ l, 1 });
-//					tmp.push_back({ h, -1 });
-//					tmp.push_back({ INF, 1 });
-//				}
-//				else {
-//					tmp.push_back({ l, -1 });
-//					tmp.push_back({ h, 1 });
-//				}
-//			}
-//			else if (inner_check(a, b, lo, perp)) {
-//				if (h < 0) h += 2 * PI;
-//				tmp.push_back({ l, -1 });
-//				tmp.push_back({ h, 1 });
-//			}
-//			else if (inner_check(a, b, hi, perp)) {
-//				if (l > 0) l -= 2 * PI;
-//				tmp.push_back({ l, -1 });
-//				tmp.push_back({ h, 1 });
-//			}
-//		}
-//	}
-//	std::sort(tmp.begin(), tmp.end());
-//	int toggle = 0;
-//	bool f = 0;
-//	for (const Seq& s : tmp) {
-//		toggle -= s.i;
-//		if (!s.i) f = !f;
-//		if (f && toggle <= 0) return 0;
-//	}
-//	return 1;
-//}
