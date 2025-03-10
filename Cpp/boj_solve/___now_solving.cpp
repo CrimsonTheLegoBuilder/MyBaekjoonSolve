@@ -138,6 +138,30 @@ bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, co
 	ld ang = angle(X, Y, b);
 	return 1;
 }
+ld sc[4];
+void update_sc(const Pos3D& p) {
+	ld angle1 = -atan2l(p.y, p.x);
+	ld dx = sqrtl(p.x * p.x + p.y * p.y);
+	ld angle2 = -atan2l(dx, p.z);
+	sc[0] = sinl(angle1);
+	sc[1] = cosl(angle1);
+	sc[2] = sinl(angle2);
+	sc[3] = cosl(angle2);
+	return;
+}
+Pos3D rotate(const Pos3D& p) {
+	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
+	return Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
+}
+Pos convert(Pos3D p, const Pos3D& v) { p = rotate(p - v); return Pos(p.x, p.y); }
+Pos convert(Pos3D q, const Pos3D& p, const Pos3D& v) { update_sc(p); return convert(q, v); }
+Pos3D recover(const Pos& p2D, const Pos3D& v) {
+	ld x = p2D.x * -sc[3];
+	ld y = p2D.y;
+	ld z = p2D.x * sc[2];
+	Pos3D p = Pos3D(x * -sc[1] + y * sc[0], x * sc[0] + y * sc[1], z);
+	return p + v;
+}
 bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
 	ld d = cos(r);
@@ -147,7 +171,9 @@ bool check(const Polyhedron& P, const ld& r) {
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
 			Pos3D cj = P[j] * d;
-			Polyhedron inxs = circle_intersection
+			Polyhedron inxs;
+			bool f = circle_intersection(ci, cj, r, inxs);
+
 		}
 		ld hi = 0;
 		for (const Pos& p : R) {
