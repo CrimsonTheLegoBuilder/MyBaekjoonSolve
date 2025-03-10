@@ -29,8 +29,30 @@ ld flip(ld lat) {
 }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 
+#define LO x
+#define HI y
+
 int N, T, q;
 ld R, TH;
+struct Pos {
+	ld x, y;
+	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
+	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
+	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
+	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
+	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
+	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
+	Pos rot(const ld& the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
+	ld Euc() const { return x * x + y * y; }
+	ld mag() const { return sqrt(Euc()); }
+	ld rad() const { return norm(atan2(y, x)); }
+	inline friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+	inline friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
+};
+typedef std::vector<Pos> Polygon;
 struct Pos3D {
 	ld x, y, z;
 	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
@@ -57,8 +79,8 @@ struct Pos3D {
 };
 const Pos3D O = { 0, 0, 0 };
 const Pos3D MAXP3D = { INF, INF, INF };
-std::vector<Pos3D> pos;
-Pos3D S2C(const ld& lon, const ld& lat) {//Spherical to Cartesian
+typedef std::vector<Pos3D> Polyhedron;
+Pos3D s2c(const ld& lon, const ld& lat) {//Spherical to Cartesian
 	ld phi = lon * PI / 180;
 	ld the = lat * PI / 180;
 	return Pos3D(cos(phi) * cos(the), sin(phi) * cos(the), sin(the));
@@ -116,12 +138,46 @@ bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, co
 	ld ang = angle(X, Y, b);
 	return 1;
 }
+bool check(const Polyhedron& P, const ld& r) {
+	int sz = P.size();
+	for (int i = 0; i < sz; i++) {
+		Polygon R;
+
+		for (int j = 0; j < sz; j++) {
+			if (j == i) continue;
+
+		}
+		ld hi = 0;
+		for (const Pos& p : R) {
+			if (hi < p.LO) return 0;
+			else hi = std::max(hi, p.HI);
+		}
+	}
+	return 1;
+}
+ld bi_search(const Polyhedron& P) {
+	ld s = TOL, e = PI;
+	int cnt = 50;
+	while (cnt--) {
+		ld m = (s + e) * .5;
+		if (check(P, m)) e = m;
+		else s = m;
+	}
+	return (s + e) * .5;
+}
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(9);
-
+	std::cin >> N;
+	Polyhedron P(N);
+	int lon, lat;
+	for (Pos3D& p : P) {
+		std::cin >> lat >> lon;
+		p = s2c(lon, lat);//unit
+	}
+	std::cout << bi_search(P) << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj4212 Shortest Flight Path
+int main() { solve(); return 0; }//boj3628
