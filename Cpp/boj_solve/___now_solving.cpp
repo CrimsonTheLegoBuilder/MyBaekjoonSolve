@@ -140,12 +140,14 @@ bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, co
 }
 bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
+	ld d = cos(r);
 	for (int i = 0; i < sz; i++) {
 		Polygon R;
-
+		Pos3D ci = P[i] * d;
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
-
+			Pos3D cj = P[j] * d;
+			Polyhedron inxs = circle_intersection
 		}
 		ld hi = 0;
 		for (const Pos& p : R) {
