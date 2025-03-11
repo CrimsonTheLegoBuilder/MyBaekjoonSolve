@@ -53,6 +53,10 @@ struct Pos {
 	inline friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 };
 typedef std::vector<Pos> Polygon;
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 struct Pos3D {
 	ld x, y, z;
 	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
@@ -153,7 +157,7 @@ Pos3D rotate(const Pos3D& p) {
 	ld x = p.x * sc[1] - p.y * sc[0], y = p.x * sc[0] + p.y * sc[1], z = p.z;
 	return Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
 }
-Pos convert(Pos3D p, const Pos3D& v) { p = rotate(p - v); return Pos(p.x, p.y); }
+Pos convert(Pos3D p, const Pos3D& v = Pos3D(0, 0, 0)) { p = rotate(p - v); return Pos(p.x, p.y); }
 Pos convert(Pos3D q, const Pos3D& p, const Pos3D& v) { update_sc(p); return convert(q, v); }
 Pos3D recover(const Pos& p2D, const Pos3D& v) {
 	ld x = p2D.x * -sc[3];
@@ -162,18 +166,51 @@ Pos3D recover(const Pos& p2D, const Pos3D& v) {
 	Pos3D p = Pos3D(x * -sc[1] + y * sc[0], x * sc[0] + y * sc[1], z);
 	return p + v;
 }
+Pos3D project(const Pos3D& p, const Pos3D& q) {
+	Pos3D v = q / p;
+	Pos3D prj = p / v;
+	return prj;
+}
+ld rad(const Pos3D& p, const Pos3D& q) { return (p * q) / p.mag(); }
+bool inner_check(const ld& r, const ld& t) {
+	ld s = r;
+	ld s = r;
+	return 1;
+}
 bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
 	ld d = cos(r);
 	for (int i = 0; i < sz; i++) {
 		Polygon R;
-		Pos3D ci = P[i] * d;
+		const Pos3D& p = P[i];
+		Pos3D ci = p * d;
+		update_sc(P[i]);
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
-			Pos3D cj = P[j] * d;
+			const Pos3D& q = P[j];
+			ld t = rad(p, q);
+			if (inner_check(r, t)) return 1;
+			Pos3D cj = q * d;
 			Polyhedron inxs;
 			bool f = circle_intersection(ci, cj, r, inxs);
-
+			if (inxs.size() == 2) {
+				Pos3D s = project(p, inxs[0]);
+				Pos3D e = project(p, inxs[1]);
+				Pos3D m_ = project(p, q);
+				Pos u = convert(s);
+				Pos v = convert(e);
+				Pos m = convert(m_);
+				if (ccw(m, u, v) > 0) std::swap(u, v);
+				ld lo = u.rad();
+				ld hi = v.rad();
+				if (hi < lo) {
+					R.push_back(Pos(lo, 2 * PI));
+					R.push_back(Pos(0, hi));
+				}
+				else {
+					R.push_back(Pos(lo, hi));
+				}
+			}
 		}
 		ld hi = 0;
 		for (const Pos& p : R) {
