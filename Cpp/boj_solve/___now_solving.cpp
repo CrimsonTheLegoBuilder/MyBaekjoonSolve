@@ -11,7 +11,7 @@ const ld INF = 1e17;
 const ld TOL = 1e-7;
 const ld PI = acos(-1);
 const ld ERAD = 6370;
-const int LEN = 600 + 25;//nC2(25) + 25
+const int LEN = 25;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
 inline ll sq(int x) { return (ll)x * x; }
@@ -184,11 +184,12 @@ bool check(const Polyhedron& P, const ld& r) {
 		const Pos3D& p = P[i];
 		Pos3D ci = p * d;
 		update_sc(P[i]);
+		bool f = 0;
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
 			const Pos3D& q = P[j];
 			ld t = rad(p, q);
-			if (inner_check(r, t)) return 1;
+			if (inner_check(r, t)) { f = 1; break; }
 			Pos3D cj = q * d;
 			Polyhedron inxs;
 			bool f = circle_intersection(ci, cj, r, inxs);
@@ -211,6 +212,7 @@ bool check(const Polyhedron& P, const ld& r) {
 				}
 			}
 		}
+		if (f) continue;
 		std::sort(R.begin(), R.end());
 		R.push_back(Pos(2 * PI, 2 * PI));
 		ld hi = 0;
