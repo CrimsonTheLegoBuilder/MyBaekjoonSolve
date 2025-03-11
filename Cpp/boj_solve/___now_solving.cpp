@@ -173,10 +173,8 @@ Pos3D project(const Pos3D& p, const Pos3D& q) {
 }
 ld rad(const Pos3D& p, const Pos3D& q) { return (p * q) / p.mag(); }
 bool inner_check(const ld& r, const ld& t) {
-	ld s = -r;
-	ld e = r;
-
-	return 1;
+	ld r_ = PI - r;
+	return t >= r_ * 2;
 }
 bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
@@ -222,7 +220,7 @@ bool check(const Polyhedron& P, const ld& r) {
 	return 1;
 }
 ld bi_search(const Polyhedron& P) {
-	ld s = TOL, e = PI;
+	ld s = TOL, e = PI - TOL;
 	int cnt = 50;
 	while (cnt--) {
 		ld m = (s + e) * .5;
@@ -239,10 +237,7 @@ void solve() {
 	std::cin >> N;
 	Polyhedron P(N);
 	int lon, lat;
-	for (Pos3D& p : P) {
-		std::cin >> lat >> lon;
-		p = s2c(lon, lat);//unit
-	}
+	for (Pos3D& p : P) { std::cin >> lat >> lon; p = s2c(lon, lat); }//unit
 	std::cout << bi_search(P) << "\n";
 	return;
 }
