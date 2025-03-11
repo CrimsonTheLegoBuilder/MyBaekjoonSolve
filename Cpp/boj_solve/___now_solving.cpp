@@ -173,8 +173,9 @@ Pos3D project(const Pos3D& p, const Pos3D& q) {
 }
 ld rad(const Pos3D& p, const Pos3D& q) { return (p * q) / p.mag(); }
 bool inner_check(const ld& r, const ld& t) {
-	ld s = r;
-	ld s = r;
+	ld s = -r;
+	ld e = r;
+
 	return 1;
 }
 bool check(const Polyhedron& P, const ld& r) {
