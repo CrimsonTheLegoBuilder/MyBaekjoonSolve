@@ -180,7 +180,7 @@ bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
 	ld d = cos(r);
 	for (int i = 0; i < sz; i++) {
-		Polygon R;
+		Polygon R = { Pos(0, 0) };
 		const Pos3D& p = P[i];
 		Pos3D ci = p * d;
 		update_sc(P[i]);
@@ -211,6 +211,8 @@ bool check(const Polyhedron& P, const ld& r) {
 				}
 			}
 		}
+		std::sort(R.begin(), R.end());
+		R.push_back(Pos(2 * PI, 2 * PI));
 		ld hi = 0;
 		for (const Pos& p : R) {
 			if (hi < p.LO) return 0;
