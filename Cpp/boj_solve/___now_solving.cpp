@@ -28,6 +28,7 @@ ld flip(ld lat) {
 	return INF;
 }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
+inline int fit(const int& x, const int& lo, const int& hi) { return std::max(lo, std::min(hi, x)); }
 
 #define LO x
 #define HI y
@@ -167,12 +168,13 @@ Pos3D recover(const Pos& p2D, const Pos3D& v) {
 	return p + v;
 }
 Pos3D project(const Pos3D& p, const Pos3D& q) {
-	Pos3D v = q / p;
-	Pos3D prj = p / v;
+	Pos3D v = (q / p).unit();
+	Pos3D prj = (p / v).unit();
 	return prj;
 }
-ld rad(const Pos3D& p, const Pos3D& q) { return (p * q) / p.mag(); }
+ld rad(const Pos3D& p, const Pos3D& q) { return norm(acos(fit((p * q) / q.mag(), -1, 1))); }
 bool inner_check(const ld& r, const ld& t) {
+	if (r < PI * .5) return 0;
 	ld r_ = PI - r;
 	return t >= r_ * 2;
 }
@@ -192,7 +194,7 @@ bool check(const Polyhedron& P, const ld& r) {
 			if (inner_check(r, t)) { f = 1; break; }
 			Pos3D cj = q * d;
 			Polyhedron inxs;
-			bool f = circle_intersection(ci, cj, r, inxs);
+			bool f0 = circle_intersection(ci, cj, r, inxs);
 			if (inxs.size() == 2) {
 				Pos3D s = project(p, inxs[0]);
 				Pos3D e = project(p, inxs[1]);
@@ -211,6 +213,7 @@ bool check(const Polyhedron& P, const ld& r) {
 					R.push_back(Pos(lo, hi));
 				}
 			}
+			std::cout << "FUCK::\n";
 		}
 		if (f) continue;
 		std::sort(R.begin(), R.end());
@@ -230,6 +233,7 @@ ld bi_search(const Polyhedron& P) {
 		ld m = (s + e) * .5;
 		if (check(P, m)) e = m;
 		else s = m;
+		//std::cout << "FUCK::\n";
 	}
 	return (s + e) * .5;
 }
