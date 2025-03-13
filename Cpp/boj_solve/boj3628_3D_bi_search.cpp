@@ -3,38 +3,26 @@
 #include <vector>
 #include <queue>
 #include <cmath>
-//#include <cstring>
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
 const ld TOL = 1e-13;
 const ld PI = acos(-1);
-const ld ERAD = 6370;
 const int LEN = 25;
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
-inline ll sq(int x) { return (ll)x * x; }
 inline ld norm(ld th) {
 	while (th < 0) th += 2 * PI;
 	while (sign(th - 2 * PI) >= 0) th -= 2 * PI;
 	return th;
 }
-ld flip(ld lat) {
-	if (zero(lat - PI * .5) || zero(lat + PI * .5)) return 0;
-	if (zero(lat)) return PI * .5;
-	if (lat > 0) return PI * .5 - lat;
-	if (lat < 0) return -(PI * .5) - lat;
-	return INF;
-}
-ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
 inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::max(lo, std::min(hi, x)); }
 
 #define LO x
 #define HI y
 
-int N, T, q;
-ld R, TH;
+int N;
 struct Pos {
 	ld x, y;
 	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
@@ -42,8 +30,8 @@ struct Pos {
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const ld& scalar) const { return { x * scalar, y * scalar }; }
-	Pos operator / (const ld& scalar) const { return { x / scalar, y / scalar }; }
+	Pos operator * (const ld& n) const { return { x * n, y * n }; }
+	Pos operator / (const ld& n) const { return { x / n, y / n }; }
 	ld operator * (const Pos& p) const { return x * p.x + y * p.y; }
 	ld operator / (const Pos& p) const { return x * p.y - y * p.x; }
 	Pos rot(const ld& the) const { return Pos(x * cos(the) - y * sin(the), x * sin(the) + y * cos(the)); }
@@ -55,15 +43,10 @@ struct Pos {
 };
 typedef std::vector<Pos> Polygon;
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 struct Pos3D {
 	ld x, y, z;
-	Pos3D(ld X = 0, ld Y = 0, ld Z = 0) : x(X), y(Y), z(Z) {}
-	//bool operator == (const Pos3D& p) const { return zero(x - p.x) && zero(y - p.y) && zero(z - p.z); }
-	//bool operator != (const Pos3D& p) const { return !zero(x - p.x) || !zero(y - p.y) || !zero(z - p.z); }
-	//bool operator < (const Pos3D& p) const { return zero(x - p.x) ? zero(y - p.y) ? z < p.z : y < p.y : x < p.x; }
+	Pos3D(ld x_ = 0, ld y_ = 0, ld z_ = 0) : x(x_), y(y_), z(z_) {}
 	ld operator * (const Pos3D& p) const { return x * p.x + y * p.y + z * p.z; }
 	Pos3D operator / (const Pos3D& p) const {
 		Pos3D ret;
@@ -74,16 +57,12 @@ struct Pos3D {
 	}
 	Pos3D operator + (const Pos3D& p) const { return { x + p.x, y + p.y, z + p.z }; }
 	Pos3D operator - (const Pos3D& p) const { return { x - p.x, y - p.y, z - p.z }; }
-	Pos3D operator * (const ld& scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-	Pos3D operator / (const ld& scalar) const { return { x / scalar, y / scalar, z / scalar }; }
-	//Pos3D& operator += (const Pos3D& p) { x += p.x; y += p.y; z += p.z; return *this; }
-	//Pos3D& operator *= (const ld& scalar) { x *= scalar; y *= scalar; z *= scalar; return *this; }
+	Pos3D operator * (const ld& n) const { return { x * n, y * n, z * n }; }
+	Pos3D operator / (const ld& n) const { return { x / n, y / n, z / n }; }
 	ld Euc() const { return x * x + y * y + z * z; }
 	ld mag() const { return sqrtl(Euc()); }
 	Pos3D unit() const { return *this / mag(); }
-};
-const Pos3D O = { 0, 0, 0 };
-const Pos3D MAXP3D = { INF, INF, INF };
+}; const Pos3D O = { 0, 0, 0 };
 typedef std::vector<Pos3D> Polyhedron;
 Pos3D s2c(const ld& lon, const ld& lat) {//Spherical to Cartesian
 	ld phi = lon * PI / 180;
@@ -103,16 +82,6 @@ bool circle_intersection(const Pos3D& a, const Pos3D& b, const ld& th, std::vect
 	if (!zero(ratio)) inxs.push_back(w - h);
 	return 1;
 }
-Pos3D point(const Pos3D Xaxis, const Pos3D Yaxis, const ld& th) {
-	return Xaxis * cos(th) + Yaxis * sin(th);
-}
-ld angle(const Pos3D Xaxis, const Pos3D Yaxis, const Pos3D& p) {
-	ld X = Xaxis * p;
-	ld Y = Yaxis * p;
-	ld th = atan2(Y, X);
-	return th;
-}
-Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
 ld sc[4];
 void update_sc(const Pos3D& p) {
 	ld angle1 = -atan2l(p.y, p.x);
@@ -131,8 +100,7 @@ Pos3D rotate(const Pos3D& p) {
 Pos convert(Pos3D p, const Pos3D& v = Pos3D(0, 0, 0)) { p = rotate(p - v); return Pos(p.x, p.y); }
 Pos3D project(const Pos3D& p, const Pos3D& q) {
 	Pos3D v = (q / p).unit();
-	Pos3D prj = (p / v).unit();
-	return prj;
+	return (p / v).unit();
 }
 ld rad(const Pos3D& p, const Pos3D& q) { return norm(acos(fit((p * q) / q.mag(), -1, 1))); }
 bool inner_check(const ld& r, const ld& t) {
@@ -143,57 +111,37 @@ bool inner_check(const ld& r, const ld& t) {
 bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
 	ld d = cos(r);
-	//std::cout << "\nr:: " << r << " ";
-	//std::cout << "d:: " << d << "\n";
 	for (int i = 0; i < sz; i++) {
 		Polygon R = { Pos(0, 0) };
 		const Pos3D& p = P[i];
-		//Pos3D ci = p * d;
 		update_sc(P[i]);
 		bool f = 0;
-		//std::cout << "i:: " << i << "\n";
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
 			const Pos3D& q = P[j];
 			ld t = rad(p, q);
-			//std::cout << "t:: " << t << "\n";
-			//std::cout << "p*q:: " << p * q << "\n";
-			//std::cout << "q.mag:: " << q.mag() << "\n";
-			//std::cout << "cos:: " << (p * q) / q.mag() << "\n";
-			//std::cout << "acos:: " << acos((p * q) / q.mag()) << "\n";
-			//std::cout << "rad(p, q):: " << rad(p, q) * 180 / PI << "\n";
 			if (inner_check(r, t)) { f = 1; break; }
-			//Pos3D cj = q * d;
 			Polyhedron inxs;
-			bool f0 = circle_intersection(p, q, r, inxs);
+			circle_intersection(p, q, r, inxs);
 			if (inxs.size() == 2) {
-				//std::cout << "2:: FUCK::\n";
 				Pos3D s = project(p, inxs[0]);
 				Pos3D e = project(p, inxs[1]);
 				Pos3D m_ = project(p, q);
 				Pos u = convert(s);
 				Pos v = convert(e);
 				Pos m = convert(m_);
-				//std::cout << "cross:: " << cross(m, u, v) << "\n";
 				if (ccw(m, u, v) == 0) continue;
 				if (ccw(m, u, v) > 0) std::swap(u, v);
 				ld lo = u.rad();
 				ld hi = v.rad();
-				//std::cout << "lo:: " << lo << " hi:: " << hi << " ";
-				//std::cout << "m:: " << m.rad() << "\n";
 				if (hi < lo) {
-					//std::cout << "rvs::\n";
 					R.push_back(Pos(lo, 2 * PI));
 					R.push_back(Pos(0, hi));
 				}
-				else {
-					R.push_back(Pos(lo, hi));
-				}
+				else R.push_back(Pos(lo, hi));
+				
 			}
-			//std::cout << "FUCK::\n";
 		}
-		//std::cout << "SWEEP::\n";
-		//std::cout << "f:: " << f << "\n";
 		if (f) continue;
 		std::sort(R.begin(), R.end());
 		R.push_back(Pos(2 * PI, 2 * PI));
@@ -202,7 +150,6 @@ bool check(const Polyhedron& P, const ld& r) {
 			if (hi < p.LO) return 0;
 			else hi = std::max(hi, p.HI);
 		}
-		//std::cout << "good::\n";
 	}
 	return 1;
 }
