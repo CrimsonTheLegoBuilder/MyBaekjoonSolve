@@ -208,7 +208,7 @@ bool check(const Polyhedron& P, const ld& r) {
 }
 ld bi_search(const Polyhedron& P) {
 	ld s = TOL, e = PI - TOL;
-	int cnt = 50;
+	int cnt = 25;
 	while (cnt--) {
 		ld m = (s + e) * .5;
 		if (check(P, m)) e = m;
@@ -220,7 +220,9 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(30);
+	std::cout.precision(9);
+	//freopen("knockdown.in", "r", stdin);
+	//freopen("knockdown.out", "w", stdout);
 	std::cin >> N;
 	Polyhedron P(N);
 	int lon, lat;
