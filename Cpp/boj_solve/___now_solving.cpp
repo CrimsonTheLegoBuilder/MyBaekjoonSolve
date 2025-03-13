@@ -181,14 +181,15 @@ bool inner_check(const ld& r, const ld& t) {
 bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
 	ld d = cos(r);
-	//std::cout << "r:: " << r << " ";
-	//std::cout << "d:: " << d << "\n";
+	std::cout << "r:: " << r << " ";
+	std::cout << "d:: " << d << "\n";
 	for (int i = 0; i < sz; i++) {
 		Polygon R = { Pos(0, 0) };
 		const Pos3D& p = P[i];
 		//Pos3D ci = p * d;
 		update_sc(P[i]);
 		bool f = 0;
+		std::cout << "i:: " << i << "\n";
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
 			const Pos3D& q = P[j];    
@@ -204,6 +205,7 @@ bool check(const Polyhedron& P, const ld& r) {
 			Polyhedron inxs;
 			bool f0 = circle_intersection(p, q, r, inxs);
 			if (inxs.size() == 2) {
+				std::cout << "2:: FUCK::\n";
 				Pos3D s = project(p, inxs[0]);
 				Pos3D e = project(p, inxs[1]);
 				Pos3D m_ = project(p, q);
@@ -223,7 +225,8 @@ bool check(const Polyhedron& P, const ld& r) {
 			}
 			//std::cout << "FUCK::\n";
 		}
-		//std::cout << "SWEEP::\n";
+		std::cout << "SWEEP::\n";
+		std::cout << "f:: " << f << "\n";
 		if (f) continue;
 		std::sort(R.begin(), R.end());
 		R.push_back(Pos(2 * PI, 2 * PI));
