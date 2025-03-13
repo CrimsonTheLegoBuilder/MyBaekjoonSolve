@@ -103,19 +103,6 @@ bool circle_intersection(const Pos3D& a, const Pos3D& b, const ld& th, std::vect
 	if (!zero(ratio)) inxs.push_back(w - h);
 	return 1;
 }
-bool plane_circle_intersection(const Pos3D& a, const Pos3D& perp, const ld& th, std::vector<Pos3D>& inxs) {
-	inxs.clear();
-	Pos3D vec = a - (perp * (perp * a));
-	if (zero(vec.mag())) return 0;
-	ld x = cos(th) / vec.mag();
-	if (x < -1 || 1 < x) return 0;
-	Pos3D w = vec.unit() * x;
-	ld ratio = sqrtl(1 - x * x);
-	Pos3D h = (vec.unit() / perp) * ratio;
-	inxs.push_back(w + h);
-	if (!zero(ratio)) inxs.push_back(w - h);
-	return 1;
-}
 Pos3D point(const Pos3D Xaxis, const Pos3D Yaxis, const ld& th) {
 	return Xaxis * cos(th) + Yaxis * sin(th);
 }
@@ -126,23 +113,6 @@ ld angle(const Pos3D Xaxis, const Pos3D Yaxis, const Pos3D& p) {
 	return th;
 }
 Pos3D cross(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3) { return (d2 - d1) / (d3 - d2); }
-int ccw(const Pos3D& d1, const Pos3D& d2, const Pos3D& d3, const Pos3D& norm) {
-	Pos3D CCW = cross(d1, d2, d3);
-	ld ret = CCW * norm;
-	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-}
-bool inner_check(const Pos3D& d1, const Pos3D& d2, const Pos3D& t, const Pos3D& nrm) {
-	return ccw(O, d1, t, nrm) >= 0 && ccw(O, d2, t, nrm) <= 0;
-}
-bool connectable(const std::vector<Pos3D>& P, const Pos3D& a, const Pos3D& b, const ld& th) {
-	if (zero((a - b).mag())) return 1;
-	if (zero((a + b).mag()) && R > ERAD * PI * .5 - TOL) return 1;
-	Pos3D perp = (a / b).unit();
-	Pos3D X = a.unit();//X-axis
-	Pos3D Y = (perp / a).unit();//Y-axis
-	ld ang = angle(X, Y, b);
-	return 1;
-}
 ld sc[4];
 void update_sc(const Pos3D& p) {
 	ld angle1 = -atan2l(p.y, p.x);
@@ -159,14 +129,6 @@ Pos3D rotate(const Pos3D& p) {
 	return Pos3D(z * sc[2] + x * sc[3], y, z * sc[3] - x * sc[2]);
 }
 Pos convert(Pos3D p, const Pos3D& v = Pos3D(0, 0, 0)) { p = rotate(p - v); return Pos(p.x, p.y); }
-Pos convert(Pos3D q, const Pos3D& p, const Pos3D& v) { update_sc(p); return convert(q, v); }
-Pos3D recover(const Pos& p2D, const Pos3D& v) {
-	ld x = p2D.x * -sc[3];
-	ld y = p2D.y;
-	ld z = p2D.x * sc[2];
-	Pos3D p = Pos3D(x * -sc[1] + y * sc[0], x * sc[0] + y * sc[1], z);
-	return p + v;
-}
 Pos3D project(const Pos3D& p, const Pos3D& q) {
 	Pos3D v = (q / p).unit();
 	Pos3D prj = (p / v).unit();
@@ -251,7 +213,6 @@ ld bi_search(const Polyhedron& P) {
 		ld m = (s + e) * .5;
 		if (check(P, m)) e = m;
 		else s = m;
-		//std::cout << "FUCK::\n";
 	}
 	return (s + e) * .5;
 }
@@ -268,17 +229,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj3628
-
-/*
-
-2
-0 0
-0 45
-2.356194490
-
-2
-0 0
-0 90
-2.356194490
-
-*/
