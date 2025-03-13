@@ -8,7 +8,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 const ld INF = 1e17;
-const ld TOL = 1e-7;
+const ld TOL = 1e-13;
 const ld PI = acos(-1);
 const ld ERAD = 6370;
 const int LEN = 25;
@@ -181,15 +181,15 @@ bool inner_check(const ld& r, const ld& t) {
 bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
 	ld d = cos(r);
-	std::cout << "r:: " << r << " ";
-	std::cout << "d:: " << d << "\n";
+	//std::cout << "\nr:: " << r << " ";
+	//std::cout << "d:: " << d << "\n";
 	for (int i = 0; i < sz; i++) {
 		Polygon R = { Pos(0, 0) };
 		const Pos3D& p = P[i];
 		//Pos3D ci = p * d;
 		update_sc(P[i]);
 		bool f = 0;
-		std::cout << "i:: " << i << "\n";
+		//std::cout << "i:: " << i << "\n";
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
 			const Pos3D& q = P[j];    
@@ -205,17 +205,22 @@ bool check(const Polyhedron& P, const ld& r) {
 			Polyhedron inxs;
 			bool f0 = circle_intersection(p, q, r, inxs);
 			if (inxs.size() == 2) {
-				std::cout << "2:: FUCK::\n";
+				//std::cout << "2:: FUCK::\n";
 				Pos3D s = project(p, inxs[0]);
 				Pos3D e = project(p, inxs[1]);
 				Pos3D m_ = project(p, q);
 				Pos u = convert(s);
 				Pos v = convert(e);
 				Pos m = convert(m_);
+				//std::cout << "cross:: " << cross(m, u, v) << "\n";
+				if (ccw(m, u, v) == 0) continue;
 				if (ccw(m, u, v) > 0) std::swap(u, v);
 				ld lo = u.rad();
 				ld hi = v.rad();
+				//std::cout << "lo:: " << lo << " hi:: " << hi << " ";
+				//std::cout << "m:: " << m.rad() << "\n";
 				if (hi < lo) {
+					//std::cout << "rvs::\n";
 					R.push_back(Pos(lo, 2 * PI));
 					R.push_back(Pos(0, hi));
 				}
@@ -225,8 +230,8 @@ bool check(const Polyhedron& P, const ld& r) {
 			}
 			//std::cout << "FUCK::\n";
 		}
-		std::cout << "SWEEP::\n";
-		std::cout << "f:: " << f << "\n";
+		//std::cout << "SWEEP::\n";
+		//std::cout << "f:: " << f << "\n";
 		if (f) continue;
 		std::sort(R.begin(), R.end());
 		R.push_back(Pos(2 * PI, 2 * PI));
@@ -235,6 +240,7 @@ bool check(const Polyhedron& P, const ld& r) {
 			if (hi < p.LO) return 0;
 			else hi = std::max(hi, p.HI);
 		}
+		//std::cout << "good::\n";
 	}
 	return 1;
 }
@@ -253,7 +259,7 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
+	std::cout.precision(30);
 	std::cin >> N;
 	Polyhedron P(N);
 	int lon, lat;
