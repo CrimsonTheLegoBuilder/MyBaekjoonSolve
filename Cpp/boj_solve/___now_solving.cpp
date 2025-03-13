@@ -28,7 +28,7 @@ ld flip(ld lat) {
 	return INF;
 }
 ll gcd(ll a, ll b) { return !b ? a : gcd(b, a % b); }
-inline int fit(const int& x, const int& lo, const int& hi) { return std::max(lo, std::min(hi, x)); }
+inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::max(lo, std::min(hi, x)); }
 
 #define LO x
 #define HI y
@@ -181,20 +181,28 @@ bool inner_check(const ld& r, const ld& t) {
 bool check(const Polyhedron& P, const ld& r) {
 	int sz = P.size();
 	ld d = cos(r);
+	//std::cout << "r:: " << r << " ";
+	//std::cout << "d:: " << d << "\n";
 	for (int i = 0; i < sz; i++) {
 		Polygon R = { Pos(0, 0) };
 		const Pos3D& p = P[i];
-		Pos3D ci = p * d;
+		//Pos3D ci = p * d;
 		update_sc(P[i]);
 		bool f = 0;
 		for (int j = 0; j < sz; j++) {
 			if (j == i) continue;
-			const Pos3D& q = P[j];
+			const Pos3D& q = P[j];    
 			ld t = rad(p, q);
+			//std::cout << "t:: " << t << "\n";
+			//std::cout << "p*q:: " << p * q << "\n";
+			//std::cout << "q.mag:: " << q.mag() << "\n";
+			//std::cout << "cos:: " << (p * q) / q.mag() << "\n";
+			//std::cout << "acos:: " << acos((p * q) / q.mag()) << "\n";
+			//std::cout << "rad(p, q):: " << rad(p, q) * 180 / PI << "\n";
 			if (inner_check(r, t)) { f = 1; break; }
-			Pos3D cj = q * d;
+			//Pos3D cj = q * d;
 			Polyhedron inxs;
-			bool f0 = circle_intersection(ci, cj, r, inxs);
+			bool f0 = circle_intersection(p, q, r, inxs);
 			if (inxs.size() == 2) {
 				Pos3D s = project(p, inxs[0]);
 				Pos3D e = project(p, inxs[1]);
@@ -213,8 +221,9 @@ bool check(const Polyhedron& P, const ld& r) {
 					R.push_back(Pos(lo, hi));
 				}
 			}
-			std::cout << "FUCK::\n";
+			//std::cout << "FUCK::\n";
 		}
+		//std::cout << "SWEEP::\n";
 		if (f) continue;
 		std::sort(R.begin(), R.end());
 		R.push_back(Pos(2 * PI, 2 * PI));
@@ -250,3 +259,17 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj3628
+
+/*
+
+2
+0 0
+0 45
+2.356194490
+
+2
+0 0
+0 90
+2.356194490
+
+*/
