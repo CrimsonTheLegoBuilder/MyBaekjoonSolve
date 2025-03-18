@@ -1659,6 +1659,9 @@
     <ClCompile Include="___now_solving.cpp">
       <Filter>소스 파일\___now_solving</Filter>
     </ClCompile>
+    <ClCompile Include="boj5418_3Dgeo.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">

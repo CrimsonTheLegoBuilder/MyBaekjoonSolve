@@ -173,16 +173,40 @@ std::vector<Face> convex_hull_3D(std::vector<Pos3D>& candi) {//incremental const
 	return hull3D;
 }
 void query() {
-
+	int x1, y1, x2, y2, h;
+	std::cin >> x1 >> y1 >> x2 >> y2;
+	std::cin >> N;
+	ld G = 1. * (x2 - x1) * (y2 - y1);
+	if (!N) {
+		std::cout << G << "\n";
+		return;
+	}
+	C3D.resize(N * 4 + 4);
+	C3D[N * 4 + 0] = Pos3D(x1, y1, 0);
+	C3D[N * 4 + 1] = Pos3D(x1, y2, 0);
+	C3D[N * 4 + 2] = Pos3D(x2, y2, 0);
+	C3D[N * 4 + 3] = Pos3D(x2, y1, 0);
+	for (int i = 0; i < N; i++) {
+		std::cin >> x1 >> y1 >> x2 >> y2 >> h;
+		C3D[i * 4 + 0] = Pos3D(x1, y1, h);
+		C3D[i * 4 + 1] = Pos3D(x1, y2, h);
+		C3D[i * 4 + 2] = Pos3D(x2, y2, h);
+		C3D[i * 4 + 3] = Pos3D(x2, y1, h);
+	}
+	Hull3D = convex_hull_3D(C3D);
+	if (col || cop) { std::cout << "err\n"; return; }
+	ld suf = 0;
+	for (const Face& F : Hull3D) suf += F.norm(C3D).mag() * .5;
+	std::cout << suf - G << "\n";
 	return;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(9);
+	std::cout.precision(4);
 	std::cin >> Q;
 	while (Q--) query();
 	return;
 }
-int main() { solve(); return 0; }//boj5774-dijk
+int main() { solve(); return 0; }//boj5418 Giant Cover
