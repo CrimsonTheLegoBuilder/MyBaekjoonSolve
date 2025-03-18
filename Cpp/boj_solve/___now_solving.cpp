@@ -31,4 +31,4 @@ void solve() {
 	while (Q--) query();
 	return;
 }
-int main() { solve(); return 0; }//boj30839
+int main() { solve(); return 0; }//boj30839 29688
