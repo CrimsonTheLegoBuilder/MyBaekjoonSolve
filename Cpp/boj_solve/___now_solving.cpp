@@ -8,6 +8,7 @@
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
+typedef std::vector<int> Vint;
 const ld INF = 1e17;
 const ld TOL = 1e-9;
 const ld PI = acos(-1);
@@ -18,11 +19,12 @@ inline bool zero(const ld& x) { return !sign(x); }
 
 #define LOWER 1
 #define UPPER -1
-#define LEFT 1
-#define RIGHT -1
+#define LEFT 0
+#define RIGHT 1
 
 int N, K, Q;
-ld X1, X2, Y1, Y2;
+int X[LEN][2];
+ll W[LEN];
 struct Pos {
 	int x, y;
 	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
@@ -57,7 +59,7 @@ Polygon half_monotone_chain(Polygon& C, int f = LEFT) {
 	if (f == RIGHT) std::reverse(C.begin(), C.end());
 	//C.erase(unique(C.begin(), C.end()), C.end());
 	if (C.size() <= 2) {
-		assert(0);
+		//assert(0);
 		for (const Pos& pos : C) H.push_back(pos);
 		return H;
 	}
@@ -68,7 +70,7 @@ Polygon half_monotone_chain(Polygon& C, int f = LEFT) {
 	}
 	int sz = H.size();
 	if (H[sz - 2].x == H[sz - 1].x) H.pop_back();
-	if (f == RIGHT) std::reverse(H.begin(), H.end());
+	//if (f == RIGHT) std::reverse(H.begin(), H.end());
 	return H;
 }
 Pos idx_bi_search(const Polygon& H, const int& y) {
@@ -84,9 +86,19 @@ Pos idx_bi_search(const Polygon& H, const int& y) {
 	}
 	return Pos(s - 1, s);
 }
-int check(const Polygon& r, const Pos& ir, const Polygon& l, const Pos& il, ld& t) {
+ld get_x(const Pos& p, const Pos& q, const ld& y) {
+	assert(p.y <= y && y <= q.y);
+	int dy = q.y - p.y;
+	int dx = q.x - p.x;
+	ld x = p.x + (y * (1. * dx / dy));
+	return x;
+}
+int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const Polygon& l, const Pos& il, ld& t) {
 	int szr = r.size(), szl = l.size();
 	if (ir.y == -1 && il.y == -1) {
+		ll xr = W[ri] - (X[ri][RIGHT] - r[ir.x].x);
+		ll xl = W[li] - (l[il.x].x - X[li][LEFT]);
+		t = xr + xl;
 		if (ir.x == 0) {
 			assert(il.x == 0);
 			return ccw(r[0], r[1], l[0], l[1]);
@@ -114,7 +126,13 @@ int check(const Polygon& r, const Pos& ir, const Polygon& l, const Pos& il, ld& 
 	if (ir.y == -1) {
 		assert(ir.x > 0);
 		Pos l0 = l[il.x], l1 = l[il.y];
-		if (ir.x == szr - 1) return ccw(r[ir.x - 1], r[ir.x], l0, l1) * -1;
+		ll xr = W[ri] - (X[ri][RIGHT] - r[ir.x].x);
+		ld x_ = get_x(l0, l1, r[ir.x].y);
+		ld xl = W[li] - (x_ - X[li][LEFT]);
+		t = xr + xl;
+		if (ir.x == szr - 1) {
+			return ccw(r[ir.x - 1], r[ir.x], l0, l1) * -1;
+		}
 		Pos r0 = r[ir.x - 1], r1 = r[ir.x], r2 = r[ir.x + 1];
 		if (ccw(l0, l1, r1, r2) >= 0 && ccw(l0, l1, r1, r0) >= 0) return 0;
 		if (ccw(l0, l1, r1, r2) < 0) return 1;
@@ -125,7 +143,13 @@ int check(const Polygon& r, const Pos& ir, const Polygon& l, const Pos& il, ld& 
 	if (il.y == -1) {
 		assert(il.x > 0);
 		Pos r0 = r[ir.x], r1 = r[ir.y];
-		if (il.x == szl - 1) return ccw(r0, r1, l[il.x - 1], l[il.x]) * -1;
+		ll xl = W[li] - (l[il.x].x - X[li][LEFT]);
+		ld x_ = get_x(r0, r1, l[il.x].y);
+		ld xr = W[ri] - (X[ri][RIGHT] - x_);
+		t = xr + xl;
+		if (il.x == szl - 1) {
+			return ccw(r0, r1, l[il.x - 1], l[il.x]) * -1;
+		}
 		Pos l0 = l[il.x - 1], l1 = l[il.x], l2 = l[il.x + 1];
 		if (ccw(r0, r1, l1, l2) <= 0 && ccw(r0, r1, l1, l0) <= 0) return 0;
 		if (ccw(r0, r1, l1, l2) > 0) return 1;
@@ -136,22 +160,21 @@ int check(const Polygon& r, const Pos& ir, const Polygon& l, const Pos& il, ld& 
 	assert(0);
 	return 0;
 }
-ld bi_search(const Polygon& r, const Polygon& l) {
+ld bi_search(const int& ri, const Polygon& r, const int& li, const Polygon& l) {
 	int szr = r.size(), szl = l.size();
 	int yr = r[szr - 1].y, yl = l[szl - 1].y;
-	ld t;
+	ld t = -1;
 	if (yr >= yl) {
 		int s = 0, e = szr - 1;
 		while (s < e) {
 			int m = s + e >> 1;
 			Pos il = idx_bi_search(l, m);
 			Pos ir = Pos(m, -1);
-			int f = check(r, ir, l, il, t);
+			int f = check(ri, r, ir, li, l, il, t);
 			if (!f) return t;
 			else if (f > 0) e = m;
 			else s = m + 1;
 		}
-		return 0;
 	}
 	else {
 		int s = 0, e = szl - 1;
@@ -159,22 +182,22 @@ ld bi_search(const Polygon& r, const Polygon& l) {
 			int m = s + e >> 1;
 			Pos ir = idx_bi_search(r, m);
 			Pos il = Pos(m, -1);
-			int f = check(r, ir, l, il, t);
+			int f = check(ri, r, ir, li, l, il, t);
 			if (!f) return t;
-			else if (f > 0) e = m;
-			else s = m + 1;
+			else if (f > 0) s = m + 1;
+			else e = m;
 		}
-		return 0;
 	}
-	assert(0);
+	std::cout << "err:: " << t << " ::what the fuck!!!\n";
+	//assert(0);
 	return -1;
 }
 void query() {
 	int ic, jc;
 	std::cin >> ic >> jc;
 	ic--; jc--;
-	ld d1 = bi_search(R[ic], L[jc]);
-	ld d2 = bi_search(R[jc], L[ic]);
+	ld d1 = bi_search(ic, R[ic], jc, L[jc]);
+	ld d2 = bi_search(jc, R[jc], ic, L[ic]);
 	std::cout << std::min(d1, d2) << "\n";
 	return;
 }
@@ -188,8 +211,11 @@ void solve() {
 		std::cin >> K;
 		Polygon C(K);
 		int y = INF;
+		int x1 = INF, x2 = -INF;
 		for (Pos& p : C) std::cin >> p, y = std::min(y, p.y);
-		for (Pos& p : C) p.y -= y;
+		for (Pos& p : C) p.y -= y, x1 = std::min(x1, p.x), x2 = std::max(x2, p.x);
+		X[i][LEFT] = x1; X[i][RIGHT] = x2;
+		W[i] = x2 - x1;
 		L[i] = half_monotone_chain(C, LEFT);
 		R[i] = half_monotone_chain(C, RIGHT);
 		if (L[i].back().y == L[i][L[i].size() - 2].y) L[i].pop_back();
