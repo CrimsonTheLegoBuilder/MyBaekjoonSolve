@@ -67,73 +67,34 @@ Polygon half_monotone_chain(Polygon& C, int f = LEFT) {
 	if (f == RIGHT) std::reverse(H.begin(), H.end());
 	return H;
 }
-Pos idx_bi_search(const Polygon& H, const ld& x) {
-	int s = 1, e = H.size() - 1;
-	if (H[1].x > x) return 0;
-	if (H[2].x > x) return 1;
-	if (!sign(H.back().x - x)) return e;
+Pos idx_bi_search(const Polygon& H, const int& y) {
+	int s = 0, e = H.size() - 1;
+	assert(y >= 0);
+	if (y == 0) return Pos(0, -1);
+	if (y < H[1].y) return Pos(0, 1);
 	while (s < e) {
-		int m = s + e + 1 >> 1;//refer to tourist
-		if (sign(H[m].x - x) == 0) return m;
-		if (sign(H[m].x - x) < 0) s = m;
-		else e = m - 1;
+		int m = s + e >> 1;
+		if (H[m].y == y) return Pos(m, -1);
+		if (H[m].y < y) s = m + 1;
+		else e = m;
 	}
-	return s;
+	return Pos(s - 1, s);
 }
-//ld height_search(const ld& x, const ld& w) {
-//	auto cal_y = [&](const Polygon& V, const int i, const ld& x_) -> ld {
-//		if (zero(V[i].x - x_)) return V[i].y;
-//		int nxt = std::min(i + 1, (int)V.size() - 1);
-//		ll den = V[nxt].x - V[i].x;
-//		ll num = V[nxt].y - V[i].y;
-//		return (ld)V[i].y + (x_ - V[i].x) * (ld)num / den;;
-//		};
-//	int l1, l2, u1, u2;
-//	ld x1 = x, x2 = x + w;
-//	l1 = idx_bi_search(L, x1);
-//	l2 = idx_bi_search(L, x2);
-//	u1 = idx_bi_search(U, x1);
-//	u2 = idx_bi_search(U, x2);
-//	ld y1 = cal_y(L, l1, x1);
-//	ld y2 = cal_y(U, u1, x1);
-//	ld y3 = cal_y(L, l2, x2);
-//	ld y4 = cal_y(U, u2, x2);
-//	ld yu = std::min(y2, y4), yl = std::max(y1, y3);
-//	X1 = x, X2 = x + w, Y1 = yl, Y2 = yu;
-//	return std::max(yu - yl, (ld)0);
-//}
-//ld area_ternary_search(const ld& w) {
-//	ld s = L[0].x, e = L.back().x - w;
-//	ld x1, x2;
-//	//while (sign(e - s) > 0) {
-//	int cnt = 50; while (cnt--) {
-//		x1 = (s + s + e) / 3;
-//		x2 = (s + e + e) / 3;
-//		ld h1 = height_search(x1, w);
-//		ld h2 = height_search(x2, w);
-//		ld a1 = w * h1, a2 = w * h2;
-//		if (sign(a2 - a1) > 0) s = x1;
-//		else e = x2;
-//	}
-//	height_search((s + e) * .5, w);
-//	return (X2 - X1) * (Y2 - Y1);
-//}
-//void area_ternary_search() {
-//	ld s = 0, e = L.back().x - L[0].x;
-//	ld w1, w2;
-//	//while (sign(e - s) > 0) {
-//	int cnt = 50; while (cnt--) {
-//		w1 = (s + s + e) / 3;
-//		w2 = (s + e + e) / 3;
-//		ld a1 = area_ternary_search(w1);
-//		ld a2 = area_ternary_search(w2);
-//		if (sign(a2 - a1) > 0) s = w1;
-//		else e = w2;
-//	}
-//	area_ternary_search((s + e) * .5);
-//	return;
-//}
-int check(const Polygon& r, const int& i, const Polygon& l, const int& j, ld& t) {
+int check(const Polygon& r, const Pos& ir, const Polygon& l, const Pos& il, ld& t) {
+	int szr = r.size(), szl = l.size();
+	if (ir.y == -1 && il.y == -1) {
+		
+		return 0;
+	}
+	if (ir.y == -1) {
+		
+		return 0;
+	}
+	if (il.y == -1) {
+		
+		return 0;
+	}
+	assert(0);
 	return 0;
 }
 ld bi_search(const Polygon& r, const Polygon& l) {
@@ -145,8 +106,8 @@ ld bi_search(const Polygon& r, const Polygon& l) {
 		while (s < e) {
 			int m = s + e >> 1;
 			Pos il = idx_bi_search(l, m);
-			Pos ir = Pos()
-			int f = check(r, m, l, il, t);
+			Pos ir = Pos(m, -1);
+			int f = check(r, ir, l, il, t);
 			if (!f) return t;
 			else if (f > 0) e = m;
 			else s = m + 1;
