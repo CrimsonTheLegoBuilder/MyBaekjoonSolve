@@ -5,11 +5,10 @@
 #include <cstring>
 #include <vector>
 typedef long long ll;
-//typedef long double ld;
 typedef double ld;
 const ll INF = 1e17;
-int N;
 
+int N;
 struct Pos {
 	ll x, y;
 	Pos(ll X = 0, ll Y = 0) : x(X), y(Y) {}
@@ -20,8 +19,7 @@ struct Pos {
 	Pos& operator *= (const ll& scale) { x *= scale; y *= scale; return *this; }
 	ll Euc() const { return x * x + y * y; }
 	ld mag() const { return hypot(x, y); }
-};
-std::vector<Pos> H;
+}; std::vector<Pos> H;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
@@ -30,11 +28,8 @@ void init() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(6);
-	std::cin >> N;
-	H.resize(N);
-	for (int i = 0; i < N; i++) std::cin >> C[i].x >> C[i].y;
-	//H = monotone_chain(C);
-	//N = H.size();
+	std::cin >> N; H.resize(N);
+	for (int i = 0; i < N; i++) std::cin >> H[i].x >> H[i].y;
 	return;
 }
 void rotating_calipers() {
@@ -42,20 +37,19 @@ void rotating_calipers() {
 	std::swap(H[0], *min_element(H.begin(), H.end()));
 	std::sort(H.begin() + 1, H.end(), [&](const Pos& p, const Pos& q) {
 		ll ret = cross(H[0], p, q);
-		if (ret != 0) return ret > 0;
-		return (H[0] - p).Euc() < (H[0] - q).Euc();
+		return ret == 0 ? (H[0] - p).Euc() < (H[0] - q).Euc() : ret > 0;
 	});
 	int S = -1;
 	for (int i = 0; i < N; i++) {
 		//while (H.size() >= 2 && cross(H[H.size() - 2], H.back(), C[i]) <= 0) {
-		while (S >= 1 && cross(H[S - 2], H[S - 1], H[i]) <= 0) {
+		while (S > 1 && cross(H[S - 1], H[S], H[i]) <= 0) {
 			//H.pop_back();
 			S--;
 		}
 		//H.push_back(C[i]);
 		H[++S] = H[i];
 	}
-	N = S;
+	N = S + 1;
 	if (N == 2) { std::cout << "0\n"; return; }
 
 	int R{ 0 }, U{ 0 }, L{ 0 };
@@ -72,8 +66,6 @@ void rotating_calipers() {
 		ld w = dot(H[i], H[(i + 1) % N], H[L % N], H[R % N]) / (H[i] - H[(i + 1) % N]).mag();
 		MIN = std::min(MIN, h * w);
 	}
-	//ll ans = MIN;
-	//if (MIN - ans > .5) ans++;
 	ll ans = MIN + .5;
 	std::cout << ans << "\n";
 	return;
