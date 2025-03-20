@@ -50,16 +50,16 @@ void rotating_calipers() {
 	for (int k = R; k < N; k++) if (cross(H[0], H[1], H[k], H[(k + 1) % N]) <= 0) { U = k; break; }
 	for (int l = U; l <= N; l++) if (dot(H[0], H[1], H[l % N], H[(l + 1) % N]) >= 0) { L = l; break; }
 	ld MIN = INF;
-	for (int i = 0; i < N; i++) {
-		while (dot(H[i], H[(i + 1) % N], H[R % N], H[(R + 1) % N]) > 0) R++;
-		while (cross(H[i], H[(i + 1) % N], H[U % N], H[(U + 1) % N]) > 0) U++;
-		while (dot(H[i], H[(i + 1) % N], H[L % N], H[(L + 1) % N]) < 0) L++;
-		ld h = cross(H[i], H[(i + 1) % N], H[U % N]) / (H[i] - H[(i + 1) % N]).mag();
-		ld w = dot(H[i], H[(i + 1) % N], H[L % N], H[R % N]) / (H[i] - H[(i + 1) % N]).mag();
+	for (int i = 0, j; i < N; i++) {
+		j = (i + 1) % N;
+		while (dot(H[i], H[j], H[R % N], H[(R + 1) % N]) > 0) R++;
+		while (cross(H[i], H[j], H[U % N], H[(U + 1) % N]) > 0) U++;
+		while (dot(H[i], H[j], H[L % N], H[(L + 1) % N]) < 0) L++;
+		ld h = cross(H[i], H[j], H[U % N]) / (H[i] - H[j]).mag();
+		ld w = dot(H[i], H[j], H[L % N], H[R % N]) / (H[i] - H[j]).mag();
 		MIN = std::min(MIN, h * w);
 	}
-	ll ans = MIN + .5;
-	std::cout << ans << "\n";
+	std::cout << ll(MIN + .5) << "\n";
 	return;
 }
 int main() { rotating_calipers(); return 0; }//boj10466
