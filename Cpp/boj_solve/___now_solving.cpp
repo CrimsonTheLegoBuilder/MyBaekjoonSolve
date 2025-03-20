@@ -46,7 +46,9 @@ typedef std::vector<Pos> Polygon;
 Polygon L[LEN], R[LEN];
 bool cmpyx(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 Polygon half_monotone_chain(Polygon& C, int f = LEFT) {
 	Polygon H;
 	std::sort(C.begin(), C.end()), cmpyx;
@@ -83,7 +85,19 @@ Pos idx_bi_search(const Polygon& H, const int& y) {
 int check(const Polygon& r, const Pos& ir, const Polygon& l, const Pos& il, ld& t) {
 	int szr = r.size(), szl = l.size();
 	if (ir.y == -1 && il.y == -1) {
-		
+		if (ir.x == 0) {
+			assert(il.x == 0);
+			return ccw(r[0], r[1], l[0], l[1]);
+		}
+		if (ir.x == szr - 1) {
+			assert(il.x > 0);
+			return ccw(r[ir.x - 1], r[ir.x], l[il.x - 1], l[il.x]);
+		}
+		if (il.x == szl - 1) {
+			assert(ir.x > 0);
+			return ccw(r[ir.x - 1], r[ir.x], l[il.x - 1], l[il.x]);
+		}
+
 		return 0;
 	}
 	if (ir.y == -1) {
@@ -112,6 +126,19 @@ ld bi_search(const Polygon& r, const Polygon& l) {
 			else if (f > 0) e = m;
 			else s = m + 1;
 		}
+	}
+	else {
+		int s = 0, e = szl - 1;
+		while (s < e) {
+			int m = s + e >> 1;
+			Pos ir = idx_bi_search(r, m);
+			Pos il = Pos(m, -1);
+			int f = check(r, ir, l, il, t);
+			if (!f) return t;
+			else if (f > 0) e = m;
+			else s = m + 1;
+		}
+
 	}
 }
 void query() {
