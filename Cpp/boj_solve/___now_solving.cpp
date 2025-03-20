@@ -93,11 +93,11 @@ int check(const Polygon& r, const Pos& ir, const Polygon& l, const Pos& il, ld& 
 		}
 		if (ir.x == szr - 1) {
 			assert(il.x > 0);
-			return ccw(r[ir.x - 1], r[ir.x], l[il.x - 1], l[il.x]);
+			return ccw(r[ir.x - 1], r[ir.x], l[il.x - 1], l[il.x]) * -1;
 		}
 		if (il.x == szl - 1) {
 			assert(ir.x > 0);
-			return ccw(r[ir.x - 1], r[ir.x], l[il.x - 1], l[il.x]);
+			return ccw(r[ir.x - 1], r[ir.x], l[il.x - 1], l[il.x]) * -1;
 		}
 		Pos r0 = r[ir.x - 1], r1 = r[ir.x], r2 = r[ir.x + 1];
 		Pos l0 = l[il.x - 1], l1 = l[il.x], l2 = l[il.x + 1];
@@ -108,17 +108,29 @@ int check(const Polygon& r, const Pos& ir, const Polygon& l, const Pos& il, ld& 
 		l0 += v; l1 += v; l2 += v;
 		if (ccw(r1, r2, l1, l2) == 0 || ccw(r0, r1, l0, l1) < 0) return 0;
 		if (ccw(r1, r2, l1, l2) > 0) return 1;
-		if (ccw(r0, r1, l0, l1) > 0) return -1;
+		if (ccw(r0, r1, l0, l1) < 0) return -1;
 		return 0;
 	}
 	if (ir.y == -1) {
 		assert(ir.x > 0);
-
+		Pos l0 = l[il.x], l1 = l[il.y];
+		if (ir.x == szr - 1) return ccw(r[ir.x - 1], r[ir.x], l0, l1) * -1;
+		Pos r0 = r[ir.x - 1], r1 = r[ir.x], r2 = r[ir.x + 1];
+		if (ccw(l0, l1, r1, r2) >= 0 && ccw(l0, l1, r1, r0) >= 0) return 0;
+		if (ccw(l0, l1, r1, r2) < 0) return 1;
+		if (ccw(l0, l1, r1, r0) < 0) return -1;
+		assert(0);
 		return 0;
 	}
 	if (il.y == -1) {
 		assert(il.x > 0);
-
+		Pos r0 = r[ir.x], r1 = r[ir.y];
+		if (il.x == szl - 1) return ccw(r0, r1, l[il.x - 1], l[il.x]) * -1;
+		Pos l0 = l[il.x - 1], l1 = l[il.x], l2 = l[il.x + 1];
+		if (ccw(r0, r1, l1, l2) <= 0 && ccw(r0, r1, l1, l0) <= 0) return 0;
+		if (ccw(r0, r1, l1, l2) > 0) return 1;
+		if (ccw(r0, r1, l1, l0) > 0) return -1;
+		assert(0);
 		return 0;
 	}
 	assert(0);
