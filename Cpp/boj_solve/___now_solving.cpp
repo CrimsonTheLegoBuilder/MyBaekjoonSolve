@@ -133,6 +133,20 @@ int idx_bi_search(const Polygon& H, const ld& x) {
 //	area_ternary_search((s + e) * .5);
 //	return;
 //}
+int check(const Polygon& r, const int& i, const Polygon& l, const int& j) {
+	return 0;
+}
+ld bi_search(const Polygon& r, const Polygon& l) {
+	int szr = r.size(), szl = l.size();
+	int yr = r[szr - 1].y, yl = l[szl - 1].y;
+	if (yr >= yl) {
+		int s = 0, e = szr - 1;
+		while (s < e) {
+			int m = s + e >> 1;
+			int il = idx_bi_search(l, m);
+		}
+	}
+}
 void query() {
 	int ic, jc;
 	std::cin >> ic >> jc;
