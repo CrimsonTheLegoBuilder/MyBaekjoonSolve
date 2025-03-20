@@ -151,6 +151,7 @@ ld bi_search(const Polygon& r, const Polygon& l) {
 			else if (f > 0) e = m;
 			else s = m + 1;
 		}
+		return 0;
 	}
 	else {
 		int s = 0, e = szl - 1;
@@ -163,8 +164,10 @@ ld bi_search(const Polygon& r, const Polygon& l) {
 			else if (f > 0) e = m;
 			else s = m + 1;
 		}
-
+		return 0;
 	}
+	assert(0);
+	return -1;
 }
 void query() {
 	int ic, jc;
