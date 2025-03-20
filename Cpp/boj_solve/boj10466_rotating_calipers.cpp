@@ -40,7 +40,7 @@ void rotating_calipers() {
 		});
 	int S = -1;
 	for (int i = 0; i < N; i++) {
-		while (S > 1 && cross(H[S - 1], H[S], H[i]) <= 0) S--;
+		while (S >= 1 && cross(H[S - 1], H[S], H[i]) <= 0) S--;
 		H[++S] = H[i];
 	}
 	N = S + 1;
