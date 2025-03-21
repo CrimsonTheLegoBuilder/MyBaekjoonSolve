@@ -79,6 +79,7 @@ Pos idx_bi_search(const Polygon& H, const int& y) {
 	int s = 0, e = H.size() - 1;
 	assert(y >= 0);
 	assert(H.size() > 1);
+	if (H.back().y < y) return Pos(-1, -1);
 	if (y == 0) return Pos(0, -1);
 	if (y < H[1].y) return Pos(0, 1);
 	if (H.back().y == y) return Pos(e, -1);
@@ -101,6 +102,7 @@ ld get_x(const Pos& p, const Pos& q, const ld& y) {
 	return x;
 }
 int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const Polygon& l, const Pos& il, ld& t) {
+	if (ir._1st == -1 || il._1st == -1) return -1;
 	int szr = r.size(), szl = l.size();
 	if (ir._2nd == -1 && il._2nd == -1) {
 		ll xr = W[ri] - (X[ri][RIGHT] - r[ir._1st].x);
@@ -168,34 +170,27 @@ int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const P
 	return 0;
 }
 ld bi_search(const int& ri, const int& li) {
-	const Polygon& r = R[ri];
-	const Polygon& l = L[li];
-	int szr = r.size(), szl = l.size();
-	int yr = r[szr - 1].y, yl = l[szl - 1].y;
+	const Polygon& r = R[ri], & l = L[li];
 	ld t = 0;
-	if (yr <= yl) {
-		int s = 0, e = szr - 1;
-		while (s < e) {
-			int m = s + e >> 1;
-			Pos il = idx_bi_search(l, m);
-			Pos ir = Pos(m, -1);
-			int f = check(ri, r, ir, li, l, il, t);
-			if (!f) return t;
-			else if (f > 0) s = m + 1;
-			else e = m;
-		}
+	int s = 0, e = r.size() - 1;
+	while (s < e) {
+		int m = s + e >> 1;
+		Pos il = idx_bi_search(l, m);
+		Pos ir = Pos(m, -1);
+		int f = check(ri, r, ir, li, l, il, t);
+		if (!f) return t;
+		else if (f > 0) s = m + 1;
+		else e = m;
 	}
-	else {
-		int s = 0, e = szl - 1;
-		while (s < e) {
-			int m = s + e >> 1;
-			Pos ir = idx_bi_search(r, m);
-			Pos il = Pos(m, -1);
-			int f = check(ri, r, ir, li, l, il, t);
-			if (!f) return t;
-			else if (f > 0) s = m + 1;
-			else e = m;
-		}
+	s = 0, e = l.size() - 1;
+	while (s < e) {
+		int m = s + e >> 1;
+		Pos ir = idx_bi_search(r, m);
+		Pos il = Pos(m, -1);
+		int f = check(ri, r, ir, li, l, il, t);
+		if (!f) return t;
+		else if (f > 0) s = m + 1;
+		else e = m;
 	}
 	return INF;
 }
