@@ -220,7 +220,7 @@ void solve() {
 		R[i] = half_monotone_chain(C, RIGHT);
 		if (L[i].back().y == L[i][L[i].size() - 2].y) L[i].pop_back();
 		if (R[i].back().y == R[i][R[i].size() - 2].y) R[i].pop_back();
-		std::reverse(R[i].begin(), R[i].end());
+		std::reverse(L[i].begin(), L[i].end());
 	}
 	std::cin >> Q;
 	while (Q--) query();
