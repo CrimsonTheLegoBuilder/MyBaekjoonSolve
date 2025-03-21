@@ -110,15 +110,11 @@ int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const P
 		t = xr + xl;
 		if (ir._1st == 0) {
 			assert(il._1st == 0);
-			return ccw(r[0], r[1], l[0], l[1]);
+			return ccw(r[0], r[1], l[0], l[1]) > 0;
 		}
-		if (ir._1st == szr - 1) {
-			assert(il._1st > 0);
-			return ccw(r[ir._1st - 1], r[ir._1st], l[il._1st - 1], l[il._1st]) * -1;
-		}
-		if (il._1st == szl - 1) {
-			assert(ir._1st > 0);
-			return ccw(r[ir._1st - 1], r[ir._1st], l[il._1st - 1], l[il._1st]) * -1;
+		if (ir._1st == szr - 1 || il._1st == szl - 1) {
+			assert(il._1st > 0 && ir._1st > 0);
+			return ccw(r[ir._1st - 1], r[ir._1st], l[il._1st - 1], l[il._1st]) >= 0 ? 0 : -1;
 		}
 		Pos r0 = r[ir._1st - 1], r1 = r[ir._1st], r2 = r[ir._1st + 1];
 		Pos l0 = l[il._1st - 1], l1 = l[il._1st], l2 = l[il._1st + 1];
@@ -127,9 +123,10 @@ int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const P
 		assert(ccw(l0, l1, l2) < 0);
 		Pos v = l1 - r1;
 		l0 += v; l1 += v; l2 += v;
-		if (ccw(r1, r2, l1, l2) == 0 || ccw(r0, r1, l0, l1) < 0) return 0;
+		if (ccw(r1, r2, l1, l2) <= 0 || ccw(r0, r1, l0, l1) >= 0) return 0;
 		if (ccw(r1, r2, l1, l2) > 0) return 1;
 		if (ccw(r0, r1, l0, l1) < 0) return -1;
+		assert(0 && 1);
 		return 0;
 	}
 	if (ir._2nd == -1) {
@@ -146,7 +143,7 @@ int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const P
 		if (ccw(l0, l1, r1, r2) >= 0 && ccw(l0, l1, r1, r0) >= 0) return 0;
 		if (ccw(l0, l1, r1, r2) < 0) return 1;
 		if (ccw(l0, l1, r1, r0) < 0) return -1;
-		assert(0);
+		assert(0 && 2);
 		return 0;
 	}
 	if (il._2nd == -1) {
@@ -163,10 +160,10 @@ int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const P
 		if (ccw(r0, r1, l1, l2) <= 0 && ccw(r0, r1, l1, l0) <= 0) return 0;
 		if (ccw(r0, r1, l1, l2) > 0) return 1;
 		if (ccw(r0, r1, l1, l0) > 0) return -1;
-		assert(0);
+		assert(0 && 3);
 		return 0;
 	}
-	assert(0);
+	assert(0 && 4);
 	return 0;
 }
 ld bi_search(const int& ri, const int& li) {
