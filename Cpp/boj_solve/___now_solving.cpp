@@ -53,10 +53,10 @@ int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2,
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
-Polygon half_monotone_chain(Polygon& C, int f = LEFT) {
+Polygon half_monotone_chain(Polygon& C, int f = RIGHT) {
 	Polygon H;
 	std::sort(C.begin(), C.end()), cmpyx;
-	if (f == RIGHT) std::reverse(C.begin(), C.end());
+	if (f == LEFT) std::reverse(C.begin(), C.end());
 	//C.erase(unique(C.begin(), C.end()), C.end());
 	if (C.size() <= 2) {
 		//assert(0);
@@ -216,10 +216,10 @@ void solve() {
 		for (Pos& p : C) p.y -= y, x1 = std::min(x1, p.x), x2 = std::max(x2, p.x);
 		X[i][LEFT] = x1; X[i][RIGHT] = x2;
 		W[i] = x2 - x1;
-		L[i] = half_monotone_chain(C, LEFT);
 		R[i] = half_monotone_chain(C, RIGHT);
-		if (L[i].back().y == L[i][L[i].size() - 2].y) L[i].pop_back();
+		L[i] = half_monotone_chain(C, LEFT);
 		if (R[i].back().y == R[i][R[i].size() - 2].y) R[i].pop_back();
+		if (L[i].back().y == L[i][L[i].size() - 2].y) L[i].pop_back();
 		std::reverse(L[i].begin(), L[i].end());
 	}
 	std::cin >> Q;
