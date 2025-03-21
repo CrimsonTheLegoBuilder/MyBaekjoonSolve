@@ -193,9 +193,7 @@ ld bi_search(const int& ri, const Polygon& r, const int& li, const Polygon& l) {
 	return -1;
 }
 void query() {
-	int ic, jc;
-	std::cin >> ic >> jc;
-	ic--; jc--;
+	int ic, jc; std::cin >> ic >> jc; ic--; jc--;
 	ld d1 = bi_search(ic, R[ic], jc, L[jc]);
 	ld d2 = bi_search(jc, R[jc], ic, L[ic]);
 	std::cout << std::min(d1, d2) << "\n";
