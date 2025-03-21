@@ -9,7 +9,7 @@ typedef long long ll;
 //typedef long double ld;
 typedef double ld;
 typedef std::vector<int> Vint;
-const ld INF = 1e17;
+const ld INF = 1e21;
 const ld TOL = 1e-9;
 const ld PI = acos(-1);
 const int LEN = 1e5 + 10;
@@ -172,7 +172,7 @@ ld bi_search(const int& ri, const int& li) {
 	const Polygon& l = L[li];
 	int szr = r.size(), szl = l.size();
 	int yr = r[szr - 1].y, yl = l[szl - 1].y;
-	ld t = -1;
+	ld t = 0;
 	if (yr <= yl) {
 		int s = 0, e = szr - 1;
 		while (s < e) {
@@ -197,9 +197,7 @@ ld bi_search(const int& ri, const int& li) {
 			else e = m;
 		}
 	}
-	std::cout << "err:: " << t << " ::what the fuck!!!\n";
-	//assert(0);
-	return -1;
+	return INF;
 }
 void query() {
 	int ic, jc; std::cin >> ic >> jc; ic--; jc--;
