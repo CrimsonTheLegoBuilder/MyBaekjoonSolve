@@ -78,6 +78,7 @@ Pos idx_bi_search(const Polygon& H, const int& y) {
 	assert(y >= 0);
 	if (y == 0) return Pos(0, -1);
 	if (y < H[1].y) return Pos(0, 1);
+	if (H.back().y == y) return Pos(e, -1);
 	while (s < e) {
 		int m = s + e >> 1;
 		if (H[m].y == y) return Pos(m, -1);
