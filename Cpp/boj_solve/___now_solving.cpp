@@ -70,7 +70,7 @@ Polygon half_monotone_chain(Polygon& C, int f = RIGHT) {
 	}
 	int sz = H.size();
 	if (H[sz - 2].x == H[sz - 1].x) H.pop_back();
-	//if (f == RIGHT) std::reverse(H.begin(), H.end());
+	if (f == LEFT) std::reverse(H.begin(), H.end());
 	return H;
 }
 Pos idx_bi_search(const Polygon& H, const int& y) {
@@ -218,9 +218,6 @@ void solve() {
 		W[i] = x2 - x1;
 		R[i] = half_monotone_chain(C, RIGHT);
 		L[i] = half_monotone_chain(C, LEFT);
-		if (R[i].back().y == R[i][R[i].size() - 2].y) R[i].pop_back();
-		if (L[i].back().y == L[i][L[i].size() - 2].y) L[i].pop_back();
-		std::reverse(L[i].begin(), L[i].end());
 	}
 	std::cin >> Q;
 	while (Q--) query();
