@@ -160,7 +160,9 @@ int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const P
 	assert(0);
 	return 0;
 }
-ld bi_search(const int& ri, const Polygon& r, const int& li, const Polygon& l) {
+ld bi_search(const int& ri, const int& li) {
+	const Polygon& r = R[ri];
+	const Polygon& l = L[li];
 	int szr = r.size(), szl = l.size();
 	int yr = r[szr - 1].y, yl = l[szl - 1].y;
 	ld t = -1;
@@ -194,8 +196,8 @@ ld bi_search(const int& ri, const Polygon& r, const int& li, const Polygon& l) {
 }
 void query() {
 	int ic, jc; std::cin >> ic >> jc; ic--; jc--;
-	ld d1 = bi_search(ic, R[ic], jc, L[jc]);
-	ld d2 = bi_search(jc, R[jc], ic, L[ic]);
+	ld d1 = bi_search(ic, jc);
+	ld d2 = bi_search(jc, ic);
 	std::cout << std::min(d1, d2) << "\n";
 	return;
 }
