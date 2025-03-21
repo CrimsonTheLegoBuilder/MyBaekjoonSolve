@@ -88,6 +88,9 @@ Pos idx_bi_search(const Polygon& H, const int& y) {
 		if (H[m].y < y) s = m + 1;
 		else e = m;
 	}
+	assert(s > 0);
+	assert(H[s - 1].y < y);
+	assert(y < H[s].y);
 	return Pos(s - 1, s);
 }
 ld get_x(const Pos& p, const Pos& q, const ld& y) {
@@ -103,15 +106,15 @@ int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const P
 		ll xr = W[ri] - (X[ri][RIGHT] - r[ir._1st].x);
 		ll xl = W[li] - (l[il._1st].x - X[li][LEFT]);
 		t = xr + xl;
-		if (ir.x == 0) {
+		if (ir._1st == 0) {
 			assert(il._1st == 0);
 			return ccw(r[0], r[1], l[0], l[1]);
 		}
-		if (ir.x == szr - 1) {
+		if (ir._1st == szr - 1) {
 			assert(il._1st > 0);
 			return ccw(r[ir._1st - 1], r[ir._1st], l[il._1st - 1], l[il._1st]) * -1;
 		}
-		if (il.x == szl - 1) {
+		if (il._1st == szl - 1) {
 			assert(ir._1st > 0);
 			return ccw(r[ir._1st - 1], r[ir._1st], l[il._1st - 1], l[il._1st]) * -1;
 		}
