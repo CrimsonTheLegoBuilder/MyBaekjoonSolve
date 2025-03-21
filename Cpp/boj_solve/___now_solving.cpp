@@ -21,6 +21,8 @@ inline bool zero(const ld& x) { return !sign(x); }
 #define UPPER -1
 #define LEFT 0
 #define RIGHT 1
+#define _1st x
+#define _2nd y
 
 int N, K, Q;
 int X[LEN][2];
@@ -46,7 +48,7 @@ struct Pos {
 }; const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 Polygon L[LEN], R[LEN];
-bool cmpyx(const Pos& p, const Pos& q) { return p.y == q.y ? p.x < q.x : p.y < q.y; }
+bool cmpyx(const Pos& p, const Pos& q) { return p.y == q.y ? p.x > q.x : p.y < q.y; }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
@@ -55,12 +57,12 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 Polygon half_monotone_chain(Polygon& C, int f = RIGHT) {
 	Polygon H;
-	std::sort(C.begin(), C.end(), cmpyx);
+	if (f == RIGHT) std::sort(C.begin(), C.end(), cmpyx);
 	if (f == LEFT) std::reverse(C.begin(), C.end());
 	//C.erase(unique(C.begin(), C.end()), C.end());
 	if (C.size() <= 2) {
 		//assert(0);
-		for (const Pos& pos : C) H.push_back(pos);
+		for (const Pos& p : C) H.push_back(p);
 		return H;
 	}
 	for (int i = 0; i < C.size(); i++) {
@@ -76,6 +78,7 @@ Polygon half_monotone_chain(Polygon& C, int f = RIGHT) {
 Pos idx_bi_search(const Polygon& H, const int& y) {
 	int s = 0, e = H.size() - 1;
 	assert(y >= 0);
+	assert(H.size() > 1);
 	if (y == 0) return Pos(0, -1);
 	if (y < H[1].y) return Pos(0, 1);
 	if (H.back().y == y) return Pos(e, -1);
@@ -96,24 +99,24 @@ ld get_x(const Pos& p, const Pos& q, const ld& y) {
 }
 int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const Polygon& l, const Pos& il, ld& t) {
 	int szr = r.size(), szl = l.size();
-	if (ir.y == -1 && il.y == -1) {
-		ll xr = W[ri] - (X[ri][RIGHT] - r[ir.x].x);
-		ll xl = W[li] - (l[il.x].x - X[li][LEFT]);
+	if (ir._2nd == -1 && il._2nd == -1) {
+		ll xr = W[ri] - (X[ri][RIGHT] - r[ir._1st].x);
+		ll xl = W[li] - (l[il._1st].x - X[li][LEFT]);
 		t = xr + xl;
 		if (ir.x == 0) {
-			assert(il.x == 0);
+			assert(il._1st == 0);
 			return ccw(r[0], r[1], l[0], l[1]);
 		}
 		if (ir.x == szr - 1) {
-			assert(il.x > 0);
-			return ccw(r[ir.x - 1], r[ir.x], l[il.x - 1], l[il.x]) * -1;
+			assert(il._1st > 0);
+			return ccw(r[ir._1st - 1], r[ir._1st], l[il._1st - 1], l[il._1st]) * -1;
 		}
 		if (il.x == szl - 1) {
-			assert(ir.x > 0);
-			return ccw(r[ir.x - 1], r[ir.x], l[il.x - 1], l[il.x]) * -1;
+			assert(ir._1st > 0);
+			return ccw(r[ir._1st - 1], r[ir._1st], l[il._1st - 1], l[il._1st]) * -1;
 		}
-		Pos r0 = r[ir.x - 1], r1 = r[ir.x], r2 = r[ir.x + 1];
-		Pos l0 = l[il.x - 1], l1 = l[il.x], l2 = l[il.x + 1];
+		Pos r0 = r[ir._1st - 1], r1 = r[ir._1st], r2 = r[ir._1st + 1];
+		Pos l0 = l[il._1st - 1], l1 = l[il._1st], l2 = l[il._1st + 1];
 		assert(r1.y == l1.y);
 		assert(ccw(r0, r1, r2) > 0);
 		assert(ccw(l0, l1, l2) < 0);
@@ -124,34 +127,34 @@ int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const P
 		if (ccw(r0, r1, l0, l1) < 0) return -1;
 		return 0;
 	}
-	if (ir.y == -1) {
-		assert(ir.x > 0);
-		Pos l0 = l[il.x], l1 = l[il.y];
-		ll xr = W[ri] - (X[ri][RIGHT] - r[ir.x].x);
-		ld x_ = get_x(l0, l1, r[ir.x].y);
+	if (ir._2nd == -1) {
+		assert(ir._1st > 0);
+		Pos l0 = l[il._1st], l1 = l[il._2nd];
+		ll xr = W[ri] - (X[ri][RIGHT] - r[ir._1st].x);
+		ld x_ = get_x(l0, l1, r[ir._1st].y);
 		ld xl = W[li] - (x_ - X[li][LEFT]);
 		t = xr + xl;
 		if (ir.x == szr - 1) {
-			return ccw(r[ir.x - 1], r[ir.x], l0, l1) * -1;
+			return ccw(r[ir._1st - 1], r[ir._1st], l0, l1) * -1;
 		}
-		Pos r0 = r[ir.x - 1], r1 = r[ir.x], r2 = r[ir.x + 1];
+		Pos r0 = r[ir._1st - 1], r1 = r[ir._1st], r2 = r[ir._1st + 1];
 		if (ccw(l0, l1, r1, r2) >= 0 && ccw(l0, l1, r1, r0) >= 0) return 0;
 		if (ccw(l0, l1, r1, r2) < 0) return 1;
 		if (ccw(l0, l1, r1, r0) < 0) return -1;
 		assert(0);
 		return 0;
 	}
-	if (il.y == -1) {
+	if (il._2nd == -1) {
 		assert(il.x > 0);
-		Pos r0 = r[ir.x], r1 = r[ir.y];
-		ll xl = W[li] - (l[il.x].x - X[li][LEFT]);
-		ld x_ = get_x(r0, r1, l[il.x].y);
+		Pos r0 = r[ir._1st], r1 = r[ir._2nd];
+		ll xl = W[li] - (l[il._1st].x - X[li][LEFT]);
+		ld x_ = get_x(r0, r1, l[il._1st].y);
 		ld xr = W[ri] - (X[ri][RIGHT] - x_);
 		t = xr + xl;
 		if (il.x == szl - 1) {
-			return ccw(r0, r1, l[il.x - 1], l[il.x]) * -1;
+			return ccw(r0, r1, l[il._1st - 1], l[il._1st]) * -1;
 		}
-		Pos l0 = l[il.x - 1], l1 = l[il.x], l2 = l[il.x + 1];
+		Pos l0 = l[il._1st - 1], l1 = l[il._1st], l2 = l[il._1st + 1];
 		if (ccw(r0, r1, l1, l2) <= 0 && ccw(r0, r1, l1, l0) <= 0) return 0;
 		if (ccw(r0, r1, l1, l2) > 0) return 1;
 		if (ccw(r0, r1, l1, l0) > 0) return -1;
@@ -219,6 +222,8 @@ void solve() {
 		W[i] = x2 - x1;
 		R[i] = half_monotone_chain(C, RIGHT);
 		L[i] = half_monotone_chain(C, LEFT);
+		assert(R[i].size() > 1);
+		assert(L[i].size() > 1);
 	}
 	std::cin >> Q;
 	while (Q--) query();
