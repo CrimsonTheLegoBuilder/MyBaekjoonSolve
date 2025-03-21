@@ -37,8 +37,8 @@ struct Pos {
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
 	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
 	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const int& scale) { x *= scale; y *= scale; return *this; }
-	Pos& operator /= (const int& scale) { x /= scale; y /= scale; return *this; }
+	Pos& operator *= (const int& n) { x *= n; y *= n; return *this; }
+	Pos& operator /= (const int& n) { x /= n; y /= n; return *this; }
 	Pos operator - () const { return { -x, -y }; }
 	ll Euc() const { return (ll)x * x + (ll)y * y; }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
