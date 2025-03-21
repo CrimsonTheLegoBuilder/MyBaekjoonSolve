@@ -174,8 +174,8 @@ ld bi_search(const int& ri, const int& li) {
 			Pos ir = Pos(m, -1);
 			int f = check(ri, r, ir, li, l, il, t);
 			if (!f) return t;
-			else if (f > 0) e = m;
-			else s = m + 1;
+			else if (f > 0) s = m + 1;
+			else e = m;
 		}
 	}
 	else {
