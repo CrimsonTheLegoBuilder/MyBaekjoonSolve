@@ -215,8 +215,8 @@ void solve() {
 	for (int i = 0; i < N; i++) {
 		std::cin >> K;
 		Polygon C(K);
-		int y = INF;
-		int x1 = INF, x2 = -INF;
+		int y = 1e9;
+		int x1 = 1e9, x2 = -1e9;
 		for (Pos& p : C) std::cin >> p, y = std::min(y, p.y);
 		for (Pos& p : C) p.y -= y, x1 = std::min(x1, p.x), x2 = std::max(x2, p.x);
 		X[i][LEFT] = x1; X[i][RIGHT] = x2;
