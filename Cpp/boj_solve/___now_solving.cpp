@@ -27,7 +27,7 @@ int X[LEN][2];
 ll W[LEN];
 struct Pos {
 	int x, y;
-	Pos(int X = 0, int Y = 0) : x(X), y(Y) {}
+	Pos(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
 	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
 	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
 	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
@@ -55,7 +55,7 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d
 ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
 Polygon half_monotone_chain(Polygon& C, int f = RIGHT) {
 	Polygon H;
-	std::sort(C.begin(), C.end()), cmpyx;
+	std::sort(C.begin(), C.end(), cmpyx);
 	if (f == LEFT) std::reverse(C.begin(), C.end());
 	//C.erase(unique(C.begin(), C.end()), C.end());
 	if (C.size() <= 2) {
