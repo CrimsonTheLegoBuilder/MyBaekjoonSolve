@@ -98,7 +98,7 @@ ld get_x(const Pos& p, const Pos& q, const ld& y) {
 	assert(p.y <= y && y <= q.y);
 	int dy = q.y - p.y;
 	int dx = q.x - p.x;
-	ld x = p.x + (y * (1. * dx / dy));
+	ld x = p.x + ((y - p.y) * (1. * dx / dy));
 	return x;
 }
 int check(const int& ri, const Polygon& r, const Pos& ir, const int& li, const Polygon& l, const Pos& il, ld& t) {
