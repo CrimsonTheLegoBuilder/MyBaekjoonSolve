@@ -1653,7 +1653,7 @@
     <ClCompile Include="boj5418_3Dgeo.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj30839_cnvxh.cpp">
+    <ClCompile Include="boj30839_bi_search_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
