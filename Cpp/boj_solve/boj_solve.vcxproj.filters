@@ -987,9 +987,6 @@
     <ClCompile Include="topo_sort_chika.cpp">
       <Filter>소스 파일\graph_search</Filter>
     </ClCompile>
-    <ClCompile Include="boj18796_greedy.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="boj22878_che_man.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -1273,9 +1270,6 @@
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj32079_tangent.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="demarc_sol.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
     <ClCompile Include="boj18190_tangent.cpp">
@@ -1620,9 +1614,6 @@
     <ClCompile Include="boj33441_ter_bi_search.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="boj12620_bool.cpp">
-      <Filter>소스 파일\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="__Geometry_generator.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
@@ -1660,6 +1651,9 @@
       <Filter>소스 파일\___now_solving</Filter>
     </ClCompile>
     <ClCompile Include="boj5418_3Dgeo.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="boj30839_cnvxh.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
   </ItemGroup>
