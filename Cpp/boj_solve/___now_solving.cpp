@@ -241,7 +241,7 @@ void solve() {
 	std::cout.precision(13);
 #ifdef DEBUG
 	const std::string dir = "../../../input_data/igor_and_toys/tests/";
-	const std::string tn = "65";
+	const std::string tn = "01";
 	freopen((dir + tn).c_str(), "r", stdin);
 	freopen("../../../input_data/igor_and_toys/tests/_igor_out.txt", "w", stdout);
 #endif
@@ -271,14 +271,16 @@ void solve() {
 #else
 	for (int q = 0; q < Q; q++) query(q);
 	freopen((dir + tn + ".a").c_str(), "r", stdin);
+	bool f = 1;
 	for (int q = 0; q < Q; q++) {
 		ld a;
 		std::cin >> a;
 		ld w = D[q];
 		ld err = std::abs(a - w) / a;
-		//std::cout << a << " " << w << " " << err << "\n";
-		if (err >= 1e10) std::cout << a << " " << w << " " << err << "\n";
+		std::cout << a << " " << w << " " << err << "\n";
+		if (err >= 1e10) f = 0, std::cout << a << " " << w << " " << err << "\n";
 	}
+	if (f) std::cout << tn <<" good\n";
 #endif
 	return;
 }
