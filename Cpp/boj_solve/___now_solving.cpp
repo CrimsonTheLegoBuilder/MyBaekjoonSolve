@@ -30,7 +30,7 @@
 //
 //	return;
 //}
-//int main() { solve(); return 0; }//boj30839 29688
+//int main() { solve(); return 0; }//boj28942
 
 
 #define _CRT_SECURE_NO_WARNINGS
