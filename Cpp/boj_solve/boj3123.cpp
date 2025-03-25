@@ -1,30 +1,23 @@
 #include <stdio.h>
-//#include <algorithm>
-typedef double ld;
-const int LEN = 1'001;
-bool loof[LEN][LEN];
-ld area;
-
-
+bool L[1001][1001];
+double A;
 int main() {
-	int X, Y, N, x, y, u, r, l, d;
+	int X, Y, N, x, y, s, i, j;
 	scanf("%d%d%d", &X, &Y, &N);
-	for (int i = 0; i < N; i++) {
+	for (i = 0; i < N; i++) {
 		scanf("%d%d", &x, &y);
-		loof[y][x] = 1;
+		L[y][x] = 1;
 	}
-	for (int j = 0; j < Y; j++) {
-		for (int i = 0; i < X; i++) {
-			u = loof[j][i], l = loof[j + 1][i];
-			r = loof[j][i + 1], d = loof[j + 1][i + 1];
-			if (u + l + r + d >= 3) area++;
-			else if (u + l + r + d == 2) {
-				if (u & d | l & r) area++;
-				else area += 0.9566114774905181;  //pi/6 + 3**.5/4
+	for (j = 0; j < Y; j++) {
+		for (i = 0; i < X; i++) {
+			s = L[j][i] + L[j + 1][i] + L[j][i + 1] + L[j + 1][i + 1];
+			if (s >= 3) A++;
+			else if (s == 2) {
+				if (L[j][i] & L[j + 1][i + 1] | L[j + 1][i] & L[j][i + 1]) A++;
+				else A += 0.956611;//pi/6 + 3**.5/4
 			}
-			else if (u + l + r + d) area += 0.7853981633974483;  //pi/4
+			else if (s) A += 0.785398;//pi/4
 		}
 	}
-	printf("%.4lf", area);
-	return 0;
+	printf("%.4lf", A);
 }
