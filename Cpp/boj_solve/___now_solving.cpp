@@ -102,8 +102,8 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 		Pdd m0 = v.p().rot(t);
 		t = norm(PI * .5 - t);
 		r = norm(rad(H[i1], H[i2], H[(i1 - 1 + sz) % sz]));
-		if (t > PI * .5 && r < t) return Pos(-1, -1);
-		if (t < PI * .5 && r > t) return Pos(-1, -1);
+		if (t > PI * .5 && r <= t) return Pos(-1, -1);
+		if (t < PI * .5 && r >= t) return Pos(-1, -1);
 		while (s < e) {
 			int m = s + e >> 1;
 			r = norm(rad(H[i1], H[i2], H[fit(i1 + m)]));
@@ -112,7 +112,7 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 			else e = m;
 		}
 		ix = intersection(H[fit(s - 1)], H[fit(s)], H[i1], m0);
-		return Pos(fit(s - 1), fit(s));
+		return Pos(fit(i1 + s - 1 + N), fit(i1 + s));
 	}
 	else {
 		Pos h = ~(H[i2] - H[i1]);
@@ -122,8 +122,8 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 		Pdd m0 = v.p().rot(t);
 		t = norm(PI * .5 + t);
 		r = norm(rad(H[i1], h2, H[(i1 - 1 + sz) % sz]));
-		if (t > PI * .5 && r < t) return Pos(-1, -1);
-		if (t < PI * .5 && r > t) return Pos(-1, -1);
+		if (t > PI * .5 && r <= t) return Pos(-1, -1);
+		if (t < PI * .5 && r >= t) return Pos(-1, -1);
 		while (s < e) {
 			int m = s + e >> 1;
 			r = norm(rad(H[i1], h2, H[fit(i1 + m)]));
@@ -132,7 +132,7 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 			else e = m;
 		}
 		ix = intersection(H[fit(s - 1)], H[fit(s)], H[i1], m0);
-		return Pos(fit(s - 1), fit(s));
+		return Pos(fit(i1 + s - 1 + N), fit(i1 + s));
 	}
 }
 void solve() {
@@ -148,24 +148,61 @@ void solve() {
 		int i0 = (i - 1 + N) % N, i1 = i % N, i2 = (i + 1) % N, i3 = (i + 2) % N;
 		const Pos& p0 = H[i0], & p1 = H[i1], & p2 = H[i2], & p3 = H[i3];
 		ld ix;
-		ld al, ar;
+		ld al = 0, ar = 0;
+		ld tri = 0;
+		ll fan = 0;
 		Pos pl = bi_search(H, c, i1, i2, ix);
 		if (pl.x == -1) al = 0;
 		else {
-
+			if (pl.y == -1) {
+				int j = pl.x;
+				if (i1 < j) {
+					fan = A[j] - A[i1] + cross(c, H[j], H[i1]);
+					al = A[N] - fan;
+				}
+				else al = A[i1] - A[j] + cross(c, H[i1], H[j]);
+			}
+			else {
+				int j0 = pl.x, j1 = pl.y;
+				if (i1 < j1) {
+					fan = A[j1] - A[i1] + cross(c, H[j1], H[i1]);
+					al = A[N] - fan;
+				}
+				else al = A[i1] - A[j1] + cross(c, H[i1], H[j1]);
+				tri = cross(H[i1], H[j0], H[j1]) * (1 - ix);
+				al += tri;
+			}
 		}
 		Pos pr = bi_search(H, c, i2, i1, ix);
 		if (pr.x == -1) ar = 0;
 		else {
-
+			if (pr.y == -1) {
+				int j = pr.x;
+				if (i1 < j) ar = A[j] - A[i1] + cross(c, H[j], H[i1]);
+				else {
+					fan = A[i1] - A[j] + cross(c, H[i1], H[j]);
+					ar = A[N] - fan;
+				}
+			}
+			else {
+				int j0 = pr.x, j1 = pr.y;
+				if (i1 < j0) ar = A[j0] - A[i1] + cross(c, H[j0], H[i1]);
+				else {
+					fan = A[i1] - A[j0] + cross(c, H[i1], H[j0]);
+					ar = A[N] - fan;
+				}
+				tri = cross(H[i1], H[j0], H[j1]) * ix;
+				ar += tri;
+			}
 		}
 		std::cout << A[N] - al - ar << "\n";
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj28942 29688
+int main() { solve(); return 0; }//boj28942
 
 
+//29688
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
 //#include <algorithm>
