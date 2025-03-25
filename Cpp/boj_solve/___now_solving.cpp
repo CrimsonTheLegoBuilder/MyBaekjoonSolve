@@ -1,5 +1,3 @@
-//freopen("../../../input_data//", "r", stdin);
-//freopen("../../../input_data//", "w", stdout);
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
@@ -140,6 +138,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(13);
+	//freopen("../../../input_data//", "r", stdin);
+	//freopen("../../../input_data//", "w", stdout);
 	std::cin >> N;
 	Polygon H(N); for (Pos& p : H) std::cin >> p;
 	Pos c; std::cin >> c;
@@ -214,16 +214,18 @@ int main() { solve(); return 0; }//boj28942
 ////typedef long double ld;
 //typedef double ld;
 //
-//int N, D, A[30], T;
+//int X, Y, N, W, D;
 //std::string s;
 //int main() {
 //	std::cin.tie(0)->sync_with_stdio(0);
 //	std::cout.tie(0);
 //	std::cout << std::fixed;
 //	std::cout.precision(10);
-//	std::cin >> N >> D;
-//	for (int i = 0; i < N; i++) std::cin >> A[i], T += A[i];
-//	D /= T;
-//	for (int i = 0; i < N; i++) std::cout << A[i] * D << "\n";
+//	std::cin >> X >> Y >> N;
+//	while (N--) {
+//		std::cin >> W;
+//		D = W >= 1000 ? W - 1000 : 0;
+//		std::cout << W << " " << std::min(1000, W) * X + D * Y << "\n";
+//	}
 //	return 0;
 //}
