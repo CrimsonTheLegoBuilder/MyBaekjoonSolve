@@ -73,6 +73,7 @@ ll dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
 ld rad(const Pos& d1, const Pos& d2, const Pos& d3) { return rad(d2 - d1, d3 - d1); }
+ld rad(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return rad(d2 - d1, d4 - d3); }
 ld operator / (const Pos& p, const Pdd& q) { return p.x * q.y - p.y * q.x; }
 Pdd operator + (const Pos& p, const Pdd& q) { return Pdd(p.x + q.x, p.y + q.y); }
 Pdd operator - (const Pos& p, const Pdd& q) { return Pdd(p.x - q.x, p.y - q.y); }
@@ -99,9 +100,10 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 		Pos v = H[i1] - c;
 		t = rad(h, v);
 		Pdd m0 = v.p().rot(t);
-		t = norm(PI * .5 + t);
+		t = norm(PI * .5 - t);
 		r = norm(rad(H[i1], H[i2], H[(i1 - 1 + sz) % sz]));
-		if (r < t) return Pos(-1, -1);
+		if (t > PI * .5 && r < t) return Pos(-1, -1);
+		if (t < PI * .5 && r > t) return Pos(-1, -1);
 		while (s < e) {
 			int m = s + e >> 1;
 			r = norm(rad(H[i1], H[i2], H[fit(i1 + m)]));
@@ -114,15 +116,17 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 	}
 	else {
 		Pos h = ~(H[i2] - H[i1]);
+		Pos h2 = H[i1] - (H[i2] - H[i1]);
 		Pos v = H[i1] - c;
 		t = rad(h, v);
 		Pdd m0 = v.p().rot(t);
 		t = norm(PI * .5 + t);
-		r = norm(rad(H[i1], H[i2], H[(i1 - 1 + sz) % sz]));
-		if (r < t) return Pos(-1, -1);
+		r = norm(rad(H[i1], h2, H[(i1 - 1 + sz) % sz]));
+		if (t > PI * .5 && r < t) return Pos(-1, -1);
+		if (t < PI * .5 && r > t) return Pos(-1, -1);
 		while (s < e) {
 			int m = s + e >> 1;
-			r = norm(rad(H[i1], H[i2], H[fit(i1 + m)]));
+			r = norm(rad(H[i1], h2, H[fit(i1 + m)]));
 			if (eq(t, r)) { ix = 0; return Pos(fit(i1 + m), -1); }
 			if (r < t) s = m + 1;
 			else e = m;
