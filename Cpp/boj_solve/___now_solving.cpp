@@ -95,13 +95,12 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 	int s = 1, e = N - 2;
 	if (f > 0) {
 		Pos h = ~(H[i2] - H[i1]);
-		Pos v = H[i1] - c;
+		Pos v = c - H[i1];
 		t = rad(h, v);
 		Pdd m0 = v.p().rot(t);
 		t = norm(PI * .5 - t);
 		r = norm(rad(H[i1], H[i2], H[(i1 - 1 + sz) % sz]));
-		if (t > PI * .5 && r <= t) return Pos(-1, -1);
-		if (t < PI * .5 && r >= t) return Pos(-1, -1);
+		if (r <= t) return Pos(-1, -1);
 		while (s < e) {
 			int m = s + e >> 1;
 			r = norm(rad(H[i1], H[i2], H[fit(i1 + m)]));
@@ -113,15 +112,14 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 		return Pos(fit(i1 + s - 1 + N), fit(i1 + s));
 	}
 	else {
-		Pos h = ~(H[i2] - H[i1]);
+		Pos h = -~(H[i2] - H[i1]);
 		Pos h2 = H[i1] - (H[i2] - H[i1]);
-		Pos v = H[i1] - c;
+		Pos v = c - H[i1];
 		t = rad(h, v);
 		Pdd m0 = v.p().rot(t);
 		t = norm(PI * .5 + t);
-		r = norm(rad(H[i1], h2, H[(i1 - 1 + sz) % sz]));
-		if (t > PI * .5 && r <= t) return Pos(-1, -1);
-		if (t < PI * .5 && r >= t) return Pos(-1, -1);
+		r = norm(rad(H[i1], h2, H[(i1 + 1) % sz]));
+		if (r >= t) return Pos(-1, -1);
 		while (s < e) {
 			int m = s + e >> 1;
 			r = norm(rad(H[i1], h2, H[fit(i1 + m)]));
@@ -132,6 +130,8 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 		ix = intersection(H[fit(s - 1)], H[fit(s)], H[i1], m0);
 		return Pos(fit(i1 + s - 1 + N), fit(i1 + s));
 	}
+	assert(0);
+	return Pos();
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
