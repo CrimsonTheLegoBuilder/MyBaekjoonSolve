@@ -96,9 +96,10 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 	if (f > 0) {
 		Pos h = ~(H[i2] - H[i1]);
 		Pos v = c - H[i1];
-		t = rad(h, v);
+		//t = rad(h, v);
+		t = rad(H[i1], c, H[i2]);
+		t = norm(PI - t);
 		Pdd m0 = v.p().rot(t);
-		t = norm(PI * .5 - t);
 		r = norm(rad(H[i1], H[i2], H[(i1 - 1 + sz) % sz]));
 		if (r <= t) return Pos(-1, -1);
 		while (s < e) {
@@ -115,7 +116,9 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 		Pos h = -~(H[i2] - H[i1]);
 		Pos h2 = H[i1] - (H[i2] - H[i1]);
 		Pos v = c - H[i1];
-		t = rad(h, v);
+		//t = rad(h, v);
+		t = rad(H[i1], H[i2], c);
+		t = norm(PI - t);
 		Pdd m0 = v.p().rot(t);
 		t = norm(PI * .5 + t);
 		r = norm(rad(H[i1], h2, H[(i1 + 1) % sz]));
