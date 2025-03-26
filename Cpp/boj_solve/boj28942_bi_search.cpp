@@ -9,7 +9,7 @@ typedef long long ll;
 typedef long double ld;
 //typedef double ld;
 const ld TOL = 1e-13;
-const double PI = acos(-1);
+const ld PI = acos(-1);
 const int LEN = 1e5 + 10;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -35,7 +35,7 @@ struct Pos {
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
 	Pos operator ~ () const { return { -y, x }; }
-	friend double rad(const Pos& p1, const Pos& p2) { return atan2(p1 / p2, p1 * p2); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 	Pdd p() const { return Pdd(x, y); }
@@ -43,7 +43,7 @@ struct Pos {
 typedef std::vector<Pos> Polygon;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
-double rad(const Pos& d1, const Pos& d2, const Pos& d3) { return rad(d2 - d1, d3 - d1); }
+ld rad(const Pos& d1, const Pos& d2, const Pos& d3) { return rad(d2 - d1, d3 - d1); }
 Pdd operator + (const Pos& p, const Pdd& q) { return Pdd(p.x + q.x, p.y + q.y); }
 ld operator / (const Pdd& p, const Pos& q) { return p.x * q.y - p.y * q.x; }
 Pdd operator - (const Pdd& p, const Pos& q) { return Pdd(p.x - q.x, p.y - q.y); }
@@ -62,7 +62,7 @@ Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& 
 	assert(f);
 	Pos v = H[i2] - H[i1];
 	Pos h2 = f > 0 ? H[i2] : H[i1] - v;
-	double t = PI - rad(H[i1], h2, c), r;
+	ld t = PI - rad(H[i1], h2, c), r;
 	Pdd m0 = H[i1] + v.p().rot(t);
 	if (f > 0) {
 		r = rad(H[i1], h2, H[(i1 - 1 + sz) % sz]);
@@ -88,8 +88,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(13);
-	freopen("mirror.in", "r", stdin);
-	freopen("mirror.out", "w", stdout);
+	//freopen("mirror.in", "r", stdin);
+	//freopen("mirror.out", "w", stdout);
 	std::cin >> N; Polygon H(N); for (Pos& p : H) std::cin >> p;
 	Pos c; std::cin >> c;
 	for (int i = 0; i < N; i++) A[i + 1] = A[i] + cross(c, H[i], H[(i + 1) % N]);
@@ -130,31 +130,4 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj29688
-
-//#define _CRT_SECURE_NO_WARNINGS
-//#include <iostream>
-//#include <algorithm>
-//#include <vector>
-//#include <cmath>
-//#include <cstring>
-//#include <cassert>
-//typedef long long ll;
-////typedef long double ld;
-//typedef double ld;
-//
-//int X, Y, N, W, D;
-//std::string s;
-//int main() {
-//	std::cin.tie(0)->sync_with_stdio(0);
-//	std::cout.tie(0);
-//	std::cout << std::fixed;
-//	std::cout.precision(10);
-//	std::cin >> X >> Y >> N;
-//	while (N--) {
-//		std::cin >> W;
-//		D = W >= 1000 ? W - 1000 : 0;
-//		std::cout << W << " " << std::min(1000, W) * X + D * Y << "\n";
-//	}
-//	return 0;
-//}
+int main() { solve(); return 0; }//boj28942

@@ -1659,6 +1659,9 @@
     <ClCompile Include="__checker.cpp">
       <Filter>소스 파일\___now_solving</Filter>
     </ClCompile>
+    <ClCompile Include="boj28942_bi_search.cpp">
+      <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="boj6632.txt">
