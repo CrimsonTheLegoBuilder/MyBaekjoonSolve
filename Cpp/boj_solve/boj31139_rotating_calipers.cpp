@@ -71,4 +71,4 @@ void solve() {
 	std::cout << T << "\n";
 	return;
 }
-int main() { solve(); return 0; }//boj31191
+int main() { solve(); return 0; }//boj31139
