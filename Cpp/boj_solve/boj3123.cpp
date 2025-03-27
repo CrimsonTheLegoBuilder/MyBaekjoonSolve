@@ -32,7 +32,7 @@ void add(const int& x, const int& y, const int& dx, const int& dy) {
 	l = L[y][x + dx];
 	if (r && l) return;
 	else if (!d && !r && !l) A += PI * .25;
-	else if ((d && r) || (d && l)) A += a1;
+	else if (d && (r || l)) A += a1;
 	else if (!d && (r || l)) A += a2;
 	else if (d && (!r && !l)) A += 1 - (PI * .25);
 	return;
