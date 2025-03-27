@@ -22,32 +22,29 @@ main() {
 	printf("%.4lf", A);
 }
 
-#include <stdio.h>
-bool L[1001][1001];
-double A, PI = 3.141592653, a1 = 0.04338852250, a2 = 0.17121331409;
-void add(const int& x, const int& y, const int& dx, const int& dy) {
-	bool d, r, l;
-	d = L[y + dy][x + dx];
-	r = L[y + dy][x];
-	l = L[y][x + dx];
-	if (r && l) return;
-	else if (!d && !r && !l) A += PI * .25;
-	else if (d && (r || l)) A += a1;
-	else if (!d && (r || l)) A += a2;
-	else if (d && (!r && !l)) A += 1 - (PI * .25);
-	return;
+#include<cstdio>
+int X, Y, N, x, y;
+bool L[1001][1001], d, r, l;
+double A, P = .785398, b = .171213, c = .043388;
+void a(int w, int h) {
+	d = L[y + h][x + w];
+	r = L[y + h][x];
+	l = L[y][x + w];
+	if (r & l)return;
+	if (!d & !r & !l)A += P;
+	if (d & !r & !l)A += 1 - P;
+	if (!d & (r | l))A += b;
+	if (d & (r | l))A += c;
 }
 main() {
-	int X, Y, N, x, y, i;
 	scanf("%d%d%d", &X, &Y, &N);
-	for (i = 0; i < N; i++) {
+	while (N--) {
 		scanf("%d%d", &x, &y);
-		if (L[y][x]) continue;
 		L[y][x] = 1;
-		if (x < X && y < Y) add(x, y, 1, 1);
-		if (x < X && 0 < y) add(x, y, 1, -1);
-		if (0 < x && y < Y) add(x, y, -1, 1);
-		if (0 < x && 0 < y) add(x, y, -1, -1);
+		if (x < X & y < Y)a(1, 1);
+		if (x < X & 0 < y)a(1, -1);
+		if (0 < x & y < Y)a(-1, 1);
+		if (0 < x & 0 < y)a(-1, -1);
 	}
-	printf("%.4lf", A);
+	printf("%.4f", A);
 }
