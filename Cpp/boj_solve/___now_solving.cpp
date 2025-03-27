@@ -74,6 +74,7 @@ void solve() {
 	Polygon A(N); for (Pos& p : A) std::cin >> p;
 	Polygon B(M); for (Pos& p : B) std::cin >> p;
 	for (int i = 0; i < N; i++) R[i + 1] = R[i] + (A[i] - A[(i + 1) % N]).mag();
+	//for (int i = 0; i <= N; i++) std::cout << R[i] << "\n";
 	int r = 0, l = 0;
 	for (; r < N; r++) if (inner_check(B[1], A[r], A[(r + 1) % N], B[0])) break;
 	for (; l < N; l++) if (inner_check(B[0], A[l], A[(l + 1) % N], B[1])) break;
@@ -86,7 +87,8 @@ void solve() {
 		a1 = l % N;
 		//std::cout << "b0:: " << B[b0] << " b1:: " << B[b1] << "\n";
 		//std::cout << "a0:: " << A[a0] << " a1:: " << A[a1] << "\n";
-		ld D = (a0 < a1) ? (R[a1] - R[a0]) : (R[N] - (R[a0] - R[a1]));
+		ld D = (a0 <= a1) ? (R[a1] - R[a0]) : (R[N] - (R[a0] - R[a1]));
+		//std::cout << "D:: " << D << "\n";
 		ix = intersection(A[(r + 1) % N], A[r % N], B[b1], B[b0]);
 		//std::cout << "ix:: " << ix << "\n";
 		D += (A[r % N] - A[(r + 1) % N]).mag() * ix;
