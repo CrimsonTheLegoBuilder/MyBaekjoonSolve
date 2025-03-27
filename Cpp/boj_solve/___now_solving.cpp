@@ -3,49 +3,29 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
-#include <cstring>
 #include <cassert>
 typedef long long ll;
-typedef long double ld;
-//typedef double ld;
+//typedef long double ld;
+typedef double ld;
 const ld TOL = 1e-13;
 const double PI = acos(-1);
 const int LEN = 2e5 + 10;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
-inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
-inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
 
 int N, M;
 ld R[LEN], ix, T;
 struct Pos {
 	int x, y;
 	Pos(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
-	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
-	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
-	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
-	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
 	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
 	Pos operator * (const int& n) const { return { x * n, y * n }; }
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
 	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
-	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
-	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
-	Pos& operator *= (const int& n) { x *= n; y *= n; return *this; }
-	Pos& operator /= (const int& n) { x /= n; y /= n; return *this; }
-	Pos operator - () const { return { -x, -y }; }
-	Pos operator ~ () const { return { -y, x }; }
-	Pos operator ! () const { return { y, x }; }
-	ll xy() const { return (ll)x * y; }
-	ll Euc() const { return (ll)x * x + (ll)y * y; }
-	int Man() const { return std::abs(x) + std::abs(y); }
 	ld mag() const { return hypot(x, y); }
-	ld rad() const { return atan2(y, x); }
-	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = Pos(0, 0);
@@ -68,13 +48,10 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(13);
-	//freopen(".in", "r", stdin);
-	//freopen(".out", "w", stdout);
 	std::cin >> N >> M; 
 	Polygon A(N); for (Pos& p : A) std::cin >> p;
 	Polygon B(M); for (Pos& p : B) std::cin >> p;
 	for (int i = 0; i < N; i++) R[i + 1] = R[i] + (A[i] - A[(i + 1) % N]).mag();
-	//for (int i = 0; i <= N; i++) std::cout << R[i] << "\n";
 	int r = 0, l = 0;
 	for (; r < N; r++) if (inner_check(B[1], A[r], A[(r + 1) % N], B[0])) break;
 	for (; l < N; l++) if (inner_check(B[0], A[l], A[(l + 1) % N], B[1])) break;
@@ -83,19 +60,12 @@ void solve() {
 		ld d = (B[b0] - B[b1]).mag();
 		while (!inner_check(B[b1], A[r % N], A[(r + 1) % N], B[b0])) r++;
 		while (!inner_check(B[b0], A[l % N], A[(l + 1) % N], B[b1])) l++;
-		a0 = (r + 1) % N;
-		a1 = l % N;
-		//std::cout << "b0:: " << B[b0] << " b1:: " << B[b1] << "\n";
-		//std::cout << "a0:: " << A[a0] << " a1:: " << A[a1] << "\n";
+		a0 = (r + 1) % N; a1 = l % N;
 		ld D = (a0 <= a1) ? (R[a1] - R[a0]) : (R[N] - (R[a0] - R[a1]));
-		//std::cout << "D:: " << D << "\n";
 		ix = intersection(A[(r + 1) % N], A[r % N], B[b1], B[b0]);
-		//std::cout << "ix:: " << ix << "\n";
 		D += (A[r % N] - A[(r + 1) % N]).mag() * ix;
 		ix = intersection(A[l % N], A[(l + 1) % N], B[b0], B[b1]);
-		//std::cout << "ix:: " << ix << "\n";
 		D += (A[l % N] - A[(l + 1) % N]).mag() * ix;
-		//std::cout << "D:: " << D << "\n";
 		T += d * (D / R[N]);
 	}
 	std::cout << T << "\n";
