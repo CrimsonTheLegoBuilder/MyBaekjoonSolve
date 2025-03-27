@@ -130,7 +130,7 @@ void solve() {
 	}
 	return;
 }
-int main() { solve(); return 0; }//boj29688
+int main() { solve(); return 0; }//boj29688 31191 29675
 
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
