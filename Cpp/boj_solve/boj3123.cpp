@@ -23,28 +23,23 @@ main() {
 }
 
 #include<cstdio>
-int X, Y, N, x, y;
-bool L[1001][1001], d, r, l;
-double A, P = .785398, b = .171213, c = .043388;
+int X, Y, N, x, y, s;
+bool L[1001][1001], d;
+double A;
 void a(int w, int h) {
+	if (x + w < 0 | X < x + w | y + h < 0 | Y < y + h)return;
 	d = L[y + h][x + w];
-	r = L[y + h][x];
-	l = L[y][x + w];
-	if (r & l)return;
-	if (!d & !r & !l)A += P;
-	if (d & !r & !l)A += 1 - P;
-	if (!d & (r | l))A += b;
-	if (d & (r | l))A += c;
+	s = L[y + h][x] + L[y][x + w];
+	if (s > 1)return;
+	if (!d & !s)A += .785398;
+	if (d & !s)A += .214602;
+	if (!d & s)A += .171213;
+	if (d & s)A += .043388;
 }
 main() {
 	scanf("%d%d%d", &X, &Y, &N);
-	while (N--) {
-		scanf("%d%d", &x, &y);
-		L[y][x] = 1;
-		if (x < X & y < Y)a(1, 1);
-		if (x < X & 0 < y)a(1, -1);
-		if (0 < x & y < Y)a(-1, 1);
-		if (0 < x & 0 < y)a(-1, -1);
-	}
+	while (N--)
+		scanf("%d%d", &x, &y), L[y][x] = 1,
+		a(1, 1), a(1, -1), a(-1, 1), a(-1, -1);
 	printf("%.4f", A);
 }

@@ -1,136 +1,107 @@
-//#define _CRT_SECURE_NO_WARNINGS
-//#include <iostream>
-//#include <algorithm>
-//#include <vector>
-//#include <cmath>
-//#include <cstring>
-//#include <cassert>
-//typedef long long ll;
-//typedef long double ld;
-////typedef double ld;
-//const ld TOL = 1e-13;
-//const double PI = acos(-1);
-//const int LEN = 1e5 + 10;
-//inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
-//inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
-//inline bool zero(const ld& x) { return !sign(x); }
-//inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
-//inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
-//
-//int N;
-//ll A[LEN];
-//struct Pdd {
-//	ld x, y;
-//	Pdd(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
-//	ld operator / (const Pdd& p) const { return x * p.x + y * p.y; }
-//	Pdd operator + (const Pdd& p) const { return Pdd(x + p.x, y + p.y); }
-//	Pdd operator - (const Pdd& p) const { return Pdd(x - p.x, y - p.y); }
-//	Pdd rot(const ld& t) const { return Pdd(x * cos(t) - y * sin(t), x * sin(t) + y * cos(t)); }
-//};
-//struct Pos {
-//	int x, y;
-//	Pos(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
-//	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
-//	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-//	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
-//	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
-//	Pos operator ~ () const { return { -y, x }; }
-//	friend double rad(const Pos& p1, const Pos& p2) { return atan2(p1 / p2, p1 * p2); }
-//	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
-//	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-//	Pdd p() const { return Pdd(x, y); }
-//}; const Pos O = Pos(0, 0);
-//typedef std::vector<Pos> Polygon;
-//ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-//int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
-//double rad(const Pos& d1, const Pos& d2, const Pos& d3) { return rad(d2 - d1, d3 - d1); }
-//Pdd operator + (const Pos& p, const Pdd& q) { return Pdd(p.x + q.x, p.y + q.y); }
-//ld operator / (const Pdd& p, const Pos& q) { return p.x * q.y - p.y * q.x; }
-//Pdd operator - (const Pdd& p, const Pos& q) { return Pdd(p.x - q.x, p.y - q.y); }
-//ld intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pdd& q2) {
-//	ld det = (q2 - q1) / (p2 - p1);
-//	if (zero(det)) return -1;
-//	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
-//	//ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
-//	//if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
-//	return a1;
-//}
-//Pos bi_search(const Polygon& H, const Pos& c, const int& i1, const int& i2, ld& ix) {
-//	int sz = H.size();
-//	auto fit = [&](const int& i) -> int { return i % sz; };
-//	int f = ccw(c, H[i1], H[i2]);
-//	assert(f);
-//	Pos v = H[i2] - H[i1];
-//	Pos h2 = f > 0 ? H[i2] : H[i1] - v;
-//	double t = PI - rad(H[i1], h2, c), r;
-//	Pdd m0 = H[i1] + v.p().rot(t);
-//	if (f > 0) {
-//		r = rad(H[i1], h2, H[(i1 - 1 + sz) % sz]);
-//		if (r <= t) return Pos(-1, -1);
-//	}
-//	else {
-//		r = rad(H[i1], h2, H[(i1 + 1) % sz]);
-//		if (r >= t) return Pos(-1, -1);
-//	}
-//	int s = 1, e = N - 1;
-//	while (s < e) {
-//		int m = s + e >> 1;
-//		r = rad(H[i1], h2, H[fit(i1 + m)]);
-//		if (eq(t, r)) { ix = 0; return Pos(fit(i1 + m), -1); }
-//		if (r < t) s = m + 1;
-//		else e = m;
-//	}
-//	ix = intersection(H[fit(i1 + s - 1 + sz)], H[fit(i1 + s)], H[i1], m0);
-//	return Pos(fit(i1 + s - 1 + sz), fit(i1 + s));
-//}
-//void solve() {
-//	std::cin.tie(0)->sync_with_stdio(0);
-//	std::cout.tie(0);
-//	std::cout << std::fixed;
-//	std::cout.precision(13);
-//	freopen("mirror.in", "r", stdin);
-//	freopen("mirror.out", "w", stdout);
-//	std::cin >> N; Polygon H(N); for (Pos& p : H) std::cin >> p;
-//	Pos c; std::cin >> c;
-//	for (int i = 0; i < N; i++) A[i + 1] = A[i] + cross(c, H[i], H[(i + 1) % N]);
-//	for (int i = 0; i < N; i++) {
-//		int i1 = i, i2 = (i + 1) % N;
-//		ld ix = 0, al = 0, ar = 0;
-//		Pos pl = bi_search(H, c, i1, i2, ix);
-//		if (pl.x == -1) al = 0;
-//		else {
-//			if (pl.y == -1) {
-//				int j = pl.x;
-//				if (i1 > j) al = A[i1] - A[j] + cross(c, H[i1], H[j]);
-//				else al = A[N] - (A[j] - A[i1] + cross(c, H[j], H[i1]));
-//			}
-//			else {
-//				int j0 = pl.x, j1 = pl.y;
-//				if (i1 > j1) al = A[i1] - A[j1] + cross(c, H[i1], H[j1]);
-//				else al = A[N] - (A[j1] - A[i1] + cross(c, H[j1], H[i1]));
-//				al += cross(H[i1], H[j0], H[j1]) * (1 - ix);
-//			}
-//		}
-//		Pos pr = bi_search(H, c, i2, i1, ix);
-//		if (pr.x == -1) ar = 0;
-//		else {
-//			if (pr.y == -1) {
-//				int j = pr.x;
-//				if (i2 < j) ar = A[j] - A[i2] + cross(c, H[j], H[i2]);
-//				else ar = A[N] - (A[i2] - A[j] + cross(c, H[i2], H[j]));
-//			}
-//			else {
-//				int j0 = pr.x, j1 = pr.y;
-//				if (i2 < j0) ar = A[j0] - A[i2] + cross(c, H[j0], H[i2]);
-//				else ar = A[N] - (A[i2] - A[j0] + cross(c, H[i2], H[j0]));
-//				ar += cross(H[i2], H[j0], H[j1]) * ix;
-//			}
-//		}
-//		std::cout << (A[N] - al - ar) * .5 << "\n";
-//	}
-//	return;
-//}
-//boj29688 31191 29675
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <cmath>
+#include <cstring>
+#include <cassert>
+typedef long long ll;
+typedef long double ld;
+//typedef double ld;
+const ld TOL = 1e-13;
+const double PI = acos(-1);
+const int LEN = 2e5 + 10;
+inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return !sign(x); }
+inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
+inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
+
+int N, M;
+ld R[LEN], ix, T;
+struct Pos {
+	int x, y;
+	Pos(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
+	bool operator == (const Pos& p) const { return x == p.x && y == p.y; }
+	bool operator != (const Pos& p) const { return x != p.x || y != p.y; }
+	bool operator < (const Pos& p) const { return x == p.x ? y < p.y : x < p.x; }
+	bool operator <= (const Pos& p) const { return x == p.x ? y <= p.y : x <= p.x; }
+	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
+	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
+	Pos operator * (const int& n) const { return { x * n, y * n }; }
+	Pos operator / (const int& n) const { return { x / n, y / n }; }
+	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
+	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
+	Pos operator ^ (const Pos& p) const { return { x * p.x, y * p.y }; }
+	Pos& operator += (const Pos& p) { x += p.x; y += p.y; return *this; }
+	Pos& operator -= (const Pos& p) { x -= p.x; y -= p.y; return *this; }
+	Pos& operator *= (const int& n) { x *= n; y *= n; return *this; }
+	Pos& operator /= (const int& n) { x /= n; y /= n; return *this; }
+	Pos operator - () const { return { -x, -y }; }
+	Pos operator ~ () const { return { -y, x }; }
+	Pos operator ! () const { return { y, x }; }
+	ll xy() const { return (ll)x * y; }
+	ll Euc() const { return (ll)x * x + (ll)y * y; }
+	int Man() const { return std::abs(x) + std::abs(y); }
+	ld mag() const { return hypot(x, y); }
+	ld rad() const { return atan2(y, x); }
+	friend ld rad(const Pos& p1, const Pos& p2) { return atan2l(p1 / p2, p1 * p2); }
+	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
+	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
+}; const Pos O = Pos(0, 0);
+typedef std::vector<Pos> Polygon;
+ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
+ld intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
+	ld det = (q2 - q1) / (p2 - p1);
+	if (zero(det)) return -1;
+	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
+	//ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
+	//if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
+	return a1;
+}
+bool inner_check(const Pos& t1, const Pos& t2, const Pos& t3, const Pos& q) {
+	return ccw(t1, t2, q) >= 0 && ccw(t2, t3, q) >= 0 && ccw(t3, t1, q) >= 0;
+}
+void solve() {
+	std::cin.tie(0)->sync_with_stdio(0);
+	std::cout.tie(0);
+	std::cout << std::fixed;
+	std::cout.precision(13);
+	//freopen(".in", "r", stdin);
+	//freopen(".out", "w", stdout);
+	std::cin >> N >> M; 
+	Polygon A(N); for (Pos& p : A) std::cin >> p;
+	Polygon B(M); for (Pos& p : B) std::cin >> p;
+	for (int i = 0; i < N; i++) R[i + 1] = R[i] + (A[i] - A[(i + 1) % N]).mag();
+	int r = 0, l = 0;
+	for (; r < N; r++) if (inner_check(B[1], A[r], A[(r + 1) % N], B[0])) break;
+	for (; l < N; l++) if (inner_check(B[0], A[l], A[(l + 1) % N], B[1])) break;
+	for (int b0 = 0, b1, a0, a1; b0 < M; b0++) {
+		b1 = (b0 + 1) % M;
+		ld d = (B[b0] - B[b1]).mag();
+		while (!inner_check(B[b1], A[r % N], A[(r + 1) % N], B[b0])) r++;
+		while (!inner_check(B[b0], A[l % N], A[(l + 1) % N], B[b1])) l++;
+		a0 = (r + 1) % N;
+		a1 = l % N;
+		//std::cout << "b0:: " << B[b0] << " b1:: " << B[b1] << "\n";
+		//std::cout << "a0:: " << A[a0] << " a1:: " << A[a1] << "\n";
+		ld D = (a0 < a1) ? (R[a1] - R[a0]) : (R[N] - (R[a0] - R[a1]));
+		ix = intersection(A[(r + 1) % N], A[r % N], B[b1], B[b0]);
+		//std::cout << "ix:: " << ix << "\n";
+		D += (A[r % N] - A[(r + 1) % N]).mag() * ix;
+		ix = intersection(A[l % N], A[(l + 1) % N], B[b0], B[b1]);
+		//std::cout << "ix:: " << ix << "\n";
+		D += (A[l % N] - A[(l + 1) % N]).mag() * ix;
+		//std::cout << "D:: " << D << "\n";
+		T += d * (D / R[N]);
+	}
+	std::cout << T << "\n";
+	return;
+}
+int main() { solve(); return 0; }//boj31191
+
+//29675 29688
 
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
@@ -158,74 +129,3 @@
 //	}
 //	return 0;
 //}
-
-
-//#include <stdio.h>
-//#include <iostream>
-//#include <cmath>
-//bool L[1001][1001];
-////double A, PI = 3.1415926535898; 0.261799387799149  0.090586073706080
-//double A, PI = acos(-1), a2 = 0.171213314093069, a3 = 0.043388522509482;
-//void add(const int& x, const int& y, const int& dx, const int& dy) {
-//	bool d, r, l;
-//	d = L[x + dx][y + dy];
-//	r = L[x + dx][y];
-//	l = L[x][y + dy];
-//	if (r && l) return;
-//	if (!d && !r && !l) { A += PI * .25; return; }
-//	if (d && r || d && l) { A += a3; return; }
-//	if (!d && (r || l)) { A += a2; return; }
-//	if (d && (!r && !l)) { A += 1 - (PI * .25); return; }
-//	return;
-//}
-//int main() {
-//	std::cout << std::fixed;
-//	std::cout.precision(15);
-//	std::cout << PI * (1 / 12.) << "\n";
-//	std::cout << PI * (1 / 6.) - 0.25 * sqrt(3) << "\n";
-//	std::cout << 1 - (0.523598775598299 + 0.433012701892219) << "\n";
-//	std::cout << 0.261799387799149 - 0.090586073706080 << "\n";
-//	//int X, Y, N, x, y, s, i, j;
-//	//scanf("%d%d%d", &X, &Y, &N);
-//	//for (i = 0; i < N; i++) {
-//	//	scanf("%d%d", &x, &y);
-//	//	if (L[y][x]) continue;
-//	//	L[y][x] = 1;
-//	//	if (x < X && y < Y) add(x, y, 1, 1);
-//	//	if (x < X && 0 < y) add(x, y, 1, -1);
-//	//	if (0 < x && y < Y) add(x, y, -1, 1);
-//	//	if (0 < x && 0 < y) add(x, y, -1, -1);
-//	//}
-//	//printf("%.4lf", A);
-//}
-
-#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-bool L[1001][1001];
-double A, PI = 3.1415926535898, a1 = 0.043388522509482, a2 = 0.171213314093069;
-void add(const int& x, const int& y, const int& dx, const int& dy) {
-	bool d, r, l;
-	d = L[y + dy][x + dx];
-	r = L[y + dy][x];
-	l = L[y][x + dx];
-	if (r && l) return;
-	if (!d && !r && !l) { A += PI * .25; return; }
-	if ((d && r) || (d && l)) { A += a1; return; }
-	if (!d && (r || l)) { A += a2; return; }
-	if (d && (!r && !l)) { A += 1 - (PI * .25); return; }
-	return;
-}
-int main() {
-	int X, Y, N, x, y, i;
-	scanf("%d%d%d", &X, &Y, &N);
-	for (i = 0; i < N; i++) {
-		scanf("%d%d", &x, &y);
-		if (L[y][x]) continue;
-		L[y][x] = 1;
-		if (x < X && y < Y) add(x, y, 1, 1);
-		if (x < X && 0 < y) add(x, y, 1, -1);
-		if (0 < x && y < Y) add(x, y, -1, 1);
-		if (0 < x && 0 < y) add(x, y, -1, -1);
-	}
-	printf("%.4lf", A);
-}
