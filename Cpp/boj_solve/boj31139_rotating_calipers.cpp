@@ -1,11 +1,9 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <algorithm>
 #include <vector>
 #include <cmath>
 #include <cassert>
 typedef long long ll;
-//typedef long double ld;
 typedef double ld;
 const ld TOL = 1e-13;
 const double PI = acos(-1);
@@ -19,16 +17,13 @@ ld R[LEN], ix, T;
 struct Pos {
 	int x, y;
 	Pos(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
-	Pos operator + (const Pos& p) const { return { x + p.x, y + p.y }; }
 	Pos operator - (const Pos& p) const { return { x - p.x, y - p.y }; }
-	Pos operator * (const int& n) const { return { x * n, y * n }; }
 	Pos operator / (const int& n) const { return { x / n, y / n }; }
-	ll operator * (const Pos& p) const { return (ll)x * p.x + (ll)y * p.y; }
 	ll operator / (const Pos& p) const { return (ll)x * p.y - (ll)y * p.x; }
 	ld mag() const { return hypot(x, y); }
 	friend std::istream& operator >> (std::istream& is, Pos& p) { is >> p.x >> p.y; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
-}; const Pos O = Pos(0, 0);
+};
 typedef std::vector<Pos> Polygon;
 ll cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
 int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
@@ -36,8 +31,6 @@ ld intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld det = (q2 - q1) / (p2 - p1);
 	if (zero(det)) return -1;
 	ld a1 = ((q2 - q1) / (q1 - p1)) / det;
-	//ld a2 = ((p2 - p1) / (p1 - q1)) / -det;
-	//if (0 < a1 && a1 < 1 && -TOL < a2 && a2 < 1 + TOL) return a1;
 	return a1;
 }
 bool inner_check(const Pos& t1, const Pos& t2, const Pos& t3, const Pos& q) {
@@ -53,8 +46,6 @@ void solve() {
 	Polygon B(M); for (Pos& p : B) std::cin >> p;
 	for (int i = 0; i < N; i++) R[i + 1] = R[i] + (A[i] - A[(i + 1) % N]).mag();
 	int r = 0, l = 0;
-	for (; r < N; r++) if (inner_check(B[1], A[r], A[(r + 1) % N], B[0])) break;
-	for (; l < N; l++) if (inner_check(B[0], A[l], A[(l + 1) % N], B[1])) break;
 	for (int b0 = 0, b1, a0, a1; b0 < M; b0++) {
 		b1 = (b0 + 1) % M;
 		ld d = (B[b0] - B[b1]).mag();
