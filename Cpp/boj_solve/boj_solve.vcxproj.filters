@@ -1647,7 +1647,7 @@
     <ClCompile Include="boj33390_hpi.cpp">
       <Filter>소스 파일\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="___now_solving.cpp">
+    <ClCompile Include="____now_solving.cpp">
       <Filter>소스 파일\___now_solving</Filter>
     </ClCompile>
     <ClCompile Include="boj5418_3Dgeo.cpp">
@@ -1664,6 +1664,9 @@
     </ClCompile>
     <ClCompile Include="boj31139_rotating_calipers.cpp">
       <Filter>소스 파일\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="____now_impl.cpp">
+      <Filter>소스 파일\___now_solving</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
