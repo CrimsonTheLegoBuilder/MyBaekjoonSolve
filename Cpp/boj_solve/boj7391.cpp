@@ -424,32 +424,3 @@ void solve() {
 	return;
 }
 int main() { solve(); return 0; }//boj7391
-
-//7391 29675 29688
-
-//#define _CRT_SECURE_NO_WARNINGS
-//#include <iostream>
-//#include <algorithm>
-//#include <vector>
-//#include <cmath>
-//#include <cstring>
-//#include <cassert>
-//typedef long long ll;
-////typedef long double ld;
-//typedef double ld;
-//
-//int X, Y, N, W, D;
-//std::string s;
-//int main() {
-//	std::cin.tie(0)->sync_with_stdio(0);
-//	std::cout.tie(0);
-//	std::cout << std::fixed;
-//	std::cout.precision(10);
-//	std::cin >> X >> Y >> N;
-//	while (N--) {
-//		std::cin >> W;
-//		D = W >= 1000 ? W - 1000 : 0;
-//		std::cout << W << " " << std::min(1000, W) * X + D * Y << "\n";
-//	}
-//	return 0;
-//}
