@@ -73,7 +73,7 @@ void solve() {
 }
 int main() { solve(); return 0; }//boj31191
 
-//29675 29688
+//7391 29675 29688
 
 //#define _CRT_SECURE_NO_WARNINGS
 //#include <iostream>
