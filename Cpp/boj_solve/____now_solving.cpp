@@ -15,7 +15,7 @@ struct C {
 };
 
 int L, N, X, xl, xr;
-struct Pos { ld x, y; };
+struct Pos { int x, y; };
 std::vector<Pos> P;
 std::vector<ld> D;
 std::map<ld, int, C> M, R;
@@ -28,10 +28,10 @@ void solve() {
 	xl = -X, xr = L - X + L;
 	P.resize(N); for (Pos& p : P) std::cin >> p.x >> p.y;
 	for (Pos& p : P) {
-		ld dx = p.x - X;
-		ld dy = p.y;
+		int dx = p.x - X;
+		int dy = p.y;
 		if (!zero(dx)) {
-			ld d = dy / dx;
+			ld d = 1. * dy / dx;
 			D.push_back(d);
 			if (M.find(d) == M.end()) M[d] = 1;
 			else M[d]++;
@@ -40,7 +40,7 @@ void solve() {
 			dx = p.x - x;
 			dy = p.y;
 			if (!zero(dx)) {
-				ld d = dy / dx;
+				ld d = 1. * dy / dx;
 				if (R.find(d) == R.end()) R[d] = 1;
 				else R[d]++;
 			}
@@ -52,7 +52,7 @@ void solve() {
 	for (const ld& d : D) {
 		int c = M[d];
 		if (R.find(-d) != R.end()) c += R[-d];
-		ld dx = d > 0 ? (L - X + L) : (X + L);
+		int dx = d > 0 ? (L - X + L) : (X + L);
 		ld dy = std::abs(dx * d);
 		dx = d > 0 ? -X : L - X;
 		ld r = dy / dx;
