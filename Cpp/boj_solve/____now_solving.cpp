@@ -7,13 +7,18 @@
 typedef long long ll;
 //typedef long double ld;
 typedef double ld;
-const ld TOL = 1e-13;
+const ld TOL = 1e-6;
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return !sign(x); }
+struct C {
+	bool operator()(const ld& a, const ld& b) const { return sign(b - a) > 0; }
+};
 
 int L, N, X, xl, xr;
 struct Pos { ld x, y; };
 std::vector<Pos> P;
 std::vector<ld> D;
-std::map<ld, int> M, R;
+std::map<ld, int, C> M, R;
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
@@ -25,7 +30,7 @@ void solve() {
 	for (Pos& p : P) {
 		ld dx = p.x - X;
 		ld dy = p.y;
-		if (std::abs(dx) > TOL) {
+		if (!zero(dx)) {
 			ld d = dy / dx;
 			D.push_back(d);
 			if (M.find(d) == M.end()) M[d] = 1;
@@ -34,7 +39,7 @@ void solve() {
 		for (const ld& x : { xl, xr }) {
 			dx = p.x - x;
 			dy = p.y;
-			if (std::abs(dx) > TOL) {
+			if (!zero(dx)) {
 				ld d = dy / dx;
 				if (R.find(d) == R.end()) R[d] = 1;
 				else R[d]++;
@@ -52,7 +57,6 @@ void solve() {
 		dx = d > 0 ? -X : L - X;
 		ld r = dy / dx;
 		if (M.find(r) != M.end()) c += M[r];
-		//std::cout << "d:: " << d << " c:: " << c << " r:: " << r << "\n";
 		ret = std::max(ret, c);
 	}
 	std::cout << ret << "\n";
