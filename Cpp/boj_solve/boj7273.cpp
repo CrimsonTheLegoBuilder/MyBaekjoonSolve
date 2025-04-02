@@ -18,9 +18,9 @@ void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
-	std::cout.precision(15);
+	std::cout.precision(6);
 	std::cin >> L >> N >> X;
-	xl = -X, xr = L - X + L;
+	xl = -X, xr = L + (L - X);
 	P.resize(N); for (Pos& p : P) std::cin >> p.x >> p.y;
 	for (Pos& p : P) {
 		ld dx = p.x - X;
@@ -52,51 +52,9 @@ void solve() {
 		dx = d > 0 ? -X : L - X;
 		ld r = dy / dx;
 		if (M.find(r) != M.end()) c += M[r];
-		//std::cout << "d:: " << d << " c:: " << c << " r:: " << r << "\n";
 		ret = std::max(ret, c);
 	}
 	std::cout << ret << "\n";
 	return;
 }
 int main() { solve(); return 0; }//boj7273
-
-/*
-
-500000 5
-200000
-100000 100000
-100000 400000
-400000 200000
-300000 300000
-200000 600000
-
-*/
-
-//7391 29675 29688
-
-//#define _CRT_SECURE_NO_WARNINGS
-//#include <iostream>
-//#include <algorithm>
-//#include <vector>
-//#include <cmath>
-//#include <cstring>
-//#include <cassert>
-//typedef long long ll;
-////typedef long double ld;
-//typedef double ld;
-//
-//int X, Y, N, W, D;
-//std::string s;
-//int main() {
-//	std::cin.tie(0)->sync_with_stdio(0);
-//	std::cout.tie(0);
-//	std::cout << std::fixed;
-//	std::cout.precision(10);
-//	std::cin >> X >> Y >> N;
-//	while (N--) {
-//		std::cin >> W;
-//		D = W >= 1000 ? W - 1000 : 0;
-//		std::cout << W << " " << std::min(1000, W) * X + D * Y << "\n";
-//	}
-//	return 0;
-//}
