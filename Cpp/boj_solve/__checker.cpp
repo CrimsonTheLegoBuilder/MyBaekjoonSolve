@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 			ld rel_err, jmax, jmin;
 			jmax = std::max(j * (1.0 + 1e-5 + 1e-15), j * (1.0 - 1e-5 - 1e-15));
 			jmin = std::min(j * (1.0 + 1e-5 + 1e-15), j * (1.0 - 1e-5 - 1e-15));
-			if (doubleCompare(j, p, 1e-5)) {
+			if (!doubleCompare(j, p, 1e-5)) {
 				quitf(_wa, "line %d value mismatch - expected: %.8f, found: %.8f, absolute error: %.8e, relative error error: [%.8f, %.8f] (not in range)",
 					n, j, p, fabs(j - p), jmin, jmax);
 			}
