@@ -41,7 +41,7 @@ void solve() {
 			dy = p.y;
 			if (!zero(dx)) {
 				ld d = 1. * dy / dx;
-				D2.push_back(d);
+				D.push_back(d);
 				if (R.find(d) == R.end()) R[d] = 1;
 				else R[d]++;
 			}
@@ -49,26 +49,14 @@ void solve() {
 	}
 	std::sort(D.begin(), D.end());
 	D.erase(unique(D.begin(), D.end()), D.end());
-	std::sort(D2.begin(), D2.end());
-	D2.erase(unique(D2.begin(), D2.end()), D2.end());
 	int ret = 0;
 	for (const ld& d : D) {
-		int c = M[d];
-		auto it = R.find(-d);
-		if (it != R.end()) c += it->second;
+		int c = 0;
+		auto it0 = M.find(d);
+		if (it0 != M.end()) c += it0->second;
 		int dx = d > 0 ? (L - X + L) : (X + L);
-		ld dy = std::abs(dx * d);
-		dx = d > 0 ? -X : L - X;
-		ld r = dy / dx;
-		auto it2 = M.find(r);
-		if (it2 != M.end()) c += it2->second;
-		ret = std::max(ret, c);
-	}
-	for (ld d : D2) {
-		int c = R[d];
-		auto it = M.find(-d);
-		if (it != M.end()) c += it->second;
-		d *= -1;
+		auto it1 = R.find(-d);
+		if (it1 != R.end()) c += it1->second;
 		int dx = d > 0 ? (L - X + L) : (X + L);
 		ld dy = std::abs(dx * d);
 		dx = d > 0 ? -X : L - X;
