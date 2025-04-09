@@ -511,12 +511,12 @@ std::vector<Pos> graham_scan(std::vector<Pos>& C) {
 	return H;
 }
 int main() {
-	int N = 240;
+	int N = 50;
 	Pos p = Pos(-1000, 0);
 	std::cout << N << "\n";
 	ld t = 2 * PI / N;
 	Vpos H;
-	std::cout << N / 3 << "\n";
+	//std::cout << N / 3 << "\n";
 	for (int i = 0; i < N; i++) {
 		Pos p_ = p.rot(t * i);
 		p_.println();
@@ -554,13 +554,13 @@ int main() {
 	std::cout << N << "\n";
 	for (Pos& p : P[0]) p.println();
 	std::cout << N / 3 << "\n";
-	std::cout << "FUCK\n";
+	//std::cout << "FUCK\n";
 	for (int i = 1; i <= (N / 3); i++) {
 		std::cout << P[i].size() << "\n";
 		for (Pos& p : P[i]) p.println();
 	}
 	Pos R = Pos(-204, 200), G = Pos(-200, 200), B = Pos(-196, 200);
-	int Q = 500;
+	int Q = 50;
 	int w = 8;
 	int h = -10;
 	std::cout << Q << "\n";
