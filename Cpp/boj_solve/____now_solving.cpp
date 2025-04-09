@@ -54,7 +54,7 @@ inline ld fit(const ld& x, const ld& lo = 0, const ld& hi = 1) { return std::min
 
 //#define POLYGON_CHECK
 
-//#define NAIVE
+#define NAIVE
 #ifndef NAIVE
 #define FAST
 #endif
@@ -177,17 +177,17 @@ struct Seg {
 	Pos s, e;
 	Seg(Pos s_ = Pos(), Pos e_ = Pos()) : s(s_), e(e_) {}
 	Pos dir() const { return (s - e).unit(); }
-	bool operator < (const Seg& l) const {
-		Pos v0 = dir();
-		Pos v1 = l.dir();
-		bool f0 = O < v0;
-		bool f1 = O < v1;
-		if (f0 != f1) return f0;
-		if (collinear(s, e, l.s, l.e)) return s == l.s ? e < l.e : s < l.s;
-		int tq = v0 / v1;
-		return !tq ? ccw(s, e, l.s) > 0 : tq > 0;
-	}
-	//bool operator < (const Seg& l) const { return s == l.s ? e < l.e : s < l.s; }
+	//bool operator < (const Seg& l) const {
+	//	Pos v0 = dir();
+	//	Pos v1 = l.dir();
+	//	bool f0 = O < v0;
+	//	bool f1 = O < v1;
+	//	if (f0 != f1) return f0;
+	//	if (collinear(s, e, l.s, l.e)) return s < l.s;
+	//	int tq = v0 / v1;
+	//	return !tq ? ccw(s, e, l.s) > 0 : tq > 0;
+	//}
+	bool operator < (const Seg& l) const { return s == l.s ? e < l.e : s < l.s; }
 	bool operator == (const Seg& l) const { return s == l.s && e == l.e; }
 	Pos p(const ld& rt = .5) const { return s + (e - s) * rt; }
 	ld green(const ld& lo = 0, const ld& hi = 1) const {
@@ -323,7 +323,6 @@ struct Event {
 	ld x;
 	int f;
 	bool operator < (const Event& o) const { return eq(x, o.x) ? f < o.f : sign(x - o.x) < 0; }
-	bool operator == (const Event& o) const { return eq(x, o.x) && f == o.f; }
 };
 typedef std::vector<Event> Ve;
 Pos cen;
@@ -453,6 +452,7 @@ void query(const int& q) {
 		//std::cout << "hhh\n\n";
 	}
 	if (!I[RED] && !I[GREEN] && !I[BLUE]) {//R & G & B
+#ifdef NAIVE //27N^3 -> N==200:216,000,000
 		Segs VS;
 		for (int i = 0; i < 3; i++) {
 			int c0 = 1 << i;
@@ -460,69 +460,110 @@ void query(const int& q) {
 			int c2 = (1 << ((i + 2) % 3));
 			int sz = H[c0].size();
 			for (int j = 0; j < sz; j++) {
-				Ve ve = { { 0, 1 }, { 1, -1 } };
 				Vld V = { 0, 1 };
 				int j1 = (j + 1) % sz;
 				const Pos& s = H[c0][j], & e = H[c0][j1];
 				Seg s0 = Seg(s, e);
 				for (const int cc : { c1, c2 }) {
 					int sz1 = H[cc].size();
-					Ve tmp;
 					for (int k = 0; k < sz1; k++) {
-						int k2 = (k + 1) % sz1;
-						const Pos& p1 = H[cc][k], & p2 = H[cc][k2];
-						if (collinear(s, e, p1, p2)) {
-							if (dot(s, e, p1, p2) < 0) continue;
-							if (on_seg_strong(s, e, p1)) {
-								ld x = projection(s, e, p1);
-								V.push_back(x);
-								tmp.push_back({ x, 1 });
-							}
-							if (on_seg_strong(s, e, p2)) {
-								ld x = projection(s, e, p2);
-								V.push_back(x);
-								tmp.push_back({ x, -1 });
-							}
-						}
-						else {
-							Seg sk = Seg(p1, p2);
-							ld x = intersection(s0, sk);
-							if (x < 0) continue;
-							int tq = ccw(s, e, p1, p2);
-							assert(tq);
-							if (tq < 0) {
-								V.push_back(x);
-								tmp.push_back({ x, 1 });
-							}
-							else {
-								V.push_back(x);
-								tmp.push_back({ x, -1 });
-							}
-						}
+						int k£ß = (k + 1) % sz1;
+						const Pos& k1 = H[cc][k], & k2 = H[cc][k£ß];
+						Seg sk = Seg(k1, k2);
+						ld x = intersection(s0, sk);
+						if (x > -.5) V.push_back(x);
+						if (on_seg_strong(s, e, k1)) V.push_back(projection(s, e, k1));
+						if (on_seg_strong(s, e, k2)) V.push_back(projection(s, e, k2));
 					}
-					std::sort(tmp.begin(), tmp.end());
-					tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
-					if (tmp.empty()) continue;
-					if (tmp[0].f == -1) ve.push_back({ 0, 1 });
-					for (const Event& ev : tmp) ve.push_back(ev);
-					if (tmp.back().f == 1) ve.push_back({ 1, -1 });
 				}
 				std::sort(V.begin(), V.end());
 				V.erase(unique(V.begin(), V.end()), V.end());
-				std::sort(ve.begin(), ve.end());
-				Polygon vp;
-				int szr = ve.size(), szx = V.size(), cnt = 0;
-				for (int x = 0, k = 0; x < szx - 1; x++) {
-					const ld& s = V[x], e = V[x + 1];
-					while (k < szr && eq(ve[k].x, s)) { cnt += ve[k].f; k++; }
-					if (cnt > 2) vp.push_back(Pos(s, e));
+				int szv = V.size();
+				for (int £ë = 0; £ë < szv - 1; £ë++) {
+					ld s = V[£ë], e = V[£ë + 1];
+					//std::cout << "s:: " << s << " e:: " << e << "\n";
+					VS.push_back(Seg(s0.p(s), s0.p(e)));
 				}
-				for (const Pos& se : vp) VS.push_back(Seg(s0.p(se.x), s0.p(se.y)));
 			}
 		}
 		std::sort(VS.begin(), VS.end());
 		VS.erase(unique(VS.begin(), VS.end()), VS.end());
+		std::cout << "VS:: " << VS.size() << "\n";
+		for (const Seg& se : VS) {
+			bool f = 1;
+			for (int i = 0; i < 3; i++) {
+				int c = 1 << i;
+				Pos m = se.p(.5);
+				if (!inner_check_concave(H[c], m, se.s, se.e)) {
+					f = 0;
+					break;
+				}
+			}
+			if (f) A[WHITE] += se.green();
+		}
+
+		//		for (const Polygon& R : T[RED]) {
+		//			for (const Polygon& G : T[GREEN]) {
+		//				for (const Polygon& B : T[BLUE]) {
+		//					Polygon ix = intersection(R, G, B);
+		//					A[WHITE] += area(ix);
+		//#ifdef POLYGON_CHECK
+		//					if (ix.size()) T[WHITE].push_back(ix);
+		//#endif
+		//				}
+		//			}
+		//		}
+#endif
+#ifdef FAST //3*3*2N^2log2N^2 -> N==200:11,520,000~
+		Segs VS;
+		for (int i = 0; i < 3; i++) {
+			int c0 = 1 << i;
+			int c1 = (1 << ((i + 1) % 3));
+			int c2 = (1 << ((i + 2) % 3));
+			for (const Polygon& T0 : T[c0]) {
+				for (int j = 0; j < 3; j++) {
+					const Pos& p0 = T0[j], & p1 = T0[(j + 1) % 3];
+					Seg l = Seg(p0, p1);
+					Polygon vp;
+					Ve ve = { { 0, 1 }, { 1, -1 } };
+					Vld vx = { 0, 1 };
+					for (const int& c : { c1, c2 }) {
+						for (const Polygon& t : T[c]) {
+							Vld tmp = intersections(l, t);
+#ifdef DEBUG
+							std::cout << "tmp.size():: " << tmp.size() << "\ntmp::\n";
+							for (const ld& x : tmp) std::cout << x << " ";
+							std::cout << "\ntmp\n";
+#endif
+							if (tmp.size() > 1) {
+								assert(tmp.size() == 2);
+								ld s = tmp[0];
+								ld e = tmp[1];
+								ve.push_back({ s, 1 });
+								ve.push_back({ e, -1 });
+								vx.push_back(s);
+								vx.push_back(e);
+							}
+						}
+					}
+					std::sort(ve.begin(), ve.end());
+					std::sort(vx.begin(), vx.end());
+					vx.erase(unique(vx.begin(), vx.end()), vx.end());
+					int szr = ve.size(), szx = vx.size(), cnt = 0;
+					for (int x = 0, k = 0; x < szx - 1; x++) {
+						const ld& s = vx[x], e = vx[x + 1];
+						while (k < szr && eq(ve[k].x, s)) { cnt += ve[k].f; k++; }
+						if (cnt > 2) vp.push_back(Pos(s, e));
+					}
+					for (const Pos& se : vp) VS.push_back(Seg(l.p(se.x), l.p(se.y)));
+				}
+			}
+		}
+		std::sort(VS.begin(), VS.end());
+		VS.erase(unique(VS.begin(), VS.end()), VS.end());
+		//std::cout << "VS:: " << VS.size() << "\n";
 		for (const Seg& se : VS) A[WHITE] += se.green();
+#endif
 	}
 	for (int i = 0; i < 3; i++) {//R & G, G & B, B & R  3*9*N^2 -> N==200:1,080,000
 		int c1 = (1 << ((i + 1) % 3));
