@@ -635,8 +635,8 @@ void solve() {
 	std::cout << std::fixed;
 	//std::cout << std::scientific;
 	std::cout.precision(13);
-	//freopen("11_big.in", "r", stdin);
-	//freopen("cccs_naive_out.txt", "w", stdout);
+	freopen("15.in", "r", stdin);
+	freopen("15_out.txt", "w", stdout);
 	std::cin >> N;
 	P[0].resize(N);
 	for (Pos& p : P[0]) std::cin >> p;
