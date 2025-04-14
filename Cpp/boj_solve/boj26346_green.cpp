@@ -153,7 +153,8 @@ void query(const int& q) {
 			else hi = std::max(hi, a.hi);
 		}
 	}
-	std::cout << "Set #" << q << ": " << A << "\n\n";
+	//std::cout << "Set #" << q << ": " << A << "\n\n";
+	std::cout << "Set #" << q << ": " << A << (q != Q ? "\n\n" : "\n");
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
