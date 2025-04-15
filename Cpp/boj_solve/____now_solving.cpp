@@ -13,4 +13,4 @@ int main() {
 	std::cin >> P >> Q >> A >> B;
 	std::cout << A * std::min(P, Q) + B * std::max(0, Q - P) << "\n";
 	return 0;
-}
+}//boj25726
