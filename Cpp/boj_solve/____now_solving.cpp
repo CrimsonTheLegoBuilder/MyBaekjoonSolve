@@ -175,4 +175,4 @@ void solve() {
 	std::cin >> T;
 	for (int t = 0; t < T; t++) query();
 }
-int main() { solve(); return 0; }
+int main() { solve(); return 0; }//boj25726
