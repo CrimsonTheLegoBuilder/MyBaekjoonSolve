@@ -9,27 +9,32 @@
 typedef long long ll;
 typedef double ld;
 //typedef long double ld;
+typedef std::vector<int> Vint;
+typedef std::vector<ll> Vll;
+typedef std::vector<ld> Vld;
+typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
 const int LEN = 25;
-int N, M, T, Q;
-ld A;
-bool zero(const ld& x) { return std::abs(x) < TOL; }
-int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
-ld norm(ld th) {
-	while (th < 0) th += PI * 2;
-	while (th > PI * 2 - TOL) th -= PI * 2;
-	return th;
-}
+inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
+inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
+inline bool zero(const ld& x) { return !sign(x); }
+inline bool eq(const ld& x, const ld& y) { return zero(x - y); }
+inline ld sq(const ld& x) { return x * x; }
+inline ll sq(const ll& x) { return x * x; }
+inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
+inline ld fit(const ld& x, const ld& lo = 0, const ld& hi = 1) { return std::min(hi, std::max(lo, x)); }
 
 //#define DEBUG
 //#define ASSERT
 
+int B, N, M, T, Q;
+ld A;
 struct Pos {
 	ld x, y;
 	ld t;
-	Pos(ld X = 0, ld Y = 0) : x(X), y(Y) { t = norm(atan2(y, x)); }
+	Pos(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) { t = norm(atan2(y, x)); }
 	bool operator == (const Pos& p) const { return zero(x - p.x) && zero(y - p.y); }
 	bool operator != (const Pos& p) const { return !zero(x - p.x) || !zero(y - p.y); }
 	bool operator < (const Pos& p) const { return zero(x - p.x) ? y < p.y : x < p.x; }
@@ -65,18 +70,43 @@ const Pos O = Pos(0, 0);
 typedef std::vector<Pos> Polygon;
 bool cmpt(const Pos& p, const Pos& q) { return p.t < q.t; }
 ld cross(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) / (d3 - d2); }
-int ccw(const Pos& d1, const Pos& d2, const Pos& d3) {
-	ld ret = cross(d1, d2, d3);
-	return zero(ret) ? 0 : ret > 0 ? 1 : -1;
-}
+ld cross(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) / (d4 - d3); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3) { return sign(cross(d1, d2, d3)); }
+int ccw(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return sign(cross(d1, d2, d3, d4)); }
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3) { return (d2 - d1) * (d3 - d2); }
+ld dot(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return (d2 - d1) * (d4 - d3); }
+bool on_seg_strong(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) >= 0; }
+bool on_seg_weak(const Pos& d1, const Pos& d2, const Pos& d3) { return !ccw(d1, d2, d3) && sign(dot(d1, d3, d2)) > 0; }
+bool collinear(const Pos& d1, const Pos& d2, const Pos& d3, const Pos& d4) { return !ccw(d1, d2, d3) && !ccw(d1, d2, d4); }
+Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) { ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2); return (p1 * a2 + p2 * a1) / (a1 + a2); }
+ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return dot(d1, d2, d1, d3) / (d2 - d1).Euc(); }
+//bool inside(const Pos& p0, const Pos& p1, const Pos& p2, const Pos& q, const int& f = STRONG) {
+//	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
+//	return ccw(p0, p1, q) >= f && ccw(p1, p2, q) >= f;
+//}
 Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
+bool inner_check_concave(const std::vector<Pos>& H, const Pos& p, const Pos& s, const Pos& e) {
+	int cnt = 0, sz = H.size();
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) {
+			assert(collinear(cur, nxt, s, e));
+			return dot(cur, nxt, s, e) > 0 ? 1 : 0;
+		}
+		if (zero(cur.y - nxt.y)) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return cnt & 1;
+}
 struct Circle {
 	Pos c;
 	int r;
-	Circle(Pos C = Pos(0, 0), int R = 0) : c(C), r(R) {}
+	Circle(Pos c_ = Pos(0, 0), int r_ = 0) : c(c_), r(r_) {}
 	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
@@ -84,20 +114,31 @@ struct Circle {
 		return r < q.r && dist + r < q.r + TOL;
 	}
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
-	bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
+	//bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
+	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
-	ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
-	ld A() const { return 1. * r * r * PI; }
+	//ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
+	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
+	ld rad(const Pos& p) const { return (p - c).rad(); }
+	ld area(const ld& lo, const ld& hi) const { return (hi - lo) * r * r * .5; }
+	ld green(const ld& lo, const ld& hi) const {
+		Pos s = Pos(cos(lo), sin(lo)), e = Pos(cos(hi), sin(hi));
+		ld fan = area(lo, hi);
+		Pos m = c + (s + e) * r * (ld).5;
+		ld tz = (cos(lo) - cos(hi)) * m.y * r;
+		return fan + tz - (s / e) * r * r * (ld).5;
+	}
 	friend std::istream& operator >> (std::istream& is, Circle& c) { is >> c.c >> c.r; return is; }
 	friend std::ostream& operator << (std::ostream& os, const Circle& c) { os << c.c << " " << c.r; return os; }
 };
 bool cmpr(const Circle& p, const Circle& q) { return p.r > q.r; }//sort descending order
+typedef std::vector<Circle> Disks;
 struct Arc {
 	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
 	Circle cen;
-	Arc(ld LO = 0, ld HI = 0, Circle CEN = Circle(Pos(0, 0), 0)) : lo(LO), hi(HI), cen(CEN) {}
+	Arc(ld l_ = 0, ld h_ = 0, Circle c_ = Circle(Pos(0, 0), 0)) : lo(l_), hi(h_), cen(c_) {}
 	bool operator < (const Arc& a) const {
 		return !sign(hi - a.hi) ?
 			lo < a.lo :
@@ -107,11 +148,11 @@ struct Arc {
 	friend std::ostream& operator << (std::ostream& os, const Arc& l) { os << l.lo << " " << l.hi << " " << l.cen.r; return os; }
 };
 std::vector<Arc> arcs[LEN], valid_arcs[LEN];
-Circle disks[LEN];
+//Circle disks[LEN];
 struct Seg {
 	Pos s, e;
 	int i;
-	Seg(Pos x, Pos y, int I = 0) : s(x), e(y), i(I) {}
+	Seg(Pos s_, Pos e_, int i_ = 0) : s(s_), e(e_), i(i_) {}
 	friend std::ostream& operator << (std::ostream& os, const Seg& S) {
 		os << "Seg[" << S.i + 1 << "] :: Seg.s : " << S.s << " Seg.e : " << S.e;
 		return os;
@@ -123,22 +164,31 @@ Seg make_seg(const ld& lo, const ld& hi, const Circle& c, const int& i) {
 	return Seg(LO, HI, i);
 }
 typedef std::vector<Seg> Segs;
-void query() {//brute O(N^4)
-	for (int i = 0; i < LEN; i++)
-		arcs[i].clear(), valid_arcs[i].clear();
-	std::cin >> N;
-	for (int i = 0; i < N; i++) std::cin >> disks[i];
-	if (N <= 2) {
-		std::cout << "0\n";
-		return;
+bool query() {//brute O(N^4)
+	for (int i = 0; i < LEN; i++) {
+		arcs[i].clear();
+		valid_arcs[i].clear();
 	}
+	std::cin >> B;
+	Polygon P(B); for (Pos& p : P) std::cin >> p;
+	std::cin >> N;
+	Polygon I(N); for (Pos& p : I) std::cin >> p;
+	std::cin >> M;
+	Disks C(M); for (Circle& c : C) std::cin >> c;
+	if (!B && !N && !M) return 0;
 	Segs segs;
+	Vbool F(N, 1);
 	for (int i = 0; i < N; i++) {
-		Circle& disk = disks[i];
-		for (int j = 0; j < N; j++) {
+		for (Circle& c : C) {
+			if (c >= I[i]) { F[i] = 0; break; }
+		}
+	}
+	for (int i = 0; i < M; i++) {
+		Circle& disk = C[i];
+		for (int j = 0; j < M; j++) {
 			if (i == j) continue;
-			Pos& ca = disks[i].c, cb = disks[j].c;
-			ll ra = disks[i].r, rb = disks[j].r;
+			Pos& ca = C[i].c, cb = C[j].c;
+			ll ra = C[i].r, rb = C[j].r;
 			Pos vec = cb - ca;//vec a -> b
 			ld distance = vec.mag();
 			ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
@@ -173,7 +223,7 @@ void query() {//brute O(N^4)
 					break;
 				}
 			}
-			valid_arcs[i].push_back(Arc(lo, hi, disks[i]));
+			valid_arcs[i].push_back(Arc(lo, hi, C[i]));
 		}
 		int sz = valid_arcs[i].size();
 		for (int k = 0; k < sz; k++) {
@@ -225,15 +275,14 @@ void query() {//brute O(N^4)
 	}
 
 	std::cout << cnt << "\n";
-	return;
+	return 1;
 }
 void solve() {
 	std::cin.tie(0)->sync_with_stdio(0);
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	std::cin >> Q;
-	while (Q--) query();//total O(N^5)
+	while (query());//total O(N^5)
 	return;
 }
 int main() { solve(); return 0; }//Tehran Site 2000 H boj7333
