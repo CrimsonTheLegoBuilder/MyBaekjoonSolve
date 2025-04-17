@@ -285,4 +285,4 @@ void solve() {
 	while (query());//total O(N^5)
 	return;
 }
-int main() { solve(); return 0; }//Tehran Site 2000 H boj7333
+int main() { solve(); return 0; }//
