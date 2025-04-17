@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 IMG_DIR = "images"
-LBL_DIR = "masks_txt_variants2"
+LBL_DIR = "masks_txt_nukki_contrast"
 EPSILONS = np.linspace(0.001, 0.05, 20)
 
 # file = "H_A_V_02_0910144019332.jpg"

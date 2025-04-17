@@ -285,4 +285,4 @@ void solve() {
 	while (query());//total O(N^5)
 	return;
 }
-int main() { solve(); return 0; }//
+int main() { solve(); return 0; }//5752
