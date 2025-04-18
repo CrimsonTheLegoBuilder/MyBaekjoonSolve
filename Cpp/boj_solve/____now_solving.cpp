@@ -88,14 +88,14 @@ Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
 	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
 	return (p1 * a2 + p2 * a1) / (a1 + a2);
 }
-bool inner_check_concave(const std::vector<Pos>& H, const Pos& p, const Pos& s, const Pos& e) {
+bool inner_check_concave(const std::vector<Pos>& H, const Pos& p) {
 	int cnt = 0, sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) {
-			assert(collinear(cur, nxt, s, e));
-			return dot(cur, nxt, s, e) > 0 ? 1 : 0;
-		}
+		//if (on_seg_strong(cur, nxt, p)) {
+		//	assert(collinear(cur, nxt, s, e));
+		//	return dot(cur, nxt, s, e) > 0 ? 1 : 0;
+		//}
 		if (zero(cur.y - nxt.y)) continue;
 		if (nxt.y < cur.y) std::swap(cur, nxt);
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
@@ -164,6 +164,7 @@ Seg make_seg(const ld& lo, const ld& hi, const Circle& c, const int& i) {
 	return Seg(LO, HI, i);
 }
 typedef std::vector<Seg> Segs;
+Polygon TRAP[LEN * LEN];
 bool query() {//brute O(N^4)
 	for (int i = 0; i < LEN; i++) {
 		arcs[i].clear();
@@ -234,7 +235,7 @@ bool query() {//brute O(N^4)
 
 	int sz = segs.size();
 	T = 0;
-	int cnt = 0;
+	int n = 0;
 	bool f = 0;
 	std::deque<Seg> dq;
 	std::vector<bool> V(sz, 0);
@@ -267,14 +268,24 @@ bool query() {//brute O(N^4)
 		}
 		if (dq[0].s == dq.back().e) {
 			ld ret = 0;
-			for (Seg& S : dq) ret += cross(O, S.s, S.e);
-			cnt += sign(ret) < 0;
+			TRAP[n].clear();
+			for (Seg& S : dq) {
+				TRAP[n].push_back(S.s);
+				ret += cross(O, S.s, S.e);
+			}
+			n++;
 			dq.clear();
 		}
 		if (f == 0) dq.clear();
 	}
+	Vint alive;
+	for (int j = 0; j < n; j++) {
+		for (const int& i : alive) {
+			if (inner_check_concave(TRAP[j], P[i])) {
 
-	std::cout << cnt << "\n";
+			}
+		}
+	}
 	return 1;
 }
 void solve() {
