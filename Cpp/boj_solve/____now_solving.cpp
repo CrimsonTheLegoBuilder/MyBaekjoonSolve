@@ -103,6 +103,21 @@ bool inner_check_concave(const std::vector<Pos>& H, const Pos& p) {
 	}
 	return cnt & 1;
 }
+ld dist(const Pos& p0, const Pos& p1, const Pos& q) {
+	ld f0 = dot(p0, p1, q);
+	ld f1 = dot(p1, p0, q);
+	if (sign(f0) > 0 || sign(f1) > 0) return std::min((p0 - q).mag(), (p1 - q).mag());
+	return std::abs(cross(p0, p1, q) / (p0 - p1).mag());
+}
+ld dist(const Polygon& H, const Pos& p) {
+	int sz = H.size();
+	ld d = INF;
+	for (int i = 0; i < sz; i++) {
+		const Pos& p0 = H[i], & p1 = H[(i + 1) % sz];
+		d = std::min(d, dist(p0, p1, p));
+	}
+	return d;
+}
 struct Circle {
 	Pos c;
 	int r;
@@ -279,13 +294,31 @@ bool query() {//brute O(N^4)
 		if (f == 0) dq.clear();
 	}
 	Vint alive;
-	for (int j = 0; j < n; j++) {
-		for (const int& i : alive) {
+	for (int i = 0; i < N; i++) {
+		if (F[i]) alive.push_back(i);
+	}
+	for (const int& i : alive) {
+		for (int j = 0; j < n; j++) {
 			if (inner_check_concave(TRAP[j], P[i])) {
-
+				F[i] = 0;
+				break;
 			}
 		}
 	}
+	alive.clear();
+	for (int i = 0; i < N; i++) if (!F[i]) alive.push_back(i);
+	//std::reverse(alive.begin(), alive.end());
+	ld d = INF;
+	int ret = -1;
+	for (const int& i : alive) {
+		ld tmp = dist(P, I[i]);
+		if (d > tmp) {
+			d = tmp;
+			ret = i;
+		}
+	}
+	if (ret == -1) std::cout << "Mission impossible\n";
+	else std::cout << "Contact informer " << ret << "\n";
 	return 1;
 }
 void solve() {
@@ -293,7 +326,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	while (query());//total O(N^5)
+	while (query());
 	return;
 }
 int main() { solve(); return 0; }//5752
