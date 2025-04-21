@@ -81,7 +81,7 @@ struct Pos {
 	friend std::ostream& operator << (std::ostream& os, const Pos& p) { os << p.x << " " << p.y; return os; }
 }; const Pos O = { 0, 0 };
 typedef std::vector<Pos> Polygon;
-Polygon ROT[LEN];
+//Polygon ROT[LEN];
 bool cmpt(const Pos& p, const Pos& q) {
 	bool f1 = O < p;
 	bool f2 = O < q;
@@ -508,7 +508,7 @@ bool query() {
 		}
 		assert(t != -1);
 		if (t) ND[t].push_back(Node(i + LEN, 0));
-		else G[0].push_back(i + LEN)
+		else G[0].push_back(i + LEN);
 	}
 
 	//radar round connect
@@ -569,4 +569,4 @@ void solve() {
 	while (query());
 	return;
 }
-int main() { solve(); return 0; }//boj22530 Intelligent Circular Perfect Cleaner
+int main() { solve(); return 0; }
