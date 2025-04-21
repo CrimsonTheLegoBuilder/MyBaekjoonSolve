@@ -16,7 +16,7 @@ typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
 const ld TOL = 1e-10;
 const ld PI = acos(-1);
-const int LEN = 25;
+const int LEN = 35;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
 inline bool zero(const ld& x) { return !sign(x); }
@@ -84,10 +84,10 @@ ld projection(const Pos& d1, const Pos& d2, const Pos& d3) { return dot(d1, d2, 
 //	if (ccw(p0, p1, p2) < 0) return ccw(p0, p1, q) >= f || ccw(p1, p2, q) >= f;
 //	return ccw(p0, p1, q) >= f && ccw(p1, p2, q) >= f;
 //}
-Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
-	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
-	return (p1 * a2 + p2 * a1) / (a1 + a2);
-}
+//Pos intersection(const Pos& p1, const Pos& p2, const Pos& q1, const Pos& q2) {
+//	ld a1 = cross(q1, q2, p1), a2 = -cross(q1, q2, p2);
+//	return (p1 * a2 + p2 * a1) / (a1 + a2);
+//}
 bool inner_check_concave(const std::vector<Pos>& H, const Pos& p) {
 	int cnt = 0, sz = H.size();
 	for (int i = 0; i < sz; i++) {
@@ -179,18 +179,20 @@ Seg make_seg(const ld& lo, const ld& hi, const Circle& c, const int& i) {
 	return Seg(LO, HI, i);
 }
 typedef std::vector<Seg> Segs;
-Polygon TRAP[LEN * LEN];
+Polygon TRAP[LEN * LEN * LEN];
 bool query() {//brute O(N^4)
 	for (int i = 0; i < LEN; i++) {
 		arcs[i].clear();
 		valid_arcs[i].clear();
 	}
+	std::cout << "query start::\n";
 	std::cin >> B;
 	Polygon P(B); for (Pos& p : P) std::cin >> p;
 	std::cin >> N;
 	Polygon I(N); for (Pos& p : I) std::cin >> p;
 	std::cin >> M;
 	Disks C(M); for (Circle& c : C) std::cin >> c;
+	std::cout << "input OK::\n";
 	if (!B && !N && !M) return 0;
 	Segs segs;
 	Vbool F(N, 1);
@@ -199,6 +201,7 @@ bool query() {//brute O(N^4)
 			if (c >= I[i]) { F[i] = 0; break; }
 		}
 	}
+	std::cout << "inner check OK::\n";
 	for (int i = 0; i < M; i++) {
 		Circle& disk = C[i];
 		for (int j = 0; j < M; j++) {
@@ -247,6 +250,7 @@ bool query() {//brute O(N^4)
 			segs.push_back(make_seg(cur.hi, nxt.lo, disk, i));
 		}
 	}
+	std::cout << "circle meet OK::\n";
 
 	int sz = segs.size();
 	T = 0;
@@ -292,6 +296,7 @@ bool query() {//brute O(N^4)
 			dq.clear();
 		}
 		if (f == 0) dq.clear();
+		//std::cout << "FUCK::\n";
 	}
 	Vint alive;
 	for (int i = 0; i < N; i++) {
@@ -327,7 +332,7 @@ void solve() {
 	std::cout << std::fixed;
 	std::cout.precision(3);
 	freopen("impos.in", "r", stdin);
-	freopen("impos.txt", "w", stdout);
+	//freopen("impos.txt", "w", stdout);
 	while (query());
 	return;
 }
