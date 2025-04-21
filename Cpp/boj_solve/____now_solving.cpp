@@ -14,7 +14,7 @@ typedef std::vector<ll> Vll;
 typedef std::vector<ld> Vld;
 typedef std::vector<bool> Vbool;
 const ld INF = 1e17;
-const ld TOL = 1e-10;
+const ld TOL = 1e-8;
 const ld PI = acos(-1);
 const int LEN = 35;
 inline int sign(const ll& x) { return x < 0 ? -1 : !!x; }
@@ -323,9 +323,7 @@ bool query() {//brute O(N^4)
 		//std::cout << "FUCK::\n";
 	}
 	Vint alive;
-	for (int i = 0; i < N; i++) {
-		if (F[i]) alive.push_back(i);
-	}
+	for (int i = 0; i < N; i++) if (F[i]) alive.push_back(i);
 	for (const int& i : alive) {
 		for (int j = 0; j < n; j++) {
 			if (inner_check_concave(TRAP[j], P[i])) {
@@ -335,19 +333,19 @@ bool query() {//brute O(N^4)
 		}
 	}
 	alive.clear();
-	for (int i = 0; i < N; i++) if (!F[i]) alive.push_back(i);
+	for (int i = 0; i < N; i++) if (F[i]) alive.push_back(i);
 	//std::reverse(alive.begin(), alive.end());
-	ld d = INF;
+	ld d = 0;
 	int ret = -1;
 	for (const int& i : alive) {
 		ld tmp = dist(P, I[i]);
-		if (d > tmp) {
+		if (d < tmp) {
 			d = tmp;
 			ret = i;
 		}
 	}
 	if (ret == -1) std::cout << "Mission impossible\n";
-	else std::cout << "Contact informer " << ret << "\n";
+	else std::cout << "Contact informer " << ret + 1 << "\n";
 	return 1;
 }
 void solve() {
@@ -355,7 +353,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	//freopen("impos.in", "r", stdin);
+	freopen("impos.in", "r", stdin);
 	//freopen("impos.txt", "w", stdout);
 	while (query());
 	return;
