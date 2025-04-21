@@ -326,6 +326,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
+	freopen("impos.in", "r", stdin);
+	freopen("impos.txt", "w", stdout);
 	while (query());
 	return;
 }
