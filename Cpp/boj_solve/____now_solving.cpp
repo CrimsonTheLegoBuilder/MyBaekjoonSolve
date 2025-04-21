@@ -129,6 +129,11 @@ struct Circle {
 		//return r < q.r && dist + r < q.r + TOL;
 		return r > q.r;
 	}
+	bool operator >= (const Circle& q) const {
+		ld dist = (c - q.c).mag();
+		//return r >= q.r && dist + q.r < r + TOL;
+		return r >= q.r && dist + q.r <= r;
+	}
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	//bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
 	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
@@ -186,43 +191,47 @@ bool query() {//brute O(N^4)
 		arcs[i].clear();
 		valid_arcs[i].clear();
 	}
-	std::cout << "query start::\n";
+	//std::cout << "query start::\n";
 	std::cin >> B;
 	Polygon P(B); for (Pos& p : P) std::cin >> p;
 	std::cin >> N;
 	Polygon I(N); for (Pos& p : I) std::cin >> p;
 	std::cin >> M;
 	Disks C(M); for (Circle& c : C) std::cin >> c;
-	std::cout << "input OK::\n";
+	//std::cout << "input OK::\n";
 	if (!B && !N && !M) return 0;
 	Segs segs;
-	Vbool V(M, 1);
+	Vbool F(M, 1);
+	Disks CC;
 	std::sort(C.begin(), C.end());
 	for (int i = 0; i < M; i++) {
 		for (int j = i + 1; j < M; j++) {
-			
+			if (C[i] >= C[j]) F[j] = 0;
 		}
 	}
-	Vbool F(N, 1);
+	for (int i = 0; i < M; i++) if (F[i]) CC.push_back(C[i]);
+	C = CC;
+	M = C.size();
+	F.resize(N, 1);
 	for (int i = 0; i < N; i++) {
 		for (Circle& c : C) {
 			if (c >= I[i]) { F[i] = 0; break; }
 		}
 	}
-	std::cout << "inner check OK::\n";
+	//std::cout << "inner check OK::\n";
 	for (int i = 0; i < M; i++) {
 		Circle& disk = C[i];
-		std::cout << "meet 00::\n";
+		//std::cout << "meet 00::\n";
 		for (int j = 0; j < M; j++) {
 			if (i == j) continue;
-			std::cout << "meet 00:: j:: " << j << "\n";
+			//std::cout << "meet 00:: j:: " << j << "\n";
 			Pos& ca = C[i].c, cb = C[j].c;
 			ll ra = C[i].r, rb = C[j].r;
 			Pos vec = cb - ca;//vec a -> b
 			ld distance = vec.mag();
-			std::cout << "distance:: " << distance << "\n";
+			//std::cout << "distance:: " << distance << "\n";
 			ld X = (ra * ra - rb * rb + vec.Euc()) / (2 * distance);
-			std::cout << "X:: " << X << "\n";
+			//std::cout << "X:: " << X << "\n";
 			if (X < 0 || X > ra) continue;
 			Pos w = vec * X / distance;
 			ld ratio = sqrt(ra * ra - X * X);
@@ -243,7 +252,7 @@ bool query() {//brute O(N^4)
 				arcs[i].push_back(a2);
 			}
 		}
-		std::cout << "meet 01::\n";
+		//std::cout << "meet 01::\n";
 		std::sort(arcs[i].begin(), arcs[i].end());
 		for (Arc& a : arcs[i]) {//sweep circle
 			ld lo = a.lo;
@@ -257,15 +266,15 @@ bool query() {//brute O(N^4)
 			}
 			valid_arcs[i].push_back(Arc(lo, hi, C[i]));
 		}
-		std::cout << "meet 02::\n";
+		//std::cout << "meet 02::\n";
 		int sz = valid_arcs[i].size();
 		for (int k = 0; k < sz; k++) {
 			Arc& cur = valid_arcs[i][k], nxt = valid_arcs[i][(k + 1) % sz];
 			segs.push_back(make_seg(cur.hi, nxt.lo, disk, i));
 		}
-		std::cout << "meet 03::\n";
+		//std::cout << "meet 03::\n";
 	}
-	std::cout << "circle meet OK::\n";
+	//std::cout << "circle meet OK::\n";
 
 	int sz = segs.size();
 	T = 0;
@@ -346,7 +355,7 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	freopen("impos.in", "r", stdin);
+	//freopen("impos.in", "r", stdin);
 	//freopen("impos.txt", "w", stdout);
 	while (query());
 	return;
