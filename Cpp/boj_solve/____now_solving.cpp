@@ -11,15 +11,15 @@
 #include <map>
 #include <set>
 typedef long long ll;
-//typedef long double ld;
-typedef double ld;
+typedef long double ld;
+//typedef double ld;
 typedef std::vector<int> Vint;
 typedef std::vector<ll> Vll;
 typedef std::vector<bool> Vbool;
 typedef std::vector<ld> Vld;
 const ll INF = 1e17;
 const int LEN = 105;
-const ld TOL = 1e-10;
+const ld TOL = 1e-9;
 const ld PI = acos(-1);
 inline int sign(const ll& x) { return x < 0 ? -1 : x > 0; }
 inline int sign(const ld& x) { return x < -TOL ? -1 : x > TOL; }
@@ -29,6 +29,8 @@ inline bool eq(const ld& u, const ld& v) { return zero(u - v); }
 inline ll sq(const ll& x) { return x * x; }
 inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >= 0) th -= 2 * PI; return th; }
 inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
+
+#define SCALE 1
 
 #define __FUCK__ ;
 #define WHAT_THE_FUCK
@@ -97,18 +99,6 @@ bool intersect(const Pos& s1, const Pos& s2, const Pos& d1, const Pos& d2) {
 		on_seg_strong(d1, d2, s2);
 	return (f1 && f2) || f3;
 }
-int inner_check(const Polygon& H, const Pos& p) {//concave
-	int sz = H.size(), cnt = 0;
-	for (int i = 0; i < sz; i++) {
-		Pos cur = H[i], nxt = H[(i + 1) % sz];
-		if (on_seg_strong(cur, nxt, p)) return 1;
-		if (cur.y == nxt.y) continue;
-		if (nxt.y < cur.y) std::swap(cur, nxt);
-		if (nxt.y <= p.y || cur.y > p.y) continue;
-		cnt += ccw(cur, nxt, p) > 0;
-	}
-	return (cnt & 1) * 2;
-}
 ld area(const Polygon& H) {
 	ld ret = 0;
 	int sz = H.size();
@@ -135,6 +125,7 @@ Polygon INX[LEN];
 void inx_sort(Polygon& INX, const Pos& a) {
 	std::sort(INX.begin(), INX.end(), [&](const Pos& p, const Pos& q) -> bool {
 		return (a - p).Euc() < (a - q).Euc();
+		//return (a - p).mag() < (a - q).mag();
 		});
 	INX.erase(unique(INX.begin(), INX.end()), INX.end());
 }
@@ -191,13 +182,30 @@ void dfs(const int& i, int v) {
 //#endif
 //	return V[g];
 //}
+int inner_check(const Polygon& H, const Pos& p) {//concave
+	int sz = H.size(), cnt = 0;
+	for (int i = 0; i < sz; i++) {
+		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
+		if (zero(cur.y - nxt.y)) continue;
+		//if (cur.y == nxt.y) continue;
+		if (nxt.y < cur.y) std::swap(cur, nxt);
+		//if (nxt.y <= p.y || cur.y > p.y) continue;
+		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		cnt += ccw(cur, nxt, p) > 0;
+	}
+	return (cnt & 1) * 2;
+}
 bool inner_check_concave(const std::vector<Pos>& H, const Pos& p) {
 	int cnt = 0, sz = H.size();
 	for (int i = 0; i < sz; i++) {
 		Pos cur = H[i], nxt = H[(i + 1) % sz];
+		if (on_seg_strong(cur, nxt, p)) return 1;
 		if (zero(cur.y - nxt.y)) continue;
+		//if (cur.y == nxt.y) continue;
 		if (nxt.y < cur.y) std::swap(cur, nxt);
 		if (nxt.y - TOL < p.y || cur.y > p.y) continue;
+		//if (nxt.y <= p.y || cur.y > p.y) continue;
 		cnt += ccw(cur, nxt, p) > 0;
 	}
 	return cnt & 1;
@@ -205,7 +213,7 @@ bool inner_check_concave(const std::vector<Pos>& H, const Pos& p) {
 ld dist(const Pos& p0, const Pos& p1, const Pos& q) {
 	ld f0 = dot(p0, p1, q);
 	ld f1 = dot(p1, p0, q);
-	if (sign(f0) > 0 || sign(f1) > 0) return std::min((p0 - q).mag(), (p1 - q).mag());
+	if (f0 > 0 || f1 > 0) return std::min((p0 - q).mag(), (p1 - q).mag());
 	return std::abs(cross(p0, p1, q) / (p0 - p1).mag());
 }
 ld dist(const Polygon& H, const Pos& p) {
@@ -219,8 +227,8 @@ ld dist(const Polygon& H, const Pos& p) {
 }
 struct Circle {
 	Pos c;
-	int r;
-	Circle(Pos c_ = Pos(0, 0), int r_ = 0) : c(c_), r(r_) {}
+	ld r;
+	Circle(Pos c_ = Pos(0, 0), ld r_ = 0) : c(c_), r(r_) {}
 	bool operator == (const Circle& C) const { return c == C.c && std::abs(r - C.r) < TOL; }
 	bool operator != (const Circle& C) const { return !(*this == C); }
 	bool operator < (const Circle& q) const {
@@ -235,10 +243,12 @@ struct Circle {
 	}
 	bool operator > (const Pos& p) const { return r > (c - p).mag(); }
 	//bool operator >= (const Pos& p) const { return r + TOL > (c - p).mag(); }
-	bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
+	//bool operator >= (const Pos& p) const { return sign(r - (c - p).mag()) >= 0; }
+	bool operator >= (const Pos& p) const { return r >= (c - p).mag(); }
 	bool operator < (const Pos& p) const { return r < (c - p).mag(); }
 	Circle operator + (const Circle& C) const { return { c + C.c, r + C.r }; }
 	Circle operator - (const Circle& C) const { return { c - C.c, r - C.r }; }
+	Circle& operator *= (const ld& n) { c *= n; r *= n; return *this; }
 	//ld H(const ld& th) const { return sin(th) * c.x + cos(th) * c.y + r; }//coord trans | check right
 	Pos p(const ld& t) const { return c + Pos(r, 0).rot(t); }
 	ld rad(const Pos& p) const { return (p - c).rad(); }
@@ -258,7 +268,8 @@ typedef std::vector<Circle> Disks;
 Vld intersections(const Circle& a, const Circle& b) {
 	Pos ca = a.c, cb = b.c;
 	Pos vec = cb - ca;
-	ll ra = a.r, rb = b.r;
+	//ll ra = a.r, rb = b.r;
+	ld ra = a.r, rb = b.r;
 	ld distance = vec.mag();
 	ld rd = vec.rad();
 	if (vec.Euc() > sq(ra + rb) + TOL) return {};
@@ -276,7 +287,8 @@ Vld intersections(const Circle& a, const Circle& b) {
 struct Arc {
 	ld lo, hi;// [lo, hi] - radian range of arc, 0 ~ 2pi
 	Arc(ld l_ = 0, ld h_ = 0) : lo(l_), hi(h_) {}
-	bool operator < (const Arc& a) const { return !sign(hi - a.hi) ? lo < a.lo : hi < a.hi; }
+	//bool operator < (const Arc& a) const { return !sign(hi - a.hi) ? lo < a.lo : hi < a.hi; }
+	bool operator < (const Arc& a) const { return hi == a.hi ? lo < a.lo : hi < a.hi; }
 };
 std::vector<Arc> arcs[LEN], valid_arcs[LEN];
 //Circle disks[LEN];
@@ -303,12 +315,13 @@ bool query() {//brute O(N^4)
 	}
 	for (int i = 0; i <= S; i++) INX[i].clear();
 	for (int i = 0; i <= I0; i++) GS[i].clear();
+	for (int i = 0; i <= ci; i++) cell[i].clear();
 
 	//std::cout << "query start::\n";
 	
-	std::cin >> B; Polygon P(B); for (Pos& p : P) std::cin >> p;
-	std::cin >> N; Polygon I(N); for (Pos& p : I) std::cin >> p;
-	std::cin >> M; Disks C(M); for (Circle& c : C) std::cin >> c;
+	std::cin >> B; Polygon P(B); for (Pos& p : P) std::cin >> p;// , p *= SCALE;
+	std::cin >> N; Polygon I(N); for (Pos& p : I) std::cin >> p;// , p *= SCALE;
+	std::cin >> M; Disks C(M); for (Circle& c : C) std::cin >> c;// , c *= SCALE;
 	
 	//std::cout << "input OK::\n";
 
@@ -327,6 +340,15 @@ bool query() {//brute O(N^4)
 	C = tmp;
 	M = C.size();
 	//circle remove
+
+	//if (N >= 778) std::cout << "q = (" << I[778].x << ", " << I[778].y << ")\n";
+	//if (N >= 777) std::cout << "p = (" << I[777].x << ", " << I[777].y << ")\n";
+	//if (N >= 776) std::cout << "r = (" << I[776].x << ", " << I[776].y << ")\n";
+	//std::cout << "C = [\n";
+	//for (Circle& c : C) {
+	//	std::cout << "(" << c.c.x << ", " << c.c.y << ", " << c.r << "),\n";
+	//}
+	//std::cout << "]\n";
 	
 	//informer remove
 	F.resize(N, 1);
@@ -366,12 +388,15 @@ bool query() {//brute O(N^4)
 				Pos s = p.p(hi), e = p.p(a.lo);
 				if (e < s) std::swap(s, e);
 				segs.push_back(Seg(s, e));
+				hi = a.hi;
 			}
 			else hi = std::max(hi, a.hi);
 		}
 	}
 	//get segments
 	
+	//std::cout << "segs:: " << segs.size() << "\n";
+
 	//get intersections
 	Polygon INXS;
 	std::sort(segs.begin(), segs.end());
@@ -392,6 +417,9 @@ bool query() {//brute O(N^4)
 	//get frags
 	std::sort(INXS.begin(), INXS.end());
 	INXS.erase(unique(INXS.begin(), INXS.end()), INXS.end());
+
+	//std::cout << "INXS.sz:: " << INXS.size() << "\n";
+
 	I0 = 0;
 	for (int i = 0; i < S; i++) {
 		inx_sort(INX[i], seg[i].s);
@@ -423,7 +451,7 @@ bool query() {//brute O(N^4)
 		map_pos[key].push_back(vec);
 
 		key = frag[i].e;
-		vec = frag[i].s - frag[i].s;
+		vec = frag[i].s - frag[i].e;
 		vec.i = frag[i].i;
 		vec.rv = 1;
 		map_pos[key].push_back(vec);
@@ -472,12 +500,16 @@ bool query() {//brute O(N^4)
 	}
 	//get polygons
 
+	//std::cout << "ci:: " << ci << "\n";
+
 	//get informer's id & distance
 	Vint OK, ID;
 	for (int i = 0; i < N; i++) if (F[i]) OK.push_back(i);
 	for (const int i : OK) {
 		for (int c = 0; c < ci; c++) {
+			//std::cout << "fuck::\n";
 			if (inner_check_concave(cell[c], I[i])) {
+			//if (inner_check(cell[c], I[i])) {
 				F[i] = 0;
 				break;
 			}
@@ -489,6 +521,7 @@ bool query() {//brute O(N^4)
 	for (const int& i : ID) {
 		ld t = dist(P, I[i]);
 		if (d < t) {
+		//if (sign(d - t) < 0) {
 			d = t;
 			ret = i;
 		}
@@ -504,8 +537,8 @@ void solve() {
 	std::cout.tie(0);
 	std::cout << std::fixed;
 	std::cout.precision(3);
-	//freopen("impos.in", "r", stdin);
-	//freopen("impos.txt", "w", stdout);
+	freopen("impos.in", "r", stdin);
+	freopen("impos.txt", "w", stdout);
 	while (query());
 	return;
 }
