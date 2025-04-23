@@ -31,7 +31,6 @@ inline ld norm(ld th) { while (th < 0) th += 2 * PI; while (sign(th - 2 * PI) >=
 inline ld fit(const ld& x, const ld& lo, const ld& hi) { return std::min(hi, std::max(lo, x)); }
 
 #define SCALE 1
-
 #define __FUCK__ ;
 #define WHAT_THE_FUCK
 //#define DEBUG
