@@ -1,3 +1,5 @@
+폐기된 레포지토리
+
 # MyBaekjoonSolve
 My Baekjoon Solve
 
